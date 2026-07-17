@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="es" class="is-landing landing-mode">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AC Edunity | Plataforma Educativa Inteligente</title>
+    <link rel="icon" type="image/png" href="assets/ac-edunity-logo.png">
+    <link rel="shortcut icon" type="image/png" href="assets/ac-edunity-logo.png">
+    <link rel="apple-touch-icon" href="assets/ac-edunity-logo.png">
+    <link rel="stylesheet" href="style.css?v=20260709-gemini-tutor">
+</head>
+<body class="app-booting is-landing landing-mode landing-active">
+    <div id="app-boot-loader" class="app-boot-loader" role="status" aria-live="polite">
+        <div class="boot-loader-card">
+            <img src="assets/ac-edunity-logo.png" alt="AC Edunity" class="boot-loader-logo">
+            <div class="boot-loader-title">AC Edunity</div>
+            <p class="boot-loader-text">Cargando tu espacio académico...</p>
+            <div class="boot-loader-spinner" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <!-- LANDING PAGE -->
+    <div id="landing-page" class="page active">
+        <nav class="landing-nav reveal">
+            <div class="nav-logo">
+                <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity" class="brand-logo">
+                <span>AC Edunity</span>
+            </div>
+            <div class="landing-links">
+                <a href="#landing-page">Inicio</a>
+                <a href="#features">Funciones</a>
+                <a href="#ai-preview">IA</a>
+                <a href="#benefits-use">Beneficios</a>
+            </div>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="showLogin()">Inicia sesión</button>
+                <button class="btn-primary" onclick="showRegister()">Registrarse</button>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Cambiar tema"></button>
+            </div>
+        </nav>
+
+        <div class="study-pet" id="study-pet" role="button" tabindex="0" aria-label="Regístrate gratis e inicia tu estudio">
+            <div class="pet-bubble">Regístrate gratis e inicia tu estudio</div>
+            <div class="pet-robot" aria-hidden="true">
+                <span class="robot-antenna"></span>
+                <span class="robot-head">
+                    <span class="robot-eye robot-eye-left"></span>
+                    <span class="robot-eye robot-eye-right"></span>
+                    <span class="robot-mouth"></span>
+                </span>
+                <span class="robot-body">
+                    <span class="robot-core"></span>
+                </span>
+                <span class="robot-shadow"></span>
+            </div>
+        </div>
+
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-left reveal-left">
+                    <span class="hero-badge">Gestión Educativa Inteligente Personalizada</span>
+                    <h1>Organiza tus estudios. Aprende mejor con IA.</h1>
+                    <p>AC Edunity combina planificación académica, inteligencia artificial y herramientas de productividad para ayudarte a alcanzar tus objetivos.</p>
+                    <div class="hero-actions">
+                        <button class="btn-large" onclick="showRegister()">Comenzar gratis</button>
+                    </div>
+                    <div class="hero-proof reveal delay-2" aria-label="Resumen de herramientas principales">
+                        <span><strong>11+</strong> secciones académicas</span>
+                        <span><strong>Tutor</strong> para estudiar mejor</span>
+                        <span><strong>XP</strong> y progreso visual</span>
+                    </div>
+                </div>
+                <div class="hero-right hero-visual reveal-right delay-1">
+                <div class="dashboard-mockup hero-dashboard">
+                    <div class="mockup-top">
+                        <span></span><span></span><span></span>
+                        <strong>Panel AC Edunity</strong>
+                    </div>
+                    <div class="mockup-grid">
+                        <div class="mockup-card wide">
+                            <small>Progreso semanal</small>
+                            <div class="mockup-bars"><i></i><i></i><i></i><i></i><i></i></div>
+                        </div>
+                        <div class="mockup-card"><small>Tareas</small><b>8</b></div>
+                        <div class="mockup-card"><small>XP</small><b>240</b></div>
+                        <div class="mockup-card wide accent"><small>Tutor</small><p>Listo para resumir tus apuntes</p></div>
+                    </div>
+                    <div class="mockup-progress-line" aria-hidden="true"><span></span></div>
+                </div>
+                <div class="hero-mini-grid" aria-label="Widgets principales de AC Edunity">
+                    <div class="hero-mini-card card-1">
+                        <span class="mini-badge">OK</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 4.5h8a3 3 0 0 1 3 3v12H8a3 3 0 0 0-3 3v-18Z"></path>
+                            <path d="M16 7.5h3a2 2 0 0 1 2 2v10h-5"></path>
+                            <path d="M8 8h5"></path>
+                            <path d="M8 12h4"></path>
+                        </svg>
+                        <h3 class="mini-title">Materias</h3>
+                    </div>
+                    <div class="hero-mini-card card-2">
+                        <span class="mini-badge">IA</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="14" rx="3"></rect>
+                            <path d="M8 3v3"></path>
+                            <path d="M16 3v3"></path>
+                            <path d="M9 12h.01"></path>
+                            <path d="M15 12h.01"></path>
+                            <path d="M9 16h6"></path>
+                        </svg>
+                        <h3 class="mini-title">Tutor</h3>
+                    </div>
+                    <div class="hero-mini-card card-3">
+                        <span class="mini-badge">Hoy</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="15" rx="3"></rect>
+                            <path d="M8 3v4"></path>
+                            <path d="M16 3v4"></path>
+                            <path d="M4 10h16"></path>
+                            <path d="M8 14h3"></path>
+                            <path d="M13 14h3"></path>
+                            <path d="M8 17h2"></path>
+                        </svg>
+                        <h3 class="mini-title">Calendario</h3>
+                    </div>
+                    <div class="hero-mini-card card-4">
+                        <span class="mini-badge">XP</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 19h16"></path>
+                            <path d="M7 16v-5"></path>
+                            <path d="M12 16V7"></path>
+                            <path d="M17 16v-8"></path>
+                            <path d="m15 6 2-2 3 3"></path>
+                        </svg>
+                        <h3 class="mini-title">Progreso</h3>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="benefits reveal" id="features">
+            <span class="section-eyebrow">Funciones</span><h2>Todo tu estudio organizado en un solo lugar</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card reveal-scale delay-1">
+                    <div class="benefit-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>
+                    </div>
+                    <h3>Organización</h3>
+                    <p>Materias, tareas y calendario con una experiencia clara para estudiar sin desorden.</p>
+                    <ul class="feature-list">
+                        <li>Materias personalizadas</li>
+                        <li>Agenda y pendientes</li>
+                    </ul>
+                </div>
+                <div class="benefit-card reveal-scale delay-2">
+                    <div class="benefit-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H20v17H8.5A3.5 3.5 0 0 0 5 22V5.5Z"></path><path d="M5 5.5A3.5 3.5 0 0 1 8.5 9H20"></path><path d="M9 5h6"></path><path d="M9 13h7"></path></svg>
+                    </div>
+                    <h3>Aprendizaje</h3>
+                    <p>IA simulada, flashcards, cuestionarios y explicaciones sencillas para repasar mejor.</p>
+                    <ul class="feature-list">
+                        <li>Explicaciones simples</li>
+                        <li>Flashcards y práctica</li>
+                    </ul>
+                </div>
+                <div class="benefit-card reveal-scale delay-3">
+                    <div class="benefit-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M7 16V9"></path><path d="M12 16V5"></path><path d="M17 16v-4"></path><path d="m15 8 2-2 3 3"></path></svg>
+                    </div>
+                    <h3>Seguimiento</h3>
+                    <p>Notas, promedio, XP, logros y progreso visual para medir tu avance académico.</p>
+                    <ul class="feature-list">
+                        <li>Promedio y nivel</li>
+                        <li>Logros desbloqueables</li>
+                    </ul>
+                </div>
+                <div class="benefit-card reveal-scale delay-2">
+                    <div class="benefit-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H10l2 2h5.5A2.5 2.5 0 0 1 20 9.5v7A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"></path><path d="M4 10h16"></path><path d="M8 14h8"></path></svg>
+                    </div>
+                    <h3>Mochila</h3>
+                    <p>Apuntes, PDFs simulados y recursos conectados con Tutor para practicar.</p>
+                    <ul class="feature-list">
+                        <li>Biblioteca digital</li>
+                        <li>Recursos por materia</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-project ai-showcase" id="ai-preview">
+            <div class="about-container ai-showcase-container">
+                <div class="about-text ai-copy reveal-left">
+                    <span class="section-eyebrow">Tutor IA</span>
+                    <h2>Estudia con un asistente académico siempre listo</h2>
+                    <p class="about-description">
+                        AC Edunity es una plataforma educativa inteligente que ayuda a los estudiantes a organizar materias, tareas, calendario, notas y mejorar el aprendizaje mediante herramientas digitales e inteligencia artificial simulada.
+                    </p>
+                    <p class="about-description">
+                        Tutor te ayuda a explicar temas, practicar para exámenes, crear preguntas y convertir ideas en material de estudio más claro.
+                    </p>
+                    <div class="about-features ai-feature-stack">
+                        <div class="about-feature reveal delay-1">
+                            <span class="feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path><path d="M5 5v14"></path></svg>
+                            </span>
+                            <span>Resume apuntes y textos cortos</span>
+                        </div>
+                        <div class="about-feature reveal delay-2">
+                            <span class="feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M9 11h6"></path><path d="M9 15h4"></path><path d="M5 4h14v16H5z"></path><path d="m8 8 1.5 1.5L12 7"></path></svg>
+                            </span>
+                            <span>Crea preguntas para practicar</span>
+                        </div>
+                        <div class="about-feature reveal delay-3">
+                            <span class="feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3"></rect><path d="M8 8h8"></path><path d="M8 12h5"></path><path d="M8 16h7"></path></svg>
+                            </span>
+                            <span>Genera flashcards y repasos</span>
+                        </div>
+                        <div class="about-feature reveal delay-2">
+                            <span class="feature-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M12 3v3"></path><path d="M5.6 5.6 7.8 7.8"></path><path d="M18.4 5.6 16.2 7.8"></path><path d="M7 14a5 5 0 1 1 10 0c0 1.7-.9 2.6-1.8 3.4-.7.6-1.2 1.2-1.2 2.1h-4c0-.9-.5-1.5-1.2-2.1C7.9 16.6 7 15.7 7 14Z"></path><path d="M10 22h4"></path></svg>
+                            </span>
+                            <span>Explica temas paso a paso</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="about-visual ai-panel reveal-right delay-1">
+                    <div class="ai-window">
+                        <div class="ai-window-top">
+                            <span></span><span></span><span></span>
+                            <strong>Tutor AC Edunity</strong>
+                        </div>
+                        <div class="ai-message user-message">Necesito repasar funciones cuadraticas.</div>
+                        <div class="ai-message tutor-message">
+                            <strong>Tutor</strong>
+                            <p>Te explico el concepto, te doy un ejemplo y luego practicamos con preguntas.</p>
+                        </div>
+                        <div class="ai-tool-row">
+                            <span>Resumen</span>
+                            <span>Preguntas</span>
+                            <span>Flashcards</span>
+                        </div>
+                    </div>
+                    <div class="ai-orbit-card ai-card-one">
+                        <span class="ai-orbit-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M9 11h6"></path><path d="M9 15h4"></path><rect x="5" y="4" width="14" height="16" rx="3"></rect><path d="m8 8 1.5 1.5L12 7"></path></svg>
+                        </span>
+                        <p><strong>Preparar examen</strong><small>Preguntas por tema</small></p>
+                    </div>
+                    <div class="ai-orbit-card ai-card-two">
+                        <span class="ai-orbit-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M4 5h11a3 3 0 0 1 3 3v11H7a3 3 0 0 0-3 3V5Z"></path><path d="M8 9h6"></path><path d="M8 13h5"></path><path d="M18 8h2a2 2 0 0 1 2 2v9h-4"></path></svg>
+                        </span>
+                        <p><strong>Repasar rapido</strong><small>Resumen y claves</small></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="use-benefits" id="benefits-use">
+            <div class="use-benefits-container">
+                <span class="section-eyebrow reveal">Beneficios</span>
+                <h2 class="reveal delay-1">Beneficios de usar AC Edunity</h2>
+                <p class="use-benefits-intro reveal delay-2">
+                    AC Edunity ayuda a que cada estudiante construya su propio espacio académico, organice sus pendientes y aprenda con apoyo inteligente sin perder el control de su rutina.
+                </p>
+
+                <div class="use-benefits-grid">
+                    <div class="use-benefit-card reveal-scale delay-1">
+                        <div class="use-benefit-icon plan-icon"></div>
+                        <h3>Menos desorden</h3>
+                        <p>Centraliza materias, tareas, notas, calendario y apuntes en una sola plataforma fácil de revisar.</p>
+                    </div>
+                    <div class="use-benefit-card reveal-scale delay-2">
+                        <div class="use-benefit-icon focus-icon"></div>
+                        <h3>Más enfoque</h3>
+                        <p>Prioriza actividades importantes, revisa pendientes y evita olvidar entregas, exámenes o prácticas.</p>
+                    </div>
+                    <div class="use-benefit-card reveal-scale delay-3">
+                        <div class="use-benefit-icon ai-icon"></div>
+                        <h3>Aprendizaje guiado</h3>
+                        <p>Usa Tutor para resumir apuntes, generar preguntas, crear flashcards y entender temas complejos.</p>
+                    </div>
+                    <div class="use-benefit-card reveal-scale delay-2">
+                        <div class="use-benefit-icon growth-icon"></div>
+                        <h3>Progreso visible</h3>
+                        <p>Visualiza tu avance con XP, racha, logros y estadisticas que motivan a seguir estudiando.</p>
+                    </div>
+                </div>
+
+                <div class="benefits-path reveal delay-3">
+                    <span>1. Crea tus materias</span>
+                    <span>2. Agenda tus pendientes</span>
+                    <span>3. Sube apuntes</span>
+                    <span>4. Pregunta a la IA</span>
+                    <span>5. Mide tu progreso</span>
+                </div>
+            </div>
+        </section>
+
+        <footer class="landing-footer reveal">
+            <p>&copy; 2026 AC Edunity. Proyecto de Grado - Gestión Educativa Inteligente Personalizada</p>
+        </footer>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="page">
+        <div class="auth-container">
+            <div class="auth-bg-scene" aria-hidden="true">
+                <span class="auth-star star-a"></span>
+                <span class="auth-star star-b"></span>
+                <span class="auth-star star-c"></span>
+                <span class="auth-planet planet-left"></span>
+                <span class="auth-planet planet-right"></span>
+                <span class="auth-floating-card float-books"></span>
+                <span class="auth-floating-card float-ai"></span>
+            </div>
+            <div class="auth-layout">
+                <div class="auth-visual auth-study-visual" aria-hidden="true">
+                    <div class="auth-visual-inner">
+                    <div class="auth-study-scene">
+                        <span class="study-particle particle-one"></span>
+                        <span class="study-particle particle-two"></span>
+                        <span class="study-particle particle-three"></span>
+                        <span class="study-particle particle-four"></span>
+
+                        <div class="study-monitor">
+                            <div class="monitor-toolbar">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="monitor-sidebar">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="monitor-dashboard">
+                                <div class="monitor-title"></div>
+                                <div class="monitor-panel panel-wide">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="monitor-panel panel-small"></div>
+                                <div class="monitor-panel panel-small two"></div>
+                                <div class="monitor-chart">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <span class="monitor-shine shine-one"></span>
+                            <span class="monitor-shine shine-two"></span>
+                        </div>
+                        <div class="monitor-stand"></div>
+                        <div class="monitor-base"></div>
+
+                        <div class="study-window calendar-window">
+                            <div class="window-label">Calendario</div>
+                            <div class="calendar-grid">
+                                <span></span><span></span><span></span><span></span>
+                                <span></span><span class="active"></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-window tasks-window">
+                            <div class="window-label">Tareas</div>
+                            <span class="task-row done"></span>
+                            <span class="task-row"></span>
+                            <span class="task-row short"></span>
+                        </div>
+
+                        <div class="study-window progress-window">
+                            <div class="window-label">Progreso</div>
+                            <div class="progress-line">
+                                <span></span>
+                            </div>
+                            <div class="progress-bars">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-window document-window">
+                            <div class="document-lines">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-pencil">
+                            <span class="pencil-body"></span>
+                            <span class="pencil-tip"></span>
+                            <span class="pencil-trace"></span>
+                        </div>
+
+                        <div class="study-gear">
+                            <span></span>
+                        </div>
+
+                        <div class="study-chat chat-one">
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="study-chat chat-two">
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="study-ai-card">
+                            <span class="ai-orb"></span>
+                            <div>
+                                <strong>Tutor</strong>
+                                <span>Listo para estudiar</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-brand">
+                        <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity" class="auth-brand-logo">
+                        <span>AC Edunity</span>
+                    </div>
+                    <h2>Inicia sesión</h2>
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="login-email" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="login-password" placeholder="********" required>
+                        </div>
+                        <button type="button" class="forgot-password-link" onclick="openPasswordResetModal()">¿Olvidaste tu contraseña?</button>
+                        <button type="submit" class="btn-primary btn-block">Inicia sesión</button>
+                    </form>
+                    <p class="auth-link">¿No tienes cuenta? <a href="#" onclick="showRegister()">Regístrate aquí</a></p>
+                    <button class="btn-secondary btn-block" onclick="showLanding()"><- Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER PAGE -->
+    <div id="register-page" class="page">
+        <div class="auth-container">
+            <div class="auth-bg-scene" aria-hidden="true">
+                <span class="auth-star star-a"></span>
+                <span class="auth-star star-b"></span>
+                <span class="auth-star star-c"></span>
+                <span class="auth-planet planet-left"></span>
+                <span class="auth-planet planet-right"></span>
+                <span class="auth-floating-card float-books"></span>
+                <span class="auth-floating-card float-ai"></span>
+            </div>
+            <div class="auth-layout">
+                <div class="auth-visual auth-study-visual" aria-hidden="true">
+                    <div class="auth-visual-inner">
+                    <div class="auth-study-scene">
+                        <span class="study-particle particle-one"></span>
+                        <span class="study-particle particle-two"></span>
+                        <span class="study-particle particle-three"></span>
+                        <span class="study-particle particle-four"></span>
+
+                        <div class="study-monitor">
+                            <div class="monitor-toolbar">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="monitor-sidebar">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <div class="monitor-dashboard">
+                                <div class="monitor-title"></div>
+                                <div class="monitor-panel panel-wide">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="monitor-panel panel-small"></div>
+                                <div class="monitor-panel panel-small two"></div>
+                                <div class="monitor-chart">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                            <span class="monitor-shine shine-one"></span>
+                            <span class="monitor-shine shine-two"></span>
+                        </div>
+                        <div class="monitor-stand"></div>
+                        <div class="monitor-base"></div>
+
+                        <div class="study-window calendar-window">
+                            <div class="window-label">Calendario</div>
+                            <div class="calendar-grid">
+                                <span></span><span></span><span></span><span></span>
+                                <span></span><span class="active"></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-window tasks-window">
+                            <div class="window-label">Tareas</div>
+                            <span class="task-row done"></span>
+                            <span class="task-row"></span>
+                            <span class="task-row short"></span>
+                        </div>
+
+                        <div class="study-window progress-window">
+                            <div class="window-label">Progreso</div>
+                            <div class="progress-line">
+                                <span></span>
+                            </div>
+                            <div class="progress-bars">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-window document-window">
+                            <div class="document-lines">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+
+                        <div class="study-pencil">
+                            <span class="pencil-body"></span>
+                            <span class="pencil-tip"></span>
+                            <span class="pencil-trace"></span>
+                        </div>
+
+                        <div class="study-gear">
+                            <span></span>
+                        </div>
+
+                        <div class="study-chat chat-one">
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="study-chat chat-two">
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                        <div class="study-ai-card">
+                            <span class="ai-orb"></span>
+                            <div>
+                                <strong>Tutor</strong>
+                                <span>Listo para estudiar</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="auth-card">
+                    <div class="auth-brand">
+                        <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity" class="auth-brand-logo">
+                        <span>AC Edunity</span>
+                    </div>
+                    <h2>Crear cuenta</h2>
+                    <form id="register-form">
+                        <div class="form-group">
+                            <label>Nombre completo</label>
+                            <input type="text" id="register-name" placeholder="Adrian Lopez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="register-email" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="register-password" placeholder="********" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-block">Crear cuenta</button>
+                    </form>
+                    <p class="auth-link">¿Ya tienes cuenta? <a href="#" onclick="showLogin()">Inicia sesión aquí</a></p>
+                    <button class="btn-secondary btn-block" onclick="showLanding()"><- Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="app-page" class="page">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-logo">
+                    <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity" class="brand-logo">
+                    <span>AC Edunity</span>
+                </h1>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">Menu</button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" onclick="navigateTo('dashboard')" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon sidebar-icon sidebar-icon-menu" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>
+                    </span>
+                    <span class="nav-label">Menu</span>
+                </a>
+                <a href="#" onclick="navigateTo('subjects')" class="nav-item" data-section="subjects">
+                    <span class="nav-icon sidebar-icon sidebar-icon-subjects" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H20v17H7.5A3.5 3.5 0 0 0 4 22V5.5Z"></path><path d="M4 5.5A3.5 3.5 0 0 1 7.5 9H20"></path><path d="M8 5h7"></path></svg>
+                    </span>
+                    <span class="nav-label">Materias</span>
+                </a>
+                <a href="#" onclick="navigateTo('tasks')" class="nav-item" data-section="tasks">
+                    <span class="nav-icon sidebar-icon sidebar-icon-tasks" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="m8 12 3 3 5-6"></path></svg>
+                    </span>
+                    <span class="nav-label">Tareas</span>
+                </a>
+                <a href="#" onclick="navigateTo('calendar')" class="nav-item" data-section="calendar">
+                    <span class="nav-icon sidebar-icon sidebar-icon-calendar" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 10h16"></path><path d="M8 14h3"></path><path d="M14 14h2"></path></svg>
+                    </span>
+                    <span class="nav-label">Calendario</span>
+                </a>
+                <a href="#" onclick="navigateTo('grades')" class="nav-item" data-section="grades">
+                    <span class="nav-icon sidebar-icon sidebar-icon-grades" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M7 16V9"></path><path d="M12 16V5"></path><path d="M17 16v-4"></path><path d="M6 9h2"></path><path d="M11 5h2"></path><path d="M16 12h2"></path></svg>
+                    </span>
+                    <span class="nav-label">Calificaciones</span>
+                </a>
+                <a href="#" onclick="navigateTo('attendance')" class="nav-item" data-section="attendance">
+                    <span class="nav-icon sidebar-icon sidebar-icon-attendance" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M9 3h6l1 2h3v16H5V5h3l1-2Z"></path><path d="m8 13 3 3 5-6"></path><path d="M9 7h6"></path></svg>
+                    </span>
+                    <span class="nav-label">Asistencia</span>
+                </a>
+                <a href="#" onclick="navigateTo('ai-assistant')" class="nav-item" data-section="ai-assistant">
+                    <span class="nav-icon sidebar-icon sidebar-icon-tutor" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="4"></rect><path d="M12 7V4"></path><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M9.5 15h5"></path><path d="M3 11v3"></path><path d="M21 11v3"></path></svg>
+                    </span>
+                    <span class="nav-label">Tutor</span>
+                </a>
+                <a href="#" onclick="navigateTo('progress')" class="nav-item" data-section="progress">
+                    <span class="nav-icon sidebar-icon sidebar-icon-progress" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 18 10 12l4 4 6-8"></path><path d="M14 8h6v6"></path><path d="M4 21h16"></path></svg>
+                    </span>
+                    <span class="nav-label">Progreso</span>
+                </a>
+                <a href="#" onclick="navigateTo('backpack')" class="nav-item" data-section="backpack">
+                    <span class="nav-icon sidebar-icon sidebar-icon-backpack" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5H10l2 2h5.5A2.5 2.5 0 0 1 20 9.5v7A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-9Z"></path><path d="M4 10h16"></path></svg>
+                    </span>
+                    <span class="nav-label">Mochila Digital</span>
+                </a>
+                <a href="#" onclick="navigateTo('profile')" class="nav-item" data-section="profile">
+                    <span class="nav-icon sidebar-icon sidebar-icon-profile" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>
+                    </span>
+                    <span class="nav-label">Perfil</span>
+                </a>
+                <a href="#" onclick="navigateTo('settings')" class="nav-item" data-section="settings">
+                    <span class="nav-icon sidebar-icon sidebar-icon-settings" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.05.05a2 2 0 0 1-2.83 2.83l-.05-.05A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.05A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.88.34l-.05.05a2 2 0 0 1-2.83-2.83l.05-.05A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.05A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.05-.05a2 2 0 0 1 2.83-2.83l.05.05A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.05A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.05-.05a2 2 0 0 1 2.83 2.83l-.05.05A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.05A1.7 1.7 0 0 0 19.4 15Z"></path></svg>
+                    </span>
+                    <span class="nav-label">Configuración</span>
+                </a>
+
+                <section class="google-tools-sidebar" aria-label="Herramientas Google educativas">
+                    <h2>Herramientas Google</h2>
+                    <div class="google-tools-list">
+                        <a class="google-tool-link google-tool-docs" href="https://docs.google.com/document/u/0/" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"></path><path d="M14 3v5h5"></path><path d="M8 12h8"></path><path d="M8 16h6"></path></svg>
+                            </span>
+                            <span>Google Docs</span>
+                        </a>
+                        <a class="google-tool-link google-tool-slides" href="https://docs.google.com/presentation/u/0/" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 9h8"></path><path d="M8 13h5"></path><path d="M10 19v2"></path><path d="M14 19v2"></path></svg>
+                            </span>
+                            <span>Google Slides</span>
+                        </a>
+                        <a class="google-tool-link google-tool-sheets" href="https://docs.google.com/spreadsheets/u/0/" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><path d="M4 10h16"></path><path d="M4 15h16"></path><path d="M10 4v16"></path><path d="M15 4v16"></path></svg>
+                            </span>
+                            <span>Google Sheets</span>
+                        </a>
+                        <a class="google-tool-link google-tool-calendar" href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 10h16"></path><path d="M8 14h3"></path><path d="M14 14h2"></path></svg>
+                            </span>
+                            <span>Google Calendar</span>
+                        </a>
+                        <a class="google-tool-link google-tool-classroom" href="https://classroom.google.com/" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2"></rect><path d="M7 18v2"></path><path d="M17 18v2"></path><circle cx="9" cy="11" r="1.5"></circle><path d="M13 10h4"></path><path d="M13 14h3"></path></svg>
+                            </span>
+                            <span>Google Classroom</span>
+                        </a>
+                        <a class="google-tool-link google-tool-forms" href="https://docs.google.com/forms/u/0/" target="_blank" rel="noopener noreferrer">
+                            <span class="google-tool-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24"><path d="M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"></path><path d="M9 8h6"></path><path d="M9 12h6"></path><path d="M9 16h3"></path><circle cx="16" cy="16" r="1"></circle></svg>
+                            </span>
+                            <span>Google Forms</span>
+                        </a>
+                    </div>
+                </section>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="theme-toggle sidebar-theme" onclick="toggleTheme()" title="Cambiar tema"></button>
+                <button id="logoutBtn" class="btn-secondary btn-block" type="button">Cerrar sesión</button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <button class="app-sidebar-control" type="button" onclick="toggleSidebarCollapse()" title="Cerrar barra lateral" aria-label="Cerrar barra lateral">
+                <span></span>
+            </button>
+
+            <!-- DASHBOARD SECTION -->
+            <section id="dashboard" class="section active">
+                <div class="section-header">
+                    <h1>Hola Adrian</h1>
+                    <p class="subtitle">Bienvenido de vuelta. Aquí está tu resumen académico</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Tareas Pendientes</span>
+                        </div>
+                        <div class="stat-value">5</div>
+                        <div class="stat-subtext">De 12 totales</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 58%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Próximo Examen</span>
+                        </div>
+                        <div class="stat-value">Matemática</div>
+                        <div class="stat-subtext">En 8 días</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: linear-gradient(90deg, #fd71af, #ffc800)"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Promedio Actual</span>
+                        </div>
+                        <div class="stat-value">8.5</div>
+                        <div class="stat-subtext">Excelente desempeno</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%; background: linear-gradient(90deg, #49ccf9, #7b68ee)"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Racha de Estudio</span>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-subtext">días consecutivos</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%; background: linear-gradient(90deg, #ffc800, #fd71af)"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Nivel Actual</span>
+                        </div>
+                        <div class="stat-value">Nivel 7</div>
+                        <div class="stat-subtext">2340 / 3000 XP</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Materias Activas</span>
+                        </div>
+                        <div class="stat-value">4</div>
+                        <div class="stat-subtext">Matemática, Física, Programación e Inglés</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-blue"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">XP Acumulado</span>
+                        </div>
+                        <div class="stat-value">2340</div>
+                        <div class="stat-subtext">660 XP para subir de nivel</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill progress-pink"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-icon"></span>
+                            <span class="stat-label">Tiempo Estudiado</span>
+                        </div>
+                        <div class="stat-value">24.5h</div>
+                        <div class="stat-subtext">Esta semana</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-row">
+                    <div class="card">
+                        <h3>Actividad Reciente</h3>
+                        <ul class="activity-list">
+                            <li>
+                                <span class="activity-time">Hace 2 horas</span>
+                                <span class="activity-text">Completaste la tarea de <strong>Física: Caída Libre</strong></span>
+                            </li>
+                            <li>
+                                <span class="activity-time">Hace 5 horas</span>
+                                <span class="activity-text">Registraste una nota 9.5 en <strong>Inglés</strong></span>
+                            </li>
+                            <li>
+                                <span class="activity-time">Hace 1 día</span>
+                                <span class="activity-text">Desbloqueaste el logro <strong>"Estudiante Dedicado"</strong></span>
+                            </li>
+                            <li>
+                                <span class="activity-time">Hace 2 días</span>
+                                <span class="activity-text">Generaste resumen en <strong>Programación</strong> con IA</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>Recomendaciones</h3>
+                        <div class="recommendations">
+                            <div class="recommendation-item">
+                                <span></span>
+                                <p>Te faltan 3 tareas de Programación. Complétalas pronto!</p>
+                            </div>
+                            <div class="recommendation-item">
+                                <span></span>
+                                <p>Tu promedio en Física bajo. Considera usar el asistente IA</p>
+                            </div>
+                            <div class="recommendation-item">
+                                <span></span>
+                                <p>Estas cerca de subir a Nivel 8. Solo te faltan 660 XP</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card weekly-progress-card">
+                        <h3>Progreso semanal</h3>
+                        <div class="weekly-chart" aria-label="Grafico semanal simulado">
+                            <span class="week-day h-42"></span>
+                            <span class="week-day h-58"></span>
+                            <span class="week-day h-68"></span>
+                            <span class="week-day h-76"></span>
+                            <span class="week-day h-92"></span>
+                            <span class="week-day h-64"></span>
+                            <span class="week-day h-84"></span>
+                        </div>
+                        <p class="chart-caption">78% de avance en tareas, repasos y notas esta semana.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUBJECTS SECTION -->
+            <section id="subjects" class="section">
+                <div class="section-header">
+                    <h1>Materias</h1>
+                    <p class="subtitle">Crea y organiza tus asignaturas en un solo lugar</p>
+                    <button class="btn-primary btn-small" onclick="addSubjectUI()">+ Nueva materia</button>
+                </div>
+
+                <div class="subjects-grid">
+                    <div class="subject-card subject-math">
+                        <div class="subject-header">
+                            <h3>Matemática</h3>
+                            <span class="subject-icon"></span>
+                        </div>
+                        <div class="subject-stats">
+                            <div class="stat">
+                                <span class="stat-name">Promedio</span>
+                                <span class="stat-num">8.7</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Tareas</span>
+                                <span class="stat-num">8/10</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Progreso</span>
+                                <span class="stat-num">87%</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 87%; background: linear-gradient(90deg, #7b68ee, #49ccf9)"></div>
+                        </div>
+                        <p class="last-activity">Última actividad: Hace 3 horas</p>
+                        <button class="btn-secondary btn-small" onclick="openSubject('Matemática')">Acceder </button>
+                    </div>
+
+                    <div class="subject-card subject-physics">
+                        <div class="subject-header">
+                            <h3>Física</h3>
+                            <span class="subject-icon"></span>
+                        </div>
+                        <div class="subject-stats">
+                            <div class="stat">
+                                <span class="stat-name">Promedio</span>
+                                <span class="stat-num">7.9</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Tareas</span>
+                                <span class="stat-num">7/10</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Progreso</span>
+                                <span class="stat-num">79%</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 79%; background: linear-gradient(90deg, #fd71af, #ffc800)"></div>
+                        </div>
+                        <p class="last-activity">Última actividad: Hace 1 día</p>
+                        <button class="btn-secondary btn-small" onclick="openSubject('Física')">Acceder </button>
+                    </div>
+
+                    <div class="subject-card subject-programming">
+                        <div class="subject-header">
+                            <h3>Programación</h3>
+                            <span class="subject-icon"></span>
+                        </div>
+                        <div class="subject-stats">
+                            <div class="stat">
+                                <span class="stat-name">Promedio</span>
+                                <span class="stat-num">9.2</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Tareas</span>
+                                <span class="stat-num">9/10</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Progreso</span>
+                                <span class="stat-num">92%</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 92%; background: linear-gradient(90deg, #49ccf9, #7b68ee)"></div>
+                        </div>
+                        <p class="last-activity">Última actividad: Hace 2 horas</p>
+                        <button class="btn-secondary btn-small" onclick="openSubject('Programación')">Acceder </button>
+                    </div>
+
+                    <div class="subject-card subject-english">
+                        <div class="subject-header">
+                            <h3>Inglés</h3>
+                            <span class="subject-icon"></span>
+                        </div>
+                        <div class="subject-stats">
+                            <div class="stat">
+                                <span class="stat-name">Promedio</span>
+                                <span class="stat-num">8.3</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Tareas</span>
+                                <span class="stat-num">8/10</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-name">Progreso</span>
+                                <span class="stat-num">83%</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 83%; background: linear-gradient(90deg, #ffc800, #fd71af)"></div>
+                        </div>
+                        <p class="last-activity">Última actividad: Hace 5 horas</p>
+                        <button class="btn-secondary btn-small" onclick="openSubject('Inglés')">Acceder </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TASKS SECTION -->
+            <section id="tasks" class="section">
+                <div class="section-header">
+                    <h1>Tareas</h1>
+                    <p class="subtitle">Organiza, prioriza y completa tus actividades académicas</p>
+                    <button class="btn-primary btn-small" onclick="addTaskUI()">+ Nueva tarea</button>
+                </div>
+
+                <div class="tasks-container">
+                    <div class="tasks-list" id="tasks-list">
+                        <div class="task-item" data-status="pending">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)">
+                            </div>
+                            <div class="task-content">
+                                <h4>Resolver ejercicios de Ecuaciones Cuadraticas</h4>
+                                <p class="task-subject"> Matemática</p>
+                                <p class="task-date">Vence: 10 de Junio</p>
+                            </div>
+                            <div class="task-priority high">Alta</div>
+                        </div>
+
+                        <div class="task-item" data-status="pending">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)">
+                            </div>
+                            <div class="task-content">
+                                <h4>Leer Capitulo 5 - Leyes de Newton</h4>
+                                <p class="task-subject"> Física</p>
+                                <p class="task-date">Vence: 12 de Junio</p>
+                            </div>
+                            <div class="task-priority medium">Media</div>
+                        </div>
+
+                        <div class="task-item" data-status="completed">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)" checked>
+                            </div>
+                            <div class="task-content">
+                                <h4>Proyecto: Crear calculadora en Python</h4>
+                                <p class="task-subject"> Programación</p>
+                                <p class="task-date">Completada: 4 de Junio</p>
+                            </div>
+                            <div class="task-priority high">Alta</div>
+                        </div>
+
+                        <div class="task-item" data-status="pending">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)">
+                            </div>
+                            <div class="task-content">
+                                <h4>Redactar ensayo en Inglés</h4>
+                                <p class="task-subject"> Inglés</p>
+                                <p class="task-date">Vence: 15 de Junio</p>
+                            </div>
+                            <div class="task-priority low">Baja</div>
+                        </div>
+
+                        <div class="task-item" data-status="pending">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)">
+                            </div>
+                            <div class="task-content">
+                                <h4>Estudiar para Quiz de Programación</h4>
+                                <p class="task-subject"> Programación</p>
+                                <p class="task-date">Vence: 8 de Junio</p>
+                            </div>
+                            <div class="task-priority high">Alta</div>
+                        </div>
+
+                        <div class="task-item" data-status="completed">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)" checked>
+                            </div>
+                            <div class="task-content">
+                                <h4>Resolver práctica de integrales</h4>
+                                <p class="task-subject"> Matemática</p>
+                                <p class="task-date">Completada: 2 de Junio</p>
+                            </div>
+                            <div class="task-priority medium">Media</div>
+                        </div>
+
+                        <div class="task-item" data-status="upcoming">
+                            <div class="task-checkbox">
+                                <input type="checkbox" onclick="toggleTask(this)">
+                            </div>
+                            <div class="task-content">
+                                <h4>Preparar exposicion del proyecto AC Edunity</h4>
+                                <p class="task-subject"> Proyecto de grado</p>
+                                <p class="task-date">Próxima: 18 de junio</p>
+                            </div>
+                            <div class="task-priority medium">Próxima</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CALENDAR SECTION -->
+            <section id="calendar" class="section">
+                <div class="section-header">
+                    <h1>Calendario</h1>
+                    <p class="subtitle">Visualiza todos tus eventos académicos</p>
+                    <button class="btn-primary btn-small" onclick="addCalendarEventUI()">+ Nuevo evento</button>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-mini" id="mini-calendar">
+                        <!-- Generado por JavaScript -->
+                    </div>
+
+                    <div class="events-list">
+                        <h3>Proximos Eventos (Junio 2026)</h3>
+                        <div id="custom-events-list"></div>
+                        <div class="event-item event-exam">
+                            <div class="event-date">
+                                <span class="day">08</span>
+                                <span class="month">Jun</span>
+                            </div>
+                            <div class="event-content">
+                                <h4>Quiz de Programación</h4>
+                                <p>Hora: 10:00 AM - 11:00 AM</p>
+                                <span class="event-badge">Examen</span>
+                            </div>
+                        </div>
+
+                        <div class="event-item event-deadline">
+                            <div class="event-date">
+                                <span class="day">10</span>
+                                <span class="month">Jun</span>
+                            </div>
+                            <div class="event-content">
+                                <h4>Entrega: Ejercicios de Matemática</h4>
+                                <p>Antes de las 11:59 PM</p>
+                                <span class="event-badge">Entrega</span>
+                            </div>
+                        </div>
+
+                        <div class="event-item event-exam">
+                            <div class="event-date">
+                                <span class="day">15</span>
+                                <span class="month">Jun</span>
+                            </div>
+                            <div class="event-content">
+                                <h4>Examen Parcial de Matemática</h4>
+                                <p>Hora: 9:00 AM - 12:00 PM</p>
+                                <span class="event-badge">Examen</span>
+                            </div>
+                        </div>
+
+                        <div class="event-item event-class">
+                            <div class="event-date">
+                                <span class="day">12</span>
+                                <span class="month">Jun</span>
+                            </div>
+                            <div class="event-content">
+                                <h4>Clase de Repaso: Física</h4>
+                                <p>Hora: 3:00 PM - 4:30 PM</p>
+                                <span class="event-badge">Clase</span>
+                            </div>
+                        </div>
+
+                        <div class="event-item event-deadline">
+                            <div class="event-date">
+                                <span class="day">20</span>
+                                <span class="month">Jun</span>
+                            </div>
+                            <div class="event-content">
+                                <h4>Entrega: Proyecto Final de Programación</h4>
+                                <p>Antes de las 11:59 PM</p>
+                                <span class="event-badge">Proyecto</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GRADES SECTION -->
+            <section id="grades" class="section">
+                <div class="section-header">
+                    <h1>Calificaciones</h1>
+                    <p class="subtitle">Registra y monitorea tu desempeño académico</p>
+                    <button class="btn-primary btn-small" onclick="showAddGradeForm()">+ Registrar calificacion</button>
+                </div>
+
+                <div class="grades-container">
+                    <div class="add-grade-form" id="add-grade-form" style="display: none;">
+                        <h3>Registrar nueva calificacion</h3>
+                        <form onsubmit="addGrade(event)">
+                            <div class="form-group">
+                                <label>Materia</label>
+                                <select id="grade-subject" required>
+                                    <option value="">Selecciona una materia</option>
+                                    <option value="Matemática">Matemática</option>
+                                    <option value="Física">Física</option>
+                                    <option value="Programación">Programación</option>
+                                    <option value="Inglés">Inglés</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Evaluacion</label>
+                                <input type="text" id="grade-evaluation" placeholder="ej: Quiz 1, Parcial 2..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Calificacion (0-10)</label>
+                                <input type="number" id="grade-value" min="0" max="10" step="0.1" required>
+                            </div>
+                            <button type="submit" class="btn-primary">Guardar calificacion</button>
+                            <button type="button" class="btn-secondary" onclick="hideAddGradeForm()">Cancelar</button>
+                        </form>
+                    </div>
+
+                    <div class="grades-grid">
+                        <div class="grade-card">
+                            <h3> Matemática</h3>
+                            <div class="grades-list">
+                                <div class="grade-item">
+                                    <span class="grade-name">Parcial 1</span>
+                                    <span class="grade-value">8.5</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Quiz 2</span>
+                                    <span class="grade-value">9.0</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Taller 3</span>
+                                    <span class="grade-value">8.2</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Promedio</span>
+                                    <span class="grade-value grade-average">8.57</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grade-card">
+                            <h3> Física</h3>
+                            <div class="grades-list">
+                                <div class="grade-item">
+                                    <span class="grade-name">Parcial 1</span>
+                                    <span class="grade-value">7.8</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Quiz 2</span>
+                                    <span class="grade-value">8.0</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Laboratorio</span>
+                                    <span class="grade-value">7.9</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Promedio</span>
+                                    <span class="grade-value grade-average">7.90</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grade-card">
+                            <h3> Programación</h3>
+                            <div class="grades-list">
+                                <div class="grade-item">
+                                    <span class="grade-name">Parcial 1</span>
+                                    <span class="grade-value">9.2</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Proyecto 1</span>
+                                    <span class="grade-value">9.5</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Quiz 3</span>
+                                    <span class="grade-value">8.8</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Promedio</span>
+                                    <span class="grade-value grade-average">9.17</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grade-card">
+                            <h3> Inglés</h3>
+                            <div class="grades-list">
+                                <div class="grade-item">
+                                    <span class="grade-name">Speaking</span>
+                                    <span class="grade-value">8.0</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Writing</span>
+                                    <span class="grade-value">8.5</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Reading</span>
+                                    <span class="grade-value">8.3</span>
+                                </div>
+                                <div class="grade-item">
+                                    <span class="grade-name">Promedio</span>
+                                    <span class="grade-value grade-average">8.27</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ATTENDANCE SECTION -->
+            <section id="attendance" class="section">
+                <div class="section-header">
+                    <h1>Asistencia</h1>
+                    <p class="subtitle">Controla tus clases, faltas y progreso académico</p>
+                    <button class="btn-primary btn-small" onclick="addAttendanceUI()">+ Registrar asistencia</button>
+                </div>
+
+                <div class="attendance-container" id="attendance-container">
+                    <!-- Generado por JavaScript -->
+                </div>
+            </section>
+
+            <!-- TUTOR SECTION -->
+            <section id="ai-assistant" class="section">
+                <div class="tutor-shell">
+                    <div class="tutor-hero">
+                        <div class="tutor-brand">
+                            <span class="tutor-logo" aria-hidden="true"></span>
+                            <div>
+                                <h1>Tutor</h1>
+                                <p>Tu espacio de estudio para preguntar, pegar textos, crear ejercicios y repasar mejor.</p>
+                            </div>
+                        </div>
+                        <div class="tutor-status"><span></span>Listo</div>
+                    </div>
+
+                    <div class="tutor-chat-card">
+                        <div class="tutor-tabs">
+                            <button class="active" type="button" onclick="setTutorMode('explain', this)">Explicar</button>
+                            <button type="button" onclick="setTutorMode('practice', this)">Practicar</button>
+                            <button type="button" onclick="setTutorMode('review', this)">Repasar</button>
+                            <button type="button" onclick="setTutorMode('flashcards', this)">Flashcards</button>
+                            <button type="button" onclick="setTutorMode('exam', this)">Examen</button>
+                            <button type="button" onclick="clearTutorChat()">Limpiar chat</button>
+                        </div>
+
+                        <div class="tutor-messages" id="tutor-messages">
+                            <div class="tutor-message tutor-bot">
+                                <strong>Tutor</strong>
+                                <p>Puedes escribirme un tema, pegar un texto corto o pedirme explicaciones, ejercicios, flashcards o preguntas de práctica.</p>
+                            </div>
+                        </div>
+
+                        <div class="tutor-composer">
+                            <textarea id="ai-topic" placeholder="Pregunta, busca o crea material de estudio. Ej: Explícame funciones cuadráticas, resume este texto, crea preguntas para mi examen..." rows="5"></textarea>
+                            <div class="tutor-composer-bar">
+                                <span class="tutor-model" id="tutor-mode-label">Modo explicar</span>
+                                <button class="tutor-send" type="button" onclick="generateTutorAnswer()" title="Enviar">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutor-tools-grid">
+                        <button class="tutor-tool-card" type="button" onclick="generateSummary()">
+                            <span class="tool-icon tool-summary"></span>
+                            <strong>Resumir</strong>
+                            <small>Convierte textos pegados en ideas clave.</small>
+                        </button>
+                        <button class="tutor-tool-card" type="button" onclick="generateQuestions()">
+                            <span class="tool-icon tool-questions"></span>
+                            <strong>Preguntas</strong>
+                            <small>Crea preguntas para practicar antes del examen.</small>
+                        </button>
+                        <button class="tutor-tool-card" type="button" onclick="generateFlashcards()">
+                            <span class="tool-icon tool-cards"></span>
+                            <strong>Flashcards</strong>
+                            <small>Genera tarjetas de repaso rapido.</small>
+                        </button>
+                        <button class="tutor-tool-card" type="button" onclick="generateSimpleExplanation()">
+                            <span class="tool-icon tool-simple"></span>
+                            <strong>Explicar fácil</strong>
+                            <small>Entiende un tema con palabras simples.</small>
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+            <!-- PROGRESS SECTION -->
+            <section id="progress" class="section">
+                <div class="section-header">
+                    <h1>Tu Progreso</h1>
+                    <p class="subtitle">Sube de nivel, gana XP y desbloquea logros academicos</p>
+                </div>
+
+                <div class="progress-container">
+                    <div class="level-display">
+                        <div class="level-card">
+                            <div class="level-number">7</div>
+                            <p>NIVEL ACTUAL</p>
+                            <div class="xp-bar">
+                                <div class="xp-fill" style="width: 78%"></div>
+                            </div>
+                            <p class="xp-text">2340 / 3000 XP</p>
+                        </div>
+
+                        <div class="stats-row">
+                            <div class="progress-stat">
+                                <span class="stat-label"> Racha Actual</span>
+                                <span class="stat-value">12 días</span>
+                            </div>
+                            <div class="progress-stat">
+                                <span class="stat-label"> Logros</span>
+                                <span class="stat-value">8/12</span>
+                            </div>
+                            <div class="progress-stat">
+                                <span class="stat-label"> Horas Estudiadas</span>
+                                <span class="stat-value">156.5h</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievements-section">
+                        <h3>Logros Desbloqueados</h3>
+                        <div class="achievements-grid">
+                            <div class="achievement unlocked" title="Primer paso: Completa tu primer tarea">
+                                <div class="achievement-icon"></div>
+                                <p>Primer Paso</p>
+                            </div>
+                            <div class="achievement unlocked" title="Estudioso: Estudia 10 horas">
+                                <div class="achievement-icon"></div>
+                                <p>Estudioso</p>
+                            </div>
+                            <div class="achievement unlocked" title="Sin parar: Mantén una racha de 7 días">
+                                <div class="achievement-icon"></div>
+                                <p>Sin Parar</p>
+                            </div>
+                            <div class="achievement unlocked" title="Promedio 8: Obtén promedio de 8.0 o más">
+                                <div class="achievement-icon"></div>
+                                <p>Muy Bien</p>
+                            </div>
+                            <div class="achievement unlocked" title="Escritor: Crea 5 notas">
+                                <div class="achievement-icon"></div>
+                                <p>Escritor</p>
+                            </div>
+                            <div class="achievement unlocked" title="Asistente: Usa 10 veces el asistente IA">
+                                <div class="achievement-icon"></div>
+                                <p>Asistente</p>
+                            </div>
+                            <div class="achievement unlocked" title="Matemático: Completa 15 tareas de Matemática">
+                                <div class="achievement-icon"></div>
+                                <p>Matemático</p>
+                            </div>
+                            <div class="achievement unlocked" title="Progresista: Completa 30 tareas">
+                                <div class="achievement-icon"></div>
+                                <p>Progresista</p>
+                            </div>
+                            <div class="achievement locked" title="Leyenda: Sube a nivel 10">
+                                <div class="achievement-icon"></div>
+                                <p>Leyenda</p>
+                            </div>
+                            <div class="achievement locked" title="Maestro: Obtén promedio 9.5 en todas las materias">
+                                <div class="achievement-icon"></div>
+                                <p>Maestro</p>
+                            </div>
+                            <div class="achievement locked" title="Racha Infinita: Mantén una racha de 30 días">
+                                <div class="achievement-icon"></div>
+                                <p>Racha Infinita</p>
+                            </div>
+                            <div class="achievement locked" title="Sabio: Usa asistente IA 50 veces">
+                                <div class="achievement-icon"></div>
+                                <p>Sabio</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BACKPACK SECTION -->
+            <section id="backpack" class="section">
+                <div class="section-header">
+                    <h1>Mochila Digital</h1>
+                    <p class="subtitle">Tus recursos guardados y archivos academicos</p>
+                </div>
+
+                <div class="backpack-container">
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Apuntes de Física</h4>
+                        <p class="resource-type">PDF - 2.4 MB</p>
+                        <p class="resource-date">Agregado: 28 de Mayo</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Apuntes de Física')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Apuntes_Física.pdf')"> Descargar</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Guía de Matemática</h4>
+                        <p class="resource-type">DOCX - 1.8 MB</p>
+                        <p class="resource-date">Agregado: 1 de Junio</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Guía de Matemática')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Guia_Matemática.docx')"> Descargar</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Informe de Programación</h4>
+                        <p class="resource-type">PDF - 3.2 MB</p>
+                        <p class="resource-date">Agregado: 3 de Junio</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Informe de Programación')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Informe_Programación.pdf')"> Descargar</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Videos Educativos (Carpeta)</h4>
+                        <p class="resource-type">Carpeta - 12 archivos</p>
+                        <p class="resource-date">Agregado: 15 de Abril</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Videos Educativos')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Videos_Educativos.zip')"> Descargar</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Tabla de Elementos</h4>
+                        <p class="resource-type">XLSX - 856 KB</p>
+                        <p class="resource-date">Agregado: 22 de Mayo</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Tabla de Elementos')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Tabla_Elementos.xlsx')"> Descargar</button>
+                        </div>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon resource-pdf-icon"></div>
+                        <h4>Diccionario de Inglés</h4>
+                        <p class="resource-type">PDF - 5.6 MB</p>
+                        <p class="resource-date">Agregado: 10 de Abril</p>
+                        <div class="resource-actions">
+                            <button class="btn-secondary btn-small" onclick="openResource('Diccionario de Inglés')"> Ver</button>
+                            <button class="btn-secondary btn-small" onclick="downloadResource('Diccionario_Inglés.pdf')"> Descargar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PROFILE SECTION -->
+            <section id="profile" class="section">
+                <div class="section-header">
+                    <h1>Perfil</h1>
+                    <p class="subtitle">Datos del estudiante, metas y resumen de aprendizaje</p>
+                </div>
+
+                <div class="profile-layout">
+                    <div class="profile-card">
+                        <div class="profile-avatar">AC</div>
+                        <div class="profile-details">
+                            <span class="profile-role">Estudiante</span>
+                            <h2 id="profile-name">Adrian Chito</h2>
+                            <p>Estudiante de Informatica desarrollando AC Edunity como proyecto de grado.</p>
+                            <div class="profile-tags">
+                                <span>Organización académica</span>
+                                <span>IA educativa</span>
+                                <span>Productividad</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-metrics">
+                        <div class="profile-metric">
+                            <span>Nivel</span>
+                            <strong>7</strong>
+                        </div>
+                        <div class="profile-metric">
+                            <span>XP</span>
+                            <strong>2340</strong>
+                        </div>
+                        <div class="profile-metric">
+                            <span>Racha</span>
+                            <strong>12 días</strong>
+                        </div>
+                        <div class="profile-metric">
+                            <span>Promedio</span>
+                            <strong>8.5</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SETTINGS SECTION -->
+            <section id="settings" class="section">
+                <div class="section-header">
+                    <h1>Configuración</h1>
+                    <p class="subtitle">Ajusta la experiencia de uso de AC Edunity</p>
+                </div>
+
+                <div class="settings-layout">
+                    <article class="settings-card">
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Experiencia</span>
+                            <h2>Sonidos de interfaz</h2>
+                            <p>Reproduce un sonido breve y suave al confirmar acciones importantes, navegar por el menú o abrir herramientas principales.</p>
+                        </div>
+                        <label class="settings-switch" for="interface-sounds-toggle">
+                            <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle onchange="toggleInterfaceSounds(this.checked)">
+                            <span class="settings-switch-track" aria-hidden="true">
+                                <span class="settings-switch-thumb"></span>
+                            </span>
+                            <strong class="settings-switch-label">ON / OFF</strong>
+                        </label>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=20260710-supabase-tutor-fix"></script>
+</body>
+</html>

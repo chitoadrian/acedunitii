@@ -1,0 +1,395 @@
+<!-- INSTRUCCIONES DE DESARROLLO Y PERSONALIZACIÓN -->
+<!-- AC STUDY - GUÍA TÉCNICA PARA DESARROLLADORES -->
+
+# AC Study - Guía Técnica para Desarrolladores
+
+## 📋 Tabla de Contenidos
+1. Estructura del Proyecto
+2. Personalización
+3. Extensiones Planeadas
+4. Integración con Servicios Externos
+5. Mejoras Futuras
+
+---
+
+## 1️⃣ Estructura del Proyecto
+
+### Archivo: `index.html`
+**Líneas: ~1200** | **Función: Estructura y contenido completo**
+
+#### Secciones principales:
+```html
+<!-- Landing Page (líneas 7-80) -->
+- Navegación con logo y botones
+- Sección héroe con tarjetas flotantes
+- Sección de beneficios
+
+<!-- Páginas de Autenticación (líneas 82-135) -->
+- Login page
+- Register page
+- Ambas con formularios
+
+<!-- App Layout (líneas 137-1200) -->
+- Sidebar con menú de navegación
+- Main content area con 11 secciones:
+  * Dashboard (líneas ~200-400)
+  * Materias (líneas ~400-550)
+  * Tareas (líneas ~550-700)
+  * Calendario (líneas ~700-850)
+  * Notas (líneas ~850-950)
+  * Asistente IA (líneas ~950-1050)
+  * Progreso (líneas ~1050-1150)
+  * Mochila Digital (líneas ~1150-1200)
+```
+
+### Archivo: `style.css`
+**Líneas: ~900** | **Función: Estilos y temas**
+
+#### Secciones principales:
+```css
+:root (líneas 1-30)
+- Variables CSS para colores, espaciado, bordes, sombras
+
+body.light-theme (líneas 32-45)
+- Sobrescribe variables para tema claro
+
+Reset y Global (líneas 47-80)
+- Reset de estilos
+
+Landing Page (líneas 160-260)
+- Estilos de navegación, héroe, beneficios
+
+Autenticación (líneas 340-420)
+- Estilos de formularios
+
+Layout Principal (líneas 610-700)
+- Sidebar, main-content, secciones
+
+Componentes (líneas 800-900)
+- Cards, tarjetas, botones, inputs
+
+Media Queries (líneas 850-950)
+- Responsive design
+```
+
+### Archivo: `app.js`
+**Líneas: ~600** | **Función: Lógica y funcionalidades**
+
+#### Funciones principales:
+
+```javascript
+// Inicialización
+initializeApp()              // Carga el tema, verifica sesión
+
+// Navegación de Páginas
+showPage(pageId)             // Muestra/oculta páginas
+showLanding()                // Ir a landing
+showLogin()                  // Ir a login
+showRegister()               // Ir a registro
+showApp()                    // Ir a app
+
+// Autenticación
+handleLogin(event)           // Procesa login
+handleRegister(event)        // Procesa registro
+handleLogout()               // Cierra sesión
+
+// Navegación SPA
+navigateTo(sectionId)        // Navega entre secciones
+
+// Tema
+toggleTheme()                // Cambia tema oscuro/claro
+updateThemeIcon(icon)        // Actualiza ícono
+
+// Tareas
+toggleTask(checkbox)         // Marca/desmarca tarea
+filterTasks(filter)          // Filtra tareas
+addTaskUI()                  // Agrega nueva tarea
+
+// Notas
+showAddGradeForm()           // Muestra form de notas
+addGrade(event)              // Agrega nota
+updateAverageGrade(card)     // Recalcula promedio
+
+// Asistente IA
+generateSummary()            // Genera resumen
+generateQuestions()          // Genera preguntas
+generateFlashcards()         // Genera flashcards
+showAIResult(title, content) // Muestra resultado
+closeAIResult()              // Cierra resultado
+copyToClipboard()            // Copia contenido
+downloadResult()             // Descarga resultado
+
+// Utilidades
+generateCalendar()           // Genera calendario
+downloadResource(filename)   // Descarga recurso
+toggleSidebar()              // Abre/cierra sidebar
+closeSidebar()               // Cierra sidebar
+handleWindowResize()         // Detecta cambios de tamaño
+```
+
+---
+
+## 2️⃣ Personalización
+
+### Cambiar Colores
+
+**Archivo: `style.css` (líneas 6-16)**
+```css
+:root {
+    --bg-dark: #292d34;        /* Fondo oscuro */
+    --color-purple: #7b68ee;   /* Morado */
+    --color-cyan: #49ccf9;     /* Cyan */
+    --color-pink: #fd71af;     /* Rosado */
+    --color-yellow: #ffc800;   /* Amarillo */
+    /* ... otros colores ... */
+}
+```
+
+**Cambio rápido:** Modifica los valores hexadecimales en `:root`
+
+### Cambiar Usuario Predeterminado
+
+**Archivo: `app.js` (líneas 20-26)**
+```javascript
+const simulatedUsers = {
+    'adrian@example.com': {
+        password: 'password123',
+        name: 'Adrian Lopez'
+    },
+    'test@example.com': {
+        password: 'test123',
+        name: 'Test User'
+    }
+};
+```
+
+**Cambio:** Agrega/modifica usuarios en este objeto
+
+### Personalizar Contenido de Secciones
+
+Todas las secciones están en HTML. Modifica el contenido directamente:
+- Dashboard: `<section id="dashboard">`
+- Materias: `<section id="subjects">`
+- Tareas: `<section id="tasks">`
+- Etc.
+
+---
+
+## 3️⃣ Extensiones Planeadas
+
+### A. Almacenamiento Local Mejorado
+```javascript
+// Guardar tareas localmente
+localStorage.setItem('tasks', JSON.stringify(tasksArray));
+
+// Cargar tareas al iniciar
+const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+```
+
+### B. Base de Datos Supabase
+```javascript
+// Futura integración
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Obtener tareas
+const { data } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('user_id', currentUser.id);
+```
+
+### C. IA Real (OpenAI)
+```javascript
+// Futura integración
+async function generateSummaryAI(topic) {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            model: 'gpt-4',
+            messages: [
+                {
+                    role: 'user',
+                    content: `Genera un resumen sobre ${topic}`
+                }
+            ]
+        })
+    });
+    
+    const result = await response.json();
+    return result.choices[0].message.content;
+}
+```
+
+---
+
+## 4️⃣ Integración con Servicios Externos
+
+### Supabase Setup
+
+1. **Crear proyecto en Supabase**
+   ```bash
+   npm install @supabase/supabase-js
+   ```
+
+2. **Configurar variables de entorno**
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_KEY=your-anon-key
+   ```
+
+3. **Crear tablas en Supabase**
+   ```sql
+   -- Users
+   CREATE TABLE users (
+       id SERIAL PRIMARY KEY,
+       email VARCHAR UNIQUE,
+       name VARCHAR,
+       created_at TIMESTAMP
+   );
+
+   -- Tasks
+   CREATE TABLE tasks (
+       id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES users(id),
+       title VARCHAR,
+       subject VARCHAR,
+       priority VARCHAR,
+       completed BOOLEAN,
+       created_at TIMESTAMP
+   );
+
+   -- Grades
+   CREATE TABLE grades (
+       id SERIAL PRIMARY KEY,
+       user_id INTEGER REFERENCES users(id),
+       subject VARCHAR,
+       evaluation VARCHAR,
+       value DECIMAL,
+       created_at TIMESTAMP
+   );
+   ```
+
+### OpenAI Integration
+
+1. **Obtener API Key**
+   - Ir a https://platform.openai.com/api-keys
+   - Crear nueva clave
+
+2. **Instalar cliente**
+   ```bash
+   npm install openai
+   ```
+
+3. **Usar en código**
+   ```javascript
+   import { OpenAI } from 'openai';
+
+   const openai = new OpenAI({
+       apiKey: process.env.OPENAI_API_KEY
+   });
+
+   async function generateContent(prompt) {
+       const message = await openai.chat.completions.create({
+           model: 'gpt-4',
+           messages: [{ role: 'user', content: prompt }]
+       });
+       return message.choices[0].message.content;
+   }
+   ```
+
+### Hostinger Deployment
+
+1. **Preparar archivos**
+   ```bash
+   # Asegúrate de que tienes:
+   - index.html
+   - style.css
+   - app.js
+   - README.md
+   ```
+
+2. **Subir via FTP**
+   - Conectar a Hostinger via FTP
+   - Subir archivos a carpeta `public_html`
+
+3. **Dominio personalizado**
+   - Apunta tu dominio a Hostinger
+   - Accede vía `tu-dominio.com`
+
+---
+
+## 5️⃣ Mejoras Futuras Recomendadas
+
+### Performance
+- [ ] Minificar CSS y JS
+- [ ] Lazy loading de imágenes
+- [ ] Service Workers para PWA
+- [ ] Caché de datos
+
+### UX/UI
+- [ ] Notificaciones in-app
+- [ ] Drag & drop para tareas
+- [ ] Búsqueda global
+- [ ] Historial de acciones
+- [ ] Paleta de temas adicionales
+
+### Features
+- [ ] Compartir tareas/recursos
+- [ ] Comentarios en tareas
+- [ ] Sistema de recordatorios
+- [ ] Integración con calendario (Google Calendar)
+- [ ] Exportar progreso a PDF
+- [ ] Sistema de recompensas real
+
+### Backend
+- [ ] API REST completa
+- [ ] Autenticación OAuth
+- [ ] Sistema de roles (estudiante, profesor, admin)
+- [ ] Sincronización en tiempo real
+- [ ] Notificaciones push
+- [ ] Estadísticas avanzadas
+
+### Mobile
+- [ ] App nativa (React Native)
+- [ ] Sincronización offline
+- [ ] Notificaciones locales
+- [ ] Cámara para scan de documentos
+
+---
+
+## 🔧 Troubleshooting
+
+### El login no funciona
+- Verifica que localStorage esté habilitado
+- Abre la consola (F12) y revisa errores
+- Usa las credenciales exactas: `adrian@example.com` / `password123`
+
+### Los estilos no cargan
+- Verifica que `style.css` esté en la misma carpeta que `index.html`
+- Recarga la página (Ctrl+F5)
+- Borra caché del navegador
+
+### La navegación no funciona
+- Asegúrate de que JavaScript esté habilitado
+- Abre la consola y busca errores
+- Verifica que `app.js` esté en la carpeta correcta
+
+---
+
+## 📚 Recursos Útiles
+
+- **MDN Web Docs**: https://developer.mozilla.org/
+- **CSS-Tricks**: https://css-tricks.com/
+- **JavaScript.info**: https://javascript.info/
+- **Supabase Docs**: https://supabase.com/docs
+- **OpenAI API**: https://platform.openai.com/docs
+
+---
+
+**¡Última actualización: Junio 5, 2026** 🚀

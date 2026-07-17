@@ -1,0 +1,184 @@
+🎓 AC STUDY - INICIO RÁPIDO
+Gestión Educativa Inteligente Personalizada
+========================================
+
+¡BIENVENIDO A AC STUDY!
+
+Este archivo te guiará en 3 pasos para comenzar a usar la plataforma.
+
+────────────────────────────────────────────────────
+
+📦 ¿QUÉ NECESITO?
+
+✓ Un navegador moderno (Chrome, Firefox, Safari, Edge)
+✓ La carpeta con estos 3 archivos:
+  - index.html
+  - style.css
+  - app.js
+
+Eso es todo. No requiere instalación.
+
+────────────────────────────────────────────────────
+
+🚀 PASO 1: ABRIR LA APLICACIÓN
+
+1. Navega a la carpeta "AC Study"
+2. Haz doble clic en "index.html"
+3. Se abrirá en tu navegador por defecto
+
+Alternativa: 
+- Abre tu navegador
+- Arrastra el archivo index.html a la ventana del navegador
+
+────────────────────────────────────────────────────
+
+🔐 PASO 2: INICIAR SESIÓN
+
+En la landing page, tienes 2 opciones:
+
+OPCIÓN 1: Usar cuenta de prueba
+- Haz clic en "Inicia sesión"
+- Email: adrian@example.com
+- Contraseña: password123
+- Haz clic en "Inicia sesión"
+
+OPCIÓN 2: Crear tu propia cuenta
+- Haz clic en "Registrarse"
+- Completa el formulario con:
+  * Nombre completo
+  * Email
+  * Contraseña
+- Haz clic en "Crear cuenta"
+
+────────────────────────────────────────────────────
+
+✨ PASO 3: EXPLORAR LA PLATAFORMA
+
+Una vez dentro, verás el dashboard. Desde aquí puedes:
+
+MENÚ LATERAL (Izquierda):
+📍 Inicio - Vuelve al dashboard
+📚 Materias - Ve tus 4 materias (Matemática, Física, Programación, Inglés)
+✓ Tareas - Gestiona tus tareas académicas
+📅 Calendario - Ve eventos y fechas importantes
+📊 Notas - Registra y ve tus calificaciones
+🤖 Asistente IA - Genera resúmenes, preguntas y flashcards
+🎮 Progreso - Ve tu nivel, XP, logros y racha
+🎒 Mochila Digital - Accede a tus recursos guardados
+
+TEMA:
+🌙 Botón en la esquina superior derecha
+- Haz clic para cambiar entre tema claro y oscuro
+- La preferencia se guarda automáticamente
+
+────────────────────────────────────────────────────
+
+🎯 FUNCIONALIDADES CLAVE
+
+1. TAREAS ✓
+   - Marca tareas como completadas
+   - Filtra por estado (Todas, Pendientes, Completadas)
+   - Agrega nuevas tareas
+   - Ve prioridad de cada tarea
+
+2. NOTAS 📊
+   - Registra notas de tus materias
+   - Calcula promedios automáticamente
+   - Visualiza tus calificaciones
+
+3. ASISTENTE IA 🤖
+   - Escribe un tema en el área de texto
+   - Elige: Resumen, Preguntas o Flashcards
+   - Obtén contenido generado instantáneamente
+   - Copia o descarga los resultados
+
+4. PROGRESO 🎮
+   - Ve tu nivel actual y XP
+   - Visualiza tu racha de estudio
+   - Desbloquea logros
+   - Ve estadísticas de estudio
+
+────────────────────────────────────────────────────
+
+💡 CONSEJOS ÚTILES
+
+✓ Prueba todas las secciones
+✓ Agrega tareas y notas de prueba
+✓ Experimenta con el asistente IA
+✓ Cambia el tema claro/oscuro
+✓ Prueba en diferentes tamaños de pantalla
+✓ Abre las herramientas de desarrollador (F12) para explorar
+
+────────────────────────────────────────────────────
+
+❓ PREGUNTAS FRECUENTES
+
+P: ¿Mi información se guarda?
+R: Sí, se guarda en localStorage de tu navegador. Persiste entre sesiones.
+
+P: ¿Puedo perder mis datos si limpio el caché?
+R: Sí, si limpias el caché del navegador se perderán los datos locales.
+
+P: ¿Cómo cambio de usuario?
+R: Haz clic en "Cerrar sesión" y vuelve a iniciar sesión con otra cuenta.
+
+P: ¿Funciona sin internet?
+R: Sí, es una aplicación web local que no requiere internet.
+
+P: ¿Puedo usar esto en móvil?
+R: Sí, está completamente optimizado para mobile.
+
+P: ¿Cómo descargo mi información?
+R: Aún no hay función de exportación, pero puedes tomar capturas.
+
+────────────────────────────────────────────────────
+
+📖 DOCUMENTACIÓN COMPLETA
+
+Para más información, consulta:
+
+📄 README.md
+   - Descripción completa del proyecto
+   - Lista de características
+   - Información técnica
+
+📄 GUIA_TECNICA.html
+   - Para desarrolladores
+   - Cómo personalizar
+   - Integración con servicios externos
+   - Mejoras futuras
+
+📄 FEATURES.txt
+   - Checklist completo de características
+   - Estadísticas del proyecto
+   - Detalles de cada sección
+
+────────────────────────────────────────────────────
+
+🎓 PROYECTO DE GRADO
+
+AC Study - Gestión Educativa Inteligente Personalizada
+Año: 2026
+Versión: 1.0 - Prototipo Funcional
+Estado: ✅ Listo para presentación
+
+Características implementadas: 50+
+Líneas de código: ~2,700
+Secciones: 11
+Funcionalidades: Todas las solicitadas ✓
+
+────────────────────────────────────────────────────
+
+🚀 ¡QUE DISFRUTES USANDO AC STUDY!
+
+Si encuentras problemas, revisa:
+1. La consola del navegador (F12 → Console)
+2. Que los 3 archivos estén en la misma carpeta
+3. Usa un navegador moderno
+
+Cualquier pregunta, consulta la documentación.
+
+────────────────────────────────────────────────────
+
+Última actualización: Junio 5, 2026
+¡Gracias por usar AC Study! 🎉
