@@ -14849,6 +14849,12 @@ body.light-theme .subject-detail-columns p {
 #dashboard {
     --dash-accent: #4ea8c7;
     --dash-accent-hover: #65b7d2;
+    --dash-blue: #38bdf8;
+    --dash-purple: #8b5cf6;
+    --dash-pink: #ec4899;
+    --dash-green: #34d399;
+    --dash-yellow: #facc15;
+    --dash-orange: #fb923c;
     --dash-surface: #101b29;
     --dash-surface-raised: #152333;
     --dash-border: rgba(148, 178, 199, 0.16);
