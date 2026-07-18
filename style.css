@@ -18891,11 +18891,7 @@ body.light-theme .sidebar .nav-item.active .nav-icon {
     background: linear-gradient(135deg, rgba(123, 104, 238, 0.96), rgba(73, 204, 249, 0.88)) !important;
     box-shadow: 0 14px 32px rgba(73, 204, 249, 0.20) !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
-}
-
-#landing-page .hero-mini-card .mini-card-icon svg,
-#landing-page .about-feature .feature-icon svg,
-#landing-page .ai-orbit-card .ai-orbit-icon svg {
+}#landing-page .hero-mini-card .mini-card-icon svg{
     width: 23px !important;
     height: 23px !important;
     stroke: #ffffff !important;
@@ -18942,15 +18938,9 @@ body.light-theme .sidebar .nav-item.active .nav-icon {
 
 #landing-page .hero-mini-card p {
     display: none !important;
-}
-
-body.light-theme #landing-page .hero-mini-card .mini-card-copy strong,
-body.light-theme #landing-page .ai-orbit-card p strong {
+}body.light-theme #landing-page .hero-mini-card .mini-card-copy strong{
     color: #0f172a !important;
-}
-
-body.light-theme #landing-page .hero-mini-card .mini-card-copy small,
-body.light-theme #landing-page .ai-orbit-card p small {
+}body.light-theme #landing-page .hero-mini-card .mini-card-copy small{
     color: #64748b !important;
 }
 
@@ -23917,17 +23907,6 @@ body.light-theme .study-ai-card {
     box-shadow: 0 0 12px rgba(73, 204, 249, 0.42);
 }
 
-#landing-page .ai-card-one {
-    left: 4%;
-    top: 12%;
-}
-
-#landing-page .ai-card-two {
-    right: 1%;
-    bottom: 12%;
-    animation-delay: 1.2s;
-}
-
 #landing-page .use-benefits {
     padding: clamp(50px, 7vw, 76px) clamp(20px, 4vw, 40px) !important;
 }
@@ -23975,15 +23954,7 @@ body.light-theme #landing-page .about-description,
 body.light-theme #landing-page .feature-list li,
 body.light-theme #landing-page .use-benefit-card p {
     color: #475569 !important;
-}
-
-body.light-theme #landing-page .landing-nav,
-body.light-theme #landing-page .dashboard-mockup,
-body.light-theme #landing-page .floating-card,
-body.light-theme #landing-page .benefit-card,
-body.light-theme #landing-page .ai-window,
-body.light-theme #landing-page .ai-orbit-card,
-body.light-theme #landing-page .use-benefit-card {
+}body.light-theme #landing-page .landing-nav, body.light-theme #landing-page .dashboard-mockup, body.light-theme #landing-page .floating-card, body.light-theme #landing-page .benefit-card, body.light-theme #landing-page .use-benefit-card{
     background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(241, 247, 255, 0.78)),
         #ffffff !important;
@@ -24008,18 +23979,9 @@ body.light-theme #landing-page .use-benefits h2,
 body.light-theme #landing-page .benefit-card h3,
 body.light-theme #landing-page .use-benefit-card h3 {
     color: #0f172a !important;
-}
-
-body.light-theme #landing-page .benefit-card p,
-body.light-theme #landing-page .ai-tool-row span,
-body.light-theme #landing-page .tutor-message,
-body.light-theme #landing-page .floating-card p,
-body.light-theme #landing-page .ai-orbit-card p {
+}body.light-theme #landing-page .benefit-card p, body.light-theme #landing-page .tutor-message, body.light-theme #landing-page .floating-card p{
     color: #334155 !important;
-}
-
-body.light-theme #landing-page .mockup-card,
-body.light-theme #landing-page .ai-tool-row span {
+}body.light-theme #landing-page .mockup-card{
     background: rgba(15, 23, 42, 0.045) !important;
     border-color: rgba(15, 23, 42, 0.07) !important;
 }
@@ -24046,9 +24008,7 @@ body.light-theme #landing-page .hero-proof span {
     50% { transform: translateY(-8px); }
 }
 
-@media (max-width: 1120px) {
-    #landing-page .hero,
-    #landing-page .ai-showcase-container {
+@media (max-width: 1120px) {#landing-page .hero{
         grid-template-columns: 1fr !important;
     }
 
@@ -24087,11 +24047,7 @@ body.light-theme #landing-page .hero-proof span {
     #landing-page .card-3,
     #landing-page .card-4 {
         grid-column: 1 !important;
-    }
-
-    #landing-page .benefits-grid,
-    #landing-page .use-benefits-grid,
-    #landing-page .ai-tool-row {
+    }#landing-page .benefits-grid, #landing-page .use-benefits-grid{
         grid-template-columns: 1fr !important;
     }
 
@@ -24107,10 +24063,7 @@ body.light-theme #landing-page .hero-proof span {
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    #landing-page .dashboard-mockup::before,
-    #landing-page .mockup-progress-line span,
-    #landing-page .ai-orbit-card {
+@media (prefers-reduced-motion: reduce) {#landing-page .dashboard-mockup::before, #landing-page .mockup-progress-line span{
         animation: none !important;
     }
 }
@@ -24607,10 +24560,7 @@ body.light-theme #calendar .event-item.event-custom .event-date {
     align-items: center !important;
     gap: 10px !important;
     border-radius: 20px !important;
-}
-
-#landing-page .hero-mini-card .mini-card-icon,
-#landing-page .ai-orbit-card .ai-orbit-icon {
+}#landing-page .hero-mini-card .mini-card-icon{
     width: 42px !important;
     height: 42px !important;
     min-width: 42px !important;
@@ -24623,11 +24573,7 @@ body.light-theme #calendar .event-item.event-custom .event-date {
 
 #landing-page .hero-mini-card .mini-card-icon {
     background: linear-gradient(135deg, rgba(123, 104, 238, 0.96), rgba(73, 204, 249, 0.88)) !important;
-}
-
-#landing-page .hero-mini-card svg,
-#landing-page .about-feature .feature-icon svg,
-#landing-page .ai-orbit-card .ai-orbit-icon svg {
+}#landing-page .hero-mini-card svg{
     width: 23px !important;
     height: 23px !important;
     stroke: #ffffff !important;
@@ -24636,18 +24582,12 @@ body.light-theme #calendar .event-item.event-custom .event-date {
     stroke-linecap: round !important;
     stroke-linejoin: round !important;
     transform: none !important;
-}
-
-#landing-page .hero-mini-card .mini-card-copy,
-#landing-page .ai-orbit-card p {
+}#landing-page .hero-mini-card .mini-card-copy{
     min-width: 0 !important;
     display: block !important;
     gap: 3px !important;
     margin: 0 !important;
-}
-
-#landing-page .hero-mini-card .mini-card-copy strong,
-#landing-page .ai-orbit-card p strong {
+}#landing-page .hero-mini-card .mini-card-copy strong{
     color: #ffffff !important;
     display: block !important;
     font-size: 0.88rem !important;
@@ -24655,10 +24595,7 @@ body.light-theme #calendar .event-item.event-custom .event-date {
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
-}
-
-#landing-page .hero-mini-card .mini-card-copy small,
-#landing-page .ai-orbit-card p small {
+}#landing-page .hero-mini-card .mini-card-copy small{
     color: rgba(226, 232, 240, 0.72) !important;
     font-size: 0.74rem !important;
     line-height: 1.2 !important;
@@ -24679,15 +24616,9 @@ body.light-theme #calendar .event-item.event-custom .event-date {
 #landing-page .hero-mini-card .mini-card-copy small,
 #landing-page .hero-mini-card .mini-card-indicator {
     display: none !important;
-}
-
-body.light-theme #landing-page .hero-mini-card .mini-card-copy strong,
-body.light-theme #landing-page .ai-orbit-card p strong {
+}body.light-theme #landing-page .hero-mini-card .mini-card-copy strong{
     color: #0f172a !important;
-}
-
-body.light-theme #landing-page .hero-mini-card .mini-card-copy small,
-body.light-theme #landing-page .ai-orbit-card p small {
+}body.light-theme #landing-page .hero-mini-card .mini-card-copy small{
     color: #64748b !important;
 }
 
@@ -25015,29 +24946,7 @@ body.light-theme .page-content,
     background: #ffffff !important;
     background-image: none !important;
     color: #0f172a !important;
-}
-
-body.light-mode #landing-page .hero,
-body.light-mode #landing-page .benefits,
-body.light-mode #landing-page .about-project,
-body.light-mode #landing-page .ai-showcase,
-body.light-mode #landing-page .use-benefits,
-body.light-mode #landing-page .hero::before,
-body.light-mode #landing-page .ai-showcase::before,
-body.light-theme #landing-page .hero,
-body.light-theme #landing-page .benefits,
-body.light-theme #landing-page .about-project,
-body.light-theme #landing-page .ai-showcase,
-body.light-theme #landing-page .use-benefits,
-body.light-theme #landing-page .hero::before,
-body.light-theme #landing-page .ai-showcase::before,
-[data-theme="light"] #landing-page .hero,
-[data-theme="light"] #landing-page .benefits,
-[data-theme="light"] #landing-page .about-project,
-[data-theme="light"] #landing-page .ai-showcase,
-[data-theme="light"] #landing-page .use-benefits,
-[data-theme="light"] #landing-page .hero::before,
-[data-theme="light"] #landing-page .ai-showcase::before {
+}body.light-mode #landing-page .hero, body.light-mode #landing-page .benefits, body.light-mode #landing-page .about-project, body.light-mode #landing-page .use-benefits, body.light-mode #landing-page .hero::before, body.light-theme #landing-page .hero, body.light-theme #landing-page .benefits, body.light-theme #landing-page .about-project, body.light-theme #landing-page .use-benefits, body.light-theme #landing-page .hero::before, [data-theme="light"] #landing-page .hero, [data-theme="light"] #landing-page .benefits, [data-theme="light"] #landing-page .about-project, [data-theme="light"] #landing-page .use-benefits, [data-theme="light"] #landing-page .hero::before{
     background: #ffffff !important;
     background-image: none !important;
     box-shadow: none !important;
@@ -26252,37 +26161,14 @@ body.landing-active .landing-wrapper,
 body.landing-active .landing-main,
 body.landing-active .sections-wrapper {
     scroll-snap-type: none !important;
-}
-
-body.landing-active #landing-page .hero-visual,
-body.landing-active #landing-page .dashboard-mockup,
-body.landing-active #landing-page .hero-mini-card,
-body.landing-active #landing-page .floating-card,
-body.landing-active #landing-page .ai-orbit-card,
-body.landing-active .study-pet,
-body.landing-active .pet-robot {
+}body.landing-active #landing-page .hero-visual, body.landing-active #landing-page .dashboard-mockup, body.landing-active #landing-page .hero-mini-card, body.landing-active #landing-page .floating-card, body.landing-active .study-pet, body.landing-active .pet-robot{
     backface-visibility: hidden !important;
     -webkit-backface-visibility: hidden !important;
     will-change: transform, opacity;
-}
-
-body.landing-active #landing-page .hero-mini-card,
-body.landing-active #landing-page .floating-card,
-body.landing-active #landing-page .ai-orbit-card,
-body.landing-active #landing-page .landing-nav,
-body.landing-active #landing-page .dashboard-mockup,
-body.landing-active #landing-page .benefit-card,
-body.landing-active #landing-page .use-benefit-card,
-body.landing-active #landing-page .ai-window,
-body.landing-active #landing-page .ai-panel {
+}body.landing-active #landing-page .hero-mini-card, body.landing-active #landing-page .floating-card, body.landing-active #landing-page .landing-nav, body.landing-active #landing-page .dashboard-mockup, body.landing-active #landing-page .benefit-card, body.landing-active #landing-page .use-benefit-card{
     backdrop-filter: blur(6px) saturate(1.02) !important;
     -webkit-backdrop-filter: blur(6px) saturate(1.02) !important;
-}
-
-body.landing-active #landing-page .hero::before,
-body.landing-active #landing-page .hero-visual::before,
-body.landing-active #landing-page .benefit-card::after,
-body.landing-active #landing-page .ai-showcase::before {
+}body.landing-active #landing-page .hero::before, body.landing-active #landing-page .hero-visual::before, body.landing-active #landing-page .benefit-card::after{
     filter: blur(4px) !important;
 }
 
@@ -26290,11 +26176,7 @@ body.landing-active #landing-page .mockup-progress-line span {
     width: 82% !important;
     transform-origin: left center !important;
     will-change: transform;
-}
-
-body.landing-active #landing-page .dashboard-mockup::before,
-body.landing-active #landing-page .mockup-progress-line span,
-body.landing-active #landing-page .ai-orbit-card {
+}body.landing-active #landing-page .dashboard-mockup::before, body.landing-active #landing-page .mockup-progress-line span{
     animation-duration: 7s !important;
 }
 
@@ -26325,26 +26207,13 @@ body.landing-active::-webkit-scrollbar-thumb {
     border-radius: 999px !important;
 }
 
-@media (max-width: 768px), (pointer: coarse) {
-    body.landing-active #landing-page .hero::before,
-    body.landing-active #landing-page .hero-visual::before,
-    body.landing-active #landing-page .benefit-card::after,
-    body.landing-active #landing-page .ai-showcase::before {
+@media (max-width: 768px), (pointer: coarse) {body.landing-active #landing-page .hero::before, body.landing-active #landing-page .hero-visual::before, body.landing-active #landing-page .benefit-card::after{
         filter: none !important;
         opacity: 0.55 !important;
-    }
-
-    body.landing-active #landing-page .hero-mini-card,
-    body.landing-active #landing-page .floating-card,
-    body.landing-active #landing-page .ai-orbit-card,
-    body.landing-active #landing-page .landing-nav {
+    }body.landing-active #landing-page .hero-mini-card, body.landing-active #landing-page .floating-card, body.landing-active #landing-page .landing-nav{
         backdrop-filter: blur(6px) !important;
         box-shadow: 0 14px 32px rgba(0, 0, 0, 0.16) !important;
-    }
-
-    body.landing-active #landing-page .dashboard-mockup::before,
-    body.landing-active #landing-page .mockup-progress-line span,
-    body.landing-active #landing-page .ai-orbit-card {
+    }body.landing-active #landing-page .dashboard-mockup::before, body.landing-active #landing-page .mockup-progress-line span{
         animation-duration: 8s !important;
     }
 }
@@ -26634,8 +26503,7 @@ body.light-mode .settings-switch-label,
 #landing-page .hero h1{display:block;max-width:700px;height:auto;max-height:none;margin:18px 0 10px;padding:0 0 .14em;overflow:visible;color:#f4f8fa;background-color:transparent;background-image:linear-gradient(112deg,#ffffff 0%,#dbe9ef 46%,#74c4d2 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-size:clamp(2.7rem,4.9vw,4.6rem);line-height:1.12;letter-spacing:-.05em;text-shadow:none;opacity:1;filter:none;transform:none}
 #landing-page .hero-left>p{max-width:570px;margin-top:0;color:var(--lp-muted);font-size:clamp(1rem,1.5vw,1.13rem);line-height:1.62}#landing-page .hero-actions{margin-top:22px}#landing-page .btn-large{min-height:48px;padding:0 22px;font-size:.98rem}
 #landing-page .hero-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:26px;border-top:1px solid var(--lp-border)}#landing-page .hero-proof span{min-width:0;padding:16px 14px 0 0;color:var(--lp-muted);border:0;border-radius:0;background:transparent;box-shadow:none;line-height:1.35}#landing-page .hero-proof span+span{padding-left:14px;border-left:1px solid var(--lp-border)}#landing-page .hero-proof strong{display:block;margin-bottom:4px;color:var(--lp-text);font-size:.9rem}
-#landing-page .hero-right,#landing-page .hero-visual{align-self:center}#landing-page .hero-visual{gap:12px;transform:translateY(6px)}#landing-page .dashboard-mockup,#landing-page .ai-window{border:1px solid var(--lp-border);border-radius:18px;background:#0c1e2c;box-shadow:0 30px 70px rgba(0,0,0,.3);transform:none}
-#landing-page .mockup-top,#landing-page .ai-window-top{border-color:var(--lp-border);background:rgba(255,255,255,.02)}#landing-page .mockup-top span{background:#647884}#landing-page .mockup-top span:first-child{background:var(--lp-accent)}
+#landing-page .hero-right,#landing-page .hero-visual{align-self:center}#landing-page .hero-visual{gap:12px;transform:translateY(6px)}#landing-page .dashboard-mockup{border:1px solid var(--lp-border);border-radius:18px;background:#0c1e2c;box-shadow:0 30px 70px rgba(0,0,0,.3);transform:none}#landing-page .mockup-top{border-color:var(--lp-border);background:rgba(255,255,255,.02)}#landing-page .mockup-top span{background:#647884}#landing-page .mockup-top span:first-child{background:var(--lp-accent)}
 #landing-page .mockup-card{border:1px solid var(--lp-border);background:rgba(255,255,255,.025);box-shadow:none}#landing-page .mockup-card.accent{background:rgba(85,183,201,.07);border-color:rgba(85,183,201,.2)}#landing-page .mockup-card b{color:var(--lp-text);font-size:1rem}
 #landing-page .mockup-bars i,#landing-page .mockup-progress-line span{background:var(--lp-accent)}#landing-page .mockup-progress-line{background:rgba(255,255,255,.06)}
 #landing-page .hero-mini-grid{gap:10px}#landing-page .hero-mini-card{min-height:116px;border:1px solid var(--lp-border);border-radius:13px;background:rgba(13,31,45,.9);box-shadow:none;transform:none}#landing-page .hero-mini-card:hover{transform:translateY(-3px);border-color:rgba(85,183,201,.34)}
@@ -26644,9 +26512,7 @@ body.light-mode .settings-switch-label,
 #landing-page .benefits>h2,#landing-page .about-project h2,#landing-page .use-benefits h2{color:var(--lp-text);letter-spacing:-.035em;font-size:clamp(2rem,3.6vw,3.15rem)}
 #landing-page .benefits-grid,#landing-page .use-benefits-grid{gap:0;border-top:1px solid var(--lp-border);border-bottom:1px solid var(--lp-border)}
 #landing-page .benefit-card,#landing-page .use-benefit-card{height:100%;min-height:260px;padding:30px 26px;border:0;border-right:1px solid var(--lp-border);border-radius:0;background:transparent;box-shadow:none}#landing-page .benefit-card:last-child,#landing-page .use-benefit-card:last-child{border-right:0}
-#landing-page .benefit-card:hover,#landing-page .use-benefit-card:hover{transform:none;background:rgba(255,255,255,.022);box-shadow:none}
-#landing-page .benefit-icon,#landing-page .use-benefit-icon,#landing-page .feature-icon,#landing-page .ai-orbit-icon{position:relative;display:grid;place-items:center;width:48px;height:48px;margin:0 0 22px;color:var(--lp-accent);border:1px solid rgba(85,183,201,.18);border-radius:10px;background:rgba(85,183,201,.055);box-shadow:none}
-#landing-page .use-benefit-icon::before,#landing-page .use-benefit-icon::after,#landing-page .plan-icon::before,#landing-page .plan-icon::after,#landing-page .focus-icon::before,#landing-page .focus-icon::after,#landing-page .ai-icon::before,#landing-page .ai-icon::after,#landing-page .growth-icon::before,#landing-page .growth-icon::after{content:none;display:none;background:none;background-image:none;mask:none;-webkit-mask:none;clip-path:none;box-shadow:none}#landing-page .benefit-icon svg,#landing-page .use-benefit-icon svg,#landing-page .feature-icon svg,#landing-page .ai-orbit-icon svg{position:relative;z-index:1;display:block;width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;filter:none}
+#landing-page .benefit-card:hover,#landing-page .use-benefit-card:hover{transform:none;background:rgba(255,255,255,.022);box-shadow:none}#landing-page .benefit-icon, #landing-page .use-benefit-icon, #landing-page .feature-icon{position:relative;display:grid;place-items:center;width:48px;height:48px;margin:0 0 22px;color:var(--lp-accent);border:1px solid rgba(85,183,201,.18);border-radius:10px;background:rgba(85,183,201,.055);box-shadow:none}#landing-page .use-benefit-icon::before, #landing-page .use-benefit-icon::after, #landing-page .plan-icon::before, #landing-page .plan-icon::after, #landing-page .focus-icon::before, #landing-page .focus-icon::after, #landing-page .growth-icon::before, #landing-page .growth-icon::after{content:none;display:none;background:none;background-image:none;mask:none;-webkit-mask:none;clip-path:none;box-shadow:none}#landing-page .benefit-icon svg, #landing-page .use-benefit-icon svg, #landing-page .feature-icon svg{position:relative;z-index:1;display:block;width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;filter:none}
 #landing-page .benefit-card h3,#landing-page .use-benefit-card h3{color:var(--lp-text)}
 #landing-page .benefit-card p,#landing-page .use-benefit-card p,#landing-page .use-benefits-intro,#landing-page .about-description{color:var(--lp-muted);line-height:1.65}
 #landing-page .feature-list li{color:#b9c6cf}#landing-page .feature-list li::before{color:var(--lp-accent)}
@@ -26658,8 +26524,7 @@ body.light-mode .settings-switch-label,
 #landing-page .benefits-path span em{color:var(--lp-muted);font-size:.9rem;font-style:normal;line-height:1.35}
 #landing-page .landing-footer{border-top:1px solid var(--lp-border);color:var(--lp-muted);background:rgba(5,14,23,.5)}#landing-page .study-pet{filter:saturate(.72)}
 body.light-theme #landing-page{--lp-bg:#f4f7f9;--lp-surface:rgba(255,255,255,.86);--lp-border:rgba(24,56,77,.13);--lp-text:#102331;--lp-muted:#5d7180;background:radial-gradient(circle at 78% 11%,rgba(58,129,151,.09),transparent 30rem),#f4f7f9}
-body.light-theme #landing-page .landing-nav{background:rgba(248,251,252,.90)}body.light-theme #landing-page .hero h1{color:#102431;background-color:transparent;background-image:linear-gradient(112deg,#102431 0%,#1f5265 52%,#44558f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:1;filter:none}body.light-theme #landing-page .dashboard-mockup,body.light-theme #landing-page .ai-window,body.light-theme #landing-page .hero-mini-card{background:rgba(255,255,255,.92)}
-body.light-theme #landing-page .benefit-card,body.light-theme #landing-page .use-benefit-card,body.light-theme #landing-page .about-feature{background:rgba(255,255,255,.82)}
+body.light-theme #landing-page .landing-nav{background:rgba(248,251,252,.90)}body.light-theme #landing-page .hero h1{color:#102431;background-color:transparent;background-image:linear-gradient(112deg,#102431 0%,#1f5265 52%,#44558f 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:1;filter:none}body.light-theme #landing-page .dashboard-mockup, body.light-theme #landing-page .hero-mini-card{background:rgba(255,255,255,.92)}body.light-theme #landing-page .benefit-card, body.light-theme #landing-page .use-benefit-card{background:rgba(255,255,255,.82)}
 @media(max-width:980px){#landing-page .landing-nav{width:min(100% - 24px,760px);flex-wrap:wrap}#landing-page .landing-links{order:3;width:100%;justify-content:center;border-top:1px solid var(--lp-border);padding-top:8px}#landing-page .hero{padding-top:78px}#landing-page .hero-content{grid-template-columns:1fr;gap:38px}#landing-page .hero-left{max-width:700px;text-align:center;margin-inline:auto}#landing-page .hero-left>p{margin-inline:auto}#landing-page .hero-actions,#landing-page .hero-proof{justify-content:center}#landing-page .hero-right{width:min(660px,100%);margin-inline:auto}#landing-page .hero-visual{transform:none}#landing-page .study-pet{right:10px;bottom:12px;transform:scale(.86);transform-origin:bottom right}#landing-page .benefits-grid,#landing-page .use-benefits-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){#landing-page .landing-nav{margin-top:8px;top:6px;padding:9px 10px;border-radius:12px}#landing-page .nav-logo span{font-size:.96rem}#landing-page .brand-logo{width:32px;height:32px}#landing-page .nav-actions .btn-secondary{display:none}#landing-page .nav-actions .btn-primary{min-height:38px;padding-inline:12px;font-size:.84rem}#landing-page .landing-links{overflow-x:auto;justify-content:flex-start;scrollbar-width:none}#landing-page .landing-links a{white-space:nowrap;padding:8px 10px;font-size:.83rem}#landing-page .hero{padding:72px 16px 54px}#landing-page .hero h1{font-size:clamp(2.3rem,11.5vw,3.2rem);line-height:1.15;margin-bottom:8px;padding-bottom:.16em;overflow:visible}#landing-page .hero-proof{display:grid;grid-template-columns:1fr;width:100%}#landing-page .hero-proof span{justify-content:center}#landing-page .mockup-grid{grid-template-columns:1fr 1fr}#landing-page .hero-mini-grid{grid-template-columns:repeat(2,1fr)}#landing-page .benefits,#landing-page .about-project,#landing-page .use-benefits{padding:68px 16px}#landing-page .benefits-grid,#landing-page .use-benefits-grid{grid-template-columns:1fr}#landing-page .benefit-card,#landing-page .use-benefit-card{padding:22px}#landing-page .benefits-path{grid-template-columns:1fr;margin-top:34px;padding-left:2px}#landing-page .benefits-path::before{top:20px;bottom:20px;left:20px;right:auto;width:1px;height:auto}#landing-page .benefits-path span{grid-template-columns:40px 1fr;justify-items:start;align-items:center;gap:14px;min-height:64px;padding:0;text-align:left}#landing-page .study-pet{right:6px;bottom:8px;transform:scale(.76);transform-origin:bottom right}}
 @media(prefers-reduced-motion:reduce){#landing-page .benefit-card:hover,#landing-page .use-benefit-card:hover,#landing-page .hero-mini-card:hover{transform:none}}
