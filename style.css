@@ -101,7 +101,54 @@ body.landing-active {
     overflow-x: hidden !important;
     overflow-y: visible !important;
     scroll-behavior: auto !important;
-}body.is-landing #app, body.is-landing .app, body.is-landing .app-shell, body.is-landing .main-app, body.is-landing .page-shell, body.is-landing .page-wrapper, body.is-landing .main-content, body.is-landing .content-area, body.is-landing #landing-page, body.is-landing #landing-page.page, body.is-landing #landing-page.page.active, body.is-landing .landing-page, body.is-landing .landing-wrapper, body.is-landing .landing-main, body.is-landing .landing-content, body.is-landing .public-page, body.is-landing .marketing-page, body.is-landing .home-page, body.is-landing .sections-wrapper, body.is-landing .features-section, body.is-landing .ai-section, body.is-landing .benefits-section, body.landing-active #app, body.landing-active .app, body.landing-active .app-shell, body.landing-active .main-app, body.landing-active .page-shell, body.landing-active .page-wrapper, body.landing-active .main-content, body.landing-active .content-area, body.landing-active #landing-page, body.landing-active #landing-page.page, body.landing-active #landing-page.page.active, body.landing-active .landing-page, body.landing-active .landing-wrapper, body.landing-active .landing-main, body.landing-active .landing-content, body.landing-active .public-page, body.landing-active .marketing-page, body.landing-active .home-page, body.landing-active .sections-wrapper, body.landing-active .features-section, body.landing-active .ai-section, body.landing-active .benefits-section{
+}
+
+body.is-landing #app,
+body.is-landing .app,
+body.is-landing .app-shell,
+body.is-landing .main-app,
+body.is-landing .page-shell,
+body.is-landing .page-wrapper,
+body.is-landing .main-content,
+body.is-landing .content-area,
+body.is-landing #landing-page,
+body.is-landing #landing-page.page,
+body.is-landing #landing-page.page.active,
+body.is-landing .landing-page,
+body.is-landing .landing-wrapper,
+body.is-landing .landing-main,
+body.is-landing .landing-content,
+body.is-landing .public-page,
+body.is-landing .marketing-page,
+body.is-landing .home-page,
+body.is-landing .sections-wrapper,
+body.is-landing .hero-section,
+body.is-landing .features-section,
+body.is-landing .ai-section,
+body.is-landing .benefits-section,
+body.landing-active #app,
+body.landing-active .app,
+body.landing-active .app-shell,
+body.landing-active .main-app,
+body.landing-active .page-shell,
+body.landing-active .page-wrapper,
+body.landing-active .main-content,
+body.landing-active .content-area,
+body.landing-active #landing-page,
+body.landing-active #landing-page.page,
+body.landing-active #landing-page.page.active,
+body.landing-active .landing-page,
+body.landing-active .landing-wrapper,
+body.landing-active .landing-main,
+body.landing-active .landing-content,
+body.landing-active .public-page,
+body.landing-active .marketing-page,
+body.landing-active .home-page,
+body.landing-active .sections-wrapper,
+body.landing-active .hero-section,
+body.landing-active .features-section,
+body.landing-active .ai-section,
+body.landing-active .benefits-section {
     height: auto !important;
     max-height: none !important;
     min-height: auto !important;
@@ -7368,6 +7415,10 @@ body.light-theme #dashboard .progress-bar {
 #dashboard .dashboard-hero-widget button {
     grid-column: 1 / -1;
     width: 100%;
+}
+
+#dashboard .hero-widget-icon {
+    position: relative;
 }
 
 #dashboard .quick-actions-bar {
@@ -14957,7 +15008,11 @@ body.light-theme .subject-detail-columns p {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-}#dashboard .dashboard-stat-card .stat-icon, #dashboard .panel-icon{
+}
+
+#dashboard .dashboard-stat-card .stat-icon,
+#dashboard .panel-icon,
+#dashboard .hero-widget-icon {
     background: linear-gradient(135deg, var(--card-accent, #38bdf8), #8b5cf6) !important;
     box-shadow: 0 16px 34px color-mix(in srgb, var(--card-accent, #38bdf8), transparent 70%) !important;
 }
@@ -15700,7 +15755,18 @@ body.is-landing {
     overflow-x: hidden !important;
     overflow-y: visible !important;
     scrollbar-width: auto !important;
-}body.is-landing #landing-page, body.is-landing #landing-page.page, body.is-landing #landing-page.page.active, body.is-landing .landing-page, body.is-landing .landing-main, body.is-landing .landing-content, body.is-landing .public-page, body.is-landing .sections-wrapper, body.is-landing .page-wrapper{
+}
+
+body.is-landing #landing-page,
+body.is-landing #landing-page.page,
+body.is-landing #landing-page.page.active,
+body.is-landing .landing-page,
+body.is-landing .landing-main,
+body.is-landing .landing-content,
+body.is-landing .public-page,
+body.is-landing .sections-wrapper,
+body.is-landing .page-wrapper,
+body.is-landing .hero-section {
     height: auto !important;
     max-height: none !important;
     min-height: auto !important;
@@ -15709,7 +15775,16 @@ body.is-landing {
     overflow-y: visible !important;
     scrollbar-width: auto !important;
     scrollbar-color: auto !important;
-}body.is-landing #landing-page::-webkit-scrollbar, body.is-landing .landing-page::-webkit-scrollbar, body.is-landing .landing-main::-webkit-scrollbar, body.is-landing .landing-content::-webkit-scrollbar, body.is-landing .public-page::-webkit-scrollbar, body.is-landing .sections-wrapper::-webkit-scrollbar, body.is-landing .page-wrapper::-webkit-scrollbar{
+}
+
+body.is-landing #landing-page::-webkit-scrollbar,
+body.is-landing .landing-page::-webkit-scrollbar,
+body.is-landing .landing-main::-webkit-scrollbar,
+body.is-landing .landing-content::-webkit-scrollbar,
+body.is-landing .public-page::-webkit-scrollbar,
+body.is-landing .sections-wrapper::-webkit-scrollbar,
+body.is-landing .page-wrapper::-webkit-scrollbar,
+body.is-landing .hero-section::-webkit-scrollbar {
     width: 14px !important;
     height: 14px !important;
 }
@@ -15727,10 +15802,29 @@ html.is-landing::-webkit-scrollbar-thumb {
     background: #cbd5e1 !important;
     border: 4px solid #ffffff !important;
     border-radius: 999px !important;
-}body.is-landing::-webkit-scrollbar, body.is-landing #landing-page::-webkit-scrollbar, body.is-landing .landing-page::-webkit-scrollbar, body.is-landing .landing-main::-webkit-scrollbar, body.is-landing .landing-content::-webkit-scrollbar, body.is-landing .public-page::-webkit-scrollbar, body.is-landing .sections-wrapper::-webkit-scrollbar, body.is-landing .page-wrapper::-webkit-scrollbar{
+}
+
+body.is-landing::-webkit-scrollbar,
+body.is-landing #landing-page::-webkit-scrollbar,
+body.is-landing .landing-page::-webkit-scrollbar,
+body.is-landing .landing-main::-webkit-scrollbar,
+body.is-landing .landing-content::-webkit-scrollbar,
+body.is-landing .public-page::-webkit-scrollbar,
+body.is-landing .sections-wrapper::-webkit-scrollbar,
+body.is-landing .page-wrapper::-webkit-scrollbar,
+body.is-landing .hero-section::-webkit-scrollbar {
     width: 14px !important;
     height: 14px !important;
-}body.is-landing #landing-page, body.is-landing .landing-page, body.is-landing .landing-main, body.is-landing .landing-content, body.is-landing .public-page, body.is-landing .sections-wrapper, body.is-landing .page-wrapper{
+}
+
+body.is-landing #landing-page,
+body.is-landing .landing-page,
+body.is-landing .landing-main,
+body.is-landing .landing-content,
+body.is-landing .public-page,
+body.is-landing .sections-wrapper,
+body.is-landing .page-wrapper,
+body.is-landing .hero-section {
     scrollbar-width: auto !important;
     -ms-overflow-style: auto !important;
 }
@@ -17848,6 +17942,84 @@ body.light-theme .sidebar .nav-item.active .nav-icon {
 @media (max-width: 520px) {
 }
 
+#landing-page .hero-widget-mini .mini-card-icon {
+    width: clamp(56px, 6vw, 64px) !important;
+    height: clamp(56px, 6vw, 64px) !important;
+    min-width: clamp(56px, 6vw, 64px) !important;
+    margin: 8px 0 10px !important;
+    border-radius: 22px !important;
+    background: linear-gradient(135deg, var(--widget-a), var(--widget-b), var(--widget-c)) !important;
+    box-shadow: 0 14px 28px var(--widget-shadow, rgba(56, 189, 248, 0.18)), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+
+#landing-page .hero-widget-mini .mini-card-icon svg {
+    width: clamp(34px, 4vw, 42px) !important;
+    height: clamp(34px, 4vw, 42px) !important;
+    stroke: #ffffff !important;
+    fill: none !important;
+    stroke-width: 2.25 !important;
+    filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.24)) !important;
+}
+
+#landing-page .hero-widget-mini .mini-card-copy {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: block !important;
+    margin: 0 !important;
+    text-align: center !important;
+}
+
+#landing-page .hero-widget-mini .mini-card-copy strong {
+    display: block !important;
+    width: 100% !important;
+    color: #ffffff !important;
+    font-size: clamp(0.9rem, 1.35vw, 1rem) !important;
+    font-weight: 950 !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+}
+
+#landing-page .hero-widget-mini .mini-card-copy small {
+    display: none !important;
+}
+
+#landing-page .hero-widget-mini .mini-card-indicator {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    grid-column: auto !important;
+    min-width: 32px !important;
+    height: 24px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 8px !important;
+    border-radius: 999px !important;
+    color: #ffffff !important;
+    font-size: 10px !important;
+    font-weight: 950 !important;
+    line-height: 1 !important;
+    background: linear-gradient(135deg, var(--widget-a), var(--widget-b), var(--widget-c)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 8px 18px var(--widget-shadow, rgba(56, 189, 248, 0.18)) !important;
+}
+
+#landing-page .hero-widget-mini::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: auto 12px 12px 12px !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(90deg, var(--widget-a), var(--widget-b), var(--widget-c)) !important;
+    opacity: 0.82 !important;
+}
+
+body.light-theme #landing-page .hero-widget-mini .mini-card-copy strong {
+    color: #0f172a !important;
+}
+
 @keyframes heroWidgetFloat {
     0%, 100% { translate: 0 0; }
     50% { translate: 0 -4px; }
@@ -17857,6 +18029,25 @@ body.light-theme .sidebar .nav-item.active .nav-icon {
 }
 
 @media (max-width: 520px) {
+
+    #landing-page .hero-widget-mini .mini-card-icon {
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+    }
+
+    #landing-page .hero-widget-mini .mini-card-icon svg {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    #landing-page .hero-widget-mini .mini-card-indicator {
+        top: 9px !important;
+        right: 9px !important;
+        height: 21px !important;
+        min-width: 28px !important;
+        font-size: 9px !important;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -17966,8 +18157,20 @@ body.light-theme .theme-toggle svg {
 body.light-theme .sidebar .sidebar-icon {
     border-color: rgba(37, 99, 235, 0.16) !important;
     box-shadow: 0 8px 18px rgba(37, 99, 235, 0.20) !important;
-}/* Iconos profesionales centrados en tarjetas, materias, recursos y dashboard */
-.card-icon, .stat-icon, .summary-icon, .dashboard-icon, .subject-icon, .resource-icon, .material-icon, .panel-icon, .app-icon, .profile-stat-icon{
+}
+
+/* Iconos profesionales centrados en tarjetas, materias, recursos y dashboard */
+.card-icon,
+.stat-icon,
+.summary-icon,
+.dashboard-icon,
+.subject-icon,
+.resource-icon,
+.material-icon,
+.panel-icon,
+.app-icon,
+.hero-widget-icon,
+.profile-stat-icon {
     position: relative !important;
     width: 56px !important;
     height: 56px !important;
@@ -17988,14 +18191,38 @@ body.light-theme .sidebar .sidebar-icon {
     background: linear-gradient(135deg, var(--card-accent, #2563eb), #38bdf8) !important;
     border: 1px solid rgba(255, 255, 255, 0.16) !important;
     box-shadow: 0 12px 26px color-mix(in srgb, var(--card-accent, #38bdf8), transparent 72%) !important;
-}.card-icon *, .stat-icon *, .summary-icon *, .dashboard-icon *, .subject-icon *, .resource-icon *, .material-icon *, .panel-icon *, .app-icon *, .profile-stat-icon *{
+}
+
+.card-icon *,
+.stat-icon *,
+.summary-icon *,
+.dashboard-icon *,
+.subject-icon *,
+.resource-icon *,
+.material-icon *,
+.panel-icon *,
+.app-icon *,
+.hero-widget-icon *,
+.profile-stat-icon * {
     transform: none !important;
     rotate: 0deg !important;
     translate: 0 0 !important;
     margin: 0 !important;
     position: relative !important;
     z-index: 2 !important;
-}.card-icon svg, .stat-icon svg, .summary-icon svg, .dashboard-icon svg, .subject-icon svg, .resource-icon svg, .material-icon svg, .panel-icon svg, .app-icon svg, .profile-stat-icon svg{
+}
+
+.card-icon svg,
+.stat-icon svg,
+.summary-icon svg,
+.dashboard-icon svg,
+.subject-icon svg,
+.resource-icon svg,
+.material-icon svg,
+.panel-icon svg,
+.app-icon svg,
+.hero-widget-icon svg,
+.profile-stat-icon svg {
     width: 26px !important;
     height: 26px !important;
     display: block !important;
@@ -18006,7 +18233,30 @@ body.light-theme .sidebar .sidebar-icon {
     fill: none !important;
     stroke-linecap: round !important;
     stroke-linejoin: round !important;
-}.card-icon::before, .card-icon::after, .stat-icon::before, .stat-icon::after, .summary-icon::before, .summary-icon::after, .dashboard-icon::before, .dashboard-icon::after, .subject-icon::before, .subject-icon::after, .resource-icon::before, .resource-icon::after, .material-icon::before, .material-icon::after, .panel-icon::before, .panel-icon::after, .app-icon::before, .app-icon::after, .profile-stat-icon::before, .profile-stat-icon::after{
+}
+
+.card-icon::before,
+.card-icon::after,
+.stat-icon::before,
+.stat-icon::after,
+.summary-icon::before,
+.summary-icon::after,
+.dashboard-icon::before,
+.dashboard-icon::after,
+.subject-icon::before,
+.subject-icon::after,
+.resource-icon::before,
+.resource-icon::after,
+.material-icon::before,
+.material-icon::after,
+.panel-icon::before,
+.panel-icon::after,
+.app-icon::before,
+.app-icon::after,
+.hero-widget-icon::before,
+.hero-widget-icon::after,
+.profile-stat-icon::before,
+.profile-stat-icon::after {
     content: none !important;
     display: none !important;
 }
@@ -23721,7 +23971,46 @@ body.landing-active #app-page.page:not(.active) {
     max-height: none !important;
     min-height: 0 !important;
     overflow: visible !important;
-}body.landing-active #app, body.landing-active .app, body.landing-active .app-shell, body.landing-active .main-app, body.landing-active .page-shell, body.landing-active .page-wrapper, body.landing-active .main-content, body.landing-active .content-area, body.landing-active #landing-page, body.landing-active #landing-page.page, body.landing-active #landing-page.page.active, body.landing-active .landing-page, body.landing-active .landing-wrapper, body.landing-active .landing-main, body.landing-active .landing-content, body.landing-active .public-page, body.landing-active .marketing-page, body.landing-active .home-page, body.landing-active .sections-wrapper, body.landing-active .features-section, body.landing-active .ai-section, body.landing-active .benefits-section, body.is-landing #landing-page, body.is-landing #landing-page.page, body.is-landing #landing-page.page.active, body.is-landing .landing-page, body.is-landing .landing-wrapper, body.is-landing .landing-main, body.is-landing .landing-content, body.is-landing .public-page, body.is-landing .marketing-page, body.is-landing .home-page, body.is-landing .sections-wrapper, body.is-landing .features-section, body.is-landing .ai-section, body.is-landing .benefits-section{
+}
+
+body.landing-active #app,
+body.landing-active .app,
+body.landing-active .app-shell,
+body.landing-active .main-app,
+body.landing-active .page-shell,
+body.landing-active .page-wrapper,
+body.landing-active .main-content,
+body.landing-active .content-area,
+body.landing-active #landing-page,
+body.landing-active #landing-page.page,
+body.landing-active #landing-page.page.active,
+body.landing-active .landing-page,
+body.landing-active .landing-wrapper,
+body.landing-active .landing-main,
+body.landing-active .landing-content,
+body.landing-active .public-page,
+body.landing-active .marketing-page,
+body.landing-active .home-page,
+body.landing-active .sections-wrapper,
+body.landing-active .hero-section,
+body.landing-active .features-section,
+body.landing-active .ai-section,
+body.landing-active .benefits-section,
+body.is-landing #landing-page,
+body.is-landing #landing-page.page,
+body.is-landing #landing-page.page.active,
+body.is-landing .landing-page,
+body.is-landing .landing-wrapper,
+body.is-landing .landing-main,
+body.is-landing .landing-content,
+body.is-landing .public-page,
+body.is-landing .marketing-page,
+body.is-landing .home-page,
+body.is-landing .sections-wrapper,
+body.is-landing .hero-section,
+body.is-landing .features-section,
+body.is-landing .ai-section,
+body.is-landing .benefits-section {
     height: auto !important;
     max-height: none !important;
     min-height: auto !important;
@@ -24145,7 +24434,6 @@ body.light-theme #landing-page #ai-preview .ai-feature-copy small,body.light-the
 @media(max-width:768px){#landing-page #ai-preview{padding:60px 18px}#landing-page #ai-preview .ai-showcase-container{grid-template-columns:1fr;gap:36px}#landing-page #ai-preview .ai-copy{max-width:640px;margin:auto;text-align:center}#landing-page #ai-preview .ai-copy h2,#landing-page #ai-preview .ai-copy .about-description{margin-inline:auto}#landing-page #ai-preview .ai-trust-bar{justify-content:center}#landing-page #ai-preview .ai-chat-shell{width:min(100%,580px)}}
 @media(max-width:480px){#landing-page #ai-preview{padding:54px 16px}#landing-page #ai-preview .ai-copy h2{font-size:clamp(2rem,10vw,2.65rem)}#landing-page #ai-preview .ai-feature-stack{grid-template-columns:1fr}#landing-page #ai-preview .about-feature{text-align:left}#landing-page #ai-preview .ai-trust-bar{justify-content:flex-start;text-align:left}#landing-page #ai-preview .ai-orbit-card{width:100%}#landing-page #ai-preview .ai-message{max-width:92%}#landing-page #ai-preview .ai-tool-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}#landing-page #ai-preview .ai-tool-row span{padding-inline:5px;font-size:.68rem}}
 @media(max-width:360px){#landing-page #ai-preview .ai-chat-body{padding:13px}#landing-page #ai-preview .ai-chat-input{margin-inline:9px}#landing-page #ai-preview .ai-orbit-card{grid-template-columns:34px minmax(0,1fr) 16px}}
-
 
 /* AC EDUNITY HERO DASHBOARD COMPACT 2026 */
 #landing-page .hero{position:relative;display:block;width:100%;min-height:640px;height:auto;margin:0;padding:64px 20px 58px;overflow:visible;background:linear-gradient(180deg,#07141f,#081722)}
