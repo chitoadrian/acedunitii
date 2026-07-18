@@ -22180,12 +22180,12 @@ body.light-theme .study-ai-card {
 #landing-page .benefits,
 #landing-page .about-project,
 #landing-page .use-benefits {
-    width: min(1180px, calc(100% - 40px)) !important;
-    max-width: 1180px !important;
-    margin: 0 auto 34px !important;
-    border-radius: 36px !important;
-    border: 1px solid rgba(255, 255, 255, 0.075) !important;
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.18) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
 }
 
 #landing-page .benefits {
@@ -24347,8 +24347,8 @@ body.light-mode .settings-switch-label,
 }
 
 /* AC EDUNITY LANDING PREMIUM 2026 */
-#landing-page{--lp-bg:#07131f;--lp-surface:rgba(13,31,45,.82);--lp-border:rgba(148,178,199,.16);--lp-text:#f3f7fa;--lp-muted:#9eb0be;--lp-accent:#55b7c9;position:relative;overflow:hidden;color:var(--lp-text);background:radial-gradient(circle at 78% 10%,rgba(58,129,151,.13),transparent 30rem),radial-gradient(circle at 10% 48%,rgba(91,72,150,.08),transparent 28rem),var(--lp-bg)}
-#landing-page::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:56px 56px;mask-image:linear-gradient(#000,transparent 72%)}
+html.is-landing,html.landing-mode,body.is-landing,body.landing-mode,body.landing-active,#landing-page{--lp-bg:#07131f;--lp-surface:rgba(13,31,45,.82);--lp-border:rgba(148,178,199,.16);--lp-text:#f3f7fa;--lp-muted:#9eb0be;--lp-accent:#55b7c9;background-color:var(--lp-bg);background-image:none}#landing-page{position:relative;isolation:isolate;overflow-x:clip;overflow-y:visible;color:var(--lp-text)}
+#landing-page::before{content:none;display:none;background:none;mask:none}
 #landing-page .landing-nav{width:min(1180px,calc(100% - 40px));min-height:68px;margin:14px auto 0;padding:10px 14px 10px 18px;border:1px solid var(--lp-border);border-radius:14px;background:rgba(7,19,31,.82);box-shadow:0 14px 42px rgba(0,0,0,.20);backdrop-filter:blur(18px);position:sticky;top:10px;z-index:100}
 #landing-page .nav-logo{gap:10px;font-weight:700;letter-spacing:-.02em}#landing-page .brand-logo{width:36px;height:36px;object-fit:contain}
 #landing-page .landing-links{gap:4px}#landing-page .landing-links a{padding:9px 12px;border-radius:8px;color:var(--lp-muted);font-size:.92rem;font-weight:550}#landing-page .landing-links a:hover{color:var(--lp-text);background:rgba(255,255,255,.05)}
@@ -24357,7 +24357,7 @@ body.light-mode .settings-switch-label,
 #landing-page .nav-actions .btn-primary,#landing-page .btn-large{color:#06131b;border:1px solid rgba(255,255,255,.16);background:var(--lp-accent)}
 #landing-page .nav-actions .btn-primary:hover,#landing-page .btn-large:hover{background:#70c6d5;transform:translateY(-1px);box-shadow:0 10px 28px rgba(47,143,165,.22)}
 #landing-page .theme-toggle{border-color:var(--lp-border);background-color:rgba(255,255,255,.035)}#landing-page .section-eyebrow{position:relative;z-index:1;color:#8fd0dc;background:rgba(85,183,201,.08);border:1px solid rgba(85,183,201,.18);box-shadow:none;letter-spacing:.08em}#landing-page .btn-large{min-height:48px;padding:0 22px;font-size:.98rem}
-#landing-page .benefits,#landing-page .about-project,#landing-page .use-benefits{position:relative;padding:88px 20px;border-top:1px solid rgba(148,178,199,.1);background:transparent}
+#landing-page .benefits,#landing-page .about-project,#landing-page .use-benefits{position:relative;display:flow-root;margin:0;padding:88px 20px;border:0;background:transparent;box-shadow:none}
 #landing-page .benefits>h2,#landing-page .about-project h2,#landing-page .use-benefits h2{color:var(--lp-text);letter-spacing:-.035em;font-size:clamp(2rem,3.6vw,3.15rem)}
 #landing-page .benefits-grid,#landing-page .use-benefits-grid{gap:0;border-top:1px solid var(--lp-border);border-bottom:1px solid var(--lp-border)}
 #landing-page .benefit-card,#landing-page .use-benefit-card{height:100%;min-height:260px;padding:30px 26px;border:0;border-right:1px solid var(--lp-border);border-radius:0;background:transparent;box-shadow:none}#landing-page .benefit-card:last-child,#landing-page .use-benefit-card:last-child{border-right:0}
@@ -24371,8 +24371,8 @@ body.light-mode .settings-switch-label,
 #landing-page .benefits-path span{position:relative;display:grid;justify-items:center;gap:12px;padding:0 10px;color:var(--lp-muted);border:0;border-radius:0;background:transparent;box-shadow:none;text-align:center}
 #landing-page .benefits-path span b{z-index:1;display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(85,183,201,.30);border-radius:50%;color:var(--lp-accent);background:var(--lp-bg);font-size:.78rem;font-weight:700}
 #landing-page .benefits-path span em{color:var(--lp-muted);font-size:.9rem;font-style:normal;line-height:1.35}
-#landing-page .landing-footer{border-top:1px solid var(--lp-border);color:var(--lp-muted);background:rgba(5,14,23,.5)}#landing-page .study-pet{filter:saturate(.72)}
-body.light-theme #landing-page{--lp-bg:#f4f7f9;--lp-surface:rgba(255,255,255,.86);--lp-border:rgba(24,56,77,.13);--lp-text:#102331;--lp-muted:#5d7180;background:radial-gradient(circle at 78% 11%,rgba(58,129,151,.09),transparent 30rem),#f4f7f9}
+#landing-page .landing-footer{margin:0;border:0;color:var(--lp-muted);background:transparent;box-shadow:none}#landing-page .study-pet{filter:saturate(.72)}
+html.is-landing:has(body.light-theme),html.landing-mode:has(body.light-theme),body.light-theme{--lp-bg:#f4f7f9;background-color:var(--lp-bg);background-image:none}body.light-theme #landing-page{--lp-bg:#f4f7f9;--lp-surface:rgba(255,255,255,.86);--lp-border:rgba(24,56,77,.13);--lp-text:#102331;--lp-muted:#5d7180;background-color:var(--lp-bg);background-image:none}
 body.light-theme #landing-page .landing-nav{background:rgba(248,251,252,.90)}body.light-theme #landing-page .benefit-card, body.light-theme #landing-page .use-benefit-card{background:rgba(255,255,255,.82)}
 @media(max-width:980px){#landing-page .landing-nav{width:min(100% - 24px,760px);flex-wrap:wrap}#landing-page .landing-links{order:3;width:100%;justify-content:center;border-top:1px solid var(--lp-border);padding-top:8px}#landing-page .study-pet{right:10px;bottom:12px;transform:scale(.86);transform-origin:bottom right}#landing-page .benefits-grid,#landing-page .use-benefits-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){#landing-page .landing-nav{margin-top:8px;top:6px;padding:9px 10px;border-radius:12px}#landing-page .nav-logo span{font-size:.96rem}#landing-page .brand-logo{width:32px;height:32px}#landing-page .nav-actions .btn-secondary{display:none}#landing-page .nav-actions .btn-primary{min-height:38px;padding-inline:12px;font-size:.84rem}#landing-page .landing-links{overflow-x:auto;justify-content:flex-start;scrollbar-width:none}#landing-page .landing-links a{white-space:nowrap;padding:8px 10px;font-size:.83rem}#landing-page .benefits,#landing-page .about-project,#landing-page .use-benefits{padding:68px 16px}#landing-page .benefits-grid,#landing-page .use-benefits-grid{grid-template-columns:1fr}#landing-page .benefit-card,#landing-page .use-benefit-card{padding:22px}#landing-page .benefits-path{grid-template-columns:1fr;margin-top:34px;padding-left:2px}#landing-page .benefits-path::before{top:20px;bottom:20px;left:20px;right:auto;width:1px;height:auto}#landing-page .benefits-path span{grid-template-columns:40px 1fr;justify-items:start;align-items:center;gap:14px;min-height:64px;padding:0;text-align:left}#landing-page .study-pet{right:6px;bottom:8px;transform:scale(.76);transform-origin:bottom right}}
@@ -24436,8 +24436,7 @@ body.light-theme #landing-page #ai-preview .ai-feature-copy small,body.light-the
 @media(max-width:360px){#landing-page #ai-preview .ai-chat-body{padding:13px}#landing-page #ai-preview .ai-chat-input{margin-inline:9px}#landing-page #ai-preview .ai-orbit-card{grid-template-columns:34px minmax(0,1fr) 16px}}
 
 /* AC EDUNITY HERO DASHBOARD COMPACT 2026 */
-#landing-page .hero{position:relative;display:block;width:100%;min-height:640px;height:auto;margin:0;padding:64px 20px 58px;overflow:visible;background:linear-gradient(180deg,#07141f,#07131f)}
-body:not(.light-theme):not(.light-mode) #landing-page .hero + .benefits{margin-top:0;border-top-color:transparent;background:#07131f;box-shadow:none}
+#landing-page .hero{position:relative;display:block;width:100%;min-height:640px;height:auto;margin:0;padding:64px 20px 58px;overflow:visible;background:var(--lp-bg)}
 #landing-page .hero::before,#landing-page .hero::after,#landing-page .hero-visual::before,#landing-page .hero-visual::after,#landing-page .dashboard-mockup::before,#landing-page .dashboard-mockup::after{content:none;display:none;background:none;filter:none}
 #landing-page .hero-content{display:grid;grid-template-columns:minmax(0,.96fr) minmax(430px,1.04fr);align-items:center;gap:clamp(42px,5vw,68px);width:min(1160px,100%);margin:auto;overflow:visible}
 #landing-page .hero-left{min-width:0;max-width:590px;overflow:visible}
@@ -24476,7 +24475,7 @@ body:not(.light-theme):not(.light-mode) #landing-page .hero + .benefits{margin-t
 #landing-page .hero-mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;width:100%;margin:0}
 #landing-page .hero-mini-card{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:54px;min-height:54px;max-height:none;margin:0;padding:9px;border:1px solid rgba(157,188,207,.12);border-radius:9px;color:#9fb1bd;background:rgba(13,31,45,.72);box-shadow:none;transform:none;overflow:visible}
 #landing-page .hero-mini-card:hover{transform:translateY(-2px);border-color:rgba(88,183,199,.27)}#landing-page .hero-mini-card svg{width:19px;height:19px;fill:none;stroke:#58b7c7;stroke-width:1.55;stroke-linecap:round;stroke-linejoin:round}#landing-page .hero-mini-card .mini-title{margin:0;color:#dce7eb;font-size:.73rem}
-body.light-theme #landing-page .hero{background:linear-gradient(180deg,#f8fafb,#f2f6f8)}body.light-theme #landing-page .hero h1{color:#102431;-webkit-text-fill-color:currentColor}body.light-theme #landing-page .hero h1 span{color:#277f93;background-image:linear-gradient(110deg,#237c90,#5e5a88);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+body.light-theme #landing-page .hero{background:var(--lp-bg)}body.light-theme #landing-page .hero h1{color:#102431;-webkit-text-fill-color:currentColor}body.light-theme #landing-page .hero h1 span{color:#277f93;background-image:linear-gradient(110deg,#237c90,#5e5a88);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 body.light-theme #landing-page .hero-left>p{color:#5a7180}body.light-theme #landing-page .dashboard-mockup{background:#fff;border-color:rgba(25,57,76,.13);box-shadow:0 18px 38px rgba(15,35,48,.09)}
 body.light-theme #landing-page .mockup-card,body.light-theme #landing-page .hero-mini-card,body.light-theme #landing-page .hero-proof>span{background:#fff;border-color:rgba(25,57,76,.11)}body.light-theme #landing-page .mockup-top strong,body.light-theme #landing-page .metric-card b,body.light-theme #landing-page .tutor-card p,body.light-theme #landing-page .mini-title,body.light-theme #landing-page .hero-proof strong{color:#17303e}
 @media(max-width:1024px){#landing-page .hero{min-height:610px;padding:58px 20px 52px}#landing-page .hero-content{grid-template-columns:minmax(0,.94fr) minmax(400px,1.06fr);gap:32px}#landing-page .hero h1{font-size:clamp(2.45rem,4.8vw,3.55rem)}#landing-page .hero-proof{grid-template-columns:1fr;gap:6px}}
