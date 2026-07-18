@@ -24483,3 +24483,36 @@ body.light-theme #landing-page .mockup-card,body.light-theme #landing-page .hero
 @media(max-width:480px){#landing-page .hero{padding:56px 16px 48px}#landing-page .hero h1{font-size:clamp(2.25rem,11vw,2.9rem);line-height:1.12}#landing-page .hero-proof{grid-template-columns:1fr}#landing-page .mockup-grid{gap:7px;padding:9px}#landing-page .mockup-bars{gap:5px}#landing-page .hero-mini-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#landing-page .study-pet{right:5px;bottom:8px;transform:scale(.74);transform-origin:bottom right}}
 @media(max-width:360px){#landing-page .hero{padding-inline:12px}#landing-page .hero h1{font-size:2.18rem}#landing-page .mockup-card{padding:9px}#landing-page .mockup-bars{gap:3px}}
 
+
+/* AC EDUNITY HERO SEAM CONTINUITY 2026 */
+body.is-landing #landing-page,
+body.landing-mode #landing-page,
+body.landing-active #landing-page {
+    background-color: var(--lp-bg);
+    background-image: none;
+}
+
+body.is-landing #landing-page > .hero,
+body.landing-mode #landing-page > .hero,
+body.landing-active #landing-page > .hero,
+body.is-landing #landing-page > .hero + #features,
+body.landing-mode #landing-page > .hero + #features,
+body.landing-active #landing-page > .hero + #features {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top: 0;
+    border-bottom: 0;
+    box-shadow: none;
+    background-color: transparent;
+    background-image: none;
+}
+
+body.is-landing #landing-page > .hero::before,
+body.is-landing #landing-page > .hero::after,
+body.landing-mode #landing-page > .hero::before,
+body.landing-mode #landing-page > .hero::after,
+body.landing-active #landing-page > .hero::before,
+body.landing-active #landing-page > .hero::after {
+    content: none;
+    display: none;
+}
