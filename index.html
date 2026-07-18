@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="assets/ac-edunity-logo.png">
     <link rel="shortcut icon" type="image/png" href="assets/ac-edunity-logo.png">
     <link rel="apple-touch-icon" href="assets/ac-edunity-logo.png">
-    <link rel="stylesheet" href="style.css?v=20260718-tutor-compact">
+    <link rel="stylesheet" href="style.css?v=20260718-hero-dashboard-compact">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <div id="app-boot-loader" class="app-boot-loader" role="status" aria-live="polite">
@@ -59,37 +59,29 @@
             <div class="hero-content">
                 <div class="hero-left reveal-left">
                     <span class="hero-badge">Gestión Educativa Inteligente Personalizada</span>
-                    <h1>Organiza tu aprendizaje. Avanza con inteligencia.</h1>
+                    <h1>Organiza tu aprendizaje. Avanza con <span>inteligencia.</span></h1>
                     <p>Planifica tus estudios, aprende con Tutor IA y convierte cada objetivo académico en progreso visible.</p>
                     <div class="hero-actions">
-                        <button class="btn-large" onclick="showRegister()">Comenzar gratis</button>
+                        <button class="btn-large" onclick="showRegister()">Comenzar gratis <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
                     </div>
                     <div class="hero-proof reveal delay-2" aria-label="Resumen de herramientas principales">
-                        <span><strong>Todo</strong> tu espacio académico</span>
-                        <span><strong>Tutor</strong> para estudiar mejor</span>
-                        <span><strong>XP</strong> y progreso visual</span>
+                        <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4zM8 4h8v3M8 11h8M8 15h5"></path></svg><small><strong>Todo</strong> tu espacio académico</small></span>
+                        <span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="3"></rect><path d="M9 2v3M15 2v3M9 11h.01M15 11h.01M9 15h6"></path></svg><small><strong>Tutor</strong> para estudiar mejor</small></span>
+                        <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M7 16v-4M12 16V8M17 16V5M14 7l3-3 3 3"></path></svg><small><strong>XP</strong> y progreso visual</small></span>
                     </div>
                 </div>
                 <div class="hero-right hero-visual reveal-right delay-1">
                 <div class="dashboard-mockup hero-dashboard">
-                    <div class="mockup-top">
-                        <span></span><span></span><span></span>
-                        <strong>Panel AC Edunity</strong>
-                    </div>
-                    <div class="mockup-grid">
-                        <div class="mockup-card wide">
-                            <small>Progreso semanal</small>
-                            <div class="mockup-bars"><i></i><i></i><i></i><i></i><i></i></div>
-                        </div>
-                        <div class="mockup-card"><small>Tareas</small><b>Prioriza</b></div>
-                        <div class="mockup-card"><small>XP</small><b>Avanza</b></div>
-                        <div class="mockup-card wide accent"><small>Tutor</small><p>Listo para resumir tus apuntes</p></div>
-                    </div>
-                    <div class="mockup-progress-line" aria-hidden="true"><span></span></div>
-                </div>
+ <div class="mockup-top"><span class="panel-status" aria-hidden="true"></span><strong>Panel AC Edunity</strong><small>Vista general</small></div>
+ <div class="mockup-grid">
+  <div class="mockup-card wide progress-card"><div class="mockup-card-heading"><small>Progreso semanal</small><span>Esta semana</span></div><div class="mockup-bars" aria-label="Progreso de lunes a domingo"><span><i style="--bar:42%"></i><small>Lun</small></span><span><i style="--bar:65%"></i><small>Mar</small></span><span><i style="--bar:54%"></i><small>Mié</small></span><span><i style="--bar:82%"></i><small>Jue</small></span><span><i style="--bar:70%"></i><small>Vie</small></span><span><i style="--bar:48%"></i><small>Sáb</small></span><span><i style="--bar:76%"></i><small>Dom</small></span></div></div>
+  <div class="mockup-card metric-card"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM9 9h6M9 13h4"></path></svg></span><small>Tareas</small><b>Prioriza</b></div>
+  <div class="mockup-card metric-card xp-card"><span class="metric-icon xp-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.5 5 5.5.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9 5.5-.8L12 3Z"></path></svg></span><small>XP</small><b>Avanza</b></div>
+  <div class="mockup-card wide tutor-card"><span class="metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"></rect><path d="M9 11h.01M15 11h.01M9 15h6"></path></svg></span><div><small>Tutor</small><p>Listo para resumir tus apuntes</p></div></div>
+ </div>
+</div>
                 <div class="hero-mini-grid" aria-label="Widgets principales de AC Edunity">
                     <div class="hero-mini-card card-1">
-                        <span class="mini-badge">OK</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M5 4.5h8a3 3 0 0 1 3 3v12H8a3 3 0 0 0-3 3v-18Z"></path>
                             <path d="M16 7.5h3a2 2 0 0 1 2 2v10h-5"></path>
@@ -99,7 +91,6 @@
                         <h3 class="mini-title">Materias</h3>
                     </div>
                     <div class="hero-mini-card card-2">
-                        <span class="mini-badge">IA</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <rect x="4" y="5" width="16" height="14" rx="3"></rect>
                             <path d="M8 3v3"></path>
@@ -111,7 +102,6 @@
                         <h3 class="mini-title">Tutor</h3>
                     </div>
                     <div class="hero-mini-card card-3">
-                        <span class="mini-badge">Hoy</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <rect x="4" y="5" width="16" height="15" rx="3"></rect>
                             <path d="M8 3v4"></path>
@@ -124,7 +114,6 @@
                         <h3 class="mini-title">Calendario</h3>
                     </div>
                     <div class="hero-mini-card card-4">
-                        <span class="mini-badge">XP</span>
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M4 19h16"></path>
                             <path d="M7 16v-5"></path>
