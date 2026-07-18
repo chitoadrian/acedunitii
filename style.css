@@ -24436,7 +24436,8 @@ body.light-theme #landing-page #ai-preview .ai-feature-copy small,body.light-the
 @media(max-width:360px){#landing-page #ai-preview .ai-chat-body{padding:13px}#landing-page #ai-preview .ai-chat-input{margin-inline:9px}#landing-page #ai-preview .ai-orbit-card{grid-template-columns:34px minmax(0,1fr) 16px}}
 
 /* AC EDUNITY HERO DASHBOARD COMPACT 2026 */
-#landing-page .hero{position:relative;display:block;width:100%;min-height:640px;height:auto;margin:0;padding:64px 20px 58px;overflow:visible;background:linear-gradient(180deg,#07141f,#081722)}
+#landing-page .hero{position:relative;display:block;width:100%;min-height:640px;height:auto;margin:0;padding:64px 20px 58px;overflow:visible;background:linear-gradient(180deg,#07141f,#07131f)}
+body:not(.light-theme):not(.light-mode) #landing-page .hero + .benefits{margin-top:0;border-top-color:transparent;background:#07131f;box-shadow:none}
 #landing-page .hero::before,#landing-page .hero::after,#landing-page .hero-visual::before,#landing-page .hero-visual::after,#landing-page .dashboard-mockup::before,#landing-page .dashboard-mockup::after{content:none;display:none;background:none;filter:none}
 #landing-page .hero-content{display:grid;grid-template-columns:minmax(0,.96fr) minmax(430px,1.04fr);align-items:center;gap:clamp(42px,5vw,68px);width:min(1160px,100%);margin:auto;overflow:visible}
 #landing-page .hero-left{min-width:0;max-width:590px;overflow:visible}
