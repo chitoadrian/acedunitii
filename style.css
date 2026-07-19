@@ -14558,7 +14558,7 @@ body.light-theme .subject-detail-card::after {
 
 #tasks .task-card-main {
     display: grid !important;
-    grid-template-columns: 52px minmax(0, 1fr) !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
     gap: 12px !important;
     align-items: start !important;
 }
@@ -15037,7 +15037,7 @@ body.light-theme .subject-detail-columns p {
 
 #dashboard .dashboard-hero-widget {
     display: grid !important;
-    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-template-columns: 52px minmax(0, 1fr) !important;
     align-items: center !important;
     gap: 12px !important;
     width: 100% !important;
@@ -15540,7 +15540,7 @@ body.light-theme #dashboard .weekly-chart {
     }
 
     #dashboard .dashboard-steps li {
-        grid-template-columns: 52px minmax(0, 1fr) !important;
+        grid-template-columns: 40px minmax(0, 1fr) !important;
     }
 
     #dashboard .dashboard-steps button {
@@ -16849,7 +16849,7 @@ body.light-theme .password-modal-card {
     }
 
     #dashboard .dashboard-hero-widget {
-        grid-template-columns: 40px minmax(0, 1fr) !important;
+        grid-template-columns: 52px minmax(0, 1fr) !important;
         max-width: none !important;
         justify-self: stretch !important;
     }
