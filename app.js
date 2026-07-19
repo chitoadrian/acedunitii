@@ -5486,6 +5486,34 @@ function getTutorConversationContext() {
         }));
 }
 
+function getTutorAIHistoryPayload() {
+    try {
+        const history = getTutorConversationContext();
+        if (!Array.isArray(history)) return [];
+
+        const ignoredResponses = [
+            'No pude conectarme con la IA.',
+            'No pude conectar con Tutor IA.'
+        ];
+
+        return history
+            .filter(item => {
+                if (!item || !['user', 'assistant'].includes(item.role)) return false;
+                const content = String(item.content || '').trim();
+                if (!content) return false;
+                return !ignoredResponses.some(message => content.startsWith(message));
+            })
+            .map(item => ({
+                role: item.role,
+                content: String(item.content).trim().slice(0, 4000)
+            }))
+            .slice(-12);
+    } catch (error) {
+        console.warn('[TUTOR IA HISTORY] No se pudo preparar el historial:', error?.message || error);
+        return [];
+    }
+}
+
 async function requestTutorAI(userMessage) {
     try {
         const sb = getSupabaseClient();
