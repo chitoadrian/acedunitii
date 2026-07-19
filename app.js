@@ -4234,21 +4234,111 @@ function normalizeTutorText(text) {
         .toLowerCase();
 }
 
+function isTutorHistoryNearBottom(messages, threshold = 120) {
+    if (!messages) return false;
+    return messages.scrollHeight - messages.scrollTop - messages.clientHeight <= threshold;
+}
+
+function scrollTutorHistoryToEnd(messages, shouldScroll = true) {
+    if (!messages || !shouldScroll) return;
+
+    requestAnimationFrame(() => {
+        messages.scrollTo({
+            top: messages.scrollHeight,
+            behavior: 'smooth'
+        });
+    });
+}
+
+function formatTutorInlineMarkdown(value) {
+    return escapeHTML(String(value || ''))
+        .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+}
+
+function renderTutorMarkdown(value) {
+    const lines = String(value || '').replace(/\r\n?/g, '\n').split('\n');
+    const output = [];
+    let paragraph = [];
+    let listType = '';
+    let listItems = [];
+
+    const flushParagraph = () => {
+        if (!paragraph.length) return;
+        output.push(`<p>${paragraph.map(formatTutorInlineMarkdown).join('<br>')}</p>`);
+        paragraph = [];
+    };
+
+    const flushList = () => {
+        if (!listType || !listItems.length) return;
+        output.push(`<${listType}>${listItems.map(item => `<li>${formatTutorInlineMarkdown(item)}</li>`).join('')}</${listType}>`);
+        listType = '';
+        listItems = [];
+    };
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        const heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
+        const unorderedItem = trimmed.match(/^[-*]\s+(.+)$/);
+        const orderedItem = trimmed.match(/^\d+[.)]\s+(.+)$/);
+
+        if (!trimmed) {
+            flushParagraph();
+            flushList();
+            return;
+        }
+
+        if (/^_{3,}$|^-{3,}$|^\*{3,}$/.test(trimmed)) {
+            flushParagraph();
+            flushList();
+            output.push('<hr>');
+            return;
+        }
+
+        if (heading) {
+            flushParagraph();
+            flushList();
+            const level = heading[1].length === 1 ? 'h3' : 'h4';
+            output.push(`<${level}>${formatTutorInlineMarkdown(heading[2])}</${level}>`);
+            return;
+        }
+
+        if (unorderedItem || orderedItem) {
+            flushParagraph();
+            const nextListType = unorderedItem ? 'ul' : 'ol';
+            if (listType && listType !== nextListType) flushList();
+            listType = nextListType;
+            listItems.push((unorderedItem || orderedItem)[1]);
+            return;
+        }
+
+        flushList();
+        paragraph.push(trimmed);
+    });
+
+    flushParagraph();
+    flushList();
+    return output.join('');
+}
+
 function appendTutorMessage(type, content, title = '') {
     const messages = document.getElementById('tutor-messages');
     if (!messages) return false;
 
+    const shouldFollowLatest = isTutorHistoryNearBottom(messages);
     const message = document.createElement('div');
-    message.className = `tutor-message ${type === 'user' ? 'tutor-user' : 'tutor-bot'}`;
+    const isUser = type === 'user';
+    message.className = `tutor-message ${isUser ? 'tutor-user' : 'tutor-bot'}`;
 
-    const displayContent = type === 'user' ? String(content || '') : polishSpanishText(content);
-    const displayTitle = type === 'user' ? String(title || '') : polishSpanishText(title);
-    const safeContent = escapeHTML(displayContent).replace(/\n/g, '<br>');
-    const safeTitle = displayTitle ? `<strong>${escapeHTML(displayTitle)}</strong>` : '';
-    message.innerHTML = `${safeTitle}<p>${safeContent}</p>`;
+    const displayContent = isUser ? String(content || '') : polishSpanishText(content);
+    const displayTitle = isUser ? String(title || '') : polishSpanishText(title);
+    const safeContent = isUser
+        ? `<p>${escapeHTML(displayContent).replace(/\n/g, '<br>')}</p>`
+        : renderTutorMarkdown(displayContent);
+    const safeTitle = displayTitle ? `<strong class="tutor-message-title">${escapeHTML(displayTitle)}</strong>` : '';
+    message.innerHTML = `${safeTitle}${safeContent || '<p></p>'}`;
 
     messages.appendChild(message);
-    messages.scrollTop = messages.scrollHeight;
+    scrollTutorHistoryToEnd(messages, shouldFollowLatest);
     return true;
 }
 
@@ -4290,8 +4380,9 @@ function appendTutorPracticeCards(topic) {
         </div>
     `;
 
+    const shouldFollowLatest = isTutorHistoryNearBottom(messages);
     messages.appendChild(message);
-    messages.scrollTop = messages.scrollHeight;
+    scrollTutorHistoryToEnd(messages, shouldFollowLatest);
     return true;
 }
 
@@ -4832,8 +4923,9 @@ function showTutorThinking() {
     const thinking = document.createElement('div');
     thinking.className = 'tutor-message tutor-bot tutor-thinking';
     thinking.innerHTML = '<strong>Tutor</strong><p>Pensando...</p>';
+    const shouldFollowLatest = isTutorHistoryNearBottom(messages);
     messages.appendChild(thinking);
-    messages.scrollTop = messages.scrollHeight;
+    scrollTutorHistoryToEnd(messages, shouldFollowLatest);
     return thinking;
 }
 
