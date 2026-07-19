@@ -13066,6 +13066,30 @@ body.is-dashboard #app-page.page.active {
     color: var(--ac-card-muted) !important;
 }
 
+#dashboard .dashboard-hero-widget .hero-widget-icon {
+    position: relative !important;
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    flex: 0 0 52px !important;
+    align-self: center !important;
+    margin: 0 !important;
+    border-radius: 13px !important;
+    border: 1px solid rgba(110, 150, 210, 0.25) !important;
+    color: #ffffff !important;
+    background: linear-gradient(145deg, rgba(46, 151, 181, 0.92), rgba(104, 91, 176, 0.86)) !important;
+    box-shadow: 0 8px 18px rgba(20, 71, 100, 0.20) !important;
+    overflow: hidden !important;
+    transform: none !important;
+}
+
+#dashboard .dashboard-hero-widget .hero-widget-icon svg {
+    width: 26px !important;
+    height: 26px !important;
+    margin: auto !important;
+    transform: none !important;
+}
+
 #subjects .subject-icon,
 #subjects .subject-symbol,
 #subjects .subject-custom-label,
@@ -14534,7 +14558,7 @@ body.light-theme .subject-detail-card::after {
 
 #tasks .task-card-main {
     display: grid !important;
-    grid-template-columns: 42px minmax(0, 1fr) !important;
+    grid-template-columns: 52px minmax(0, 1fr) !important;
     gap: 12px !important;
     align-items: start !important;
 }
@@ -14872,10 +14896,10 @@ body.light-theme .subject-detail-columns p {
     border: 1px solid rgba(93, 159, 187, 0.22) !important;
     border-radius: 18px !important;
     background:
-        linear-gradient(105deg, rgba(56, 189, 248, 0.055), transparent 38%),
+        linear-gradient(108deg, rgba(47, 183, 167, 0.065), transparent 39%),
         linear-gradient(285deg, rgba(139, 92, 246, 0.045), transparent 34%),
-        linear-gradient(135deg, #122131 0%, #0e1926 100%) !important;
-    box-shadow: 0 15px 36px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(148, 200, 219, 0.035) !important;
+        linear-gradient(135deg, #122332 0%, #0e1926 100%) !important;
+    box-shadow: 0 15px 36px rgba(0, 0, 0, 0.20), inset 0 -2px 0 rgba(47, 183, 167, 0.10), inset 0 1px 0 rgba(148, 200, 219, 0.035) !important;
     overflow: hidden !important;
 }
 
@@ -15022,8 +15046,8 @@ body.light-theme .subject-detail-columns p {
     padding: 17px !important;
     border: 1px solid rgba(119, 135, 205, 0.24) !important;
     border-radius: 14px !important;
-    background: linear-gradient(145deg, #17293a 0%, #152333 100%) !important;
-    box-shadow: 0 11px 26px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(149, 164, 220, 0.04) !important;
+    background: linear-gradient(145deg, #193044 0%, #17283a 58%, #18263b 100%) !important;
+    box-shadow: 0 11px 26px rgba(0, 0, 0, 0.16), inset 0 -1px 0 rgba(108, 126, 204, 0.08), inset 0 1px 0 rgba(149, 164, 220, 0.045) !important;
     justify-self: end !important;
 }
 
@@ -15039,12 +15063,8 @@ body.light-theme .subject-detail-columns p {
     line-height: 1.42 !important;
 }
 
-#dashboard .hero-widget-icon {
-    width: 42px !important;
-    height: 42px !important;
-    color: var(--dash-accent) !important;
-    border-color: rgba(110, 150, 210, 0.25) !important;
-    background: linear-gradient(145deg, rgba(78, 168, 199, 0.18), rgba(139, 92, 246, 0.13)) !important;
+#dashboard .dashboard-hero-widget > div {
+    min-width: 0 !important;
 }
 
 #dashboard .dashboard-hero-widget .btn-primary {
@@ -15520,7 +15540,7 @@ body.light-theme #dashboard .weekly-chart {
     }
 
     #dashboard .dashboard-steps li {
-        grid-template-columns: 40px minmax(0, 1fr) !important;
+        grid-template-columns: 52px minmax(0, 1fr) !important;
     }
 
     #dashboard .dashboard-steps button {
