@@ -5539,8 +5539,11 @@ async function requestTutorAI(userMessage) {
             }
         });
 
-        if (error || !data?.ok) {
-            throw new Error(error?.message || data?.error || "Error al conectar con Tutor IA.");
+        if (error) throw error;
+        if (!data?.ok) {
+            const remoteError = new Error(data?.error || "Error al conectar con Tutor IA.");
+            remoteError.details = data?.details || data;
+            throw remoteError;
         }
 
         return {
@@ -5549,7 +5552,26 @@ async function requestTutorAI(userMessage) {
         };
 
     } catch (error) {
-        console.error("[TUTOR IA]", error);
+        const response = error?.context;
+        let responseBody = null;
+
+        if (response && typeof response.clone === 'function') {
+            try {
+                responseBody = await response.clone().json();
+            } catch (_) {
+                try {
+                    responseBody = await response.clone().text();
+                } catch (_) {
+                    responseBody = null;
+                }
+            }
+        }
+
+        console.error("[TUTOR IA]", {
+            status: response?.status || error?.status || null,
+            message: error?.message || "Error al conectar con Tutor IA.",
+            details: responseBody?.details || responseBody?.error || error?.details || responseBody || null
+        });
 
         return {
             ok: false,
