@@ -7,9 +7,14 @@
     <link rel="icon" type="image/png" href="assets/ac-edunity-logo.png">
     <link rel="shortcut icon" type="image/png" href="assets/ac-edunity-logo.png">
     <link rel="apple-touch-icon" href="assets/ac-edunity-logo.png">
-    <link rel="stylesheet" href="style.css?v=20260718-tutor-compact-layout-v1">
+    <link rel="stylesheet" href="style.css?v=20260718-tutor-shared-robot-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
+    <svg class="app-svg-definitions" aria-hidden="true" focusable="false">
+        <defs>
+            <symbol id="icon-tutor-robot" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="4"></rect><path d="M12 7V4"></path><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M9.5 15h5"></path><path d="M3 11v3"></path><path d="M21 11v3"></path></symbol>
+        </defs>
+    </svg>
     <div id="app-boot-loader" class="app-boot-loader" role="status" aria-live="polite">
         <div class="boot-loader-card">
             <img src="assets/ac-edunity-logo.png" alt="AC Edunity" class="boot-loader-logo">
@@ -590,7 +595,7 @@
                 </a>
                 <a href="#" onclick="navigateTo('ai-assistant')" class="nav-item" data-section="ai-assistant">
                     <span class="nav-icon sidebar-icon sidebar-icon-tutor" aria-hidden="true">
-                        <svg viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="4"></rect><path d="M12 7V4"></path><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M9.5 15h5"></path><path d="M3 11v3"></path><path d="M21 11v3"></path></svg>
+                        <svg viewBox="0 0 24 24"><use href="#icon-tutor-robot"></use></svg>
                     </span>
                     <span class="nav-label">Tutor</span>
                 </a>
@@ -1272,7 +1277,7 @@
                 <div class="tutor-shell">
                     <div class="tutor-hero">
                         <div class="tutor-brand">
-                            <span class="nav-icon-tutor tutor-header-icon" aria-hidden="true"></span>
+                            <span class="sidebar-icon-tutor tutor-header-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#icon-tutor-robot"></use></svg></span>
                             <div>
                                 <h1>Tutor IA</h1>
                                 <p>Tu espacio de estudio para preguntar, pegar textos, crear ejercicios y repasar mejor.</p>
