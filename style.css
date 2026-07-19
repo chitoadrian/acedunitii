@@ -8809,377 +8809,6 @@ body.light-theme #calendar .calendar-day.muted {
     background: #ffc800;
 }
 
-.tutor-shell {
-    width: min(100%, 980px);
-    margin: 0 auto;
-    display: grid;
-    gap: 22px;
-}
-
-.tutor-hero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 10px 4px;
-}
-
-.tutor-brand {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-}
-
-.tutor-logo {
-    width: 54px;
-    height: 54px;
-    border-radius: 18px;
-    background:
-        radial-gradient(circle at 30% 26%, #ffffff 0 12%, transparent 13%),
-        radial-gradient(circle at 70% 26%, #fd71af 0 18%, transparent 19%),
-        radial-gradient(circle at 28% 70%, #49ccf9 0 20%, transparent 21%),
-        radial-gradient(circle at 72% 70%, #7b68ee 0 20%, transparent 21%),
-        radial-gradient(circle, #ffc800 0 14%, transparent 15%);
-    box-shadow: 0 18px 40px rgba(73, 204, 249, 0.25);
-}
-
-.tutor-brand h1 {
-    margin: 0;
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    line-height: 1;
-}
-
-.tutor-brand p {
-    max-width: 620px;
-    margin: 8px 0 0;
-    color: var(--text-secondary);
-    font-size: 1rem;
-}
-
-.tutor-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid rgba(73, 204, 249, 0.3);
-    background: rgba(73, 204, 249, 0.1);
-    color: var(--text-primary);
-    border-radius: 999px;
-    padding: 10px 14px;
-    font-weight: 800;
-}
-
-.tutor-status span {
-    width: 9px;
-    height: 9px;
-    border-radius: 999px;
-    background: #00c875;
-    box-shadow: 0 0 0 6px rgba(0, 200, 117, 0.12);
-}
-
-.tutor-chat-card {
-    position: relative;
-    border-radius: 28px;
-    padding: 30px;
-    background:
-        linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
-        linear-gradient(120deg, rgba(123, 104, 238, 0.65), rgba(73, 204, 249, 0.65), rgba(253, 113, 175, 0.65)) border-box;
-    border: 1px solid transparent;
-    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.24);
-    display: grid;
-    gap: 16px;
-}
-
-.tutor-chat-card::before {
-    content: "";
-    position: absolute;
-    inset: -60px 12% auto 12%;
-    height: 110px;
-    pointer-events: none;
-    background: radial-gradient(circle, rgba(253, 113, 175, 0.25), transparent 65%);
-    filter: blur(18px);
-}
-
-.tutor-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 18px;
-}
-
-.tutor-tabs button {
-    border: 1px solid var(--border-color);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-secondary);
-    border-radius: 999px;
-    padding: 9px 14px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.tutor-tabs button:hover,
-.tutor-tabs button.active {
-    color: #ffffff;
-    border-color: rgba(73, 204, 249, 0.5);
-    background: linear-gradient(135deg, #7b68ee, #49ccf9);
-    transform: translateY(-1px);
-}
-
-.tutor-bot {
-    background: linear-gradient(135deg, rgba(123, 104, 238, 0.2), rgba(73, 204, 249, 0.14));
-}
-
-.tutor-user {
-    justify-self: end;
-    background: linear-gradient(135deg, rgba(253, 113, 175, 0.22), rgba(123, 104, 238, 0.2));
-    color: var(--text-primary);
-}
-
-.tutor-user p {
-    color: var(--text-primary);
-}
-
-.tutor-file-card {
-    justify-self: end;
-    max-width: 420px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    border: 1px solid rgba(73, 204, 249, 0.35);
-    border-radius: 18px;
-    padding: 14px 16px;
-    background: linear-gradient(135deg, rgba(123, 104, 238, 0.26), rgba(73, 204, 249, 0.16));
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
-}
-
-.tutor-file-icon {
-    flex: 0 0 54px;
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    display: grid;
-    place-items: center;
-    color: #111827;
-    background:
-        linear-gradient(135deg, #ffffff 0 55%, #d7ecff 56%),
-        linear-gradient(135deg, #7b68ee, #49ccf9);
-    font-size: 0.78rem;
-    font-weight: 950;
-}
-
-.tutor-file-card strong,
-.tutor-file-card small {
-    display: block;
-}
-
-.tutor-file-card strong {
-    color: var(--text-primary);
-    line-height: 1.25;
-}
-
-.tutor-file-card small {
-    margin-top: 4px;
-    color: var(--text-secondary);
-}
-
-.tutor-composer {
-    border-radius: 24px;
-    padding: 14px;
-    border: 1px solid rgba(73, 204, 249, 0.28);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.tutor-composer textarea {
-    width: 100%;
-    min-height: 130px;
-    resize: vertical;
-    border: 0;
-    outline: none;
-    background: transparent;
-    color: var(--text-primary);
-    font: inherit;
-    line-height: 1.5;
-    padding: 8px;
-}
-
-.tutor-composer textarea::placeholder {
-    color: var(--text-muted);
-}
-
-.tutor-composer-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-color);
-}
-
-.tutor-icon-btn,
-.tutor-send {
-    border: 0;
-    cursor: pointer;
-    font-weight: 900;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.tutor-icon-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    color: var(--text-primary);
-    background: var(--bg-tertiary);
-    font-size: 1.3rem;
-}
-
-.tutor-model {
-    color: var(--text-secondary);
-    font-weight: 800;
-    margin-right: auto;
-}
-
-.tutor-send {
-    border-radius: 999px;
-    padding: 10px 18px;
-    color: #ffffff;
-    background: linear-gradient(135deg, #7b68ee, #49ccf9, #fd71af);
-    box-shadow: 0 14px 28px rgba(123, 104, 238, 0.26);
-}
-
-.tutor-send:disabled,
-.tutor-send.is-loading {
-    cursor: wait;
-    opacity: 0.72;
-    transform: none;
-    box-shadow: 0 10px 22px rgba(73, 204, 249, 0.16);
-}
-
-.tutor-icon-btn:hover,
-.tutor-send:hover,
-.tutor-tool-card:hover {
-    transform: translateY(-2px);
-}
-
-.tutor-tools-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-}
-
-.tutor-tool-card {
-    text-align: left;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 18px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    cursor: pointer;
-    box-shadow: var(--shadow-soft);
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.tutor-tool-card:hover {
-    border-color: rgba(73, 204, 249, 0.55);
-}
-
-.tutor-tool-card strong,
-.tutor-tool-card small {
-    display: block;
-}
-
-.tutor-tool-card strong {
-    margin: 12px 0 6px;
-    font-size: 1rem;
-}
-
-.tutor-tool-card small {
-    color: var(--text-secondary);
-    line-height: 1.45;
-}
-
-.tool-icon {
-    width: 42px;
-    height: 42px;
-    display: block;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #7b68ee, #49ccf9);
-    box-shadow: 0 14px 30px rgba(73, 204, 249, 0.2);
-}
-
-.tool-summary {
-    background:
-        linear-gradient(90deg, transparent 28%, #ffffff 29% 34%, transparent 35%),
-        linear-gradient(180deg, #7b68ee, #49ccf9);
-}
-
-.tool-questions {
-    background:
-        radial-gradient(circle at 50% 42%, #ffffff 0 18%, transparent 19%),
-        radial-gradient(circle at 50% 73%, #fd71af 0 7%, transparent 8%),
-        linear-gradient(135deg, #7b68ee, #49ccf9);
-}
-
-.tool-cards {
-    background:
-        linear-gradient(135deg, #ffffff 0 42%, transparent 43%),
-        linear-gradient(135deg, #ffc800 0 50%, #49ccf9 51%);
-}
-
-.tool-simple {
-    background:
-        radial-gradient(circle at 50% 36%, #ffc800 0 18%, transparent 19%),
-        linear-gradient(135deg, #7b68ee, #fd71af);
-}
-
-.tutor-output {
-    display: none !important;
-}
-
-body.light-theme .tutor-chat-card,
-body.light-theme .tutor-tool-card,
-body.light-theme .tutor-output {
-    background: rgba(255, 255, 255, 0.9);
-}
-
-body.light-theme .tutor-composer {
-    background: rgba(248, 250, 255, 0.86);
-}
-
-@media (max-width: 900px) {
-    .tutor-hero {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .tutor-tools-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 560px) {
-    .tutor-chat-card {
-        padding: 20px;
-        border-radius: 22px;
-    }
-
-    .tutor-brand {
-        align-items: flex-start;
-    }
-
-    .tutor-logo {
-        width: 46px;
-        height: 46px;
-        border-radius: 16px;
-    }
-
-    .tutor-tools-grid {
-        grid-template-columns: 1fr;
-    }
-
-.tutor-composer-bar {
-        flex-wrap: wrap;
-    }
-}
-
 /* Limpieza de iconos: evita emojis rotos por codificacion */
 .theme-toggle::before {
     content: "";
@@ -9314,28 +8943,68 @@ body.light-theme .theme-toggle::before {
         linear-gradient(135deg, #7b68ee, #49ccf9);
 }
 
-/* Tutor: panel moderno con historial interno */
+/* Tutor IA: interfaz compacta, aislada y responsive */
+#ai-assistant {
+    padding-inline: clamp(18px, 2.5vw, 34px);
+}
+
 #ai-assistant .tutor-shell {
-    width: min(100%, 980px);
-    max-width: 980px;
-    margin: 0 auto;
-    gap: 22px;
+    width: calc(100% - clamp(0px, 1vw, 18px));
+    max-width: 1120px;
+    margin-inline: auto;
+    display: grid;
+    gap: 12px;
 }
 
 #ai-assistant .tutor-hero {
-    justify-content: center;
-    text-align: center;
-    margin-bottom: 6px;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2px 4px 4px;
 }
 
 #ai-assistant .tutor-brand {
-    justify-content: center;
-    text-align: center;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#ai-assistant .tutor-header-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(73, 204, 249, 0.28);
+    border-radius: 13px;
+    box-shadow: 0 8px 22px rgba(73, 204, 249, 0.14);
+}
+
+#ai-assistant .tutor-header-icon::before {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -42%) scale(1.12);
+}
+
+#ai-assistant .tutor-header-icon::after {
+    left: 50%;
+    top: 8px;
+    transform: translateX(-50%) scale(1.08);
+}
+
+#ai-assistant .tutor-brand h1 {
+    margin: 0;
+    font-size: clamp(1.38rem, 2vw, 1.55rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
 }
 
 #ai-assistant .tutor-brand p {
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 720px;
+    margin: 3px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.4;
 }
 
 #ai-assistant .tutor-status {
@@ -9344,37 +9013,42 @@ body.light-theme .theme-toggle::before {
 
 #ai-assistant .tutor-chat-card {
     position: relative;
-    height: clamp(570px, 70dvh, 740px);
+    height: clamp(540px, calc(100dvh - 220px), 720px);
     min-height: 0;
-    padding: 18px;
-    gap: 14px;
+    padding: 13px;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 9px;
     overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 21px;
     background:
         linear-gradient(145deg, rgba(14, 31, 61, 0.98), rgba(8, 20, 43, 0.98)) padding-box,
-        linear-gradient(135deg, rgba(123, 104, 238, 0.68), rgba(73, 204, 249, 0.56), rgba(253, 113, 175, 0.46)) border-box;
-    border: 1px solid transparent;
-    border-radius: 26px;
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+        linear-gradient(135deg, rgba(123, 104, 238, 0.58), rgba(73, 204, 249, 0.48), rgba(253, 113, 175, 0.38)) border-box;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.26);
     isolation: isolate;
 }
 
 #ai-assistant .tutor-chat-card::before {
-    inset: -72px 16% auto;
-    opacity: 0.32;
+    content: "";
+    position: absolute;
+    inset: -76px 20% auto;
+    height: 100px;
     z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(73, 204, 249, 0.18), transparent 68%);
+    filter: blur(16px);
 }
 
 #ai-assistant .tutor-tabs {
     position: relative;
     z-index: 2;
+    min-width: 0;
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
-    min-width: 0;
+    gap: 6px;
     margin: 0;
-    padding: 2px 2px 6px;
+    padding: 1px 1px 4px;
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-inline: contain;
@@ -9387,20 +9061,24 @@ body.light-theme .theme-toggle::before {
 
 #ai-assistant .tutor-tabs button {
     flex: 0 0 auto;
-    min-height: 38px;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    min-height: 32px;
+    padding: 6px 11px;
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 999px;
-    padding: 8px 14px;
-    background: rgba(255, 255, 255, 0.055);
+    background: rgba(255, 255, 255, 0.05);
     color: #aebdd2;
-    box-shadow: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+    line-height: 1;
     white-space: nowrap;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
 }
 
 #ai-assistant .tutor-tabs button:hover,
 #ai-assistant .tutor-tabs button.active {
     color: #ffffff;
-    border-color: rgba(73, 204, 249, 0.54);
+    border-color: rgba(73, 204, 249, 0.5);
     background: linear-gradient(135deg, rgba(123, 104, 238, 0.94), rgba(53, 171, 222, 0.94));
     transform: translateY(-1px);
 }
@@ -9409,67 +9087,69 @@ body.light-theme .theme-toggle::before {
     min-width: 0;
     min-height: 0;
     height: 100%;
-    padding: 10px 8px 18px 4px;
+    padding: 7px 6px 12px 2px;
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 9px;
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
     scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: rgba(112, 170, 220, 0.62) rgba(8, 20, 43, 0.38);
+    scrollbar-color: rgba(112, 170, 220, 0.58) rgba(8, 20, 43, 0.3);
 }
 
 #ai-assistant .tutor-messages::-webkit-scrollbar {
-    width: 8px;
+    width: 7px;
 }
 
 #ai-assistant .tutor-messages::-webkit-scrollbar-track {
-    background: rgba(8, 20, 43, 0.38);
     border-radius: 999px;
+    background: rgba(8, 20, 43, 0.3);
 }
 
 #ai-assistant .tutor-messages::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, rgba(123, 104, 238, 0.72), rgba(73, 204, 249, 0.72));
     border: 2px solid transparent;
     border-radius: 999px;
+    background: linear-gradient(180deg, rgba(123, 104, 238, 0.7), rgba(73, 204, 249, 0.7));
     background-clip: padding-box;
 }
 
 #ai-assistant .tutor-message {
     flex: 0 0 auto;
     width: fit-content;
-    max-width: min(86%, 720px);
+    max-width: min(88%, 820px);
     box-sizing: border-box;
-    padding: 14px 16px;
-    border: 1px solid rgba(148, 163, 184, 0.17);
-    border-radius: 18px;
+    padding: 11px 13px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 16px;
     color: #e9f1fb;
+    font-size: 0.9rem;
     line-height: 1.58;
     overflow-wrap: anywhere;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
 }
 
 #ai-assistant .tutor-bot {
     align-self: flex-start;
-    border-bottom-left-radius: 6px;
+    border-bottom-left-radius: 5px;
     background: linear-gradient(145deg, rgba(25, 48, 82, 0.94), rgba(17, 38, 70, 0.94));
 }
 
 #ai-assistant .tutor-user {
     align-self: flex-end;
-    border-color: rgba(124, 125, 255, 0.32);
-    border-bottom-right-radius: 6px;
+    max-width: min(78%, 680px);
+    border-color: rgba(124, 125, 255, 0.28);
+    border-bottom-right-radius: 5px;
     background: linear-gradient(135deg, #6258c7, #3d86c4);
     color: #ffffff;
 }
 
 #ai-assistant .tutor-message-title {
     display: block;
-    margin: 0 0 7px;
+    margin: 0 0 5px;
     color: #9de5f5;
-    font-size: 0.82rem;
+    font-size: 0.76rem;
     letter-spacing: 0.025em;
 }
 
@@ -9482,7 +9162,7 @@ body.light-theme .theme-toggle::before {
 }
 
 #ai-assistant .tutor-message p {
-    margin: 0 0 10px;
+    margin: 0 0 7px;
 }
 
 #ai-assistant .tutor-message p:last-child,
@@ -9493,8 +9173,8 @@ body.light-theme .theme-toggle::before {
 
 #ai-assistant .tutor-message h3,
 #ai-assistant .tutor-message h4 {
-    margin: 13px 0 7px;
-    line-height: 1.3;
+    margin: 9px 0 5px;
+    line-height: 1.28;
 }
 
 #ai-assistant .tutor-message h3:first-child,
@@ -9503,28 +9183,28 @@ body.light-theme .theme-toggle::before {
 }
 
 #ai-assistant .tutor-message h3 {
-    font-size: 1.1rem;
+    font-size: 1.02rem;
 }
 
 #ai-assistant .tutor-message h4 {
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 #ai-assistant .tutor-message ul,
 #ai-assistant .tutor-message ol {
-    margin: 8px 0 12px;
-    padding-left: 1.35rem;
+    margin: 5px 0 8px;
+    padding-left: 1.25rem;
 }
 
 #ai-assistant .tutor-message li + li {
-    margin-top: 5px;
+    margin-top: 3px;
 }
 
 #ai-assistant .tutor-message hr {
     height: 1px;
-    margin: 15px 0;
+    margin: 10px 0;
     border: 0;
-    background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.42), transparent);
+    background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.4), transparent);
 }
 
 #ai-assistant .tutor-message strong {
@@ -9532,27 +9212,54 @@ body.light-theme .theme-toggle::before {
     font-weight: 800;
 }
 
+#ai-assistant .tutor-message code {
+    padding: 0.12em 0.34em;
+    border-radius: 5px;
+    background: rgba(5, 14, 31, 0.48);
+    color: #c4eff8;
+    font: 0.92em/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+#ai-assistant .tutor-message pre {
+    max-width: 100%;
+    margin: 7px 0;
+    padding: 9px 11px;
+    overflow-x: auto;
+    border-radius: 9px;
+    background: rgba(5, 14, 31, 0.6);
+}
+
 #ai-assistant .tutor-composer {
     position: relative;
     z-index: 2;
     min-width: 0;
-    padding: 11px 12px 10px;
-    border: 1px solid rgba(113, 169, 218, 0.28);
-    border-radius: 19px;
+    padding: 8px 9px 7px;
+    border: 1px solid rgba(113, 169, 218, 0.25);
+    border-radius: 15px;
     background: rgba(6, 17, 37, 0.94);
-    box-shadow: 0 -14px 32px rgba(6, 17, 37, 0.34);
+    box-shadow: 0 -9px 24px rgba(6, 17, 37, 0.28);
 }
 
 #ai-assistant .tutor-composer textarea {
     display: block;
     width: 100%;
-    min-height: 72px;
-    max-height: 118px;
-    padding: 7px 6px;
-    resize: vertical;
-    color: #edf5ff;
-    font-size: 0.96rem;
+    min-height: 48px;
+    max-height: 92px;
+    field-sizing: content;
+    resize: none;
+    padding: 5px;
+    border: 0;
+    outline: 0;
     background: transparent;
+    color: #edf5ff;
+    font: inherit;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+#ai-assistant .tutor-composer:focus-within {
+    border-color: rgba(73, 204, 249, 0.48);
+    box-shadow: 0 0 0 3px rgba(73, 204, 249, 0.08), 0 -9px 24px rgba(6, 17, 37, 0.24);
 }
 
 #ai-assistant .tutor-composer textarea::placeholder {
@@ -9561,142 +9268,89 @@ body.light-theme .theme-toggle::before {
 
 #ai-assistant .tutor-composer-bar {
     min-width: 0;
-    padding-top: 9px;
-    border-top: 1px solid rgba(148, 163, 184, 0.16);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
 }
 
 #ai-assistant .tutor-model {
     min-width: 0;
+    margin-right: auto;
     color: #aebdd2;
+    font-size: 0.8rem;
+    font-weight: 800;
 }
 
 #ai-assistant .tutor-send {
     flex: 0 0 auto;
-}
-
-#ai-assistant .tutor-tools-grid {
-    max-width: 920px;
-    margin: 8px auto 0;
-}
-
-body.light-theme #ai-assistant .tutor-chat-card {
-    background:
-        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 253, 0.98)) padding-box,
-        linear-gradient(135deg, rgba(123, 104, 238, 0.42), rgba(73, 204, 249, 0.42), rgba(253, 113, 175, 0.3)) border-box;
-    box-shadow: 0 22px 54px rgba(49, 68, 91, 0.16);
-}
-
-body.light-theme #ai-assistant .tutor-tabs button {
-    border-color: rgba(100, 116, 139, 0.18);
-    background: rgba(226, 232, 240, 0.7);
-    color: #526277;
-}
-
-body.light-theme #ai-assistant .tutor-tabs button:hover,
-body.light-theme #ai-assistant .tutor-tabs button.active {
+    min-height: 32px;
+    padding: 7px 14px;
+    border: 0;
+    border-radius: 999px;
     color: #ffffff;
-    border-color: rgba(72, 129, 196, 0.4);
-    background: linear-gradient(135deg, #6d63d3, #438fc8);
+    background: linear-gradient(135deg, #7b68ee, #49ccf9, #fd71af);
+    box-shadow: 0 8px 18px rgba(123, 104, 238, 0.22);
+    font-size: 0.84rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-body.light-theme #ai-assistant .tutor-messages {
-    scrollbar-color: rgba(88, 134, 176, 0.56) rgba(219, 229, 239, 0.72);
+#ai-assistant .tutor-send:hover {
+    transform: translateY(-1px);
 }
 
-body.light-theme #ai-assistant .tutor-messages::-webkit-scrollbar-track {
-    background: rgba(219, 229, 239, 0.72);
-}
-
-body.light-theme #ai-assistant .tutor-bot {
-    border-color: rgba(100, 116, 139, 0.15);
-    background: linear-gradient(145deg, #ffffff, #f1f6fb);
-    color: #25364b;
-    box-shadow: 0 9px 24px rgba(71, 91, 116, 0.1);
-}
-
-body.light-theme #ai-assistant .tutor-user {
-    border-color: rgba(76, 86, 180, 0.22);
-    background: linear-gradient(135deg, #6b61cf, #438fc8);
-    color: #ffffff;
-}
-
-body.light-theme #ai-assistant .tutor-message-title,
-body.light-theme #ai-assistant .tutor-bot strong {
-    color: #345f86;
-}
-
-body.light-theme #ai-assistant .tutor-user strong {
-    color: #ffffff;
-}
-
-body.light-theme #ai-assistant .tutor-composer {
-    border-color: rgba(100, 116, 139, 0.2);
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 -12px 30px rgba(71, 91, 116, 0.1);
-}
-
-body.light-theme #ai-assistant .tutor-composer textarea {
-    color: #172033;
-}
-
-body.light-theme #ai-assistant .tutor-composer textarea::placeholder {
-    color: #718096;
-}
-
-body.light-theme #ai-assistant .tutor-composer-bar {
-    border-top-color: rgba(100, 116, 139, 0.16);
-}
-
-body.light-theme #ai-assistant .tutor-model {
-    color: #526277;
-}
-
-@media (max-width: 1024px) {
-    #ai-assistant .tutor-chat-card {
-        height: clamp(550px, 68dvh, 700px);
-    }
+#ai-assistant .tutor-send:disabled,
+#ai-assistant .tutor-send.is-loading {
+    cursor: wait;
+    opacity: 0.72;
+    transform: none;
+    box-shadow: none;
 }
 
 .tutor-practice-response {
-    max-width: 92%;
+    max-width: 94%;
 }
 
 .tutor-practice-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 14px;
+    gap: 8px;
+    margin-top: 9px;
 }
 
 .tutor-practice-card {
     display: grid;
-    grid-template-columns: 34px 1fr;
-    gap: 10px;
+    grid-template-columns: 30px 1fr;
+    gap: 8px;
     align-items: start;
-    padding: 14px;
-    border-radius: 18px;
-    border: 1px solid rgba(73, 204, 249, 0.22);
-    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border: 1px solid rgba(73, 204, 249, 0.2);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .tutor-practice-card span {
-    width: 34px;
-    height: 34px;
-    border-radius: 12px;
+    width: 30px;
+    height: 30px;
     display: grid;
     place-items: center;
+    border-radius: 9px;
     color: #ffffff;
-    font-weight: 900;
     background: linear-gradient(135deg, #7b68ee, #49ccf9);
+    font-weight: 900;
 }
 
 .tutor-practice-card p {
-    color: #1f2937 !important;
-    font-weight: 750;
+    margin: 0;
+    color: inherit !important;
+    font-weight: 700;
 }
 
 .tutor-thinking {
-    max-width: 360px;
+    max-width: 300px;
     opacity: 0.9;
 }
 
@@ -9705,7 +9359,7 @@ body.light-theme #ai-assistant .tutor-model {
     display: inline-block;
     width: 28px;
     height: 10px;
-    margin-left: 8px;
+    margin-left: 7px;
     border-radius: 999px;
     background:
         radial-gradient(circle, #49ccf9 0 28%, transparent 30%) 0 50% / 10px 10px,
@@ -9726,23 +9380,175 @@ body.light-theme #ai-assistant .tutor-model {
     }
 }
 
-@media (max-width: 720px) {
+body.light-theme #ai-assistant .tutor-header-icon {
+    border-color: rgba(73, 150, 190, 0.24);
+    box-shadow: 0 7px 18px rgba(73, 150, 190, 0.12);
+}
+
+body.light-theme #ai-assistant .tutor-chat-card {
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(244, 248, 253, 0.98)) padding-box,
+        linear-gradient(135deg, rgba(123, 104, 238, 0.38), rgba(73, 204, 249, 0.38), rgba(253, 113, 175, 0.26)) border-box;
+    box-shadow: 0 16px 40px rgba(49, 68, 91, 0.14);
+}
+
+body.light-theme #ai-assistant .tutor-tabs button {
+    border-color: rgba(100, 116, 139, 0.16);
+    background: rgba(226, 232, 240, 0.68);
+    color: #526277;
+}
+
+body.light-theme #ai-assistant .tutor-tabs button:hover,
+body.light-theme #ai-assistant .tutor-tabs button.active {
+    color: #ffffff;
+    border-color: rgba(72, 129, 196, 0.36);
+    background: linear-gradient(135deg, #6d63d3, #438fc8);
+}
+
+body.light-theme #ai-assistant .tutor-messages {
+    scrollbar-color: rgba(88, 134, 176, 0.52) rgba(219, 229, 239, 0.68);
+}
+
+body.light-theme #ai-assistant .tutor-messages::-webkit-scrollbar-track {
+    background: rgba(219, 229, 239, 0.68);
+}
+
+body.light-theme #ai-assistant .tutor-bot {
+    border-color: rgba(100, 116, 139, 0.14);
+    background: linear-gradient(145deg, #ffffff, #f1f6fb);
+    color: #25364b;
+    box-shadow: 0 7px 18px rgba(71, 91, 116, 0.09);
+}
+
+body.light-theme #ai-assistant .tutor-user {
+    border-color: rgba(76, 86, 180, 0.2);
+    background: linear-gradient(135deg, #6b61cf, #438fc8);
+    color: #ffffff;
+}
+
+body.light-theme #ai-assistant .tutor-message-title,
+body.light-theme #ai-assistant .tutor-bot strong {
+    color: #345f86;
+}
+
+body.light-theme #ai-assistant .tutor-user strong {
+    color: #ffffff;
+}
+
+body.light-theme #ai-assistant .tutor-message code,
+body.light-theme #ai-assistant .tutor-message pre {
+    background: rgba(215, 226, 237, 0.72);
+    color: #244c68;
+}
+
+body.light-theme #ai-assistant .tutor-composer {
+    border-color: rgba(100, 116, 139, 0.18);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 -8px 22px rgba(71, 91, 116, 0.09);
+}
+
+body.light-theme #ai-assistant .tutor-composer textarea {
+    color: #172033;
+}
+
+body.light-theme #ai-assistant .tutor-composer textarea::placeholder {
+    color: #718096;
+}
+
+body.light-theme #ai-assistant .tutor-composer-bar {
+    border-top-color: rgba(100, 116, 139, 0.14);
+}
+
+body.light-theme #ai-assistant .tutor-model {
+    color: #526277;
+}
+
+body.light-theme .tutor-practice-card {
+    border-color: rgba(73, 150, 190, 0.2);
+    background: rgba(237, 244, 250, 0.9);
+}
+
+@media (max-width: 1024px) {
+    #ai-assistant {
+        padding-inline: 20px;
+    }
+
+    #ai-assistant .tutor-shell {
+        width: 100%;
+    }
+
     #ai-assistant .tutor-chat-card {
-        height: min(68dvh, 640px);
-        min-height: 500px;
-        padding: 13px;
-        gap: 10px;
-        border-radius: 21px;
+        height: clamp(520px, calc(100dvh - 205px), 680px);
+    }
+
+    #ai-assistant .tutor-header-icon {
+        flex-basis: 38px;
+        width: 38px;
+        height: 38px;
+    }
+}
+
+@media (max-width: 720px) {
+    #ai-assistant {
+        padding-inline: 13px;
+    }
+
+    #ai-assistant .tutor-shell {
+        gap: 9px;
+    }
+
+    #ai-assistant .tutor-hero {
+        min-height: 48px;
+        padding-inline: 2px;
+    }
+
+    #ai-assistant .tutor-brand {
+        gap: 9px;
+    }
+
+    #ai-assistant .tutor-header-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    #ai-assistant .tutor-header-icon::before {
+        transform: translate(-50%, -42%) scale(0.94);
+    }
+
+    #ai-assistant .tutor-header-icon::after {
+        top: 6px;
+        transform: translateX(-50%) scale(0.92);
+    }
+
+    #ai-assistant .tutor-brand h1 {
+        font-size: 1.25rem;
+    }
+
+    #ai-assistant .tutor-brand p {
+        max-width: 520px;
+        font-size: 0.8rem;
+        line-height: 1.32;
+    }
+
+    #ai-assistant .tutor-chat-card {
+        height: min(74dvh, 640px);
+        min-height: 490px;
+        padding: 10px;
+        gap: 7px;
+        border-radius: 18px;
     }
 
     #ai-assistant .tutor-tabs {
-        gap: 6px;
-        padding-bottom: 5px;
+        gap: 5px;
+        padding-bottom: 3px;
     }
 
     #ai-assistant .tutor-tabs button {
-        min-height: 36px;
-        padding: 8px 12px;
+        min-height: 31px;
+        padding: 6px 10px;
+        font-size: 0.79rem;
     }
 
     #ai-assistant .tutor-message,
@@ -9750,14 +9556,18 @@ body.light-theme #ai-assistant .tutor-model {
         max-width: 94%;
     }
 
+    #ai-assistant .tutor-user {
+        max-width: 86%;
+    }
+
     #ai-assistant .tutor-composer {
-        padding: 9px 10px 8px;
-        border-radius: 17px;
+        padding: 7px 8px 6px;
+        border-radius: 13px;
     }
 
     #ai-assistant .tutor-composer textarea {
-        min-height: 64px;
-        max-height: 96px;
+        min-height: 44px;
+        max-height: 82px;
     }
 
     .tutor-practice-grid {
@@ -9766,39 +9576,70 @@ body.light-theme #ai-assistant .tutor-model {
 }
 
 @media (max-width: 480px) {
+    #ai-assistant {
+        padding-inline: 9px;
+    }
+
     #ai-assistant .tutor-shell {
-        gap: 15px;
+        width: 100%;
+        gap: 7px;
+    }
+
+    #ai-assistant .tutor-hero {
+        min-height: 44px;
+        padding-top: 0;
+    }
+
+    #ai-assistant .tutor-header-icon {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+    }
+
+    #ai-assistant .tutor-brand h1 {
+        font-size: 1.18rem;
+    }
+
+    #ai-assistant .tutor-brand p {
+        margin-top: 2px;
+        font-size: 0.75rem;
     }
 
     #ai-assistant .tutor-chat-card {
-        height: min(72dvh, 600px);
+        height: min(76dvh, 610px);
         min-height: 470px;
-        padding: 10px;
-        border-radius: 18px;
+        padding: 8px;
+        border-radius: 16px;
     }
 
     #ai-assistant .tutor-messages {
-        padding: 7px 5px 12px 2px;
-        gap: 10px;
+        padding: 5px 4px 9px 1px;
+        gap: 8px;
     }
 
     #ai-assistant .tutor-message {
         max-width: 96%;
-        padding: 12px 13px;
-        border-radius: 16px;
-        font-size: 0.94rem;
+        padding: 10px 11px;
+        border-radius: 14px;
+        font-size: 0.86rem;
+    }
+
+    #ai-assistant .tutor-user {
+        max-width: 90%;
     }
 
     #ai-assistant .tutor-composer-bar {
-        gap: 8px;
+        gap: 6px;
     }
 
     #ai-assistant .tutor-model {
-        font-size: 0.82rem;
+        font-size: 0.75rem;
     }
 
     #ai-assistant .tutor-send {
-        padding: 9px 15px;
+        min-height: 30px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
     }
 }
 
