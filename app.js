@@ -5567,11 +5567,11 @@ async function requestTutorAI(userMessage) {
             }
         }
 
-        console.error("[TUTOR IA]", {
+        console.error("[TUTOR IA]", JSON.stringify({
             status: response?.status || error?.status || null,
             message: error?.message || "Error al conectar con Tutor IA.",
             details: responseBody?.details || responseBody?.error || error?.details || responseBody || null
-        });
+        }));
 
         return {
             ok: false,
