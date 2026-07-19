@@ -4203,14 +4203,10 @@ function getResourceFromAIInput() {
 }
 
 let currentTutorPdf = null;
-let currentTutorTopic = getStoredTutorTopic();
+let currentTutorTopic = '';
 
 function getStoredTutorTopic() {
-    try {
-        return localStorage.getItem('acStudyTutorTopic') || '';
-    } catch (error) {
-        return '';
-    }
+    return getTutorStorageValue('acStudyTutorTopic');
 }
 
 function setTutorTopic(topic) {
@@ -4218,12 +4214,8 @@ function setTutorTopic(topic) {
     if (typeof tutorState !== 'undefined') {
         tutorState.topic = currentTutorTopic;
     }
-    try {
-        if (currentTutorTopic) {
-            localStorage.setItem('acStudyTutorTopic', currentTutorTopic);
-        }
-    } catch (error) {
-        // localStorage puede no estar disponible en algunos navegadores privados.
+    if (currentTutorTopic) {
+        setTutorStorageValue('acStudyTutorTopic', currentTutorTopic);
     }
 }
 
@@ -4622,26 +4614,77 @@ function generateTrueFalse() {
 // Punto central para conectar el asistente con un servicio externo mas adelante.
 // ============================================
 
+const TUTOR_STORAGE_PREFIX = 'ac_edunity_tutor';
+const TUTOR_LEGACY_STORAGE_KEYS = [
+    'acStudyTutorHistory',
+    'acStudyTutorPendingQuestion',
+    'acStudyTutorTopic',
+    'acStudyTutorSubtopic',
+    'acStudyLastTutorResponse',
+    'acStudyTutorMode'
+];
+let activeTutorUserId = '';
+let tutorAuthGeneration = 0;
+let tutorRequestOwnerId = '';
+
 const tutorState = {
-    mode: getTutorStorageValue('acStudyTutorMode') || 'explain',
-    topic: getTutorStorageValue('acStudyTutorTopic') || '',
+    mode: 'explain',
+    topic: '',
     messages: [],
-    lastTopic: getTutorStorageValue('acStudyTutorTopic') || '',
+    lastTopic: '',
     lastIntent: '',
     lastAnswer: '',
     lastUserMessage: '',
     turnCount: 0,
-    history: getTutorHistory(),
-    pendingQuestion: getTutorPendingQuestion()
+    history: [],
+    pendingQuestion: null
 };
-let lastTopic = tutorState.topic;
-let lastSubtopic = getTutorStorageValue('acStudyTutorSubtopic') || '';
+let lastTopic = '';
+let lastSubtopic = '';
 let lastIntent = '';
 let chatHistory = tutorState.history;
-let lastTutorResponse = getTutorStorageValue('acStudyLastTutorResponse') || '';
+let lastTutorResponse = '';
 let tutorRequestInProgress = false;
 
-function getTutorStorageValue(key) {
+function normalizeTutorUserId(userId) {
+    const normalized = String(userId || '').trim().toLowerCase();
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(normalized)
+        ? normalized
+        : '';
+}
+
+function getTutorStorageKey(userId) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    return normalizedUserId ? `${TUTOR_STORAGE_PREFIX}_history_${normalizedUserId}` : '';
+}
+
+function getTutorScopedStorageKey(userId, storageName) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    if (!normalizedUserId) return '';
+    if (storageName === 'acStudyTutorHistory') return getTutorStorageKey(normalizedUserId);
+
+    const areaByStorageName = {
+        acStudyTutorPendingQuestion: 'pending',
+        acStudyTutorTopic: 'topic',
+        acStudyTutorSubtopic: 'subtopic',
+        acStudyLastTutorResponse: 'last_response',
+        acStudyTutorMode: 'mode'
+    };
+    const area = areaByStorageName[storageName];
+    return area ? `${TUTOR_STORAGE_PREFIX}_${area}_${normalizedUserId}` : '';
+}
+
+function removeLegacyTutorStorage() {
+    try {
+        TUTOR_LEGACY_STORAGE_KEYS.forEach(key => localStorage.removeItem(key));
+    } catch (error) {
+        // El historial heredado se ignora si el almacenamiento no está disponible.
+    }
+}
+
+function getTutorStorageValue(storageName, userId = activeTutorUserId) {
+    const key = getTutorScopedStorageKey(userId, storageName);
+    if (!key) return '';
     try {
         return localStorage.getItem(key) || '';
     } catch (error) {
@@ -4649,48 +4692,140 @@ function getTutorStorageValue(key) {
     }
 }
 
-function setTutorStorageValue(key, value) {
+function setTutorStorageValue(storageName, value, userId = activeTutorUserId) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    const key = getTutorScopedStorageKey(normalizedUserId, storageName);
+    if (!key || normalizedUserId !== activeTutorUserId) return false;
     try {
-        localStorage.setItem(key, value);
+        localStorage.setItem(key, String(value ?? ''));
+        return true;
     } catch (error) {
-        // El prototipo puede ejecutarse en navegadores sin almacenamiento disponible.
+        return false;
     }
 }
 
-function getTutorHistory() {
+function getTutorHistory(userId = activeTutorUserId) {
+    const key = getTutorStorageKey(userId);
+    if (!key) return [];
     try {
-        return JSON.parse(localStorage.getItem('acStudyTutorHistory') || '[]');
+        const history = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!Array.isArray(history)) return [];
+        return history
+            .filter(item => item && ['user', 'assistant'].includes(item.role) && String(item.content || '').trim())
+            .map(item => ({ ...item, content: String(item.content).slice(0, 12000) }))
+            .slice(-16);
     } catch (error) {
         return [];
     }
 }
 
-function saveTutorHistory() {
+function saveTutorHistory(userId = activeTutorUserId) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    const key = getTutorStorageKey(normalizedUserId);
+    if (!key || normalizedUserId !== activeTutorUserId) return false;
     try {
-        localStorage.setItem('acStudyTutorHistory', JSON.stringify(tutorState.history.slice(-16)));
+        localStorage.setItem(key, JSON.stringify(tutorState.history.slice(-16)));
+        return true;
     } catch (error) {
-        // Historial solo local y opcional.
+        return false;
     }
 }
 
-function getTutorPendingQuestion() {
+function getTutorPendingQuestion(userId = activeTutorUserId) {
+    const key = getTutorScopedStorageKey(userId, 'acStudyTutorPendingQuestion');
+    if (!key) return null;
     try {
-        return JSON.parse(localStorage.getItem('acStudyTutorPendingQuestion') || 'null');
+        return JSON.parse(localStorage.getItem(key) || 'null');
     } catch (error) {
         return null;
     }
 }
 
-function saveTutorPendingQuestion() {
+function saveTutorPendingQuestion(userId = activeTutorUserId) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    const key = getTutorScopedStorageKey(normalizedUserId, 'acStudyTutorPendingQuestion');
+    if (!key || normalizedUserId !== activeTutorUserId) return false;
     try {
         if (tutorState.pendingQuestion) {
-            localStorage.setItem('acStudyTutorPendingQuestion', JSON.stringify(tutorState.pendingQuestion));
+            localStorage.setItem(key, JSON.stringify(tutorState.pendingQuestion));
         } else {
-            localStorage.removeItem('acStudyTutorPendingQuestion');
+            localStorage.removeItem(key);
         }
+        return true;
     } catch (error) {
-        // Preguntas pendientes solo viven en el navegador.
+        return false;
     }
+}
+
+function renderTutorConversation() {
+    const messages = document.getElementById('tutor-messages');
+    if (!messages) return;
+
+    messages.innerHTML = '';
+    if (!activeTutorUserId || !tutorState.history.length) {
+        messages.innerHTML = `
+            <div class="tutor-message tutor-bot">
+                <strong>Tutor</strong>
+                <p>${activeTutorUserId
+                    ? 'Puedes escribirme un tema, pegar un texto corto o pedirme explicaciones, ejercicios, flashcards o preguntas de práctica.'
+                    : 'Inicia sesión para usar tu historial privado del Tutor.'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    tutorState.history.forEach(item => {
+        appendTutorMessage(item.role === 'user' ? 'user' : 'bot', item.content, item.role === 'assistant' ? 'Tutor' : '');
+    });
+    messages.scrollTop = messages.scrollHeight;
+}
+
+function resetTutorConversationMemory() {
+    tutorState.history = [];
+    tutorState.messages = [];
+    tutorState.lastTopic = '';
+    tutorState.lastIntent = '';
+    tutorState.lastAnswer = '';
+    tutorState.lastUserMessage = '';
+    tutorState.turnCount = 0;
+    tutorState.topic = '';
+    tutorState.pendingQuestion = null;
+    tutorState.mode = 'explain';
+    lastTopic = '';
+    lastIntent = '';
+    lastSubtopic = '';
+    chatHistory = tutorState.history;
+    lastTutorResponse = '';
+    currentTutorTopic = '';
+}
+
+function setTutorAuthenticatedUser(user) {
+    const nextUserId = normalizeTutorUserId(user?.id);
+    if (nextUserId === activeTutorUserId) return;
+
+    tutorAuthGeneration += 1;
+    tutorRequestInProgress = false;
+    tutorRequestOwnerId = '';
+    resetTutorConversationMemory();
+    activeTutorUserId = nextUserId;
+    renderTutorConversation();
+
+    if (!activeTutorUserId) return;
+
+    tutorState.history = getTutorHistory(activeTutorUserId);
+    tutorState.pendingQuestion = getTutorPendingQuestion(activeTutorUserId);
+    tutorState.topic = getTutorStorageValue('acStudyTutorTopic') || '';
+    tutorState.lastTopic = tutorState.topic;
+    tutorState.mode = getTutorStorageValue('acStudyTutorMode') || 'explain';
+    lastTopic = tutorState.topic;
+    lastSubtopic = getTutorStorageValue('acStudyTutorSubtopic') || '';
+    lastTutorResponse = getTutorStorageValue('acStudyLastTutorResponse') || '';
+    currentTutorTopic = tutorState.topic;
+    chatHistory = tutorState.history;
+    renderTutorConversation();
+
+    const label = document.getElementById('tutor-mode-label');
+    if (label) label.textContent = `Modo ${getTutorModeName(tutorState.mode)}`;
 }
 
 function rememberTutorTopic(topic) {
@@ -4740,9 +4875,20 @@ function getTutorModeName(mode) {
 
 function clearTutorChat() {
     const messages = document.getElementById('tutor-messages');
-    if (!messages) return;
+    if (!messages || !activeTutorUserId) return;
 
-    resetTutorState();
+    const userId = activeTutorUserId;
+    const keys = TUTOR_LEGACY_STORAGE_KEYS
+        .map(storageName => getTutorScopedStorageKey(userId, storageName))
+        .filter(Boolean);
+
+    resetTutorConversationMemory();
+
+    try {
+        keys.forEach(key => localStorage.removeItem(key));
+    } catch (error) {
+        // Solo se elimina el estado del Tutor perteneciente a la cuenta activa.
+    }
 
     messages.innerHTML = `
         <div class="tutor-message tutor-bot">
@@ -4750,36 +4896,21 @@ function clearTutorChat() {
             <p>Chat limpio. Escribe un tema o una pregunta y empezamos desde cero.</p>
         </div>
     `;
+
+    const label = document.getElementById('tutor-mode-label');
+    if (label) label.textContent = 'Modo explicar';
 }
 
 function resetTutorState() {
-    tutorState.history = [];
-    tutorState.messages = [];
-    tutorState.lastTopic = '';
-    tutorState.lastIntent = '';
-    tutorState.lastAnswer = '';
-    tutorState.lastUserMessage = '';
-    tutorState.turnCount = 0;
-    tutorState.topic = '';
-    tutorState.pendingQuestion = null;
-    lastTopic = '';
-    lastIntent = '';
-    lastSubtopic = '';
-    chatHistory = tutorState.history;
-    lastTutorResponse = '';
-    currentTutorTopic = '';
-    saveTutorHistory();
-    saveTutorPendingQuestion();
-    try {
-        localStorage.removeItem('acStudyTutorTopic');
-        localStorage.removeItem('acStudyTutorSubtopic');
-        localStorage.removeItem('acStudyLastTutorResponse');
-    } catch (error) {
-        // Limpieza opcional de memoria local del Tutor.
-    }
+    resetTutorConversationMemory();
+    renderTutorConversation();
 }
 
-function addTutorHistory(role, content) {
+function addTutorHistory(role, content, userId = activeTutorUserId) {
+    const normalizedUserId = normalizeTutorUserId(userId);
+    if (!normalizedUserId || normalizedUserId !== activeTutorUserId) return false;
+    if (!['user', 'assistant'].includes(role) || !String(content || '').trim()) return false;
+
     tutorState.history.push({
         role,
         content,
@@ -4797,7 +4928,8 @@ function addTutorHistory(role, content) {
     if (role === 'assistant') {
         tutorState.lastAnswer = content;
     }
-    saveTutorHistory();
+    saveTutorHistory(normalizedUserId);
+    return true;
 }
 
 function normalizeTutorTopic(topic) {
@@ -6227,13 +6359,33 @@ async function sendTutorMessage(userMessage, displayMessage = userMessage) {
         return;
     }
 
-    if (tutorRequestInProgress) return;
+    const sb = getSupabaseClient();
+    const { data: sessionData } = await sb.auth.getSession();
+    const requestUser = sessionData?.session?.user || null;
+    const requestUserId = normalizeTutorUserId(requestUser?.id);
+
+    if (!requestUserId) {
+        setTutorAuthenticatedUser(null);
+        notify('Debes iniciar sesión para usar Tutor IA.', 'error');
+        return;
+    }
+
+    if (requestUserId !== activeTutorUserId) {
+        setTutorAuthenticatedUser(requestUser);
+    }
+
+    if (tutorRequestInProgress && tutorRequestOwnerId === requestUserId) return;
+
+    const requestGeneration = tutorAuthGeneration;
     tutorRequestInProgress = true;
+    tutorRequestOwnerId = requestUserId;
     setTutorSendingState(true);
 
     const input = document.getElementById('ai-topic');
+    if (requestUserId !== activeTutorUserId || requestGeneration !== tutorAuthGeneration) return;
+
     appendTutorMessage('user', visibleMessage);
-    addTutorHistory('user', visibleMessage);
+    addTutorHistory('user', visibleMessage, requestUserId);
     if (input) input.value = '';
 
     const thinking = showTutorThinking();
@@ -6242,18 +6394,30 @@ async function sendTutorMessage(userMessage, displayMessage = userMessage) {
         const result = await requestTutorAI(cleanMessage);
         if (thinking) thinking.remove();
 
+        if (requestUserId !== activeTutorUserId || requestGeneration !== tutorAuthGeneration) {
+            return;
+        }
+
         appendTutorMessage('bot', result.answer, 'Tutor');
-        addTutorHistory('assistant', result.answer);
+        addTutorHistory('assistant', result.answer, requestUserId);
     } catch (error) {
         if (thinking) thinking.remove();
+
+        if (requestUserId !== activeTutorUserId || requestGeneration !== tutorAuthGeneration) {
+            return;
+        }
+
         const answer = getTutorAIErrorAnswer(error, cleanMessage);
         console.error("[TUTOR IA UNEXPECTED ERROR]", error);
         appendTutorMessage('bot', answer, 'Tutor');
-        addTutorHistory('assistant', answer);
+        addTutorHistory('assistant', answer, requestUserId);
     } finally {
-        tutorRequestInProgress = false;
-        setTutorSendingState(false);
-        if (input) input.focus();
+        if (tutorRequestOwnerId === requestUserId && requestGeneration === tutorAuthGeneration) {
+            tutorRequestInProgress = false;
+            tutorRequestOwnerId = '';
+            setTutorSendingState(false);
+            if (input) input.focus();
+        }
     }
 }
 
@@ -8478,6 +8642,7 @@ async function syncWorkspaceFromSupabase() {
 }
 
 async function bootstrapAuthenticatedApp(user, fallbackName = '') {
+    setTutorAuthenticatedUser(user);
     loadInterfaceSoundPreferenceFromUser(user);
     const profile = await ensureProfileRow(user, fallbackName);
     currentUser = getPublicUserFromAuth(user, profile);
@@ -9076,6 +9241,7 @@ async function handleLogout(event) {
             return;
         }
 
+        setTutorAuthenticatedUser(null);
         currentUser = null;
         profileState = null;
         workspaceState = mergeWorkspaceState();
@@ -9516,6 +9682,8 @@ async function initializeApp() {
     initLandingWheelControl();
 
     const shouldRestoreStudentApp = shouldRestoreAppFromSession();
+    removeLegacyTutorStorage();
+    setTutorAuthenticatedUser(null);
     console.log(shouldRestoreStudentApp ? "[APP] Restauración de panel pendiente" : "[APP] Landing inicial");
     currentUser = null;
     profileState = null;
@@ -9529,6 +9697,10 @@ async function initializeApp() {
 
         if (!authListenerReady) {
             sb.auth.onAuthStateChange(async (authEvent, session) => {
+                if (['SIGNED_IN', 'USER_UPDATED', 'TOKEN_REFRESHED'].includes(authEvent)) {
+                    setTutorAuthenticatedUser(session?.user || null);
+                }
+
                 if (authEvent === 'PASSWORD_RECOVERY') {
                     console.log('[PASSWORD UPDATE] Modo recuperación detectado');
                     currentUser = null;
@@ -9540,6 +9712,7 @@ async function initializeApp() {
                 }
 
                 if (authEvent === 'SIGNED_OUT') {
+                    setTutorAuthenticatedUser(null);
                     currentUser = null;
                     profileState = null;
                     workspaceState = mergeWorkspaceState();
@@ -9555,6 +9728,7 @@ async function initializeApp() {
 
         const { data: sessionData, error } = await sb.auth.getSession();
         if (error) throw error;
+        setTutorAuthenticatedUser(sessionData?.session?.user || null);
         if (isPasswordRecoveryUrl()) {
             console.log('[PASSWORD UPDATE] Link de recuperación detectado en URL');
             window.setTimeout(openPasswordUpdateModal, 250);
