@@ -11428,6 +11428,18 @@ body.light-theme #attendance .day-justified { color: #16789d; }
     }
 }
 
+body #attendance {
+    max-width: 1440px !important;
+}
+
+body #attendance .section-header h1 {
+    font-size: clamp(32px, 3vw, 40px) !important;
+}
+
+body #attendance .section-header > button {
+    min-height: 46px !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     #attendance .attendance-stat-card,
     #attendance .attendance-card,
