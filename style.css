@@ -30500,17 +30500,19 @@ body #tasks .task-board.task-list-modern > .task-empty-filter {
 }
 
 
-/* Tareas: panel unificado de informacion */
+/* Tareas: panel unificado de informacion - alineacion v2 */
 body #tasks .task-card-modern .task-meta-grid {
     position: relative !important;
     width: 100% !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 18px 28px !important;
+    grid-template-rows: repeat(2, minmax(78px, auto)) !important;
+    align-items: stretch !important;
+    gap: 0 !important;
     margin: 8px 0 2px !important;
-    padding: 52px 18px 18px !important;
+    padding: 54px 22px 22px !important;
     border: 1px solid rgba(148, 163, 184, .18) !important;
-    border-radius: 16px !important;
+    border-radius: 17px !important;
     background: rgba(15, 23, 42, .34) !important;
     box-shadow: none !important;
     overflow: hidden !important;
@@ -30519,7 +30521,7 @@ body #tasks .task-card-modern .task-meta-grid {
 body #tasks .task-card-modern .task-meta-grid::before {
     content: "Información de la tarea" !important;
     position: absolute !important;
-    inset: 17px 18px auto !important;
+    inset: 20px 22px auto !important;
     color: rgba(248, 250, 252, .94) !important;
     font-size: .82rem !important;
     font-weight: 700 !important;
@@ -30527,21 +30529,34 @@ body #tasks .task-card-modern .task-meta-grid::before {
     letter-spacing: .015em !important;
 }
 
+body #tasks .task-card-modern .task-meta-grid::after {
+    content: "" !important;
+    position: absolute !important;
+    z-index: 0 !important;
+    inset: 54px 22px 22px !important;
+    pointer-events: none !important;
+    background:
+        linear-gradient(to bottom, transparent calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% + .5px), transparent calc(50% + .5px)),
+        linear-gradient(to right, transparent calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% + .5px), transparent calc(50% + .5px)) !important;
+}
+
 body #tasks .task-card-modern .task-meta-grid > span {
     position: relative !important;
+    z-index: 1 !important;
     display: flex !important;
+    width: 100% !important;
     min-width: 0 !important;
-    min-height: 48px !important;
+    min-height: 78px !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
-    gap: 5px !important;
+    gap: 7px !important;
     margin: 0 !important;
-    padding: 0 0 0 30px !important;
+    padding: 14px 20px !important;
     color: rgba(248, 250, 252, .96) !important;
-    font-size: .96rem !important;
+    font-size: 1.03rem !important;
     font-weight: 650 !important;
-    line-height: 1.35 !important;
+    line-height: 1.3 !important;
     background: transparent !important;
     border: 0 !important;
     border-radius: 0 !important;
@@ -30549,30 +30564,29 @@ body #tasks .task-card-modern .task-meta-grid > span {
     overflow-wrap: anywhere !important;
 }
 
-body #tasks .task-card-modern .task-meta-grid > span::before {
-    position: absolute !important;
-    top: 2px !important;
-    left: 0 !important;
-    width: 20px !important;
-    color: rgba(203, 213, 225, .92) !important;
-    font-size: 1rem !important;
-    line-height: 1 !important;
-    text-align: center !important;
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(odd) {
+    padding-left: 0 !important;
+    padding-right: 24px !important;
 }
 
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(1)::before { content: "📅" !important; }
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(2)::before { content: "⏳" !important; }
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(3)::before { content: "🚩" !important; }
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(4)::before { content: "📧" !important; }
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(even) {
+    padding-left: 24px !important;
+    padding-right: 0 !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span::before {
+    content: none !important;
+    display: none !important;
+}
 
 body #tasks .task-card-modern .task-meta-grid > span > strong {
     display: block !important;
     margin: 0 !important;
     color: rgba(148, 163, 184, .96) !important;
-    font-size: .69rem !important;
+    font-size: .76rem !important;
     font-weight: 700 !important;
     line-height: 1.15 !important;
-    letter-spacing: .055em !important;
+    letter-spacing: .045em !important;
     text-transform: uppercase !important;
 }
 
@@ -30622,12 +30636,14 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-moder
     color: #172033 !important;
 }
 
-body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span {
-    color: #202a3a !important;
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid::after {
+    background:
+        linear-gradient(to bottom, transparent calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% + .5px), transparent calc(50% + .5px)),
+        linear-gradient(to right, transparent calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% + .5px), transparent calc(50% + .5px)) !important;
 }
 
-body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span::before {
-    color: #667085 !important;
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span {
+    color: #202a3a !important;
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span > strong {
@@ -30658,11 +30674,40 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-moder
 @media (max-width: 599px) {
     body #tasks .task-card-modern .task-meta-grid {
         grid-template-columns: minmax(0, 1fr) !important;
-        gap: 17px !important;
-        padding: 52px 18px 18px !important;
+        grid-template-rows: none !important;
+        padding: 54px 20px 20px !important;
     }
 
-    body #tasks .task-card-modern .task-meta-grid > span {
-        min-height: 44px !important;
+    body #tasks .task-card-modern .task-meta-grid::before {
+        inset: 20px 20px auto !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid::after {
+        display: none !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid > span,
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(odd),
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(even) {
+        min-height: 72px !important;
+        padding: 14px 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(148, 163, 184, .13) !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid > span:last-child {
+        border-bottom: 0 !important;
+    }
+}
+
+@media (max-width: 380px) {
+    body #tasks .task-card-modern .task-meta-grid {
+        padding-right: 18px !important;
+        padding-left: 18px !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid::before {
+        right: 18px !important;
+        left: 18px !important;
     }
 }
