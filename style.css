@@ -30273,3 +30273,228 @@ body[data-theme="light"] .quick-modal:has(.quick-modal-card[aria-label="Editar t
         transform: none !important;
     }
 }
+
+
+/* Tareas: correccion puntual de grid 2x2 y proporciones de tarjetas */
+body #tasks .task-board.task-list-modern {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
+    justify-items: stretch !important;
+    gap: 22px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body #tasks .task-board.task-list-modern > .task-item.task-card-modern {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    justify-self: stretch !important;
+    align-self: stretch !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    gap: 11px !important;
+    margin: 0 !important;
+    padding: 21px 22px !important;
+    border-width: 1px !important;
+    border-radius: 17px !important;
+    box-shadow: 0 7px 20px rgba(2, 8, 23, .13) !important;
+}
+
+body #tasks .task-board.task-list-modern > .task-item.task-card-modern:hover {
+    box-shadow: 0 11px 26px rgba(2, 8, 23, .18) !important;
+}
+
+body #tasks .task-card-modern .task-card-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 12px !important;
+}
+
+body #tasks .task-card-modern .task-content {
+    width: 100% !important;
+    min-width: 0 !important;
+    gap: 8px !important;
+}
+
+body #tasks .task-card-modern .task-title-row {
+    width: 100% !important;
+    min-width: 0 !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+    gap: 12px !important;
+}
+
+body #tasks .task-card-modern .task-title-row h4 {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    line-height: 1.27 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+body #tasks .task-card-modern .task-status {
+    align-self: start !important;
+    flex: 0 0 auto !important;
+}
+
+body #tasks .task-card-modern .task-subject {
+    max-width: 100% !important;
+    margin-top: 1px !important;
+}
+
+body #tasks .task-card-modern .task-description {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    line-height: 1.46 !important;
+    -webkit-line-clamp: 3 !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    margin: 2px 0 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span {
+    min-width: 0 !important;
+    min-height: 54px !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    background: var(--tasks-surface-soft) !important;
+    border: 1px solid var(--tasks-border) !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(even),
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(n+3),
+body #tasks .task-card-modern .task-meta-grid > span + span {
+    border: 1px solid var(--tasks-border) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid strong {
+    display: block !important;
+    margin-bottom: 3px !important;
+}
+
+body #tasks .task-card-modern .task-reminder-alert {
+    margin: 1px 0 0 !important;
+}
+
+body #tasks .task-card-modern .task-card-actions {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-flow: row !important;
+    gap: 10px !important;
+    margin: auto 0 0 !important;
+    padding: 12px 0 0 !important;
+}
+
+body #tasks .task-card-modern .task-card-actions.has-complete,
+body #tasks .task-card-modern .task-card-actions.no-complete {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+body #tasks .task-card-modern .task-card-actions button,
+body #tasks .task-card-modern .task-card-actions [data-task-calendar],
+body #tasks .task-card-modern .task-card-actions [data-task-delete] {
+    grid-column: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    min-height: 41px !important;
+    height: 41px !important;
+    margin: 0 !important;
+    padding: 0 11px !important;
+    border-radius: 10px !important;
+}
+
+body #tasks .task-board.task-list-modern > .task-empty-filter {
+    grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 899px) {
+    body #tasks .task-board.task-list-modern {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 18px !important;
+    }
+
+    body #tasks .task-board.task-list-modern > .task-item.task-card-modern {
+        padding: 19px !important;
+    }
+}
+
+@media (max-width: 599px) {
+    body #tasks .task-board.task-list-modern {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 15px !important;
+    }
+
+    body #tasks .task-board.task-list-modern > .task-item.task-card-modern {
+        width: 100% !important;
+        height: auto !important;
+        padding: 17px !important;
+    }
+
+    body #tasks .task-card-modern .task-card-main {
+        grid-template-columns: 38px minmax(0, 1fr) !important;
+        gap: 9px !important;
+    }
+
+    body #tasks .task-card-modern .task-title-row {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        gap: 8px !important;
+    }
+}
+
+@media (max-width: 419px) {
+    body #tasks .task-card-modern .task-title-row,
+    body #tasks .task-card-modern .task-meta-grid,
+    body #tasks .task-card-modern .task-card-actions,
+    body #tasks .task-card-modern .task-card-actions.has-complete,
+    body #tasks .task-card-modern .task-card-actions.no-complete {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body #tasks .task-card-modern .task-status {
+        justify-self: start !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid > span {
+        min-height: 0 !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body #tasks .task-board.task-list-modern > .task-item.task-card-modern {
+        transition: none !important;
+        animation: none !important;
+    }
+}
