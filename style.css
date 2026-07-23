@@ -27837,3 +27837,1040 @@ body[data-theme="light"] #backpack .resource-actions .btn-secondary:hover {
         transform: none !important;
     }
 }
+
+
+/* Materias: cuadernos digitales modernos y modal compacto */
+body #subjects {
+    --subjects-surface: #111827;
+    --subjects-surface-raised: #172033;
+    --subjects-surface-soft: #1b2538;
+    --subjects-border: rgba(148, 163, 184, .17);
+    --subjects-border-strong: rgba(148, 163, 184, .28);
+    --subjects-text: #f4f7fb;
+    --subjects-muted: #a8b3c5;
+    --subjects-subtle: #7f8ca3;
+    --subjects-accent: #7467df;
+    --subjects-metal: #75839a;
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin-inline: auto !important;
+    padding: 0 0 32px !important;
+    color: var(--subjects-text) !important;
+}
+
+body #subjects > .section-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: end !important;
+    gap: 4px 20px !important;
+    min-height: 0 !important;
+    margin: 0 0 22px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body #subjects > .section-header h1 {
+    grid-column: 1 !important;
+    margin: 0 !important;
+    color: var(--subjects-text) !important;
+    font-size: clamp(2.125rem, 3vw, 2.5rem) !important;
+    font-weight: 780 !important;
+    line-height: 1.08 !important;
+    letter-spacing: -.035em !important;
+    text-shadow: none !important;
+}
+
+body #subjects > .section-header .subtitle {
+    grid-column: 1 !important;
+    margin: 3px 0 0 !important;
+    color: var(--subjects-muted) !important;
+    font-size: clamp(.94rem, 1.2vw, 1.05rem) !important;
+    line-height: 1.45 !important;
+}
+
+body #subjects > .section-header .btn-primary {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    align-self: end !important;
+    width: auto !important;
+    min-width: 146px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 17px !important;
+    color: #fff !important;
+    background: #6f63df !important;
+    border: 1px solid rgba(164, 154, 255, .36) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 16px rgba(74, 62, 180, .18) !important;
+    font-size: .88rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease !important;
+}
+
+body #subjects > .section-header .btn-primary:hover {
+    transform: translateY(-1px) !important;
+    background: #7b70e8 !important;
+}
+
+body #subjects > .section-header .btn-primary:focus-visible,
+body #subjects .subjects-toolbar input:focus,
+body #subjects .subjects-toolbar select:focus,
+body #subjects .card-actions button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--subjects-accent) 38%, transparent) !important;
+    outline-offset: 2px !important;
+}
+
+body #subjects .subjects-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(280px, 1fr) minmax(180px, 280px) !important;
+    align-items: end !important;
+    gap: 16px !important;
+    margin: 0 0 22px !important;
+    padding: 18px 20px !important;
+    background: var(--subjects-surface) !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 10px 28px rgba(2, 8, 23, .16) !important;
+}
+
+body #subjects .subjects-toolbar label {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+    margin: 0 !important;
+    color: var(--subjects-muted) !important;
+    font-size: .76rem !important;
+    font-weight: 650 !important;
+    line-height: 1.2 !important;
+    letter-spacing: .01em !important;
+    text-transform: none !important;
+}
+
+body #subjects .subjects-toolbar input,
+body #subjects .subjects-toolbar select {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 13px !important;
+    color: var(--subjects-text) !important;
+    background-color: var(--subjects-surface-soft) !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font: inherit !important;
+    font-size: .89rem !important;
+    font-weight: 500 !important;
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+body #subjects .subjects-toolbar input::placeholder {
+    color: var(--subjects-subtle) !important;
+    opacity: 1 !important;
+}
+
+body #subjects .subjects-toolbar input:hover,
+body #subjects .subjects-toolbar select:hover {
+    background-color: #202b3f !important;
+    border-color: var(--subjects-border-strong) !important;
+}
+
+body #subjects .subjects-toolbar input:focus,
+body #subjects .subjects-toolbar select:focus {
+    border-color: color-mix(in srgb, var(--subjects-accent) 68%, white 8%) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--subjects-accent) 16%, transparent) !important;
+    outline: none !important;
+}
+
+body #subjects .subjects-grid {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    align-items: stretch !important;
+    gap: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body #subjects .subject-card.subject-space-card {
+    position: relative !important;
+    isolation: isolate !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    padding: 20px 20px 20px 34px !important;
+    overflow: hidden !important;
+    color: var(--subjects-text) !important;
+    background: var(--subjects-surface) !important;
+    background-image: none !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 24px rgba(2, 8, 23, .14) !important;
+    transform: none !important;
+    transition: transform 190ms ease, border-color 190ms ease, box-shadow 190ms ease, background-color 190ms ease !important;
+}
+
+body #subjects .subject-card.subject-space-card::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 auto 0 0 !important;
+    width: 17px !important;
+    height: auto !important;
+    background: color-mix(in srgb, var(--subject-color, #7467df) 78%, #273047) !important;
+    border: 0 !important;
+    border-radius: 18px 0 0 18px !important;
+    box-shadow: inset -2px 0 4px rgba(2, 8, 23, .18) !important;
+    opacity: .92 !important;
+    pointer-events: none !important;
+}
+
+body #subjects .subject-card.subject-space-card::after {
+    content: none !important;
+    display: none !important;
+}
+
+body #subjects .subject-card.subject-space-card:hover {
+    transform: translateY(-2px) !important;
+    background: var(--subjects-surface-raised) !important;
+    border-color: color-mix(in srgb, var(--subject-color, #7467df) 30%, var(--subjects-border)) !important;
+    box-shadow: 0 13px 30px rgba(2, 8, 23, .2) !important;
+}
+
+body #subjects .subject-card.subject-space-card .neon-border-lines {
+    display: none !important;
+}
+
+body #subjects .subject-card.subject-space-card .subject-orbit {
+    position: absolute !important;
+    z-index: 3 !important;
+    top: 18px !important;
+    bottom: 18px !important;
+    left: 4px !important;
+    width: 28px !important;
+    height: auto !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background:
+        radial-gradient(ellipse 12px 7px at 50% 50%,
+            transparent 0 43%,
+            var(--subjects-metal) 47% 62%,
+            rgba(255, 255, 255, .2) 64% 69%,
+            transparent 72%)
+        center top / 28px 48px repeat-y !important;
+    box-shadow: none !important;
+    transform: none !important;
+    pointer-events: none !important;
+}
+
+body #subjects .subject-card.subject-space-card .subject-orbit::before,
+body #subjects .subject-card.subject-space-card .subject-orbit::after {
+    content: none !important;
+    display: none !important;
+}
+
+body #subjects .subject-header {
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body #subjects .subject-title {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+}
+
+body #subjects .subject-title > div:last-child {
+    min-width: 0 !important;
+}
+
+body #subjects .subject-title .subject-book-icon,
+body #subjects .subject-title .subject-icon,
+body #subjects .subject-title [class*="subject-icon"],
+body #subjects .subject-title [class*="book-icon"] {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    display: grid !important;
+    place-items: center !important;
+    margin: 0 !important;
+    color: var(--subject-color, #7467df) !important;
+    background: color-mix(in srgb, var(--subject-color, #7467df) 13%, var(--subjects-surface-soft)) !important;
+    border: 1px solid color-mix(in srgb, var(--subject-color, #7467df) 27%, transparent) !important;
+    border-radius: 13px !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+body #subjects .subject-title svg {
+    width: 23px !important;
+    height: 23px !important;
+    filter: none !important;
+}
+
+body #subjects .subject-title h3 {
+    display: -webkit-box !important;
+    max-width: 100% !important;
+    margin: 0 0 4px !important;
+    overflow: hidden !important;
+    color: var(--subjects-text) !important;
+    font-size: clamp(1.18rem, 1.6vw, 1.42rem) !important;
+    font-weight: 720 !important;
+    line-height: 1.22 !important;
+    letter-spacing: -.02em !important;
+    text-shadow: none !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+body #subjects .subject-title p {
+    display: -webkit-box !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: var(--subjects-muted) !important;
+    font-size: .86rem !important;
+    font-weight: 450 !important;
+    line-height: 1.42 !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+body #subjects .subject-chip {
+    flex: 0 0 auto !important;
+    width: fit-content !important;
+    max-width: 40% !important;
+    min-height: 25px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 1px 0 0 !important;
+    padding: 4px 9px !important;
+    color: color-mix(in srgb, var(--subject-color, #7467df) 66%, white) !important;
+    background: color-mix(in srgb, var(--subject-color, #7467df) 12%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--subject-color, #7467df) 28%, transparent) !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+    font-size: .7rem !important;
+    font-weight: 680 !important;
+    line-height: 1.15 !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #subjects .subject-progress-block {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body #subjects .subject-progress-block > div:first-child {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    color: var(--subjects-muted) !important;
+    font-size: .78rem !important;
+    font-weight: 620 !important;
+}
+
+body #subjects .subject-progress-block strong {
+    color: var(--subject-color, #7467df) !important;
+    font-size: .84rem !important;
+    font-weight: 760 !important;
+}
+
+body #subjects .subject-progress-block .progress-bar {
+    width: 100% !important;
+    height: 9px !important;
+    min-height: 9px !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    background: var(--subjects-surface-soft) !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 999px !important;
+    box-shadow: none !important;
+}
+
+body #subjects .subject-progress-block .progress-fill {
+    height: 100% !important;
+    min-height: 0 !important;
+    background: var(--subject-color, #7467df) !important;
+    border-radius: inherit !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+body #subjects .subject-metric-grid {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body #subjects .subject-metric-grid > div {
+    min-width: 0 !important;
+    min-height: 58px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    background: var(--subjects-surface-soft) !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 11px !important;
+    box-shadow: none !important;
+}
+
+body #subjects .subject-metric-grid span {
+    color: var(--subjects-muted) !important;
+    font-size: .72rem !important;
+    font-weight: 590 !important;
+    line-height: 1.25 !important;
+}
+
+body #subjects .subject-metric-grid strong {
+    color: color-mix(in srgb, var(--subject-color, #7467df) 68%, white) !important;
+    font-size: 1.08rem !important;
+    font-weight: 740 !important;
+    line-height: 1.1 !important;
+}
+
+body #subjects .subject-card-footer {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 2px 12px !important;
+    background: var(--subjects-surface-soft) !important;
+    border: 1px solid var(--subjects-border) !important;
+    border-radius: 11px !important;
+    box-shadow: none !important;
+}
+
+body #subjects .subject-card-footer p {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 9px 0 !important;
+    color: var(--subjects-muted) !important;
+    font-size: .76rem !important;
+    font-weight: 470 !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #subjects .subject-card-footer p + p {
+    border-top: 1px solid var(--subjects-border) !important;
+}
+
+body #subjects .subject-card-footer strong {
+    color: var(--subjects-text) !important;
+    font-weight: 650 !important;
+}
+
+body #subjects .subject-card .card-actions {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(72px, .7fr)) !important;
+    gap: 8px !important;
+    margin: auto 0 0 !important;
+    padding: 13px 0 0 !important;
+    background: transparent !important;
+    border-top: 1px solid var(--subjects-border) !important;
+}
+
+body #subjects .subject-card .card-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    font-size: .78rem !important;
+    font-weight: 680 !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, color 180ms ease !important;
+}
+
+body #subjects .subject-card .card-actions button:hover {
+    transform: translateY(-1px) !important;
+}
+
+body #subjects .subject-card .card-actions .btn-primary {
+    color: #fff !important;
+    background: color-mix(in srgb, var(--subject-color, #7467df) 78%, #3f3a78) !important;
+    border: 1px solid color-mix(in srgb, var(--subject-color, #7467df) 68%, white 10%) !important;
+}
+
+body #subjects .subject-card .card-actions .btn-secondary {
+    color: #dbe3f0 !important;
+    background: var(--subjects-surface-soft) !important;
+    border: 1px solid var(--subjects-border) !important;
+}
+
+body #subjects .subject-card .card-actions .btn-danger {
+    color: #f2a6ad !important;
+    background: rgba(239, 68, 68, .07) !important;
+    border: 1px solid rgba(248, 113, 113, .18) !important;
+}
+
+body #subjects .subject-card .card-actions .btn-danger:hover {
+    color: #ffc2c7 !important;
+    background: rgba(239, 68, 68, .12) !important;
+    border-color: rgba(248, 113, 113, .3) !important;
+}
+
+body #subjects .subjects-grid > .empty-state {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-height: 250px !important;
+    display: grid !important;
+    place-items: center !important;
+    align-content: center !important;
+    gap: 12px !important;
+    padding: 32px 22px !important;
+    text-align: center !important;
+    background: var(--subjects-surface) !important;
+    border: 1px dashed var(--subjects-border-strong) !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+}
+
+/* Modal exclusivo de Crear/Editar materia */
+body .quick-modal:has(.quick-modal-card[aria-label="Crear materia"]),
+body .quick-modal:has(.quick-modal-card[aria-label="Editar materia"]) {
+    --subject-modal-bg: #111827;
+    --subject-modal-soft: #192337;
+    --subject-modal-border: rgba(148, 163, 184, .18);
+    --subject-modal-text: #f4f7fb;
+    --subject-modal-muted: #a8b3c5;
+    padding: 20px !important;
+    background: rgba(2, 8, 23, .7) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"],
+body .quick-modal-card[aria-label="Editar materia"] {
+    position: relative !important;
+    width: min(820px, calc(100vw - 40px)) !important;
+    max-width: 820px !important;
+    max-height: 88vh !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+    gap: 0 !important;
+    margin: auto !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    color: var(--subject-modal-text) !important;
+    background: var(--subject-modal-bg) !important;
+    border: 1px solid var(--subject-modal-border) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 22px 60px rgba(2, 8, 23, .42) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] > h3,
+body .quick-modal-card[aria-label="Editar materia"] > h3 {
+    min-height: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 20px 66px 20px 24px !important;
+    color: var(--subject-modal-text) !important;
+    background: var(--subject-modal-bg) !important;
+    border-bottom: 1px solid var(--subject-modal-border) !important;
+    font-size: 1.22rem !important;
+    font-weight: 720 !important;
+    line-height: 1.25 !important;
+    letter-spacing: -.015em !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-close,
+body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-close {
+    position: absolute !important;
+    z-index: 5 !important;
+    top: 15px !important;
+    right: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: grid !important;
+    place-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: var(--subject-modal-muted) !important;
+    background: var(--subject-modal-soft) !important;
+    border: 1px solid var(--subject-modal-border) !important;
+    border-radius: 11px !important;
+    box-shadow: none !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-close:hover,
+body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-close:hover {
+    color: var(--subject-modal-text) !important;
+    background: #222d42 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-close:focus-visible,
+body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-close:focus-visible {
+    outline: 3px solid rgba(124, 111, 240, .32) !important;
+    outline-offset: 2px !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-form,
+body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-form {
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start !important;
+    gap: 18px !important;
+    margin: 0 !important;
+    padding: 22px 24px 86px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    background: var(--subject-modal-bg) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .quick-modal-form > label,
+body .quick-modal-card[aria-label="Editar materia"] .quick-modal-form > label {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    color: var(--subject-modal-muted) !important;
+    font-size: .78rem !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .quick-modal-form > label:has(.choice-grid),
+body .quick-modal-card[aria-label="Editar materia"] .quick-modal-form > label:has(.choice-grid),
+body .quick-modal-card[aria-label="Crear materia"] .quick-modal-form > label:has(textarea),
+body .quick-modal-card[aria-label="Editar materia"] .quick-modal-form > label:has(textarea) {
+    grid-column: 1 / -1 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] input:not([type="radio"]),
+body .quick-modal-card[aria-label="Editar materia"] input:not([type="radio"]),
+body .quick-modal-card[aria-label="Crear materia"] textarea,
+body .quick-modal-card[aria-label="Editar materia"] textarea,
+body .quick-modal-card[aria-label="Crear materia"] select,
+body .quick-modal-card[aria-label="Editar materia"] select {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    padding: 11px 13px !important;
+    color: var(--subject-modal-text) !important;
+    background: var(--subject-modal-soft) !important;
+    border: 1px solid var(--subject-modal-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font: inherit !important;
+    font-size: .9rem !important;
+    font-weight: 500 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] textarea,
+body .quick-modal-card[aria-label="Editar materia"] textarea {
+    min-height: 100px !important;
+    resize: vertical !important;
+    line-height: 1.48 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] input:not([type="radio"]):focus,
+body .quick-modal-card[aria-label="Editar materia"] input:not([type="radio"]):focus,
+body .quick-modal-card[aria-label="Crear materia"] textarea:focus,
+body .quick-modal-card[aria-label="Editar materia"] textarea:focus {
+    border-color: #8074e8 !important;
+    box-shadow: 0 0 0 3px rgba(124, 111, 240, .16) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-grid,
+body .quick-modal-card[aria-label="Editar materia"] .choice-grid {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-pill,
+body .quick-modal-card[aria-label="Editar materia"] .choice-pill {
+    position: relative !important;
+    min-width: 0 !important;
+    min-height: 78px !important;
+    display: grid !important;
+    place-items: center !important;
+    align-content: center !important;
+    gap: 7px !important;
+    margin: 0 !important;
+    padding: 10px 8px !important;
+    color: var(--subject-modal-muted) !important;
+    background: var(--subject-modal-soft) !important;
+    border: 1px solid var(--subject-modal-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-pill:hover,
+body .quick-modal-card[aria-label="Editar materia"] .choice-pill:hover {
+    transform: translateY(-1px) !important;
+    border-color: rgba(148, 163, 184, .34) !important;
+    background: #202b40 !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-pill:has(input:checked),
+body .quick-modal-card[aria-label="Editar materia"] .choice-pill:has(input:checked) {
+    color: var(--subject-modal-text) !important;
+    background: color-mix(in srgb, var(--choice-color, #7467df) 12%, var(--subject-modal-soft)) !important;
+    border-color: color-mix(in srgb, var(--choice-color, #7467df) 58%, #9d94ff) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-pill input,
+body .quick-modal-card[aria-label="Editar materia"] .choice-pill input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-dot,
+body .quick-modal-card[aria-label="Editar materia"] .choice-dot {
+    width: 25px !important;
+    height: 25px !important;
+    display: block !important;
+    margin: 0 !important;
+    background: var(--choice-color, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--choice-color, #7f8ca3) 45%, var(--subject-modal-border)) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .choice-pill strong,
+body .quick-modal-card[aria-label="Editar materia"] .choice-pill strong {
+    max-width: 100% !important;
+    color: inherit !important;
+    font-size: .75rem !important;
+    font-weight: 650 !important;
+    line-height: 1.25 !important;
+    overflow-wrap: anywhere !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .quick-modal-actions,
+body .quick-modal-card[aria-label="Editar materia"] .quick-modal-actions {
+    position: sticky !important;
+    z-index: 4 !important;
+    bottom: -86px !important;
+    grid-column: 1 / -1 !important;
+    min-height: 70px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    margin: 0 -24px -86px !important;
+    padding: 13px 24px !important;
+    background: var(--subject-modal-bg) !important;
+    border-top: 1px solid var(--subject-modal-border) !important;
+    box-shadow: 0 -8px 18px rgba(2, 8, 23, .12) !important;
+}
+
+body .quick-modal-card[aria-label="Crear materia"] .quick-modal-actions .btn-primary,
+body .quick-modal-card[aria-label="Editar materia"] .quick-modal-actions .btn-primary {
+    width: auto !important;
+    min-width: 168px !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    padding: 0 18px !important;
+    color: #fff !important;
+    background: #6f63df !important;
+    border: 1px solid rgba(164, 154, 255, .36) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    font-size: .88rem !important;
+    font-weight: 700 !important;
+}
+
+/* Variantes claras, acotadas a Materias */
+body.light-theme #subjects,
+body.light-mode #subjects,
+body[data-theme="light"] #subjects {
+    --subjects-surface: #ffffff;
+    --subjects-surface-raised: #ffffff;
+    --subjects-surface-soft: #f6f8fb;
+    --subjects-border: rgba(15, 23, 42, .1);
+    --subjects-border-strong: rgba(15, 23, 42, .18);
+    --subjects-text: #172033;
+    --subjects-muted: #617087;
+    --subjects-subtle: #7b8799;
+    --subjects-accent: #675bd4;
+    --subjects-metal: #a6afbd;
+}
+
+body.light-theme #subjects .subjects-toolbar,
+body.light-theme #subjects .subject-card.subject-space-card,
+body.light-mode #subjects .subjects-toolbar,
+body.light-mode #subjects .subject-card.subject-space-card,
+body[data-theme="light"] #subjects .subjects-toolbar,
+body[data-theme="light"] #subjects .subject-card.subject-space-card {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06) !important;
+}
+
+body.light-theme #subjects .subjects-toolbar input:hover,
+body.light-theme #subjects .subjects-toolbar select:hover,
+body.light-mode #subjects .subjects-toolbar input:hover,
+body.light-mode #subjects .subjects-toolbar select:hover,
+body[data-theme="light"] #subjects .subjects-toolbar input:hover,
+body[data-theme="light"] #subjects .subjects-toolbar select:hover {
+    background-color: #f1f4f8 !important;
+}
+
+body.light-theme #subjects .subject-metric-grid strong,
+body.light-mode #subjects .subject-metric-grid strong,
+body[data-theme="light"] #subjects .subject-metric-grid strong,
+body.light-theme #subjects .subject-chip,
+body.light-mode #subjects .subject-chip,
+body[data-theme="light"] #subjects .subject-chip {
+    color: color-mix(in srgb, var(--subject-color, #675bd4) 78%, #172033) !important;
+}
+
+body.light-theme .quick-modal:has(.quick-modal-card[aria-label="Crear materia"]),
+body.light-theme .quick-modal:has(.quick-modal-card[aria-label="Editar materia"]),
+body.light-mode .quick-modal:has(.quick-modal-card[aria-label="Crear materia"]),
+body.light-mode .quick-modal:has(.quick-modal-card[aria-label="Editar materia"]),
+body[data-theme="light"] .quick-modal:has(.quick-modal-card[aria-label="Crear materia"]),
+body[data-theme="light"] .quick-modal:has(.quick-modal-card[aria-label="Editar materia"]) {
+    --subject-modal-bg: #ffffff;
+    --subject-modal-soft: #f6f8fb;
+    --subject-modal-border: rgba(15, 23, 42, .11);
+    --subject-modal-text: #172033;
+    --subject-modal-muted: #617087;
+    background: rgba(15, 23, 42, .35) !important;
+}
+
+body.light-theme .quick-modal-card[aria-label="Crear materia"] .choice-pill:hover,
+body.light-theme .quick-modal-card[aria-label="Editar materia"] .choice-pill:hover,
+body.light-mode .quick-modal-card[aria-label="Crear materia"] .choice-pill:hover,
+body.light-mode .quick-modal-card[aria-label="Editar materia"] .choice-pill:hover {
+    background: #eef2f7 !important;
+}
+
+@media (max-width: 1180px) {
+    body #subjects .subjects-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 720px) {
+    body #subjects {
+        padding-bottom: 24px !important;
+    }
+
+    body #subjects > .section-header {
+        grid-template-columns: 1fr !important;
+        align-items: start !important;
+        gap: 6px !important;
+        margin-bottom: 18px !important;
+    }
+
+    body #subjects > .section-header h1,
+    body #subjects > .section-header .subtitle,
+    body #subjects > .section-header .btn-primary {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+    }
+
+    body #subjects > .section-header .btn-primary {
+        width: 100% !important;
+        margin-top: 8px !important;
+    }
+
+    body #subjects .subjects-toolbar {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        padding: 16px !important;
+    }
+
+    body #subjects .quick-modal-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-form,
+    body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-form {
+        grid-template-columns: 1fr !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .quick-modal-form > label,
+    body .quick-modal-card[aria-label="Editar materia"] .quick-modal-form > label {
+        grid-column: 1 !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .choice-grid,
+    body .quick-modal-card[aria-label="Editar materia"] .choice-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 620px) {
+    body #subjects .subjects-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    body #subjects .subject-card.subject-space-card {
+        padding: 18px 17px 18px 31px !important;
+        border-radius: 16px !important;
+    }
+
+    body #subjects .subject-card.subject-space-card::before {
+        width: 15px !important;
+        border-radius: 16px 0 0 16px !important;
+    }
+
+    body #subjects .subject-card.subject-space-card .subject-orbit {
+        left: 2px !important;
+        width: 26px !important;
+        background-size: 26px 46px !important;
+    }
+
+    body #subjects .subject-card .card-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    body #subjects .subject-card .card-actions [data-subject-open] {
+        grid-column: 1 / -1 !important;
+    }
+
+    body .quick-modal:has(.quick-modal-card[aria-label="Crear materia"]),
+    body .quick-modal:has(.quick-modal-card[aria-label="Editar materia"]) {
+        padding: 10px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"],
+    body .quick-modal-card[aria-label="Editar materia"] {
+        width: calc(100vw - 20px) !important;
+        max-height: 92vh !important;
+        border-radius: 18px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] > h3,
+    body .quick-modal-card[aria-label="Editar materia"] > h3 {
+        min-height: 64px !important;
+        padding: 17px 60px 17px 18px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-close,
+    body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-close {
+        top: 12px !important;
+        right: 12px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] > .quick-modal-form,
+    body .quick-modal-card[aria-label="Editar materia"] > .quick-modal-form {
+        gap: 15px !important;
+        padding: 18px 18px 82px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .choice-grid,
+    body .quick-modal-card[aria-label="Editar materia"] .choice-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .choice-pill,
+    body .quick-modal-card[aria-label="Editar materia"] .choice-pill {
+        min-height: 74px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .quick-modal-actions,
+    body .quick-modal-card[aria-label="Editar materia"] .quick-modal-actions {
+        bottom: -82px !important;
+        min-height: 66px !important;
+        margin: 0 -18px -82px !important;
+        padding: 10px 18px !important;
+    }
+
+    body .quick-modal-card[aria-label="Crear materia"] .quick-modal-actions .btn-primary,
+    body .quick-modal-card[aria-label="Editar materia"] .quick-modal-actions .btn-primary {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 400px) {
+    body #subjects .subject-header {
+        display: grid !important;
+    }
+
+    body #subjects .subject-chip {
+        max-width: 100% !important;
+    }
+
+    body #subjects .subject-card .card-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    body #subjects .subject-card .card-actions [data-subject-open] {
+        grid-column: 1 !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body #subjects .subject-card.subject-space-card,
+    body #subjects .subject-card .card-actions button,
+    body #subjects > .section-header .btn-primary,
+    body .quick-modal-card[aria-label="Crear materia"] .choice-pill,
+    body .quick-modal-card[aria-label="Editar materia"] .choice-pill {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    body #subjects .subject-card.subject-space-card:hover,
+    body #subjects .subject-card .card-actions button:hover,
+    body #subjects > .section-header .btn-primary:hover,
+    body .quick-modal-card[aria-label="Crear materia"] .choice-pill:hover,
+    body .quick-modal-card[aria-label="Editar materia"] .choice-pill:hover {
+        transform: none !important;
+    }
+}
