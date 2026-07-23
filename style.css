@@ -28874,3 +28874,285 @@ body.light-mode .quick-modal-card[aria-label="Editar materia"] .choice-pill:hove
         transform: none !important;
     }
 }
+
+
+/* Materias: correccion exclusiva de contraste y portada en tema claro */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects {
+    --subjects-card-bg: #ffffff;
+    --subjects-card-border: #d8dee8;
+    --subjects-card-text: #172033;
+    --subjects-card-muted: #536174;
+    --subjects-card-subtle: #6b778a;
+    --subjects-stat-bg: #f5f7fa;
+    --subjects-stat-border: #dfe4ec;
+    --subjects-progress-track: #e7ebf1;
+    --subjects-action-bg: #ffffff;
+    --subjects-action-text: #273244;
+    --subjects-action-border: #cfd6e1;
+    --subjects-danger-bg: #fff1f2;
+    --subjects-danger-text: #b42332;
+    --subjects-danger-border: #f2bdc3;
+    --subjects-ring: #8b97a8;
+    --subjects-ring-highlight: rgba(255, 255, 255, .88);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card {
+    padding-left: 40px !important;
+    color: var(--subjects-card-text) !important;
+    background-color: var(--subjects-card-bg) !important;
+    background-image: none !important;
+    border-color: var(--subjects-card-border) !important;
+    box-shadow: 0 8px 22px rgba(15, 23, 42, .07) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card:hover {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border-color: color-mix(in srgb, var(--subject-color, #675bd4) 27%, var(--subjects-card-border)) !important;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .1) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card::before {
+    width: 14px !important;
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 76%, #ffffff 24%) !important;
+    border: 0 !important;
+    box-shadow: inset -1px 0 2px rgba(15, 23, 42, .12) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card::after {
+    content: none !important;
+    display: none !important;
+    background: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card .neon-border-lines,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card .neon-line {
+    display: none !important;
+    background: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card .subject-orbit {
+    top: 18px !important;
+    bottom: 18px !important;
+    left: 0 !important;
+    width: 28px !important;
+    background:
+        radial-gradient(ellipse 12px 7px at 50% 50%,
+            transparent 0 42%,
+            var(--subjects-ring) 47% 61%,
+            var(--subjects-ring-highlight) 63% 68%,
+            transparent 71%)
+        center top / 28px 48px repeat-y !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-header,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-metric-grid,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions {
+    background-image: none !important;
+    box-shadow: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: start !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title {
+    min-width: 0 !important;
+    grid-template-columns: 48px minmax(0, 1fr) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title > div:last-child {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title h3 {
+    max-width: 100% !important;
+    color: var(--subjects-card-text) !important;
+    font-weight: 720 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: auto !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title p {
+    color: var(--subjects-card-muted) !important;
+    opacity: 1 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title .subject-book-icon,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title .subject-icon,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title [class*="subject-icon"],
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title [class*="book-icon"] {
+    color: color-mix(in srgb, var(--subject-color, #675bd4) 88%, #172033 12%) !important;
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 13%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--subject-color, #675bd4) 34%, #d4dae4) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title svg,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title path,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-title use {
+    color: inherit !important;
+    stroke: currentColor !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-chip {
+    max-width: none !important;
+    color: color-mix(in srgb, var(--subject-color, #675bd4) 82%, #172033 18%) !important;
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 11%, #ffffff) !important;
+    border-color: color-mix(in srgb, var(--subject-color, #675bd4) 34%, #d4dae4) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block > div:first-child,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block > div:first-child span {
+    color: #3f4b5d !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block strong {
+    color: color-mix(in srgb, var(--subject-color, #675bd4) 84%, #172033 16%) !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block .progress-bar {
+    background: var(--subjects-progress-track) !important;
+    border-color: #d6dce5 !important;
+    box-shadow: inset 0 1px 1px rgba(15, 23, 42, .04) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-progress-block .progress-fill {
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 90%, #374151 10%) !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-metric-grid > div {
+    background: var(--subjects-stat-bg) !important;
+    background-image: none !important;
+    border-color: var(--subjects-stat-border) !important;
+    box-shadow: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-metric-grid span {
+    color: #4d596b !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-metric-grid strong {
+    color: color-mix(in srgb, var(--subject-color, #675bd4) 82%, #172033 18%) !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card-footer {
+    background: var(--subjects-stat-bg) !important;
+    background-image: none !important;
+    border-color: var(--subjects-stat-border) !important;
+    box-shadow: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card-footer p {
+    color: var(--subjects-card-muted) !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card-footer p + p {
+    border-top-color: var(--subjects-stat-border) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card-footer strong {
+    color: #2c3748 !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions {
+    border-top-color: var(--subjects-stat-border) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions button {
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-primary {
+    color: #ffffff !important;
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 86%, #273244 14%) !important;
+    border-color: color-mix(in srgb, var(--subject-color, #675bd4) 82%, #273244 18%) !important;
+    text-shadow: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-primary:hover {
+    color: #ffffff !important;
+    background: color-mix(in srgb, var(--subject-color, #675bd4) 72%, #172033 28%) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-secondary {
+    color: var(--subjects-action-text) !important;
+    background: var(--subjects-action-bg) !important;
+    border-color: var(--subjects-action-border) !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-secondary:hover {
+    color: #172033 !important;
+    background: #eef1f5 !important;
+    border-color: #aeb8c7 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-danger {
+    color: var(--subjects-danger-text) !important;
+    background: var(--subjects-danger-bg) !important;
+    border-color: var(--subjects-danger-border) !important;
+    opacity: 1 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions .btn-danger:hover {
+    color: #8f1725 !important;
+    background: #ffe4e6 !important;
+    border-color: #e9959f !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--subject-color, #675bd4) 34%, transparent) !important;
+    outline-offset: 2px !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card .card-actions button:disabled {
+    color: #8994a5 !important;
+    background: #edf0f4 !important;
+    border-color: #d9dee6 !important;
+    opacity: .72 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+@media (max-width: 620px) {
+    body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card {
+        padding-left: 36px !important;
+    }
+
+    body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card::before {
+        width: 13px !important;
+    }
+
+    body:is(.light-theme, .light-mode, [data-theme="light"]) #subjects .subject-card.subject-space-card .subject-orbit {
+        left: -1px !important;
+        width: 26px !important;
+        background-size: 26px 46px !important;
+    }
+}
