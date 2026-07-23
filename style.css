@@ -30498,3 +30498,171 @@ body #tasks .task-board.task-list-modern > .task-empty-filter {
         animation: none !important;
     }
 }
+
+
+/* Tareas: panel unificado de informacion */
+body #tasks .task-card-modern .task-meta-grid {
+    position: relative !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px 28px !important;
+    margin: 8px 0 2px !important;
+    padding: 52px 18px 18px !important;
+    border: 1px solid rgba(148, 163, 184, .18) !important;
+    border-radius: 16px !important;
+    background: rgba(15, 23, 42, .34) !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid::before {
+    content: "Información de la tarea" !important;
+    position: absolute !important;
+    inset: 17px 18px auto !important;
+    color: rgba(248, 250, 252, .94) !important;
+    font-size: .82rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    letter-spacing: .015em !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span {
+    position: relative !important;
+    display: flex !important;
+    min-width: 0 !important;
+    min-height: 48px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 0 0 30px !important;
+    color: rgba(248, 250, 252, .96) !important;
+    font-size: .96rem !important;
+    font-weight: 650 !important;
+    line-height: 1.35 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span::before {
+    position: absolute !important;
+    top: 2px !important;
+    left: 0 !important;
+    width: 20px !important;
+    color: rgba(203, 213, 225, .92) !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    text-align: center !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(1)::before { content: "📅" !important; }
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(2)::before { content: "⏳" !important; }
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(3)::before { content: "🚩" !important; }
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(4)::before { content: "📧" !important; }
+
+body #tasks .task-card-modern .task-meta-grid > span > strong {
+    display: block !important;
+    margin: 0 !important;
+    color: rgba(148, 163, 184, .96) !important;
+    font-size: .69rem !important;
+    font-weight: 700 !important;
+    line-height: 1.15 !important;
+    letter-spacing: .055em !important;
+    text-transform: uppercase !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid .task-priority {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 25px !important;
+    margin: -1px 0 0 !important;
+    padding: 4px 10px !important;
+    border: 1px solid transparent !important;
+    border-radius: 999px !important;
+    font-size: .78rem !important;
+    font-style: normal !important;
+    font-weight: 750 !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid .task-priority.high,
+body #tasks .task-card-modern .task-meta-grid .task-priority.alta {
+    color: #fecdd3 !important;
+    background: rgba(244, 63, 94, .13) !important;
+    border-color: rgba(251, 113, 133, .25) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid .task-priority.medium,
+body #tasks .task-card-modern .task-meta-grid .task-priority.media {
+    color: #fde68a !important;
+    background: rgba(245, 158, 11, .13) !important;
+    border-color: rgba(251, 191, 36, .25) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid .task-priority.low,
+body #tasks .task-card-modern .task-meta-grid .task-priority.baja {
+    color: #bbf7d0 !important;
+    background: rgba(34, 197, 94, .13) !important;
+    border-color: rgba(74, 222, 128, .24) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid {
+    background: #f7f8fa !important;
+    border-color: rgba(15, 23, 42, .10) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid::before {
+    color: #172033 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span {
+    color: #202a3a !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span::before {
+    color: #667085 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span > strong {
+    color: #667085 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.high,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.alta {
+    color: #b4233a !important;
+    background: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.medium,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.media {
+    color: #8a5a08 !important;
+    background: #fffbeb !important;
+    border-color: #fde68a !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.low,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid .task-priority.baja {
+    color: #18753c !important;
+    background: #f0fdf4 !important;
+    border-color: #bbf7d0 !important;
+}
+
+@media (max-width: 599px) {
+    body #tasks .task-card-modern .task-meta-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 17px !important;
+        padding: 52px 18px 18px !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid > span {
+        min-height: 44px !important;
+    }
+}
