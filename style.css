@@ -27114,3 +27114,726 @@ body.light-theme #profile .profile-avatar {
         transform: none !important;
     }
 }
+
+
+/* Mochila Digital: biblioteca academica SaaS compacta y responsive */
+body #backpack {
+    --backpack-surface: #111827;
+    --backpack-surface-raised: #172033;
+    --backpack-surface-soft: #1b2538;
+    --backpack-border: rgba(148, 163, 184, 0.17);
+    --backpack-border-strong: rgba(148, 163, 184, 0.28);
+    --backpack-text: #f4f7fb;
+    --backpack-muted: #a8b3c5;
+    --backpack-subtle: #7f8ca3;
+    --backpack-accent: #7c6ff0;
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin-inline: auto !important;
+    padding: 0 0 32px !important;
+    color: var(--backpack-text);
+}
+
+body #backpack > .section-header {
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+    min-height: 0 !important;
+    margin: 0 0 22px !important;
+    padding: 0 !important;
+    gap: 20px !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body #backpack > .section-header h1 {
+    margin: 0 !important;
+    color: var(--backpack-text) !important;
+    font-size: clamp(2.125rem, 3vw, 2.5rem) !important;
+    font-weight: 780 !important;
+    line-height: 1.08 !important;
+    letter-spacing: -0.035em !important;
+    text-shadow: none !important;
+}
+
+body #backpack > .section-header .subtitle {
+    margin: 7px 0 0 !important;
+    color: var(--backpack-muted) !important;
+    font-size: clamp(.94rem, 1.2vw, 1.05rem) !important;
+    line-height: 1.45 !important;
+}
+
+body #backpack .backpack-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(280px, 1.7fr) repeat(3, minmax(142px, .72fr)) auto !important;
+    align-items: end !important;
+    gap: 14px !important;
+    margin: 0 0 22px !important;
+    padding: 18px !important;
+    border: 1px solid var(--backpack-border) !important;
+    border-radius: 18px !important;
+    background: var(--backpack-surface) !important;
+    box-shadow: 0 10px 28px rgba(2, 8, 23, .16) !important;
+    overflow: visible !important;
+}
+
+body #backpack .backpack-toolbar label {
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+    margin: 0 !important;
+    color: var(--backpack-muted) !important;
+    font-size: .76rem !important;
+    font-weight: 650 !important;
+    line-height: 1.2 !important;
+    letter-spacing: .01em !important;
+    text-transform: none !important;
+}
+
+body #backpack .backpack-toolbar input,
+body #backpack .backpack-toolbar select {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 13px !important;
+    color: var(--backpack-text) !important;
+    font: inherit !important;
+    font-size: .89rem !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    background-color: var(--backpack-surface-soft) !important;
+    border: 1px solid var(--backpack-border) !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease !important;
+}
+
+body #backpack .backpack-toolbar input::placeholder {
+    color: var(--backpack-subtle) !important;
+    opacity: 1 !important;
+}
+
+body #backpack .backpack-toolbar input:hover,
+body #backpack .backpack-toolbar select:hover {
+    border-color: var(--backpack-border-strong) !important;
+    background-color: #202b3f !important;
+}
+
+body #backpack .backpack-toolbar input:focus,
+body #backpack .backpack-toolbar select:focus {
+    border-color: color-mix(in srgb, var(--backpack-accent) 70%, white 8%) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--backpack-accent) 18%, transparent) !important;
+}
+
+body #backpack .backpack-toolbar .btn-primary {
+    width: auto !important;
+    min-width: 126px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 0 17px !important;
+    align-self: end !important;
+    justify-self: end !important;
+    border: 1px solid color-mix(in srgb, var(--backpack-accent) 74%, white 8%) !important;
+    border-radius: 12px !important;
+    background: #6f63df !important;
+    color: #fff !important;
+    box-shadow: 0 6px 16px rgba(74, 62, 180, .18) !important;
+    font-size: .88rem !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease !important;
+}
+
+body #backpack .backpack-toolbar .btn-primary:hover {
+    transform: translateY(-1px) !important;
+    background: #7b70e8 !important;
+    box-shadow: 0 8px 18px rgba(74, 62, 180, .22) !important;
+}
+
+body #backpack .backpack-toolbar .btn-primary:focus-visible,
+body #backpack .resource-actions button:focus-visible,
+body #backpack .empty-state button:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--backpack-accent) 42%, transparent) !important;
+    outline-offset: 2px !important;
+}
+
+body #backpack .backpack-container,
+body #backpack .backpack-grid,
+body #backpack .resources-grid {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    align-items: stretch !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body #backpack .resource-card.library-resource-card,
+body #backpack .library-resource-card {
+    position: relative !important;
+    isolation: isolate !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 13px !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    overflow: hidden !important;
+    color: var(--backpack-text) !important;
+    background: var(--backpack-surface) !important;
+    border: 1px solid var(--backpack-border) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 8px 24px rgba(2, 8, 23, .14) !important;
+    transform: none !important;
+    transition: transform 190ms ease, border-color 190ms ease, box-shadow 190ms ease, background-color 190ms ease !important;
+}
+
+body #backpack .resource-card.library-resource-card::before,
+body #backpack .library-resource-card::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 auto 0 0 !important;
+    width: 4px !important;
+    height: auto !important;
+    background: var(--resource-color, #7c6ff0) !important;
+    border: 0 !important;
+    border-radius: 18px 0 0 18px !important;
+    box-shadow: none !important;
+    opacity: .9 !important;
+    pointer-events: none !important;
+}
+
+body #backpack .resource-card.library-resource-card::after,
+body #backpack .library-resource-card::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 38px !important;
+    height: 38px !important;
+    background: linear-gradient(225deg, var(--backpack-surface-soft) 0 49%, transparent 51%) !important;
+    border: 0 !important;
+    opacity: .7 !important;
+    pointer-events: none !important;
+}
+
+body #backpack .resource-card.library-resource-card:hover,
+body #backpack .library-resource-card:hover {
+    transform: translateY(-2px) !important;
+    border-color: color-mix(in srgb, var(--resource-color, #7c6ff0) 34%, var(--backpack-border)) !important;
+    background: var(--backpack-surface-raised) !important;
+    box-shadow: 0 13px 30px rgba(2, 8, 23, .2) !important;
+}
+
+body #backpack .library-resource-card .neon-border-lines {
+    display: none !important;
+}
+
+body #backpack .library-resource-card .resource-top {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 18px 0 0 !important;
+    border: 0 !important;
+}
+
+body #backpack .library-resource-card .resource-icon.resource-pdf-icon {
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    display: grid !important;
+    place-items: center !important;
+    margin: 0 !important;
+    color: var(--resource-color, #7c6ff0) !important;
+    background: color-mix(in srgb, var(--resource-color, #7c6ff0) 13%, var(--backpack-surface-soft)) !important;
+    border: 1px solid color-mix(in srgb, var(--resource-color, #7c6ff0) 28%, transparent) !important;
+    border-radius: 13px !important;
+    box-shadow: none !important;
+}
+
+body #backpack .library-resource-card .resource-icon.resource-pdf-icon svg {
+    width: 22px !important;
+    height: 22px !important;
+    filter: none !important;
+}
+
+body #backpack .library-resource-card .resource-info {
+    min-width: 0 !important;
+}
+
+body #backpack .library-resource-card .resource-info h4 {
+    display: -webkit-box !important;
+    max-width: 100% !important;
+    margin: 0 0 4px !important;
+    overflow: hidden !important;
+    color: var(--backpack-text) !important;
+    font-size: clamp(1.08rem, 1.35vw, 1.24rem) !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    letter-spacing: -.015em !important;
+    text-shadow: none !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+body #backpack .library-resource-card .resource-type {
+    display: -webkit-box !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    color: var(--backpack-muted) !important;
+    font-size: .86rem !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+body #backpack .resource-meta-row {
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 7px !important;
+    margin: 0 !important;
+}
+
+body #backpack .resource-subject-chip,
+body #backpack .resource-status {
+    width: fit-content !important;
+    max-width: 100% !important;
+    min-height: 25px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 4px 9px !important;
+    border-radius: 999px !important;
+    font-size: .72rem !important;
+    font-weight: 680 !important;
+    line-height: 1.15 !important;
+    box-shadow: none !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #backpack .resource-subject-chip {
+    color: color-mix(in srgb, var(--resource-color, #7c6ff0) 66%, white) !important;
+    background: color-mix(in srgb, var(--resource-color, #7c6ff0) 12%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--resource-color, #7c6ff0) 28%, transparent) !important;
+}
+
+body #backpack .resource-status {
+    color: #c7c1ff !important;
+    background: rgba(124, 111, 240, .11) !important;
+    border: 1px solid rgba(143, 132, 245, .24) !important;
+}
+
+body #backpack .resource-status.completed,
+body #backpack .resource-status.reviewed,
+body #backpack .resource-status.ready {
+    color: #86d9ac !important;
+    background: rgba(34, 197, 94, .09) !important;
+    border-color: rgba(74, 222, 128, .22) !important;
+}
+
+body #backpack .resource-description {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    display: -webkit-box !important;
+    margin: 0 !important;
+    padding: 11px 12px !important;
+    overflow: hidden !important;
+    color: var(--backpack-muted) !important;
+    background: var(--backpack-surface-soft) !important;
+    border: 1px solid var(--backpack-border) !important;
+    border-radius: 11px !important;
+    font-size: .86rem !important;
+    font-weight: 450 !important;
+    line-height: 1.48 !important;
+    box-shadow: none !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+}
+
+body #backpack .resource-data {
+    min-width: 0 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 5px 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+body #backpack .resource-data span {
+    width: auto !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    display: inline !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: var(--backpack-subtle) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    font-size: .73rem !important;
+    font-weight: 520 !important;
+    line-height: 1.4 !important;
+    box-shadow: none !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #backpack .resource-data span:not(:last-child)::after {
+    content: "·" !important;
+    display: inline-block !important;
+    margin: 0 7px !important;
+    color: var(--backpack-border-strong) !important;
+}
+
+body #backpack .library-resource-card > .resource-actions,
+body #backpack .resource-card > .resource-actions.resource-actions-grid {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: auto 0 0 !important;
+    padding: 13px 0 0 !important;
+    border-top: 1px solid var(--backpack-border) !important;
+    background: transparent !important;
+}
+
+body #backpack .resource-actions button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    font-size: .79rem !important;
+    font-weight: 660 !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+    transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease, color 180ms ease !important;
+}
+
+body #backpack .resource-actions button:hover {
+    transform: translateY(-1px) !important;
+}
+
+body #backpack .resource-actions .btn-secondary {
+    color: #dbe3f0 !important;
+    background: var(--backpack-surface-soft) !important;
+    border: 1px solid var(--backpack-border) !important;
+}
+
+body #backpack .resource-actions .btn-secondary:hover {
+    color: #fff !important;
+    background: #253146 !important;
+    border-color: var(--backpack-border-strong) !important;
+}
+
+body #backpack .resource-actions [data-resource-ai] {
+    color: #d4d0ff !important;
+    background: rgba(124, 111, 240, .12) !important;
+    border-color: rgba(143, 132, 245, .27) !important;
+}
+
+body #backpack .resource-actions [data-resource-ai]:hover {
+    color: #eceaff !important;
+    background: rgba(124, 111, 240, .19) !important;
+    border-color: rgba(143, 132, 245, .4) !important;
+}
+
+body #backpack .resource-actions .btn-danger {
+    color: #f2a6ad !important;
+    background: rgba(239, 68, 68, .07) !important;
+    border: 1px solid rgba(248, 113, 113, .18) !important;
+}
+
+body #backpack .resource-actions .btn-danger:hover {
+    color: #ffc2c7 !important;
+    background: rgba(239, 68, 68, .12) !important;
+    border-color: rgba(248, 113, 113, .3) !important;
+}
+
+body #backpack .backpack-container > .empty-state {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    min-height: 260px !important;
+    display: grid !important;
+    place-items: center !important;
+    align-content: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 34px 22px !important;
+    text-align: center !important;
+    background: var(--backpack-surface) !important;
+    border: 1px dashed var(--backpack-border-strong) !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+}
+
+body #backpack .empty-state .empty-icon {
+    width: 52px !important;
+    height: 52px !important;
+    margin: 0 !important;
+    border-radius: 15px !important;
+    background-color: var(--backpack-surface-soft) !important;
+    border: 1px solid var(--backpack-border) !important;
+    box-shadow: none !important;
+}
+
+body #backpack .empty-state h3 {
+    max-width: 480px !important;
+    margin: 0 !important;
+    color: var(--backpack-text) !important;
+    font-size: 1.05rem !important;
+    font-weight: 650 !important;
+    line-height: 1.4 !important;
+}
+
+body #backpack .empty-state .btn-primary {
+    min-height: 42px !important;
+    margin: 2px 0 0 !important;
+    padding: 0 16px !important;
+    border-radius: 11px !important;
+    background: #6f63df !important;
+    box-shadow: none !important;
+}
+
+/* Tema claro: superficies documentales limpias, sin alterar el dashboard */
+body.light-theme #backpack,
+body.light-mode #backpack,
+body[data-theme="light"] #backpack {
+    --backpack-surface: #ffffff;
+    --backpack-surface-raised: #ffffff;
+    --backpack-surface-soft: #f6f8fb;
+    --backpack-border: rgba(15, 23, 42, .1);
+    --backpack-border-strong: rgba(15, 23, 42, .18);
+    --backpack-text: #172033;
+    --backpack-muted: #617087;
+    --backpack-subtle: #7b8799;
+    --backpack-accent: #675bd4;
+}
+
+body.light-theme #backpack .backpack-toolbar,
+body.light-mode #backpack .backpack-toolbar,
+body[data-theme="light"] #backpack .backpack-toolbar,
+body.light-theme #backpack .library-resource-card,
+body.light-mode #backpack .library-resource-card,
+body[data-theme="light"] #backpack .library-resource-card {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06) !important;
+}
+
+body.light-theme #backpack .backpack-toolbar input:hover,
+body.light-theme #backpack .backpack-toolbar select:hover,
+body.light-mode #backpack .backpack-toolbar input:hover,
+body.light-mode #backpack .backpack-toolbar select:hover,
+body[data-theme="light"] #backpack .backpack-toolbar input:hover,
+body[data-theme="light"] #backpack .backpack-toolbar select:hover {
+    background-color: #f1f4f8 !important;
+}
+
+body.light-theme #backpack .library-resource-card::after,
+body.light-mode #backpack .library-resource-card::after,
+body[data-theme="light"] #backpack .library-resource-card::after {
+    background: linear-gradient(225deg, #eef2f7 0 49%, transparent 51%) !important;
+}
+
+body.light-theme #backpack .resource-subject-chip,
+body.light-mode #backpack .resource-subject-chip,
+body[data-theme="light"] #backpack .resource-subject-chip {
+    color: color-mix(in srgb, var(--resource-color, #675bd4) 78%, #172033) !important;
+}
+
+body.light-theme #backpack .resource-status,
+body.light-mode #backpack .resource-status,
+body[data-theme="light"] #backpack .resource-status {
+    color: #5e53c5 !important;
+}
+
+body.light-theme #backpack .resource-actions .btn-secondary,
+body.light-mode #backpack .resource-actions .btn-secondary,
+body[data-theme="light"] #backpack .resource-actions .btn-secondary {
+    color: #3f4b5f !important;
+    background: #f7f9fc !important;
+}
+
+body.light-theme #backpack .resource-actions .btn-secondary:hover,
+body.light-mode #backpack .resource-actions .btn-secondary:hover,
+body[data-theme="light"] #backpack .resource-actions .btn-secondary:hover {
+    color: #172033 !important;
+    background: #eef2f7 !important;
+}
+
+@media (max-width: 1180px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: minmax(260px, 1.5fr) repeat(2, minmax(150px, .75fr)) !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(4) {
+        grid-column: 1 / 2 !important;
+    }
+
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: 3 / 4 !important;
+    }
+
+    body #backpack .backpack-container,
+    body #backpack .backpack-grid,
+    body #backpack .resources-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 820px) {
+    body #backpack {
+        padding-bottom: 26px !important;
+    }
+
+    body #backpack > .section-header {
+        margin-bottom: 18px !important;
+    }
+
+    body #backpack .backpack-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        padding: 16px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search {
+        grid-column: 1 / -1 !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(4) {
+        grid-column: auto !important;
+    }
+
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: 1 / -1 !important;
+        justify-self: start !important;
+    }
+}
+
+@media (max-width: 560px) {
+    body #backpack {
+        padding-bottom: 20px !important;
+    }
+
+    body #backpack > .section-header {
+        align-items: flex-start !important;
+        margin-bottom: 16px !important;
+    }
+
+    body #backpack > .section-header h1 {
+        font-size: clamp(1.9rem, 9vw, 2.15rem) !important;
+    }
+
+    body #backpack > .section-header .subtitle {
+        margin-top: 5px !important;
+        font-size: .92rem !important;
+    }
+
+    body #backpack .backpack-toolbar {
+        grid-template-columns: 1fr !important;
+        gap: 11px !important;
+        margin-bottom: 16px !important;
+        padding: 14px !important;
+        border-radius: 16px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search,
+    body #backpack .backpack-toolbar label,
+    body #backpack .backpack-toolbar label:nth-of-type(4),
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: 1 !important;
+    }
+
+    body #backpack .backpack-toolbar .btn-primary {
+        width: 100% !important;
+        justify-self: stretch !important;
+    }
+
+    body #backpack .backpack-container,
+    body #backpack .backpack-grid,
+    body #backpack .resources-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    body #backpack .resource-card.library-resource-card,
+    body #backpack .library-resource-card {
+        gap: 12px !important;
+        padding: 17px !important;
+        border-radius: 16px !important;
+    }
+
+    body #backpack .library-resource-card .resource-top {
+        grid-template-columns: 42px minmax(0, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    body #backpack .library-resource-card .resource-icon.resource-pdf-icon {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        border-radius: 12px !important;
+    }
+
+    body #backpack .resource-data {
+        row-gap: 4px !important;
+    }
+
+    body #backpack .library-resource-card > .resource-actions,
+    body #backpack .resource-card > .resource-actions.resource-actions-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    body #backpack .resource-actions button {
+        min-height: 40px !important;
+        height: auto !important;
+        padding-block: 8px !important;
+    }
+}
+
+@media (max-width: 390px) {
+    body #backpack .library-resource-card > .resource-actions,
+    body #backpack .resource-card > .resource-actions.resource-actions-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body #backpack .library-resource-card,
+    body #backpack .resource-actions button,
+    body #backpack .backpack-toolbar .btn-primary,
+    body #backpack .backpack-toolbar input,
+    body #backpack .backpack-toolbar select {
+        transition: none !important;
+        animation: none !important;
+    }
+
+    body #backpack .library-resource-card:hover,
+    body #backpack .resource-actions button:hover,
+    body #backpack .backpack-toolbar .btn-primary:hover {
+        transform: none !important;
+    }
+}
