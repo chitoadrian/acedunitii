@@ -30500,15 +30500,17 @@ body #tasks .task-board.task-list-modern > .task-empty-filter {
 }
 
 
-/* Tareas: panel unificado de informacion - alineacion v2 */
+/* Tareas: alineacion precisa del grid de informacion v3 */
 body #tasks .task-card-modern .task-meta-grid {
+    --task-info-divider: rgba(148, 163, 184, .14);
     position: relative !important;
     width: 100% !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-template-rows: repeat(2, minmax(78px, auto)) !important;
+    grid-template-rows: repeat(2, minmax(110px, auto)) !important;
     align-items: stretch !important;
     gap: 0 !important;
+    box-sizing: border-box !important;
     margin: 8px 0 2px !important;
     padding: 54px 22px 22px !important;
     border: 1px solid rgba(148, 163, 184, .18) !important;
@@ -30521,23 +30523,30 @@ body #tasks .task-card-modern .task-meta-grid {
 body #tasks .task-card-modern .task-meta-grid::before {
     content: "Información de la tarea" !important;
     position: absolute !important;
-    inset: 20px 22px auto !important;
+    z-index: 0 !important;
+    inset: 20px 22px 22px !important;
+    box-sizing: border-box !important;
     color: rgba(248, 250, 252, .94) !important;
     font-size: .82rem !important;
     font-weight: 700 !important;
     line-height: 1.2 !important;
     letter-spacing: .015em !important;
+    pointer-events: none !important;
+    background: linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 34px / 1px calc(100% - 34px) no-repeat !important;
 }
 
 body #tasks .task-card-modern .task-meta-grid::after {
     content: "" !important;
     position: absolute !important;
     z-index: 0 !important;
-    inset: 54px 22px 22px !important;
+    left: 22px !important;
+    right: 22px !important;
+    top: calc(50% + 16px) !important;
+    height: 1px !important;
+    box-sizing: border-box !important;
+    transform: translateY(-.5px) !important;
+    background: var(--task-info-divider) !important;
     pointer-events: none !important;
-    background:
-        linear-gradient(to bottom, transparent calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% + .5px), transparent calc(50% + .5px)),
-        linear-gradient(to right, transparent calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% - .5px), rgba(148, 163, 184, .13) calc(50% + .5px), transparent calc(50% + .5px)) !important;
 }
 
 body #tasks .task-card-modern .task-meta-grid > span {
@@ -30546,13 +30555,14 @@ body #tasks .task-card-modern .task-meta-grid > span {
     display: flex !important;
     width: 100% !important;
     min-width: 0 !important;
-    min-height: 78px !important;
+    min-height: 110px !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
-    gap: 7px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
     margin: 0 !important;
-    padding: 14px 20px !important;
+    padding: 24px !important;
     color: rgba(248, 250, 252, .96) !important;
     font-size: 1.03rem !important;
     font-weight: 650 !important;
@@ -30562,16 +30572,6 @@ body #tasks .task-card-modern .task-meta-grid > span {
     border-radius: 0 !important;
     box-shadow: none !important;
     overflow-wrap: anywhere !important;
-}
-
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(odd) {
-    padding-left: 0 !important;
-    padding-right: 24px !important;
-}
-
-body #tasks .task-card-modern .task-meta-grid > span:nth-child(even) {
-    padding-left: 24px !important;
-    padding-right: 0 !important;
 }
 
 body #tasks .task-card-modern .task-meta-grid > span::before {
@@ -30595,7 +30595,7 @@ body #tasks .task-card-modern .task-meta-grid .task-priority {
     align-items: center !important;
     justify-content: center !important;
     min-height: 25px !important;
-    margin: -1px 0 0 !important;
+    margin: 0 !important;
     padding: 4px 10px !important;
     border: 1px solid transparent !important;
     border-radius: 999px !important;
@@ -30628,18 +30628,13 @@ body #tasks .task-card-modern .task-meta-grid .task-priority.baja {
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid {
+    --task-info-divider: rgba(15, 23, 42, .09);
     background: #f7f8fa !important;
     border-color: rgba(15, 23, 42, .10) !important;
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid::before {
     color: #172033 !important;
-}
-
-body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid::after {
-    background:
-        linear-gradient(to bottom, transparent calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% + .5px), transparent calc(50% + .5px)),
-        linear-gradient(to right, transparent calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% - .5px), rgba(15, 23, 42, .08) calc(50% + .5px), transparent calc(50% + .5px)) !important;
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span {
@@ -30674,29 +30669,32 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-moder
 @media (max-width: 599px) {
     body #tasks .task-card-modern .task-meta-grid {
         grid-template-columns: minmax(0, 1fr) !important;
-        grid-template-rows: none !important;
+        grid-template-rows: repeat(4, minmax(96px, auto)) !important;
         padding: 54px 20px 20px !important;
     }
 
     body #tasks .task-card-modern .task-meta-grid::before {
-        inset: 20px 20px auto !important;
+        inset: 20px 20px 20px !important;
+        background: none !important;
     }
 
     body #tasks .task-card-modern .task-meta-grid::after {
-        display: none !important;
+        left: 20px !important;
+        right: 20px !important;
+        top: 54px !important;
+        bottom: 20px !important;
+        height: auto !important;
+        transform: none !important;
+        background:
+            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 25% / 100% 1px no-repeat,
+            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 50% / 100% 1px no-repeat,
+            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 75% / 100% 1px no-repeat !important;
     }
 
-    body #tasks .task-card-modern .task-meta-grid > span,
-    body #tasks .task-card-modern .task-meta-grid > span:nth-child(odd),
-    body #tasks .task-card-modern .task-meta-grid > span:nth-child(even) {
-        min-height: 72px !important;
-        padding: 14px 0 !important;
+    body #tasks .task-card-modern .task-meta-grid > span {
+        min-height: 96px !important;
+        padding: 24px !important;
         border: 0 !important;
-        border-bottom: 1px solid rgba(148, 163, 184, .13) !important;
-    }
-
-    body #tasks .task-card-modern .task-meta-grid > span:last-child {
-        border-bottom: 0 !important;
     }
 }
 
@@ -30707,6 +30705,11 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-moder
     }
 
     body #tasks .task-card-modern .task-meta-grid::before {
+        right: 18px !important;
+        left: 18px !important;
+    }
+
+    body #tasks .task-card-modern .task-meta-grid::after {
         right: 18px !important;
         left: 18px !important;
     }
