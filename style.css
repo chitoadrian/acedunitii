@@ -30500,69 +30500,73 @@ body #tasks .task-board.task-list-modern > .task-empty-filter {
 }
 
 
-/* Tareas: alineacion precisa del grid de informacion v3 */
-body #tasks .task-card-modern .task-meta-grid {
-    --task-info-divider: rgba(148, 163, 184, .14);
-    position: relative !important;
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    grid-template-rows: repeat(2, minmax(110px, auto)) !important;
-    align-items: stretch !important;
-    gap: 0 !important;
-    box-sizing: border-box !important;
-    margin: 8px 0 2px !important;
-    padding: 54px 22px 22px !important;
-    border: 1px solid rgba(148, 163, 184, .18) !important;
-    border-radius: 17px !important;
-    background: rgba(15, 23, 42, .34) !important;
-    box-shadow: none !important;
-    overflow: hidden !important;
+/* Tareas: grid de informacion con borde completo v4 */
+body #tasks .task-card-modern .task-content {
+    display: flex !important;
+    flex-direction: column !important;
 }
 
-body #tasks .task-card-modern .task-meta-grid::before {
+body #tasks .task-card-modern .task-title-row { order: 1 !important; }
+body #tasks .task-card-modern .task-subject { order: 2 !important; }
+body #tasks .task-card-modern .task-description { order: 3 !important; }
+
+body #tasks .task-card-modern .task-content::after {
     content: "Información de la tarea" !important;
-    position: absolute !important;
-    z-index: 0 !important;
-    inset: 20px 22px 22px !important;
+    order: 4 !important;
+    display: block !important;
+    width: 100% !important;
     box-sizing: border-box !important;
+    margin: 8px 0 2px !important;
+    padding: 0 !important;
     color: rgba(248, 250, 252, .94) !important;
     font-size: .82rem !important;
     font-weight: 700 !important;
     line-height: 1.2 !important;
     letter-spacing: .015em !important;
-    pointer-events: none !important;
-    background: linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 34px / 1px calc(100% - 34px) no-repeat !important;
 }
 
-body #tasks .task-card-modern .task-meta-grid::after {
-    content: "" !important;
-    position: absolute !important;
-    z-index: 0 !important;
-    left: 22px !important;
-    right: 22px !important;
-    top: calc(50% + 16px) !important;
-    height: 1px !important;
+body #tasks .task-card-modern .task-meta-grid {
+    --task-info-divider: rgba(148, 163, 184, .24);
+    order: 5 !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: none !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-rows: repeat(2, minmax(120px, auto)) !important;
+    grid-auto-flow: row !important;
+    align-items: stretch !important;
+    gap: 0 !important;
     box-sizing: border-box !important;
-    transform: translateY(-.5px) !important;
-    background: var(--task-info-divider) !important;
-    pointer-events: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--task-info-divider) !important;
+    border-radius: 14px !important;
+    background: rgba(15, 23, 42, .28) !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid::before,
+body #tasks .task-card-modern .task-meta-grid::after {
+    content: none !important;
+    display: none !important;
 }
 
 body #tasks .task-card-modern .task-meta-grid > span {
-    position: relative !important;
-    z-index: 1 !important;
+    position: static !important;
+    z-index: auto !important;
     display: flex !important;
     width: 100% !important;
     min-width: 0 !important;
-    min-height: 110px !important;
+    min-height: 120px !important;
     flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: center !important;
     gap: 10px !important;
     box-sizing: border-box !important;
     margin: 0 !important;
-    padding: 24px !important;
+    padding: 24px 28px !important;
     color: rgba(248, 250, 252, .96) !important;
     font-size: 1.03rem !important;
     font-weight: 650 !important;
@@ -30571,7 +30575,25 @@ body #tasks .task-card-modern .task-meta-grid > span {
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    transform: none !important;
     overflow-wrap: anywhere !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(1) {
+    border-right: 1px solid var(--task-info-divider) !important;
+    border-bottom: 1px solid var(--task-info-divider) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(2) {
+    border-bottom: 1px solid var(--task-info-divider) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(3) {
+    border-right: 1px solid var(--task-info-divider) !important;
+}
+
+body #tasks .task-card-modern .task-meta-grid > span:nth-child(4) {
+    border: 0 !important;
 }
 
 body #tasks .task-card-modern .task-meta-grid > span::before {
@@ -30627,14 +30649,17 @@ body #tasks .task-card-modern .task-meta-grid .task-priority.baja {
     border-color: rgba(74, 222, 128, .24) !important;
 }
 
-body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid {
-    --task-info-divider: rgba(15, 23, 42, .09);
-    background: #f7f8fa !important;
-    border-color: rgba(15, 23, 42, .10) !important;
+body #tasks .task-card-modern .task-reminder-alert {
+    order: 6 !important;
 }
 
-body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid::before {
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-content::after {
     color: #172033 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid {
+    --task-info-divider: rgba(15, 23, 42, .20);
+    background: #f7f8fa !important;
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-modern .task-meta-grid > span {
@@ -30669,48 +30694,21 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-moder
 @media (max-width: 599px) {
     body #tasks .task-card-modern .task-meta-grid {
         grid-template-columns: minmax(0, 1fr) !important;
-        grid-template-rows: repeat(4, minmax(96px, auto)) !important;
-        padding: 54px 20px 20px !important;
+        grid-template-rows: auto !important;
     }
 
-    body #tasks .task-card-modern .task-meta-grid::before {
-        inset: 20px 20px 20px !important;
-        background: none !important;
-    }
-
-    body #tasks .task-card-modern .task-meta-grid::after {
-        left: 20px !important;
-        right: 20px !important;
-        top: 54px !important;
-        bottom: 20px !important;
-        height: auto !important;
-        transform: none !important;
-        background:
-            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 25% / 100% 1px no-repeat,
-            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 50% / 100% 1px no-repeat,
-            linear-gradient(var(--task-info-divider), var(--task-info-divider)) center 75% / 100% 1px no-repeat !important;
-    }
-
-    body #tasks .task-card-modern .task-meta-grid > span {
-        min-height: 96px !important;
-        padding: 24px !important;
+    body #tasks .task-card-modern .task-meta-grid > span,
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(1),
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(2),
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(3),
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(4) {
+        min-height: 104px !important;
+        padding: 24px 28px !important;
         border: 0 !important;
-    }
-}
-
-@media (max-width: 380px) {
-    body #tasks .task-card-modern .task-meta-grid {
-        padding-right: 18px !important;
-        padding-left: 18px !important;
+        border-bottom: 1px solid var(--task-info-divider) !important;
     }
 
-    body #tasks .task-card-modern .task-meta-grid::before {
-        right: 18px !important;
-        left: 18px !important;
-    }
-
-    body #tasks .task-card-modern .task-meta-grid::after {
-        right: 18px !important;
-        left: 18px !important;
+    body #tasks .task-card-modern .task-meta-grid > span:nth-child(4) {
+        border-bottom: 0 !important;
     }
 }
