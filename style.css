@@ -34377,6 +34377,29 @@ body #grades .period-gradebook-table {
     background: var(--grades-surface) !important;
 }
 
+body #grades .period-gradebook-table thead {
+    display: table-header-group !important;
+}
+
+body #grades .period-gradebook-table tbody {
+    display: table-row-group !important;
+}
+
+body #grades .period-gradebook-table tr {
+    display: table-row !important;
+    width: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+body #grades .period-gradebook-table th,
+body #grades .period-gradebook-table td {
+    display: table-cell !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    white-space: normal !important;
+}
+
 body #grades .period-gradebook-table .subject-column { width: 210px !important; }
 body #grades .period-gradebook-table .average-column { width: 112px !important; }
 body #grades .period-gradebook-table .period-average-column { width: 104px !important; }
@@ -34409,8 +34432,15 @@ body #grades .period-gradebook-table thead th {
 }
 
 body #grades .period-gradebook-table .period-head {
+    display: table-cell !important;
     min-height: 0 !important;
-    padding: 13px 10px !important;
+    padding: 15px 10px !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    vertical-align: middle !important;
 }
 
 body #grades .period-gradebook-table .period-head::before,
@@ -34434,12 +34464,12 @@ body #grades .period-gradebook-table .period-group-2 {
     box-shadow: inset 0 3px 0 var(--grades-period-two) !important;
 }
 
-body #grades .period-gradebook-table .period-detail-row .period-1 {
-    box-shadow: inset 0 2px 0 color-mix(in srgb, var(--grades-period-one) 72%, transparent) !important;
+body #grades .period-gradebook-table .period-header-row .period-1 {
+    box-shadow: inset 0 3px 0 color-mix(in srgb, var(--grades-period-one) 78%, transparent) !important;
 }
 
-body #grades .period-gradebook-table .period-detail-row .period-2 {
-    box-shadow: inset 0 2px 0 color-mix(in srgb, var(--grades-period-two) 72%, transparent) !important;
+body #grades .period-gradebook-table .period-header-row .period-2 {
+    box-shadow: inset 0 3px 0 color-mix(in srgb, var(--grades-period-two) 78%, transparent) !important;
 }
 
 body #grades .period-gradebook-table .partial-head { color: var(--grades-partial) !important; }
