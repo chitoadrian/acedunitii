@@ -34173,8 +34173,7 @@ body #progress .progress-stat-grid > .premium-progress-stat > div > small {
     }
 }
 
-
-/* Calificaciones: sistema visual moderno, legible y aislado */
+/* Calificaciones: tabla semántica reconstruida y alineada */
 body #grades {
     --grades-bg: #202633;
     --grades-surface: #293140;
@@ -34218,31 +34217,24 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #grades {
 body #grades .section-header {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) auto !important;
-    grid-template-areas:
-        "title action"
-        "subtitle action" !important;
+    grid-template-areas: "title action" "subtitle action" !important;
     align-items: center !important;
-    column-gap: 24px !important;
-    row-gap: 7px !important;
+    gap: 7px 24px !important;
     width: 100% !important;
     min-width: 0 !important;
     margin-bottom: 24px !important;
-    padding-top: 4px !important;
 }
 
 body #grades .section-header h1 {
     grid-area: title !important;
     margin: 0 !important;
     color: var(--grades-text) !important;
-    line-height: 1.12 !important;
 }
 
 body #grades .section-header .subtitle {
     grid-area: subtitle !important;
     margin: 0 !important;
-    max-width: 680px !important;
     color: var(--grades-muted) !important;
-    line-height: 1.5 !important;
 }
 
 body #grades .section-header > .btn-primary {
@@ -34257,20 +34249,12 @@ body #grades .section-header > .btn-primary {
     box-shadow: 0 6px 16px color-mix(in srgb, var(--grades-accent) 18%, transparent) !important;
     font-weight: 800 !important;
     white-space: nowrap !important;
-    transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease !important;
+    transition: transform 160ms ease, background-color 160ms ease !important;
 }
 
 body #grades .section-header > .btn-primary:hover {
     transform: translateY(-1px) !important;
     background: color-mix(in srgb, var(--grades-accent) 88%, #202938) !important;
-    box-shadow: 0 8px 18px color-mix(in srgb, var(--grades-accent) 20%, transparent) !important;
-}
-
-body #grades .section-header > .btn-primary:focus-visible,
-body #grades .grades-toolbar select:focus-visible,
-body #grades .period-grade-cell:focus-visible {
-    outline: 3px solid color-mix(in srgb, var(--grades-accent) 36%, transparent) !important;
-    outline-offset: 2px !important;
 }
 
 body #grades .grades-container {
@@ -34281,7 +34265,7 @@ body #grades .grades-container {
 
 body #grades .grades-toolbar {
     display: grid !important;
-    grid-template-columns: minmax(210px, auto) minmax(260px, 1fr) minmax(190px, auto) !important;
+    grid-template-columns: minmax(220px, auto) minmax(260px, 1fr) minmax(190px, auto) !important;
     align-items: center !important;
     gap: 16px !important;
     width: 100% !important;
@@ -34310,7 +34294,6 @@ body #grades .grade-summary > strong {
     font-size: clamp(18px, 2vw, 23px) !important;
     font-weight: 850 !important;
     line-height: 1.18 !important;
-    letter-spacing: -0.02em !important;
 }
 
 body #grades .grade-status {
@@ -34333,14 +34316,12 @@ body #grades .grade-status.aprobado {
     background: color-mix(in srgb, var(--grades-accent) 12%, transparent) !important;
 }
 
-body #grades .grade-status.necesita-mejorar,
-body #grades .grade-status.reprobado {
+body #grades .grade-status:is(.necesita-mejorar, .reprobado) {
     color: var(--grades-danger) !important;
     background: color-mix(in srgb, var(--grades-danger) 12%, transparent) !important;
 }
 
 body #grades .grade-formula-note {
-    justify-self: start !important;
     min-width: 0 !important;
     padding: 10px 14px !important;
     border: 1px solid var(--grades-border) !important;
@@ -34350,7 +34331,6 @@ body #grades .grade-formula-note {
     font-size: 12px !important;
     font-weight: 650 !important;
     line-height: 1.4 !important;
-    white-space: normal !important;
 }
 
 body #grades .grades-toolbar select {
@@ -34367,6 +34347,12 @@ body #grades .grades-toolbar select {
     font-weight: 700 !important;
 }
 
+body #grades :is(.section-header > .btn-primary, .grades-toolbar select, .period-grade-cell):focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--grades-accent) 36%, transparent) !important;
+    outline-offset: 2px !important;
+}
+
+body #grades .grades-table-wrapper,
 body #grades .period-gradebook-panel {
     width: 100% !important;
     max-width: 100% !important;
@@ -34382,151 +34368,208 @@ body #grades .period-gradebook-panel {
 }
 
 body #grades .period-gradebook-table {
-    display: grid !important;
-    grid-template-columns: minmax(210px, 1.5fr) 112px repeat(8, minmax(98px, 1fr)) !important;
+    display: table !important;
     width: 100% !important;
-    min-width: 1160px !important;
+    min-width: 1120px !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
     background: var(--grades-surface) !important;
 }
 
-body #grades :is(.period-head, .period-subject-cell, .period-average-cell, .period-grade-cell) {
+body #grades .period-gradebook-table .subject-column { width: 210px !important; }
+body #grades .period-gradebook-table .average-column { width: 112px !important; }
+body #grades .period-gradebook-table .period-average-column { width: 104px !important; }
+body #grades .period-gradebook-table .partial-column { width: 104px !important; }
+body #grades .period-gradebook-table .exam-column { width: 104px !important; }
+
+body #grades .period-gradebook-table :is(th, td) {
+    position: static;
     min-width: 0 !important;
-    min-height: 76px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
     border-right: 1px solid var(--grades-border) !important;
     border-bottom: 1px solid var(--grades-border) !important;
+    vertical-align: middle !important;
     box-sizing: border-box !important;
+    transform: none !important;
 }
 
-body #grades .period-head {
-    position: relative !important;
-    display: grid !important;
-    place-items: center !important;
-    padding: 13px 10px 11px !important;
+body #grades .period-gradebook-table thead th {
     background: var(--grades-surface-soft) !important;
     color: var(--grades-muted) !important;
     font-size: 11px !important;
     font-weight: 800 !important;
     line-height: 1.25 !important;
-    letter-spacing: 0.035em !important;
+    letter-spacing: .035em !important;
+    text-align: center !important;
     text-transform: uppercase !important;
 }
 
-body #grades .period-head::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 12px auto !important;
-    height: 3px !important;
-    border-radius: 0 0 999px 999px !important;
-    background: var(--grades-accent) !important;
-    opacity: .9 !important;
+body #grades .period-gradebook-table .period-head {
+    min-height: 0 !important;
+    padding: 13px 10px !important;
 }
 
-body #grades .subject-head {
+body #grades .period-gradebook-table .period-head::before,
+body #grades .period-gradebook-table .period-head::after {
+    content: none !important;
+    display: none !important;
+}
+
+body #grades .period-gradebook-table .period-group-head {
+    padding: 15px 12px !important;
+    color: var(--grades-text) !important;
+    font-size: 12px !important;
+    border-bottom-width: 2px !important;
+}
+
+body #grades .period-gradebook-table .period-group-1 {
+    box-shadow: inset 0 3px 0 var(--grades-period-one) !important;
+}
+
+body #grades .period-gradebook-table .period-group-2 {
+    box-shadow: inset 0 3px 0 var(--grades-period-two) !important;
+}
+
+body #grades .period-gradebook-table .period-detail-row .period-1 {
+    box-shadow: inset 0 2px 0 color-mix(in srgb, var(--grades-period-one) 72%, transparent) !important;
+}
+
+body #grades .period-gradebook-table .period-detail-row .period-2 {
+    box-shadow: inset 0 2px 0 color-mix(in srgb, var(--grades-period-two) 72%, transparent) !important;
+}
+
+body #grades .period-gradebook-table .partial-head { color: var(--grades-partial) !important; }
+body #grades .period-gradebook-table .exam-head { color: var(--grades-exam) !important; }
+
+body #grades .period-gradebook-table .subject-head,
+body #grades .period-gradebook-table .period-subject-cell {
     position: sticky !important;
     left: 0 !important;
-    z-index: 4 !important;
-    justify-items: start !important;
-    padding-left: 18px !important;
+    text-align: left !important;
+    background: var(--grades-surface) !important;
+    box-shadow: 7px 0 14px rgba(8, 13, 22, .08) !important;
+}
+
+body #grades .period-gradebook-table .subject-head {
+    z-index: 5 !important;
+    padding: 16px 18px !important;
     color: var(--grades-text) !important;
     background: var(--grades-surface-soft) !important;
 }
 
-body #grades .subject-head::before,
-body #grades .average-head::before {
-    background: var(--grades-accent) !important;
-}
-
-body #grades .period-average-head::before {
-    background: var(--grades-period-one) !important;
-}
-
-body #grades .partial-head::before {
-    background: var(--grades-partial) !important;
-}
-
-body #grades .exam-head::before {
-    background: var(--grades-exam) !important;
-}
-
-body #grades .period-head:nth-child(7)::before {
-    background: var(--grades-period-two) !important;
-}
-
-body #grades .period-gradebook-table > :nth-child(10n + 3),
-body #grades .period-gradebook-table > :nth-child(10n + 7) {
-    border-left: 2px solid color-mix(in srgb, var(--grades-accent) 34%, var(--grades-border)) !important;
-}
-
-body #grades .period-subject-cell {
-    position: sticky !important;
-    left: 0 !important;
-    z-index: 3 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    gap: 6px !important;
+body #grades .period-gradebook-table .period-subject-cell {
+    z-index: 2 !important;
     padding: 15px 18px !important;
-    background: var(--grades-surface) !important;
-    box-shadow: 7px 0 14px rgba(8, 13, 22, 0.08) !important;
 }
 
-body #grades .period-subject-cell strong {
-    max-width: 100% !important;
-    color: var(--grades-text) !important;
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    line-height: 1.28 !important;
+body #grades .period-subject-cell strong,
+body #grades .period-subject-cell small,
+body #grades .period-average-cell strong,
+body #grades .period-average-cell span {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
     white-space: normal !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
 }
 
+body #grades .period-subject-cell strong {
+    color: var(--grades-text) !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.28 !important;
+}
+
 body #grades .period-subject-cell small {
+    margin-top: 6px !important;
     color: var(--grades-muted) !important;
     font-size: 11px !important;
     font-weight: 650 !important;
     line-height: 1.35 !important;
 }
 
-body #grades :is(.period-average-cell, .period-grade-cell) {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 7px !important;
-    padding: 12px 7px !important;
+body #grades .period-average-cell {
+    padding: 14px 8px !important;
     background: var(--grades-surface) !important;
     color: var(--grades-muted) !important;
     text-align: center !important;
 }
 
-body #grades .period-grade-cell {
-    border-top: 0 !important;
-    border-left: 0;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    cursor: pointer !important;
-    transition: background-color 150ms ease, color 150ms ease !important;
-}
-
-body #grades .period-grade-cell:hover {
-    transform: none !important;
-    background: color-mix(in srgb, var(--grades-accent) 9%, var(--grades-surface)) !important;
-}
-
-body #grades :is(.period-average-cell, .period-grade-cell) strong {
+body #grades .period-average-cell strong {
     color: var(--grades-text) !important;
     font-size: 19px !important;
     font-weight: 850 !important;
     line-height: 1.05 !important;
 }
 
-body #grades :is(.period-average-cell, .period-grade-cell) span {
+body #grades .period-average-cell span {
+    margin-top: 7px !important;
     color: var(--grades-muted) !important;
     font-size: 10px !important;
     font-weight: 700 !important;
     line-height: 1.3 !important;
+}
+
+body #grades .grade-table-cell {
+    padding: 0 !important;
+    background: var(--grades-surface) !important;
+}
+
+body #grades .period-grade-cell {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 82px !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 12px 7px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--grades-muted) !important;
+    box-shadow: none !important;
+    text-align: center !important;
+    transform: none !important;
+    cursor: pointer !important;
+    transition: background-color 150ms ease !important;
+    box-sizing: border-box !important;
+}
+
+body #grades .period-grade-cell:hover {
+    background: color-mix(in srgb, var(--grades-accent) 9%, var(--grades-surface)) !important;
+}
+
+body #grades .period-grade-cell strong,
+body #grades .period-grade-cell span {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+}
+
+body #grades .period-grade-cell strong {
+    color: var(--grades-text) !important;
+    font-size: 19px !important;
+    font-weight: 850 !important;
+}
+
+body #grades .period-grade-cell span {
+    color: var(--grades-muted) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
 }
 
 body #grades .period-grade-cell.empty strong {
@@ -34534,23 +34577,27 @@ body #grades .period-grade-cell.empty strong {
 }
 
 body #grades .period-grade-cell.empty span {
+    width: auto !important;
     padding: 4px 8px !important;
     border-radius: 999px !important;
     background: color-mix(in srgb, var(--grades-accent) 10%, transparent) !important;
     color: var(--grades-accent) !important;
 }
 
-body #grades :is(.period-average-cell, .period-grade-cell).excelente strong {
-    color: var(--grades-success) !important;
+body #grades :is(.period-average-cell, .period-grade-cell).excelente strong { color: var(--grades-success) !important; }
+body #grades :is(.period-average-cell, .period-grade-cell).aprobado strong { color: var(--grades-accent) !important; }
+body #grades :is(.period-average-cell, .period-grade-cell):is(.reprobado, .necesita-mejorar) strong { color: var(--grades-danger) !important; }
+
+body #grades .period-subject-row:hover > :is(th, td) {
+    background-color: color-mix(in srgb, var(--grades-accent) 4%, var(--grades-surface)) !important;
 }
 
-body #grades :is(.period-average-cell, .period-grade-cell).aprobado strong {
-    color: var(--grades-accent) !important;
+body #grades .period-subject-row:last-child > :is(th, td) {
+    border-bottom: 0 !important;
 }
 
-body #grades :is(.period-average-cell, .period-grade-cell).reprobado strong,
-body #grades :is(.period-average-cell, .period-grade-cell).necesita-mejorar strong {
-    color: var(--grades-danger) !important;
+body #grades .period-gradebook-table tr > :last-child {
+    border-right: 0 !important;
 }
 
 @media (max-width: 900px) {
