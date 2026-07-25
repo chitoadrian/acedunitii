@@ -33920,3 +33920,205 @@ body #dashboard .dashboard-bottom-section .chart-caption {
         gap: 14px !important;
     }
 }
+
+
+/* Tareas: restauración aislada de símbolos de iconos */
+body #tasks {
+    --tasks-icon-color: #E8ECF5;
+    --tasks-icon-bg: #252B48;
+    --tasks-icon-border: #3B4266;
+}
+
+body #tasks .tasks-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    color: var(--tasks-icon-color) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+}
+
+body #tasks .tasks-icon-box {
+    background: var(--tasks-icon-bg) !important;
+    border: 1px solid var(--tasks-icon-border) !important;
+    box-shadow: none !important;
+}
+
+body #tasks .tasks-icon svg {
+    display: block !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+}
+
+body #tasks .tasks-icon.stroke-icon svg,
+body #tasks .tasks-icon.stroke-icon svg :is(path, rect, circle, line, polyline, polygon) {
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body #tasks .tasks-icon.fill-icon svg,
+body #tasks .tasks-icon.fill-icon svg :is(path, rect, circle, polygon) {
+    fill: currentColor !important;
+    stroke: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body #tasks > .section-header h1 {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 11px !important;
+}
+
+body #tasks .tasks-heading-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 11px !important;
+}
+
+body #tasks .tasks-heading-icon svg {
+    width: 21px !important;
+    height: 21px !important;
+    min-width: 21px !important;
+    min-height: 21px !important;
+}
+
+body #tasks .task-summary-strip > div {
+    grid-template-columns: 40px minmax(0, 1fr) !important;
+    grid-template-rows: auto !important;
+    align-items: center !important;
+    column-gap: 12px !important;
+}
+
+body #tasks .task-summary-strip > div > div {
+    min-width: 0 !important;
+}
+
+body #tasks .task-summary-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 11px !important;
+}
+
+body #tasks .task-summary-strip > div:nth-child(1) .task-summary-icon {
+    color: #BDB6FF !important;
+    background: rgba(116, 103, 223, .14) !important;
+    border-color: rgba(157, 146, 244, .30) !important;
+}
+
+body #tasks .task-summary-strip > div:nth-child(2) .task-summary-icon {
+    color: #E8BB6D !important;
+    background: rgba(213, 154, 54, .13) !important;
+    border-color: rgba(229, 174, 79, .28) !important;
+}
+
+body #tasks .task-summary-strip > div:nth-child(3) .task-summary-icon {
+    color: #82D9A8 !important;
+    background: rgba(52, 184, 115, .13) !important;
+    border-color: rgba(77, 199, 137, .28) !important;
+}
+
+body #tasks .task-summary-strip > div:nth-child(4) .task-summary-icon {
+    color: #F08790 !important;
+    background: rgba(227, 101, 112, .13) !important;
+    border-color: rgba(237, 126, 136, .28) !important;
+}
+
+body #tasks .task-checkbox.task-check-modern > span::after {
+    content: "✓" !important;
+    display: block !important;
+    color: color-mix(in srgb, var(--subject-color, var(--tasks-accent)) 78%, #E8ECF5) !important;
+    font-size: .84rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    opacity: .46 !important;
+    visibility: visible !important;
+    filter: none !important;
+}
+
+body #tasks .task-checkbox.task-check-modern input:checked + span::after {
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+body #tasks :is(
+    .section-header .btn-primary,
+    .task-card-actions button,
+    .filter-btn,
+    .task-status,
+    .task-priority
+) :is(svg, path, use) {
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    filter: none !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks {
+    --tasks-icon-color: #334155;
+    --tasks-icon-bg: #E8EEF7;
+    --tasks-icon-border: #CBD5E1;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-summary-strip > div:nth-child(1) .task-summary-icon {
+    color: #5A4FC0 !important;
+    background: #ECEAF9 !important;
+    border-color: #CBC5ED !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-summary-strip > div:nth-child(2) .task-summary-icon {
+    color: #9A6512 !important;
+    background: #FAF1DF !important;
+    border-color: #E7D2A7 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-summary-strip > div:nth-child(3) .task-summary-icon {
+    color: #19724A !important;
+    background: #E5F3EB !important;
+    border-color: #B9DDC9 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-summary-strip > div:nth-child(4) .task-summary-icon {
+    color: #B13F4B !important;
+    background: #F8E8EA !important;
+    border-color: #E5BDC2 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-checkbox.task-check-modern > span::after {
+    color: color-mix(in srgb, var(--subject-color, #6558D8) 76%, #334155) !important;
+    opacity: .62 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-checkbox.task-check-modern input:checked + span::after {
+    color: #FFFFFF !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 520px) {
+    body #tasks .tasks-heading-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+    }
+
+    body #tasks .task-summary-strip > div {
+        grid-template-columns: 38px minmax(0, 1fr) !important;
+    }
+}
