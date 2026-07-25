@@ -33146,3 +33146,446 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-s
     }
     body #dashboard :is(.dashboard-stat-card, .dashboard-panel-card, button):hover { transform: none !important; }
 }
+
+
+
+/* Panel académico: corrección de maquetación, solapamientos y contraste */
+body #dashboard,
+body #dashboard *,
+body #dashboard *::before,
+body #dashboard *::after {
+    box-sizing: border-box;
+}
+
+body #dashboard {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: clip !important;
+}
+
+body #dashboard :is(
+    .dashboard-clean-layout,
+    .dashboard-panel-card,
+    .dashboard-progress-body,
+    .dashboard-progress-details,
+    .dashboard-day-list,
+    .dashboard-steps,
+    .weekly-chart,
+    .panel-title,
+    .panel-title > div
+) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #dashboard .dashboard-clean-layout {
+    position: relative !important;
+    isolation: isolate !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-template-areas:
+        "progress day"
+        "starter weekly" !important;
+    align-items: stretch !important;
+    justify-items: stretch !important;
+    gap: 24px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-clean-layout > .dashboard-panel-card {
+    position: relative !important;
+    inset: auto !important;
+    z-index: auto !important;
+    translate: none !important;
+    transform: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    align-self: stretch !important;
+    overflow: hidden !important;
+}
+
+body #dashboard .dashboard-clean-layout > .dashboard-panel-card:hover {
+    transform: translateY(-1px) !important;
+}
+
+body #dashboard .dashboard-progress-card { grid-area: progress !important; }
+body #dashboard .dashboard-day-card { grid-area: day !important; }
+body #dashboard .starter-card { grid-area: starter !important; }
+body #dashboard .weekly-progress-card { grid-area: weekly !important; }
+
+body #dashboard .dashboard-progress-body {
+    position: static !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 28px !important;
+    padding: 2px 0 0 !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-xp-ring {
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 auto !important;
+    width: 104px !important;
+    height: 104px !important;
+    min-width: 104px !important;
+    min-height: 104px !important;
+    max-width: 104px !important;
+    max-height: 104px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    overflow: hidden !important;
+    line-height: 1 !important;
+}
+
+body #dashboard .dashboard-xp-ring :is(span, small) {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    transform: none !important;
+    line-height: 1 !important;
+}
+
+body #dashboard .dashboard-xp-ring span {
+    display: block !important;
+    font-size: 1.2rem !important;
+}
+
+body #dashboard .dashboard-xp-ring small {
+    display: block !important;
+    font-size: .55rem !important;
+    letter-spacing: .08em !important;
+}
+
+body #dashboard .dashboard-progress-details {
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-progress-details > :is(strong, span) {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #dashboard .dashboard-progress-details .progress-bar {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 2px 0 0 !important;
+    transform: none !important;
+    overflow: hidden !important;
+}
+
+body #dashboard .dashboard-achievements {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 7px !important;
+    margin: 2px 0 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-achievements span {
+    position: static !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 27px !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #dashboard .dashboard-steps {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-steps li {
+    position: static !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 54px !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 16px !important;
+    margin: 0 !important;
+    padding: 10px 12px !important;
+    transform: none !important;
+    overflow: hidden !important;
+}
+
+body #dashboard .dashboard-steps li > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #dashboard .dashboard-steps li :is(strong, small) {
+    max-width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere !important;
+    line-height: 1.35 !important;
+}
+
+body #dashboard .dashboard-steps li button {
+    position: static !important;
+    inset: auto !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+body #dashboard .weekly-progress-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+}
+
+body #dashboard .weekly-chart {
+    position: relative !important;
+    inset: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: clamp(145px, 16vw, 175px) !important;
+    min-height: 145px !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: space-evenly !important;
+    gap: clamp(5px, 1vw, 11px) !important;
+    margin: 0 !important;
+    transform: none !important;
+    overflow: hidden !important;
+}
+
+body #dashboard .weekly-chart .week-day {
+    position: static !important;
+    inset: auto !important;
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 5px !important;
+    max-width: 30px !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+body #dashboard .chart-caption {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 12px 0 0 !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #dashboard .dashboard-stat-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+body #dashboard .dashboard-icon,
+body #dashboard .dashboard-icon svg,
+body #dashboard .panel-icon svg,
+body #dashboard .stat-icon svg {
+    color: inherit !important;
+}
+
+body #dashboard :is(.dashboard-icon, .panel-icon, .stat-icon) svg {
+    width: 1em !important;
+    height: 1em !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard {
+    --dashboard-icon-bg: #E8EEF7;
+    --dashboard-icon-color: #334155;
+    --dashboard-card-blue: #2563EB;
+    --dashboard-card-green: #16856B;
+    --dashboard-card-orange: #B96716;
+    --dashboard-card-purple: #6D4BD1;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card {
+    border-color: #CBD5E1 !important;
+    box-shadow: 0 7px 20px rgba(31, 41, 55, .07) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card:nth-child(1) { --dashboard-card-accent: var(--dashboard-card-blue); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card:nth-child(2) { --dashboard-card-accent: var(--dashboard-card-orange); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card:nth-child(3) { --dashboard-card-accent: var(--dashboard-card-green); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card:nth-child(4) { --dashboard-card-accent: var(--dashboard-card-purple); }
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card .stat-icon {
+    color: var(--dashboard-card-accent) !important;
+    background: color-mix(in srgb, var(--dashboard-card-accent) 10%, #F7F8FA) !important;
+    border-color: color-mix(in srgb, var(--dashboard-card-accent) 28%, #CBD5E1) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card .stat-label,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .panel-title h3 {
+    color: #1E293B !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card .stat-value {
+    color: #1F2937 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-stat-card .stat-subtext,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .panel-title p {
+    color: #475569 !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard :is(
+    .panel-title .panel-icon,
+    .dashboard-hero-widget .hero-widget-icon
+) {
+    color: #5146A8 !important;
+    background: #EAE7F7 !important;
+    border-color: #CFC8ED !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-hero-copy h1 [aria-hidden="true"] {
+    color: #7C5A2B !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard :is(
+    .dashboard-hero-actions button,
+    .dashboard-steps li button
+) {
+    color: #334155 !important;
+}
+
+@media (max-width: 1024px) {
+    body #dashboard .dashboard-clean-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-areas:
+            "progress"
+            "day"
+            "starter"
+            "weekly" !important;
+        gap: 18px !important;
+    }
+
+    body #dashboard .dashboard-clean-layout > .dashboard-panel-card {
+        height: auto !important;
+    }
+}
+
+@media (max-width: 720px) {
+    body #dashboard .dashboard-progress-body {
+        grid-template-columns: minmax(0, 1fr) !important;
+        justify-items: center !important;
+        gap: 20px !important;
+        text-align: center !important;
+    }
+
+    body #dashboard .dashboard-progress-details {
+        align-items: stretch !important;
+        text-align: center !important;
+    }
+
+    body #dashboard .dashboard-achievements {
+        justify-content: center !important;
+    }
+
+    body #dashboard .dashboard-steps li {
+        grid-template-columns: auto minmax(0, 1fr) auto !important;
+        gap: 11px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body #dashboard .dashboard-clean-layout {
+        gap: 14px !important;
+    }
+
+    body #dashboard .dashboard-panel-card {
+        padding: 15px !important;
+    }
+
+    body #dashboard .dashboard-steps li {
+        grid-template-columns: 32px minmax(0, 1fr) !important;
+        align-items: start !important;
+        padding: 10px !important;
+    }
+
+    body #dashboard .dashboard-steps li button {
+        grid-column: 2 !important;
+        justify-self: start !important;
+    }
+
+    body #dashboard .weekly-chart {
+        height: 145px !important;
+        min-height: 145px !important;
+        padding: 14px 10px 10px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    body #dashboard .dashboard-panel-card {
+        padding: 13px !important;
+    }
+
+    body #dashboard .panel-title {
+        grid-template-columns: 34px minmax(0, 1fr) !important;
+        gap: 9px !important;
+    }
+
+    body #dashboard .panel-title .panel-icon {
+        width: 34px !important;
+        height: 34px !important;
+        min-width: 34px !important;
+    }
+
+    body #dashboard .dashboard-achievements span {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
