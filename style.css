@@ -34172,3 +34172,432 @@ body #progress .progress-stat-grid > .premium-progress-stat > div > small {
         padding: 20px !important;
     }
 }
+
+
+/* Calificaciones: sistema visual moderno, legible y aislado */
+body #grades {
+    --grades-bg: #202633;
+    --grades-surface: #293140;
+    --grades-surface-soft: #242C39;
+    --grades-border: #3A4658;
+    --grades-text: #E8ECF3;
+    --grades-muted: #AAB4C3;
+    --grades-accent: #6D8FD7;
+    --grades-success: #59B78C;
+    --grades-warning: #D8A75D;
+    --grades-danger: #D97878;
+    --grades-period-one: #6E98D8;
+    --grades-partial: #6FA886;
+    --grades-exam: #D28B6C;
+    --grades-period-two: #8A7AC8;
+    --grades-radius: 20px;
+    --grades-shadow: 0 12px 30px rgba(8, 13, 22, 0.18);
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #grades {
+    --grades-bg: #EEF1F5;
+    --grades-surface: #F7F8FA;
+    --grades-surface-soft: #F1F3F6;
+    --grades-border: #D5DAE2;
+    --grades-text: #1F2937;
+    --grades-muted: #667085;
+    --grades-accent: #4F73B8;
+    --grades-success: #348461;
+    --grades-warning: #A66E24;
+    --grades-danger: #B85454;
+    --grades-period-one: #4F78B7;
+    --grades-partial: #4E8465;
+    --grades-exam: #B26748;
+    --grades-period-two: #705EAE;
+    --grades-shadow: 0 10px 26px rgba(31, 41, 55, 0.08);
+}
+
+body #grades .section-header {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas:
+        "title action"
+        "subtitle action" !important;
+    align-items: center !important;
+    column-gap: 24px !important;
+    row-gap: 7px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-bottom: 24px !important;
+    padding-top: 4px !important;
+}
+
+body #grades .section-header h1 {
+    grid-area: title !important;
+    margin: 0 !important;
+    color: var(--grades-text) !important;
+    line-height: 1.12 !important;
+}
+
+body #grades .section-header .subtitle {
+    grid-area: subtitle !important;
+    margin: 0 !important;
+    max-width: 680px !important;
+    color: var(--grades-muted) !important;
+    line-height: 1.5 !important;
+}
+
+body #grades .section-header > .btn-primary {
+    grid-area: action !important;
+    justify-self: end !important;
+    min-height: 42px !important;
+    padding: 10px 18px !important;
+    border: 1px solid color-mix(in srgb, var(--grades-accent) 72%, var(--grades-border)) !important;
+    border-radius: 13px !important;
+    background: var(--grades-accent) !important;
+    color: #F8FAFC !important;
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--grades-accent) 18%, transparent) !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease !important;
+}
+
+body #grades .section-header > .btn-primary:hover {
+    transform: translateY(-1px) !important;
+    background: color-mix(in srgb, var(--grades-accent) 88%, #202938) !important;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--grades-accent) 20%, transparent) !important;
+}
+
+body #grades .section-header > .btn-primary:focus-visible,
+body #grades .grades-toolbar select:focus-visible,
+body #grades .period-grade-cell:focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--grades-accent) 36%, transparent) !important;
+    outline-offset: 2px !important;
+}
+
+body #grades .grades-container {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #grades .grades-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(210px, auto) minmax(260px, 1fr) minmax(190px, auto) !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 0 18px !important;
+    padding: 16px 18px !important;
+    border: 1px solid var(--grades-border) !important;
+    border-radius: var(--grades-radius) !important;
+    background: var(--grades-surface) !important;
+    box-shadow: var(--grades-shadow) !important;
+    box-sizing: border-box !important;
+}
+
+body #grades .grade-summary {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    min-width: 0 !important;
+    padding-right: 16px !important;
+    border-right: 1px solid var(--grades-border) !important;
+}
+
+body #grades .grade-summary > strong {
+    color: var(--grades-text) !important;
+    font-size: clamp(18px, 2vw, 23px) !important;
+    font-weight: 850 !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.02em !important;
+}
+
+body #grades .grade-status {
+    padding: 5px 9px !important;
+    border: 1px solid color-mix(in srgb, currentColor 28%, transparent) !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-transform: capitalize !important;
+}
+
+body #grades .grade-status.excelente {
+    color: var(--grades-success) !important;
+    background: color-mix(in srgb, var(--grades-success) 12%, transparent) !important;
+}
+
+body #grades .grade-status.aprobado {
+    color: var(--grades-accent) !important;
+    background: color-mix(in srgb, var(--grades-accent) 12%, transparent) !important;
+}
+
+body #grades .grade-status.necesita-mejorar,
+body #grades .grade-status.reprobado {
+    color: var(--grades-danger) !important;
+    background: color-mix(in srgb, var(--grades-danger) 12%, transparent) !important;
+}
+
+body #grades .grade-formula-note {
+    justify-self: start !important;
+    min-width: 0 !important;
+    padding: 10px 14px !important;
+    border: 1px solid var(--grades-border) !important;
+    border-radius: 12px !important;
+    background: var(--grades-surface-soft) !important;
+    color: var(--grades-muted) !important;
+    font-size: 12px !important;
+    font-weight: 650 !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+}
+
+body #grades .grades-toolbar select {
+    justify-self: end !important;
+    width: 100% !important;
+    min-width: 190px !important;
+    min-height: 42px !important;
+    padding: 9px 34px 9px 12px !important;
+    border: 1px solid var(--grades-border) !important;
+    border-radius: 12px !important;
+    background-color: var(--grades-surface-soft) !important;
+    color: var(--grades-text) !important;
+    box-shadow: none !important;
+    font-weight: 700 !important;
+}
+
+body #grades .period-gradebook-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-inline: contain !important;
+    border: 1px solid var(--grades-border) !important;
+    border-radius: var(--grades-radius) !important;
+    background: var(--grades-surface) !important;
+    box-shadow: var(--grades-shadow) !important;
+    scrollbar-color: color-mix(in srgb, var(--grades-accent) 52%, var(--grades-border)) var(--grades-surface-soft) !important;
+    box-sizing: border-box !important;
+}
+
+body #grades .period-gradebook-table {
+    display: grid !important;
+    grid-template-columns: minmax(210px, 1.5fr) 112px repeat(8, minmax(98px, 1fr)) !important;
+    width: 100% !important;
+    min-width: 1160px !important;
+    background: var(--grades-surface) !important;
+}
+
+body #grades :is(.period-head, .period-subject-cell, .period-average-cell, .period-grade-cell) {
+    min-width: 0 !important;
+    min-height: 76px !important;
+    border-right: 1px solid var(--grades-border) !important;
+    border-bottom: 1px solid var(--grades-border) !important;
+    box-sizing: border-box !important;
+}
+
+body #grades .period-head {
+    position: relative !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 13px 10px 11px !important;
+    background: var(--grades-surface-soft) !important;
+    color: var(--grades-muted) !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.035em !important;
+    text-transform: uppercase !important;
+}
+
+body #grades .period-head::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 12px auto !important;
+    height: 3px !important;
+    border-radius: 0 0 999px 999px !important;
+    background: var(--grades-accent) !important;
+    opacity: .9 !important;
+}
+
+body #grades .subject-head {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 4 !important;
+    justify-items: start !important;
+    padding-left: 18px !important;
+    color: var(--grades-text) !important;
+    background: var(--grades-surface-soft) !important;
+}
+
+body #grades .subject-head::before,
+body #grades .average-head::before {
+    background: var(--grades-accent) !important;
+}
+
+body #grades .period-average-head::before {
+    background: var(--grades-period-one) !important;
+}
+
+body #grades .partial-head::before {
+    background: var(--grades-partial) !important;
+}
+
+body #grades .exam-head::before {
+    background: var(--grades-exam) !important;
+}
+
+body #grades .period-head:nth-child(7)::before {
+    background: var(--grades-period-two) !important;
+}
+
+body #grades .period-gradebook-table > :nth-child(10n + 3),
+body #grades .period-gradebook-table > :nth-child(10n + 7) {
+    border-left: 2px solid color-mix(in srgb, var(--grades-accent) 34%, var(--grades-border)) !important;
+}
+
+body #grades .period-subject-cell {
+    position: sticky !important;
+    left: 0 !important;
+    z-index: 3 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 15px 18px !important;
+    background: var(--grades-surface) !important;
+    box-shadow: 7px 0 14px rgba(8, 13, 22, 0.08) !important;
+}
+
+body #grades .period-subject-cell strong {
+    max-width: 100% !important;
+    color: var(--grades-text) !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.28 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+}
+
+body #grades .period-subject-cell small {
+    color: var(--grades-muted) !important;
+    font-size: 11px !important;
+    font-weight: 650 !important;
+    line-height: 1.35 !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell) {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    padding: 12px 7px !important;
+    background: var(--grades-surface) !important;
+    color: var(--grades-muted) !important;
+    text-align: center !important;
+}
+
+body #grades .period-grade-cell {
+    border-top: 0 !important;
+    border-left: 0;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    transition: background-color 150ms ease, color 150ms ease !important;
+}
+
+body #grades .period-grade-cell:hover {
+    transform: none !important;
+    background: color-mix(in srgb, var(--grades-accent) 9%, var(--grades-surface)) !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell) strong {
+    color: var(--grades-text) !important;
+    font-size: 19px !important;
+    font-weight: 850 !important;
+    line-height: 1.05 !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell) span {
+    color: var(--grades-muted) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body #grades .period-grade-cell.empty strong {
+    color: color-mix(in srgb, var(--grades-muted) 62%, transparent) !important;
+}
+
+body #grades .period-grade-cell.empty span {
+    padding: 4px 8px !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--grades-accent) 10%, transparent) !important;
+    color: var(--grades-accent) !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell).excelente strong {
+    color: var(--grades-success) !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell).aprobado strong {
+    color: var(--grades-accent) !important;
+}
+
+body #grades :is(.period-average-cell, .period-grade-cell).reprobado strong,
+body #grades :is(.period-average-cell, .period-grade-cell).necesita-mejorar strong {
+    color: var(--grades-danger) !important;
+}
+
+@media (max-width: 900px) {
+    body #grades .grades-toolbar {
+        grid-template-columns: minmax(0, 1fr) minmax(180px, auto) !important;
+    }
+
+    body #grades .grade-summary {
+        grid-column: 1 / -1 !important;
+        padding-right: 0 !important;
+        padding-bottom: 14px !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid var(--grades-border) !important;
+    }
+}
+
+@media (max-width: 700px) {
+    body #grades .section-header {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-areas: "title" "subtitle" "action" !important;
+        gap: 9px !important;
+    }
+
+    body #grades .section-header > .btn-primary {
+        justify-self: stretch !important;
+        width: 100% !important;
+        margin-top: 7px !important;
+    }
+
+    body #grades .grades-toolbar {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 12px !important;
+        padding: 15px !important;
+    }
+
+    body #grades .grade-summary {
+        grid-column: auto !important;
+    }
+
+    body #grades .grade-formula-note,
+    body #grades .grades-toolbar select {
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    body #grades .period-gradebook-table {
+        min-width: 1080px !important;
+    }
+}
