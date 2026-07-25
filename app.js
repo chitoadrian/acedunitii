@@ -3510,8 +3510,7 @@ function formatGradeValue(value) {
 
 const gradePeriods = [
     { value: 'p1', label: 'Periodo 1' },
-    { value: 'p2', label: 'Periodo 2' },
-    { value: 'p3', label: 'Periodo 3' }
+    { value: 'p2', label: 'Periodo 2' }
 ];
 
 const gradeCategories = [
@@ -3963,17 +3962,20 @@ function renderGrades(workspace) {
     if (gradeSortMode === 'high') subjectRows.sort((a, b) => (b.average || 0) - (a.average || 0));
     if (gradeSortMode === 'low') subjectRows.sort((a, b) => (a.average || 0) - (b.average || 0));
 
-    const renderCell = (row, period, category = null) => {
+    const renderCell = (row, period, periodIndex, category = null) => {
         const value = category ? getCategoryAverage(row.grades, period.value, category) : period.average;
         const grades = category ? getCategoryGrades(row.grades, period.value, category) : [];
         const status = value === null ? 'empty' : getGradeStatus(value).replace(' ', '-');
         const label = category ? getGradeCategoryLabel(category) : period.label;
         const title = category ? `${row.subject} - ${period.label} - ${label}` : `${row.subject} - ${period.label}`;
+        const cellType = category || 'period-average';
         return `
-            <button class="period-grade-cell ${status}" type="button" data-grade-add="true" data-subject="${escapeHTML(row.subject)}" data-period="${escapeHTML(period.value)}" data-category="${escapeHTML(category || 'partial1')}" title="${escapeHTML(title)}">
-                <strong>${value === null ? '--' : formatGradeValue(value)}</strong>
-                <span>${category ? (grades.length ? `${grades.length} nota${grades.length === 1 ? '' : 's'}` : 'Agregar') : 'Periodo'}</span>
-            </button>
+            <td class="grade-table-cell period-${periodIndex + 1} ${escapeHTML(cellType)}">
+                <button class="period-grade-cell ${status}" type="button" data-grade-add="true" data-subject="${escapeHTML(row.subject)}" data-period="${escapeHTML(period.value)}" data-category="${escapeHTML(category || 'partial1')}" title="${escapeHTML(title)}">
+                    <strong>${value === null ? '--' : formatGradeValue(value)}</strong>
+                    <span>${category ? (grades.length ? `${grades.length} nota${grades.length === 1 ? '' : 's'}` : 'Agregar') : 'Periodo'}</span>
+                </button>
+            </td>
         `;
     };
 
@@ -3990,33 +3992,56 @@ function renderGrades(workspace) {
                 <option value="low" ${gradeSortMode === 'low' ? 'selected' : ''}>Promedio menor</option>
             </select>
         </div>
-        <div class="period-gradebook-panel">
-            <div class="period-gradebook-table">
-                <div class="period-head subject-head">Asignatura</div>
-                <div class="period-head average-head">Promedio</div>
-                ${gradePeriods.map(period => `
-                    <div class="period-head period-average-head">${escapeHTML(period.label)}</div>
-                    <div class="period-head partial-head">Parcial 1</div>
-                    <div class="period-head partial-head">Parcial 2</div>
-                    <div class="period-head exam-head">Examen</div>
-                `).join('')}
-                ${subjectRows.map(row => `
-                    <div class="period-subject-cell">
-                        <strong>${escapeHTML(row.subject)}</strong>
-                        <small>${row.grades.length} ${row.grades.length === 1 ? 'calificación' : 'calificaciones'}</small>
-                    </div>
-                    <div class="period-average-cell ${row.average === null ? 'empty' : getGradeStatus(row.average).replace(' ', '-')}">
-                        <strong>${row.average === null ? '--' : row.average.toFixed(2)}</strong>
-                        <span>${row.average === null ? 'Sin datos' : getGradeStatus(row.average)}</span>
-                    </div>
-                    ${row.summary.periods.map(period => `
-                        ${renderCell(row, period)}
-                        ${renderCell(row, period, 'partial1')}
-                        ${renderCell(row, period, 'partial2')}
-                        ${renderCell(row, period, 'exam')}
+        <div class="period-gradebook-panel grades-table-wrapper">
+            <table class="period-gradebook-table">
+                <colgroup>
+                    <col class="subject-column">
+                    <col class="average-column">
+                    ${gradePeriods.map(() => `
+                        <col class="period-average-column">
+                        <col class="partial-column">
+                        <col class="partial-column">
+                        <col class="exam-column">
                     `).join('')}
-                `).join('')}
-            </div>
+                </colgroup>
+                <thead>
+                    <tr class="period-group-row">
+                        <th class="period-head subject-head" rowspan="2" scope="col">Asignatura</th>
+                        <th class="period-head average-head" rowspan="2" scope="col">Promedio</th>
+                        ${gradePeriods.map((period, periodIndex) => `
+                            <th class="period-head period-group-head period-group-${periodIndex + 1}" colspan="4" scope="colgroup">${escapeHTML(period.label)}</th>
+                        `).join('')}
+                    </tr>
+                    <tr class="period-detail-row">
+                        ${gradePeriods.map((period, periodIndex) => `
+                            <th class="period-head period-average-head period-${periodIndex + 1}" scope="col">Promedio periodo</th>
+                            <th class="period-head partial-head period-${periodIndex + 1}" scope="col">Parcial 1</th>
+                            <th class="period-head partial-head period-${periodIndex + 1}" scope="col">Parcial 2</th>
+                            <th class="period-head exam-head period-${periodIndex + 1}" scope="col">Examen</th>
+                        `).join('')}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${subjectRows.map(row => `
+                        <tr class="period-subject-row">
+                            <th class="period-subject-cell" scope="row">
+                                <strong>${escapeHTML(row.subject)}</strong>
+                                <small>${row.grades.length} ${row.grades.length === 1 ? 'calificación' : 'calificaciones'}</small>
+                            </th>
+                            <td class="period-average-cell ${row.average === null ? 'empty' : getGradeStatus(row.average).replace(' ', '-')}">
+                                <strong>${row.average === null ? '--' : row.average.toFixed(2)}</strong>
+                                <span>${row.average === null ? 'Sin datos' : getGradeStatus(row.average)}</span>
+                            </td>
+                            ${row.summary.periods.map((period, periodIndex) => `
+                                ${renderCell(row, period, periodIndex)}
+                                ${renderCell(row, period, periodIndex, 'partial1')}
+                                ${renderCell(row, period, periodIndex, 'partial2')}
+                                ${renderCell(row, period, periodIndex, 'exam')}
+                            `).join('')}
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
         </div>
     `;
 
