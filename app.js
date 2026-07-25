@@ -14,7 +14,7 @@ let currentUser = null;
 let currentSection = 'dashboard';
 let isDarkTheme = !localStorage.getItem('theme') || localStorage.getItem('theme') === 'dark';
 let isTabletOrSmaller = window.innerWidth <= 768;
-let calendarViewDate = new Date(2026, 5, 1);
+let calendarViewDate = new Date();
 let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 const INTERFACE_SOUND_STORAGE_KEY = 'ac_interface_sounds_enabled';
 const INTERFACE_SOUND_SRC = 'assets/click.mp3';
