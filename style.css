@@ -32385,3 +32385,79 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) *::-webkit-scrollbar-th
 body:is(.light-theme, .light-mode, [data-theme="light"]) *::-webkit-scrollbar-thumb:hover {
     background: #929EAE;
 }
+
+
+/* Tema claro global suave: correcciones de alta especificidad para la landing */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-nav {
+    color: var(--text-primary) !important;
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 8px 24px rgba(31, 41, 55, .06) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
+    #features,
+    #ai-preview,
+    #benefits-use,
+    .benefits,
+    .about-project,
+    .use-benefits
+) {
+    color: var(--text-primary) !important;
+    background: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
+    .dashboard-mockup,
+    .hero-dashboard,
+    .mockup-card,
+    .hero-mini-card,
+    .benefit-card,
+    .about-feature,
+    .ai-orbit-card,
+    .ai-window,
+    .use-benefit-card,
+    .pet-bubble
+) {
+    color: var(--text-primary) !important;
+    background: var(--surface) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: var(--soft-shadow) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) :is(
+    .auth-card,
+    .auth-modal-content,
+    .login-card,
+    .register-card
+) {
+    color: var(--text-primary) !important;
+    background: var(--surface-soft) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 22px 55px rgba(31, 41, 55, .16) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .brand-logo {
+    background: transparent !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
+    .benefit-card,
+    .about-feature,
+    .use-benefit-card,
+    .ai-orbit-card,
+    .ai-window
+) :is(h3, h4, strong) {
+    color: var(--text-primary) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
+    .benefit-card,
+    .about-feature,
+    .use-benefit-card,
+    .ai-orbit-card,
+    .ai-window
+) :is(p, span, small) {
+    color: var(--text-secondary) !important;
+}
