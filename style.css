@@ -31858,3 +31858,40 @@ body #calendar .calendar-day.muted {
         font-size: 8px !important;
     }
 }
+
+
+/* Mochila Digital: modal PDF compacto y acceso funcional al Tutor */
+body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-form,
+body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-form {
+    align-items: start !important;
+    row-gap: 14px !important;
+}
+
+body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-form > label:nth-child(5),
+body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-form > label:nth-child(5) {
+    grid-column: 1 / -1 !important;
+}
+
+body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-actions,
+body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-actions {
+    margin-top: 2px !important;
+}
+
+body #backpack [data-resource-ai] {
+    cursor: pointer !important;
+    touch-action: manipulation;
+}
+
+@media (max-width: 720px) {
+    body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-form,
+    body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-form {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-form > label,
+    body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-form > label,
+    body .quick-modal-card[aria-label="Subir PDF"] .quick-modal-actions,
+    body .quick-modal-card[aria-label="Editar recurso"] .quick-modal-actions {
+        grid-column: 1 !important;
+    }
+}
