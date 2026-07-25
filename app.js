@@ -6645,7 +6645,7 @@ function renderDashboard(workspace) {
                     `}
             </div>
 
-            <div class="dashboard-bottom-grid">
+            <div class="dashboard-bottom-section">
                 <div class="card starter-card dashboard-panel-card">
                     <div class="panel-title">
                         ${appIconHTML('list', 'panel-icon panel-icon-steps dashboard-icon')}
