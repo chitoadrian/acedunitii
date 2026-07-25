@@ -33788,3 +33788,135 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .theme-toggle {
         justify-self: start !important;
     }
 }
+
+
+/* Panel académico: Centro del estudiante y Progreso semanal en una sola columna */
+body #dashboard .dashboard-clean-layout > .dashboard-bottom-section {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+    gap: 24px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-section > :is(
+    .starter-card,
+    .weekly-progress-card
+) {
+    grid-area: auto !important;
+    position: relative !important;
+    inset: auto !important;
+    z-index: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-section .dashboard-steps {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #dashboard .dashboard-bottom-section .dashboard-steps li {
+    position: static !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 16px !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-section .dashboard-steps li > div {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    display: block !important;
+}
+
+body #dashboard .dashboard-bottom-section .dashboard-steps li :is(strong, small) {
+    display: block !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+}
+
+body #dashboard .dashboard-bottom-section .dashboard-steps li :is(
+    .step-number,
+    button
+) {
+    flex-shrink: 0 !important;
+    writing-mode: horizontal-tb !important;
+}
+
+body #dashboard .dashboard-bottom-section .weekly-progress-card,
+body #dashboard .dashboard-bottom-section .weekly-chart {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-section .weekly-chart {
+    justify-content: space-evenly !important;
+    margin-inline: auto !important;
+}
+
+body #dashboard .dashboard-bottom-section .chart-caption {
+    width: 100% !important;
+    margin: 12px auto 0 !important;
+    text-align: center !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+}
+
+@media (max-width: 700px) {
+    body #dashboard .dashboard-bottom-section {
+        gap: 18px !important;
+    }
+
+    body #dashboard .dashboard-bottom-section .dashboard-steps li {
+        grid-template-columns: auto minmax(0, 1fr) !important;
+        align-items: start !important;
+        gap: 12px !important;
+    }
+
+    body #dashboard .dashboard-bottom-section .dashboard-steps li button {
+        grid-column: 2 !important;
+        justify-self: start !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body #dashboard .dashboard-bottom-section {
+        gap: 14px !important;
+    }
+}
