@@ -7504,16 +7504,8 @@ function openPdfResource(resource, recentText = 'Abriste un PDF desde Mochila Di
     return true;
 }
 
-function askAIAboutResource(resourceId) {
-    const resource = loadWorkspace().resources.find(item => item.id === resourceId);
-    if (!resource) {
-        notify('No se encontró el recurso seleccionado.', 'error');
-        return;
-    }
-
+function askAIAboutResource() {
     navigateTo('ai-assistant');
-    setAIContextFromResource(resource);
-    notify('Tutor abierto. Escribe tu pregunta cuando quieras.', 'success');
 }
 
 function practiceWithResource(resourceId) {
