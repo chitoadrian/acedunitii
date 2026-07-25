@@ -33433,14 +33433,32 @@ body #dashboard .stat-icon svg {
     color: inherit !important;
 }
 
-body #dashboard :is(.dashboard-icon, .panel-icon, .stat-icon) svg {
-    width: 1em !important;
-    height: 1em !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
+body #dashboard .dashboard-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    color: var(--dashboard-icon-color, var(--dashboard-text)) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body #dashboard .dashboard-icon svg {
+    display: block !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     fill: none !important;
     stroke: currentColor !important;
     stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard {
@@ -33587,5 +33605,186 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard :is(
     body #dashboard .dashboard-achievements span {
         width: 100% !important;
         justify-content: center !important;
+    }
+}
+
+
+/* Panel académico: grid inferior real e iconos visibles */
+body #dashboard {
+    --dashboard-icon-color: #E8ECF5;
+    --dashboard-icon-bg: #252B48;
+    --dashboard-icon-border: #3B4266;
+}
+
+body #dashboard .dashboard-clean-layout {
+    grid-template-areas: none !important;
+}
+
+body #dashboard .dashboard-clean-layout > :is(
+    .dashboard-progress-card,
+    .dashboard-day-card,
+    .dashboard-bottom-grid
+) {
+    grid-area: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #dashboard .dashboard-bottom-grid {
+    grid-column: 1 / -1 !important;
+    position: static !important;
+    inset: auto !important;
+    z-index: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    align-items: start !important;
+    justify-items: stretch !important;
+    gap: 24px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-grid > :is(
+    .starter-card,
+    .weekly-progress-card
+) {
+    grid-area: auto !important;
+    position: relative !important;
+    inset: auto !important;
+    z-index: auto !important;
+    align-self: start !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+body #dashboard .dashboard-bottom-grid > :is(
+    .starter-card,
+    .weekly-progress-card
+):hover {
+    transform: none !important;
+}
+
+body #dashboard .dashboard-bottom-grid .dashboard-steps,
+body #dashboard .dashboard-bottom-grid .dashboard-steps li,
+body #dashboard .dashboard-bottom-grid .weekly-chart {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body #dashboard .dashboard-bottom-grid .dashboard-steps li {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 16px !important;
+}
+
+body #dashboard .dashboard-bottom-grid .dashboard-steps li > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+body #dashboard .dashboard-bottom-grid .dashboard-steps li :is(strong, small) {
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+}
+
+body #dashboard .dashboard-bottom-grid .weekly-chart {
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+}
+
+body #dashboard :is(
+    .stat-icon,
+    .panel-icon,
+    .hero-widget-icon
+) {
+    color: var(--dashboard-icon-color) !important;
+    background: var(--dashboard-icon-bg) !important;
+    border-color: var(--dashboard-icon-border) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+body #dashboard .dashboard-stat-card .stat-icon {
+    color: var(--dashboard-card-accent) !important;
+}
+
+body #dashboard .dashboard-icon svg :is(path, rect, circle, line, polyline, polygon) {
+    opacity: 1 !important;
+    visibility: visible !important;
+    fill: none !important;
+    stroke: currentColor !important;
+}
+
+body .theme-toggle {
+    color: #E8ECF5 !important;
+}
+
+body .theme-toggle svg {
+    display: block !important;
+    width: 21px !important;
+    height: 21px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.9 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard {
+    --dashboard-icon-color: #334155;
+    --dashboard-icon-bg: #E8EDF5;
+    --dashboard-icon-border: #CBD5E1;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .theme-toggle {
+    color: #334155 !important;
+}
+
+@media (max-width: 1050px) {
+    body #dashboard .dashboard-clean-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body #dashboard .dashboard-bottom-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 18px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    body #dashboard .dashboard-bottom-grid {
+        gap: 14px !important;
+    }
+
+    body #dashboard .dashboard-bottom-grid .dashboard-steps li {
+        grid-template-columns: 32px minmax(0, 1fr) !important;
+        align-items: start !important;
+        gap: 11px !important;
+    }
+
+    body #dashboard .dashboard-bottom-grid .dashboard-steps li button {
+        grid-column: 2 !important;
+        justify-self: start !important;
     }
 }
