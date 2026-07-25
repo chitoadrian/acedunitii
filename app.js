@@ -4005,20 +4005,17 @@ function renderGrades(workspace) {
                     `).join('')}
                 </colgroup>
                 <thead>
-                    <tr class="period-group-row">
-                        <th class="period-head subject-head" rowspan="2" scope="col">Asignatura</th>
-                        <th class="period-head average-head" rowspan="2" scope="col">Promedio</th>
-                        ${gradePeriods.map((period, periodIndex) => `
-                            <th class="period-head period-group-head period-group-${periodIndex + 1}" colspan="4" scope="colgroup">${escapeHTML(period.label)}</th>
-                        `).join('')}
-                    </tr>
-                    <tr class="period-detail-row">
-                        ${gradePeriods.map((period, periodIndex) => `
-                            <th class="period-head period-average-head period-${periodIndex + 1}" scope="col">Promedio periodo</th>
-                            <th class="period-head partial-head period-${periodIndex + 1}" scope="col">Parcial 1</th>
-                            <th class="period-head partial-head period-${periodIndex + 1}" scope="col">Parcial 2</th>
-                            <th class="period-head exam-head period-${periodIndex + 1}" scope="col">Examen</th>
-                        `).join('')}
+                    <tr class="period-header-row">
+                        <th class="period-head subject-head" scope="col">Asignatura</th>
+                        <th class="period-head average-head" scope="col">Promedio</th>
+                        <th class="period-head period-average-head period-1" scope="col">Periodo 1</th>
+                        <th class="period-head partial-head period-1" scope="col">Parcial 1</th>
+                        <th class="period-head partial-head period-1" scope="col">Parcial 2</th>
+                        <th class="period-head exam-head period-1" scope="col">Examen</th>
+                        <th class="period-head period-average-head period-2" scope="col">Periodo 2</th>
+                        <th class="period-head partial-head period-2" scope="col">Parcial 1</th>
+                        <th class="period-head partial-head period-2" scope="col">Parcial 2</th>
+                        <th class="period-head exam-head period-2" scope="col">Examen</th>
                     </tr>
                 </thead>
                 <tbody>
