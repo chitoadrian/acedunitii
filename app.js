@@ -3201,22 +3201,10 @@ function renderTasks(workspace) {
             `).join('')}
         </div>
         <div class="task-summary-strip">
-            <div>
-                ${appIconHTML('list', 'tasks-icon tasks-icon-box stroke-icon task-summary-icon')}
-                <div><strong>${counts.pending}</strong><span>Pendientes</span></div>
-            </div>
-            <div>
-                ${appIconHTML('clock', 'tasks-icon tasks-icon-box stroke-icon task-summary-icon')}
-                <div><strong>${counts.upcoming}</strong><span>Próximas</span></div>
-            </div>
-            <div>
-                ${appIconHTML('check', 'tasks-icon tasks-icon-box stroke-icon task-summary-icon')}
-                <div><strong>${counts.completed}</strong><span>Completadas</span></div>
-            </div>
-            <div>
-                ${appIconHTML('calendar', 'tasks-icon tasks-icon-box stroke-icon task-summary-icon')}
-                <div><strong>${counts.overdue}</strong><span>Vencidas</span></div>
-            </div>
+            <div><strong>${counts.pending}</strong><span>Pendientes</span></div>
+            <div><strong>${counts.upcoming}</strong><span>Próximas</span></div>
+            <div><strong>${counts.completed}</strong><span>Completadas</span></div>
+            <div><strong>${counts.overdue}</strong><span>Vencidas</span></div>
         </div>
                 <div class="task-board task-list-modern">
             ${filteredTasks.length ? filteredTasks.map(task => {
