@@ -7117,10 +7117,22 @@ function renderProgress(workspace) {
     `;
 }
 
+function progressStatIconSvg(type) {
+    const icons = {
+        streak: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M13 2.8c.35 2.35-.45 3.9-2.25 5.25C8.55 9.7 7 11.8 7 14.5a5.5 5.5 0 0 0 11 0c0-3.15-1.8-5.55-4.1-7.6.05 1.6-.5 2.85-1.65 3.8"></path><path d="M10.3 17.05c0-1.25.75-2.2 2.05-3.15 1.05 1.05 1.65 2 1.65 3.1a1.85 1.85 0 0 1-3.7.05Z"></path></svg>`,
+        trophy: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4h8v4a4 4 0 0 1-8 0V4Z"></path><path d="M8 6H5v1a4 4 0 0 0 4 4"></path><path d="M16 6h3v1a4 4 0 0 1-4 4"></path><path d="M12 12v4"></path><path d="M9 20h6"></path><path d="M10 16h4v4h-4"></path></svg>`,
+        status: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 17 9 12l3 3 7-8"></path><path d="M14 7h5v5"></path></svg>`,
+        activity: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 19V9"></path><path d="M10 19V5"></path><path d="M16 19v-7"></path><path d="M22 19V8"></path><path d="M2 19h20"></path></svg>`,
+        tasks: `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.7 2.7L16.5 9"></path></svg>`
+    };
+
+    return icons[type] || icons.status;
+}
+
 function progressStatCard(type, label, value, detail) {
     return `
         <div class="progress-stat premium-progress-stat stat-${escapeHTML(type)} premium-border">
-            <span class="progress-stat-icon" aria-hidden="true"></span>
+            <span class="progress-stat-icon stroke-icon" aria-hidden="true">${progressStatIconSvg(type)}</span>
             <div>
                 <span class="stat-label">${escapeHTML(label)}</span>
                 <span class="stat-value">${escapeHTML(value)}</span>
@@ -7129,7 +7141,6 @@ function progressStatCard(type, label, value, detail) {
         </div>
     `;
 }
-
 function readFileAsDataUrl(file) {
     return new Promise((resolve, reject) => {
         if (!file || !file.name) {
