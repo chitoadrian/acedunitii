@@ -32461,3 +32461,22 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
 ) :is(p, span, small) {
     color: var(--text-secondary) !important;
 }
+
+
+/* Tema claro global suave: autenticación */
+body:is(.light-theme, .light-mode, [data-theme="light"]) :is(
+    #login-page,
+    #register-page
+) .auth-card {
+    color: var(--text-primary) !important;
+    background: var(--surface-soft) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: 0 22px 55px rgba(31, 41, 55, .16) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) :is(
+    #login-page,
+    #register-page
+) .auth-container {
+    background: var(--bg-primary) !important;
+}
