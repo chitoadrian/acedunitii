@@ -4168,9 +4168,14 @@ function practiceWithResource(resourceId) {
 
 function setAIContextFromResource(resource) {
     const topic = document.getElementById('ai-topic');
-    if (topic) {
-        topic.value = `PDF simulado: ${resource.title}\nMateria: ${resource.subject}\nArchivo: ${resource.fileName}\nDescripción: ${resource.description || resource.content}`;
-    }
+    if (!topic) return null;
+
+    const resourceTitle = String(resource?.title || 'Recurso PDF').trim();
+    const resourceFileName = String(resource?.fileName || 'PDF').trim();
+    topic.value = `Recurso: ${resourceTitle}\nArchivo: ${resourceFileName}\n\n`;
+    topic.focus();
+    topic.setSelectionRange(topic.value.length, topic.value.length);
+    return topic;
 }
 
 function buildResourceAIResponse(resource, type) {
@@ -7146,10 +7151,9 @@ function openResourceForm(resourceId = null) {
         fields: [
             { name: 'title', label: 'Título del recurso', value: resource?.title || '', placeholder: 'Ej: Guía de estudio' },
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: resource?.subject || '' },
-            { name: 'file', label: 'Archivo PDF', type: 'file', accept: '.pdf,application/pdf', required: !resource },
             { name: 'description', label: 'Descripción corta', type: 'textarea', value: resource?.description || resource?.content || '', placeholder: 'Describe de qué trata el PDF' },
             { name: 'tag', label: 'Etiqueta', type: 'select', options: ['Apunte', 'Guía', 'Informe', 'Proyecto', 'Tarea'], value: resource?.tag || 'Apunte' },
-            { name: 'useWithTutor', label: 'Tutor', type: 'checkbox', checked: resource?.useWithTutor !== false, help: 'Usar con Tutor' }
+            { name: 'file', label: 'Archivo PDF', type: 'file', accept: '.pdf,application/pdf', required: !resource }
         ],
         onSubmit: async values => {
             const fresh = loadWorkspace();
@@ -7176,7 +7180,6 @@ function openResourceForm(resourceId = null) {
                 content: values.description.trim(),
                 type: 'PDF',
                 tag: values.tag || 'Apunte',
-                useWithTutor: values.useWithTutor === 'yes',
                 uploadedAt: resource?.uploadedAt || new Date().toISOString()
             };
 
@@ -7503,14 +7506,14 @@ function openPdfResource(resource, recentText = 'Abriste un PDF desde Mochila Di
 
 function askAIAboutResource(resourceId) {
     const resource = loadWorkspace().resources.find(item => item.id === resourceId);
-    if (!resource) return;
+    if (!resource) {
+        notify('No se encontró el recurso seleccionado.', 'error');
+        return;
+    }
 
-    const updated = markResourceAIUsed(resourceId, `Preguntaste a Tutor sobre ${resource.title}.`) || resource;
-    // Futuro: enviar metadata y contenido extraido del recurso a una IA real.
-    setAIContextFromResource(updated);
     navigateTo('ai-assistant');
-    appendTutorMessage('bot', `Vamos a estudiar tu recurso de ${updated.subject || 'General'}: ${updated.title}.\n\nTrabajaré con el título, la materia y la descripción guardada. Puedes pedirme un resumen, una explicacion sencilla, preguntas abiertas, verdadero/falso, flashcards o un cuestionario.`, 'Tutor');
-    notify('Recurso abierto en Tutor.', 'success');
+    setAIContextFromResource(resource);
+    notify('Tutor abierto. Escribe tu pregunta cuando quieras.', 'success');
 }
 
 function practiceWithResource(resourceId) {
