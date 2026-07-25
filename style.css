@@ -33975,3 +33975,87 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks {
     --task-check-bg: #EEF4FF;
     --task-check-border: #7DA6F8;
 }
+
+
+/* Progress: real, theme-safe icons for the five summary cards */
+body #progress {
+    --progress-icon-bg: #222A3D;
+    --progress-icon-border: #3B4663;
+    --progress-icon-color: #E8ECF5;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #progress {
+    --progress-icon-bg: #E8EDF5;
+    --progress-icon-border: #C7D0DF;
+    --progress-icon-color: #334155;
+}
+
+body #progress .progress-stat-grid .stat-streak { --progress-color: #D9922E; }
+body #progress .progress-stat-grid .stat-trophy { --progress-color: #7C65D9; }
+body #progress .progress-stat-grid .stat-status { --progress-color: #3A8EC7; }
+body #progress .progress-stat-grid .stat-activity { --progress-color: #6478D8; }
+body #progress .progress-stat-grid .stat-tasks { --progress-color: #25A77A; }
+
+body #progress .progress-stat-grid .progress-stat-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border: 1px solid color-mix(in srgb, var(--progress-color) 34%, var(--progress-icon-border));
+    border-radius: 18px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    color: var(--progress-color, var(--progress-icon-color));
+    background: color-mix(in srgb, var(--progress-color) 13%, var(--progress-icon-bg));
+    box-shadow: none;
+    filter: none;
+    opacity: 1;
+    visibility: visible;
+}
+
+body #progress .progress-stat-grid .progress-stat-icon::before,
+body #progress .progress-stat-grid .progress-stat-icon::after {
+    content: none !important;
+    display: none !important;
+}
+
+body #progress .progress-stat-grid .progress-stat-icon svg {
+    display: block;
+    width: 30px;
+    height: 30px;
+    color: currentColor;
+    opacity: 1;
+    visibility: visible;
+    filter: none;
+}
+
+body #progress .progress-stat-grid .progress-stat-icon.stroke-icon svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+body #progress .progress-stat-grid .progress-stat-icon.stroke-icon svg path,
+body #progress .progress-stat-grid .progress-stat-icon.stroke-icon svg circle {
+    fill: none;
+    stroke: currentColor;
+}
+
+@media (max-width: 600px) {
+    body #progress .progress-stat-grid .progress-stat-icon {
+        width: 56px;
+        height: 56px;
+        min-width: 56px;
+        border-radius: 16px;
+    }
+
+    body #progress .progress-stat-grid .progress-stat-icon svg {
+        width: 27px;
+        height: 27px;
+    }
+}
