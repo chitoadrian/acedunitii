@@ -6645,7 +6645,8 @@ function renderDashboard(workspace) {
                     `}
             </div>
 
-            <div class="card starter-card dashboard-panel-card">
+            <div class="dashboard-bottom-grid">
+                <div class="card starter-card dashboard-panel-card">
                     <div class="panel-title">
                         ${appIconHTML('list', 'panel-icon panel-icon-steps dashboard-icon')}
                         <div>
@@ -6679,6 +6680,7 @@ function renderDashboard(workspace) {
                         ${[15, 20, 25, 30, 35, 40, Math.min(95, 20 + completed * 12)].map(value => `<span class="week-day" style="height:${value}%"></span>`).join('')}
                     </div>
                     <p class="chart-caption">${completed ? `Has completado ${completed} tarea(s).` : 'Tu gráfico crecerá cuando completes actividades.'}</p>
+            </div>
             </div>
         </div>
     `;
