@@ -35114,3 +35114,39 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-le
     filter: drop-shadow(0 2px 3px rgba(82, 222, 255, .32));
     box-sizing: border-box;
 }
+
+
+/* Mascot glass visor v4: one bright premium finish shared by light and dark themes */
+#landing-page .robot-visor,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-visor {
+    border: 1px solid rgba(121, 132, 210, .32);
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, .98) 0%, rgba(245, 247, 255, .98) 35%, rgba(226, 239, 255, .97) 70%, rgba(235, 228, 255, .96) 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 -5px 12px rgba(111, 142, 214, .10),
+        0 3px 8px rgba(60, 72, 126, .16);
+}
+
+#landing-page .robot-visor::before,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-visor::before {
+    top: 3px;
+    left: 8px;
+    right: 8px;
+    height: 9px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, .88) 46%, rgba(255, 255, 255, .52) 68%, transparent 100%);
+    opacity: .86;
+}
+
+#landing-page .robot-happy-eye,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-eye {
+    border-top-color: #479cf2;
+    filter: drop-shadow(0 -1px 2px rgba(66, 164, 240, .28));
+}
+
+#landing-page .robot-happy-smile,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-smile {
+    border-bottom-color: #58afea;
+    filter: drop-shadow(0 2px 2px rgba(70, 169, 232, .24));
+}
