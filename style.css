@@ -35208,3 +35208,39 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     border-bottom-color: #58afea;
     filter: drop-shadow(0 2px 2px rgba(70, 169, 232, .22));
 }
+
+
+/* Mascot fixed face v6: calm welcome expression with no cursor tracking */
+#landing-page .robot-visor,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-visor {
+    border: 1px solid rgba(118, 151, 220, .28);
+    background:
+        linear-gradient(180deg, rgba(153, 205, 255, .10) 0%, transparent 25%),
+        radial-gradient(circle at 50% -22%, rgba(113, 155, 235, .28), transparent 58%),
+        linear-gradient(150deg, #192747 0%, #0d1730 62%, #142442 100%);
+    box-shadow:
+        inset 0 0 15px rgba(82, 166, 239, .12),
+        inset 0 1px 0 rgba(187, 226, 255, .15),
+        0 3px 8px rgba(18, 28, 57, .22);
+}
+#landing-page .robot-visor::before,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-visor::before {
+    top: 3px; left: 9px; right: 9px; height: 7px;
+    background: linear-gradient(90deg, transparent, rgba(207, 235, 255, .16), transparent);
+    opacity: .82;
+}
+#landing-page .robot-happy-eye,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-eye {
+    top: 12px; display: block; width: 21px; height: 12px; overflow: visible;
+    border: 0; border-top: 4px solid #78e8ff; border-radius: 50% 50% 0 0;
+    background: transparent; box-shadow: none;
+    filter: drop-shadow(0 -1px 3px rgba(93, 225, 255, .34));
+}
+#landing-page .robot-happy-eye-left { left: 6px; transform: rotate(-3deg); }
+#landing-page .robot-happy-eye-right { right: 6px; left: auto; transform: rotate(3deg); }
+#landing-page .robot-happy-smile,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-smile {
+    left: 50%; bottom: 5px; width: 21px; height: 9px; transform: translateX(-50%);
+    border: 0; border-bottom: 2px solid #70e3fb; border-radius: 0 0 50% 50%;
+    background: transparent; filter: drop-shadow(0 2px 2px rgba(82, 222, 255, .26));
+}

@@ -7807,46 +7807,9 @@ function initStudyPet() {
     let offsetY = 0;
     let startX = 0;
     let startY = 0;
-    let eyeFrame = 0;
-    let lastPointerEvent = null;
-    const canTrackEyes = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-    const updateEyeDirection = event => {
-        if (!document.body.classList.contains('landing-active')) return;
-        lastPointerEvent = event;
-        if (eyeFrame) return;
 
-        eyeFrame = window.requestAnimationFrame(() => {
-            eyeFrame = 0;
-            const robot = pet.querySelector('.pet-robot');
-            if (!robot || !lastPointerEvent) return;
-
-            const rect = robot.getBoundingClientRect();
-            const centerX = rect.left + rect.width * 0.5;
-            const centerY = rect.top + rect.height * 0.34;
-            const deltaX = lastPointerEvent.clientX - centerX;
-            const deltaY = lastPointerEvent.clientY - centerY;
-            const distance = Math.max(Math.hypot(deltaX, deltaY), 1);
-            const maxMove = window.innerWidth < 720 ? 3 : 4;
-
-            pet.style.setProperty('--pet-eye-x', `${(deltaX / distance) * maxMove}px`);
-            pet.style.setProperty('--pet-eye-y', `${(deltaY / distance) * maxMove}px`);
-        });
-    };
-
-    const resetEyeDirection = () => {
-        lastPointerEvent = null;
-        pet.style.setProperty('--pet-eye-x', '0px');
-        pet.style.setProperty('--pet-eye-y', '0px');
-    };
-
-    if (canTrackEyes) {
-        document.addEventListener('pointermove', updateEyeDirection, { passive: true });
-        document.addEventListener('pointerleave', resetEyeDirection, { passive: true });
-    }
-
-    pet.addEventListener('pointerdown', event => {
+pet.addEventListener('pointerdown', event => {
         if (event.button !== undefined && event.button !== 0) return;
         dragging = true;
         moved = false;
