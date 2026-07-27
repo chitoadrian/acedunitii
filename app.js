@@ -7905,7 +7905,7 @@ function initStudyPet() {
 
 const SUPABASE_URL = 'https://pskbdeqaajprfhrjortm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_M3ABI_7yU49LkGO3Op-CLA_qsCDP7Lz';
-const RESET_REDIRECT_URL = 'https://chitoadrian.github.io/AC-Edunity-/';
+const RESET_REDIRECT_URL = 'https://linen-quetzal-416622.hostingersite.com/';
 
 let supabaseClient = null;
 let workspaceState = null;
