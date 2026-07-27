@@ -34693,3 +34693,28 @@ body #grades .period-gradebook-table tr > :last-child {
     filter: none !important;
     flex-shrink: 0 !important;
 }
+
+/* Boot loader logo: transparent official asset in a circular frame */
+.boot-loader-logo-wrapper {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.boot-loader-logo-wrapper .boot-loader-logo {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    display: block;
+    object-fit: contain;
+    border-radius: 50%;
+    background: transparent;
+    border: 0;
+}
