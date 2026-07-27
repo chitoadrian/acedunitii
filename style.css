@@ -34678,3 +34678,18 @@ body #grades .period-gradebook-table tr > :last-child {
         min-width: 1080px !important;
     }
 }
+
+/* Sidebar brand logo: use the transparent official asset without altering header sizing */
+.sidebar .sidebar-logo .brand-logo {
+    display: block !important;
+    object-fit: contain !important;
+    border-radius: 50% !important;
+    clip-path: circle(50% at 50% 50%) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    flex-shrink: 0 !important;
+}
