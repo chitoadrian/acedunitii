@@ -35050,3 +35050,67 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-le
     background: transparent;
     box-shadow: 0 2px 5px rgba(82, 222, 255, .28);
 }
+
+
+/* Mascot face v3: rebuilt from scratch with a welcoming happy expression */
+#landing-page .robot-visor {
+    background:
+        linear-gradient(180deg, rgba(134, 211, 255, .10) 0%, transparent 24%),
+        radial-gradient(circle at 50% -18%, rgba(94, 153, 235, .24), transparent 55%),
+        linear-gradient(150deg, #101a31 0%, #060c1a 66%, #0b1730 100%);
+    box-shadow:
+        inset 0 0 15px rgba(65, 172, 255, .13),
+        inset 0 1px 0 rgba(174, 231, 255, .14),
+        0 2px 5px rgba(15, 23, 42, .20);
+}
+
+#landing-page .robot-visor::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 9px;
+    right: 9px;
+    height: 7px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(203, 239, 255, .13), transparent);
+    pointer-events: none;
+}
+
+#landing-page .robot-happy-eye {
+    position: absolute;
+    top: 12px;
+    display: block;
+    width: 21px;
+    height: 12px;
+    border-top: 4px solid #78e8ff;
+    border-radius: 50% 50% 0 0;
+    background: transparent;
+    filter: drop-shadow(0 -1px 3px rgba(93, 225, 255, .40));
+    box-sizing: border-box;
+}
+
+#landing-page .robot-happy-eye-left {
+    left: 6px;
+    transform: rotate(-3deg);
+}
+
+#landing-page .robot-happy-eye-right {
+    right: 6px;
+    transform: rotate(3deg);
+}
+
+#landing-page .robot-happy-smile {
+    position: absolute;
+    left: 50%;
+    bottom: 5px;
+    display: block;
+    width: 23px;
+    height: 10px;
+    transform: translateX(-50%);
+    border: 0;
+    border-bottom: 3px solid #70e3fb;
+    border-radius: 0 0 50% 50%;
+    background: transparent;
+    filter: drop-shadow(0 2px 3px rgba(82, 222, 255, .32));
+    box-sizing: border-box;
+}
