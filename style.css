@@ -35150,3 +35150,61 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     border-bottom-color: #58afea;
     filter: drop-shadow(0 2px 2px rgba(70, 169, 232, .24));
 }
+
+
+/* Mascot tracking eyes v5: open eye shells with cursor-following pupils */
+#landing-page .robot-happy-eye,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-eye {
+    top: 10px;
+    width: 21px;
+    height: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(91, 124, 205, .24);
+    border-radius: 9px;
+    background: linear-gradient(155deg, #ffffff 0%, #f7fbff 58%, #e9f2ff 100%);
+    box-shadow:
+        0 2px 5px rgba(57, 79, 136, .14),
+        inset 0 1px 0 rgba(255, 255, 255, .98);
+    filter: none;
+    transform: none;
+}
+
+#landing-page .robot-happy-eye-left {
+    left: 6px;
+}
+
+#landing-page .robot-happy-eye-right {
+    right: 6px;
+    left: auto;
+}
+
+#landing-page .robot-pupil {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #69c8ff 0%, #2f83ef 72%, #486ee8 100%);
+    box-shadow:
+        0 0 4px rgba(64, 157, 239, .32),
+        inset 1px 1px 0 rgba(255, 255, 255, .52);
+    transform: translate(
+        calc(-50% + var(--pet-eye-x, 0px)),
+        calc(-50% + var(--pet-eye-y, 0px))
+    );
+    transition: transform 120ms cubic-bezier(.2, .75, .3, 1);
+    will-change: transform;
+    pointer-events: none;
+}
+
+#landing-page .robot-happy-smile,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-happy-smile {
+    width: 20px;
+    height: 8px;
+    bottom: 4px;
+    border-bottom-width: 2px;
+    border-bottom-color: #58afea;
+    filter: drop-shadow(0 2px 2px rgba(70, 169, 232, .22));
+}
