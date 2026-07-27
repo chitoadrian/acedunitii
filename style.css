@@ -35010,3 +35010,43 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-le
         0 8px 18px rgba(42, 50, 91, .16),
         inset 0 1px 0 rgba(255, 255, 255, .98);
 }
+
+
+/* Mascot face refinement: happy closed eyes and a small friendly smile */
+#landing-page .robot-eye {
+    top: 13px;
+    width: 15px;
+    height: 8px;
+    border: 0;
+    border-top: 3px solid #79e8ff;
+    border-radius: 999px 999px 0 0;
+    background: transparent;
+    box-shadow: 0 -2px 6px rgba(84, 221, 255, .38);
+}
+
+#landing-page .robot-eye-left {
+    left: 10px;
+    transform: rotate(-2deg);
+}
+
+#landing-page .robot-eye-right {
+    right: 10px;
+    left: auto;
+    transform: rotate(2deg);
+}
+
+#landing-page .robot-eye::after {
+    content: none;
+}
+
+#landing-page .robot-mouth {
+    left: 22px;
+    bottom: 7px;
+    width: 16px;
+    height: 7px;
+    border: 0;
+    border-bottom: 2px solid #70e2fb;
+    border-radius: 0 0 999px 999px;
+    background: transparent;
+    box-shadow: 0 2px 5px rgba(82, 222, 255, .28);
+}
