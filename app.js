@@ -7868,7 +7868,7 @@ pet.addEventListener('pointerdown', event => {
 
 const SUPABASE_URL = 'https://pskbdeqaajprfhrjortm.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_M3ABI_7yU49LkGO3Op-CLA_qsCDP7Lz';
-const RESET_REDIRECT_URL = 'https://linen-quetzal-416622.hostingersite.com/';
+const RESET_REDIRECT_URL = 'https://edunity.me/#reset-password';
 
 let supabaseClient = null;
 let workspaceState = null;
@@ -8029,11 +8029,11 @@ function openPasswordUpdateModal() {
             <form class="quick-modal-form password-update-form">
                 <label>
                     <span>Nueva contraseña</span>
-                    <input type="password" name="newPassword" placeholder="Minimo 6 caracteres" required>
+                    <input type="password" name="newPassword" placeholder="Mínimo 8 caracteres" minlength="8" autocomplete="new-password" required>
                 </label>
                 <label>
                     <span>Confirmar contraseña</span>
-                    <input type="password" name="confirmPassword" placeholder="Repite la contraseña" required>
+                    <input type="password" name="confirmPassword" placeholder="Repite la contraseña" minlength="8" autocomplete="new-password" required>
                 </label>
                 <div class="quick-modal-actions password-modal-actions">
                     <button class="btn-secondary btn-small" type="button" data-cancel>Cancelar</button>
@@ -8090,12 +8090,14 @@ async function handlePasswordReset(email) {
 }
 
 async function handleUpdatePassword(newPassword, confirmPassword) {
-    if (!newPassword || String(newPassword).length < 6) {
-        showToast("La contraseña debe tener mínimo 6 caracteres.", "error");
+    const cleanPassword = String(newPassword || '');
+
+    if (cleanPassword.length < 8) {
+        showToast("La contraseña debe tener mínimo 8 caracteres.", "error");
         return;
     }
 
-    if (newPassword !== confirmPassword) {
+    if (cleanPassword !== String(confirmPassword || '')) {
         showToast("Las contraseñas no coinciden.", "error");
         return;
     }
@@ -8105,7 +8107,7 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
         console.log("[PASSWORD UPDATE] Actualizando contraseña");
 
         const { error } = await sb.auth.updateUser({
-            password: newPassword
+            password: cleanPassword
         });
 
         if (error) {
@@ -8115,15 +8117,17 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
             return;
         }
 
+        const updateForm = document.querySelector('#password-update-modal form');
+        updateForm?.reset();
         showToast("Contraseña actualizada correctamente. Ya puedes iniciar sesión.", "success");
         closePasswordUpdateModal();
+        window.history.replaceState({}, document.title, window.location.pathname);
         await sb.auth.signOut();
         currentUser = null;
         profileState = null;
         workspaceState = mergeWorkspaceState();
         clearAppViewSession();
-        showLanding();
-        window.history.replaceState({}, document.title, window.location.pathname);
+        showLogin();
     } catch (error) {
         console.error("[PASSWORD UPDATE ERROR]", error);
         showToast("No se pudo actualizar la contraseña.", "error");
@@ -8133,7 +8137,7 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
 function isPasswordRecoveryUrl() {
     const hash = window.location.hash || '';
     const search = window.location.search || '';
-    return hash.includes('type=recovery') || search.includes('type=recovery');
+    return hash.includes('reset-password') || hash.includes('type=recovery') || search.includes('type=recovery');
 }
 
 function getWorkspaceExtrasKey() {
