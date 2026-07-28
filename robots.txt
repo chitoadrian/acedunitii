@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://edunity.me/sitemap.xml
