@@ -7971,6 +7971,96 @@ function closePasswordUpdateModal() {
     document.getElementById('password-update-modal')?.remove();
 }
 
+let passwordRecoverySessionPromise = null;
+
+function getPasswordRecoveryTokensFromUrl() {
+    const hash = String(window.location.hash || '').replace(/^#/, '');
+    const search = String(window.location.search || '').replace(/^\?/, '');
+    const tokenFragment = hash.includes('access_token=')
+        ? hash.slice(hash.indexOf('access_token='))
+        : '';
+    const hashParams = new URLSearchParams(tokenFragment || hash.replace(/^reset-password[?&]?/, ''));
+    const searchParams = new URLSearchParams(search);
+
+    return {
+        accessToken: hashParams.get('access_token') || searchParams.get('access_token') || '',
+        refreshToken: hashParams.get('refresh_token') || searchParams.get('refresh_token') || '',
+        type: hashParams.get('type') || searchParams.get('type') || ''
+    };
+}
+
+function getPasswordRecoveryErrorMessage(error) {
+    const message = String(error?.message || error || '').toLowerCase();
+
+    if (message.includes('refresh token') || message.includes('jwt') || message.includes('expired') || message.includes('session')) {
+        return 'La sesión de recuperación expiró. Solicita un enlace nuevo.';
+    }
+    if (message.includes('password') || message.includes('weak')) {
+        return 'Supabase rechazó la contraseña. Usa una contraseña diferente y segura de al menos 8 caracteres.';
+    }
+    if (message.includes('fetch') || message.includes('network') || message.includes('connection')) {
+        return 'No se pudo conectar con Supabase. Revisa tu conexión e intenta nuevamente.';
+    }
+
+    return 'No se pudo actualizar la contraseña. Solicita un enlace nuevo e intenta otra vez.';
+}
+
+async function ensurePasswordRecoverySession(sb = getSupabaseClient()) {
+    if (passwordRecoverySessionPromise) return passwordRecoverySessionPromise;
+
+    passwordRecoverySessionPromise = (async () => {
+        const { data: currentData, error: currentError } = await sb.auth.getSession();
+        console.log('[PASSWORD RECOVERY] Sesión existente:', Boolean(currentData?.session));
+
+        if (currentData?.session) {
+            return { session: currentData.session, error: null, restored: false };
+        }
+
+        const recoveryTokens = getPasswordRecoveryTokensFromUrl();
+        const hasRecoveryTokens = Boolean(recoveryTokens.accessToken && recoveryTokens.refreshToken);
+        console.log('[PASSWORD RECOVERY] Tokens disponibles en URL:', hasRecoveryTokens);
+
+        if (!hasRecoveryTokens) {
+            return { session: null, error: currentError || new Error('Recovery session missing'), restored: false };
+        }
+
+        const { data: sessionData, error: sessionError } = await sb.auth.setSession({
+            access_token: recoveryTokens.accessToken,
+            refresh_token: recoveryTokens.refreshToken
+        });
+
+        if (sessionError) {
+            console.error('[PASSWORD RECOVERY] setSession falló:', sessionError.message);
+            return { session: null, error: sessionError, restored: false };
+        }
+
+        const { data: verifiedData, error: verifiedError } = await sb.auth.getSession();
+        const verifiedSession = verifiedData?.session || sessionData?.session || null;
+        console.log('[PASSWORD RECOVERY] Sesión después de setSession:', Boolean(verifiedSession));
+        return { session: verifiedSession, error: verifiedError, restored: Boolean(verifiedSession) };
+    })();
+
+    try {
+        return await passwordRecoverySessionPromise;
+    } finally {
+        passwordRecoverySessionPromise = null;
+    }
+}
+
+async function openPasswordRecoveryFlow(sb = getSupabaseClient()) {
+    const { session, error } = await ensurePasswordRecoverySession(sb);
+    if (!session) {
+        showLanding();
+        showToast(getPasswordRecoveryErrorMessage(error), 'error');
+        return false;
+    }
+
+    clearAppViewSession();
+    showLanding();
+    openPasswordUpdateModal();
+    return true;
+}
+
 function openPasswordResetModal(prefillEmail = '') {
     const existingModal = document.querySelector('.quick-modal');
     if (existingModal) existingModal.remove();
@@ -8015,6 +8105,8 @@ function openPasswordResetModal(prefillEmail = '') {
 }
 
 function openPasswordUpdateModal() {
+    if (document.getElementById('password-update-modal')) return;
+
     const existingModal = document.querySelector('.quick-modal');
     if (existingModal) existingModal.remove();
 
@@ -8104,22 +8196,35 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
 
     try {
         const sb = getSupabaseClient();
-        console.log("[PASSWORD UPDATE] Actualizando contraseña");
+        const { session, error: sessionError } = await ensurePasswordRecoverySession(sb);
+        console.log('[PASSWORD UPDATE] Sesión válida antes de updateUser:', Boolean(session));
+
+        if (!session) {
+            showToast('La sesión de recuperación expiró. Solicita un enlace nuevo.', 'error');
+            if (sessionError) {
+                console.error('[PASSWORD UPDATE] Sesión ausente:', sessionError.message);
+            }
+            return;
+        }
 
         const { error } = await sb.auth.updateUser({
             password: cleanPassword
         });
 
         if (error) {
-            console.error("[PASSWORD UPDATE ERROR]", error);
+            console.error('[PASSWORD UPDATE] updateUser falló:', {
+                message: error.message,
+                code: error.code,
+                status: error.status
+            });
             logSupabaseError('auth updateUser password', error);
-            showToast("No se pudo actualizar la contraseña.", "error");
+            showToast(getPasswordRecoveryErrorMessage(error), 'error');
             return;
         }
 
         const updateForm = document.querySelector('#password-update-modal form');
         updateForm?.reset();
-        showToast("Contraseña actualizada correctamente. Ya puedes iniciar sesión.", "success");
+        showToast('Contraseña actualizada correctamente. Ya puedes iniciar sesión.', 'success');
         closePasswordUpdateModal();
         window.history.replaceState({}, document.title, window.location.pathname);
         await sb.auth.signOut();
@@ -8129,8 +8234,8 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
         clearAppViewSession();
         showLogin();
     } catch (error) {
-        console.error("[PASSWORD UPDATE ERROR]", error);
-        showToast("No se pudo actualizar la contraseña.", "error");
+        console.error('[PASSWORD UPDATE] Error inesperado:', error?.message || error);
+        showToast(getPasswordRecoveryErrorMessage(error), 'error');
     }
 }
 
@@ -9726,17 +9831,24 @@ async function initializeApp() {
 
         if (!authListenerReady) {
             sb.auth.onAuthStateChange(async (authEvent, session) => {
+                console.log('[Supabase Auth] Evento recibido:', {
+                    event: authEvent,
+                    hasSession: Boolean(session)
+                });
+
                 if (['SIGNED_IN', 'USER_UPDATED', 'TOKEN_REFRESHED'].includes(authEvent)) {
                     setTutorAuthenticatedUser(session?.user || null);
                 }
 
                 if (authEvent === 'PASSWORD_RECOVERY') {
-                    console.log('[PASSWORD UPDATE] Modo recuperación detectado');
+                    console.log('[PASSWORD UPDATE] Modo recuperación detectado; preparando sesión');
                     currentUser = null;
                     profileState = null;
                     workspaceState = mergeWorkspaceState();
                     showLanding();
-                    window.setTimeout(openPasswordUpdateModal, 100);
+                    window.setTimeout(() => {
+                        openPasswordRecoveryFlow(sb);
+                    }, 0);
                     return;
                 }
 
@@ -9757,12 +9869,11 @@ async function initializeApp() {
 
         const { data: sessionData, error } = await sb.auth.getSession();
         if (error) throw error;
+        console.log('[PASSWORD RECOVERY] Sesión al iniciar:', Boolean(sessionData?.session));
         setTutorAuthenticatedUser(sessionData?.session?.user || null);
         if (isPasswordRecoveryUrl()) {
-            console.log('[PASSWORD UPDATE] Link de recuperación detectado en URL');
-            window.setTimeout(openPasswordUpdateModal, 250);
-            clearAppViewSession();
-            showLanding();
+            console.log('[PASSWORD UPDATE] Link de recuperación detectado en URL; validando sesión');
+            await openPasswordRecoveryFlow(sb);
             return;
         }
 
