@@ -8634,6 +8634,37 @@ async function syncWorkspaceFromSupabase() {
     });
 }
 
+const welcomeEmailRequests = new Set();
+
+function requestWelcomeEmailForConfirmedUser(user) {
+    const confirmedAt = user?.email_confirmed_at || user?.confirmed_at;
+    if (!user?.id || !user?.email || !confirmedAt || welcomeEmailRequests.has(user.id)) return;
+
+    welcomeEmailRequests.add(user.id);
+    Promise.resolve()
+        .then(async () => {
+            const { data, error } = await getSupabaseClient().functions.invoke('welcome-email', {
+                body: {}
+            });
+
+            if (error || !data?.ok) {
+                welcomeEmailRequests.delete(user.id);
+                console.warn('[WELCOME EMAIL] Envío aplazado:', {
+                    message: error?.message || data?.error || 'Respuesta no válida'
+                });
+                return;
+            }
+
+            console.info('[WELCOME EMAIL] Estado:', data.status || 'processed');
+        })
+        .catch(error => {
+            welcomeEmailRequests.delete(user.id);
+            console.warn('[WELCOME EMAIL] Envío aplazado:', {
+                message: error instanceof Error ? error.message : 'Error desconocido'
+            });
+        });
+}
+
 async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     setTutorAuthenticatedUser(user);
     loadInterfaceSoundPreferenceFromUser(user);
@@ -8641,6 +8672,7 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     currentUser = getPublicUserFromAuth(user, profile);
     console.log('[Supabase] Usuario actual autenticado', currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    requestWelcomeEmailForConfirmedUser(user);
     await syncWorkspaceFromSupabase();
     updateDashboardGreeting();
 }
