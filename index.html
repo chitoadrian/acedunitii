@@ -43,7 +43,7 @@
     </style>
 
     <link rel="stylesheet" href="style.css?v=20260729-auth-ui-final-v1">
-    <link rel="stylesheet" href="auth-ui.css?v=20260729-auth-layout-premium-v1">
+    <link rel="stylesheet" href="settings.css?v=20260729-settings-premium-v1">\n    <link rel="stylesheet" href="auth-ui.css?v=20260729-auth-layout-premium-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <svg class="app-svg-definitions" aria-hidden="true" focusable="false">
@@ -1454,25 +1454,137 @@
 
             <!-- SETTINGS SECTION -->
             <section id="settings" class="section">
-                <div class="section-header">
+                <div class="section-header settings-page-header">
+                    <span class="settings-page-eyebrow">Preferencias</span>
                     <h1>Configuración</h1>
-                    <p class="subtitle">Ajusta la experiencia de uso de AC Edunity</p>
+                    <p class="subtitle">Personaliza tu experiencia en AC Edunity</p>
                 </div>
 
                 <div class="settings-layout">
-                    <article class="settings-card">
+                    <article class="settings-card settings-card--sound">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="16" cy="16" r="3"></circle></svg></div>
                         <div class="settings-card-copy">
                             <span class="settings-kicker">Experiencia</span>
                             <h2>Sonidos de interfaz</h2>
-                            <p>Reproduce un sonido breve y suave al confirmar acciones importantes, navegar por el menú o abrir herramientas principales.</p>
+                            <p>Reproduce un sonido breve y suave al confirmar acciones importantes, navegar por el menú o abrir herramientas.</p>
                         </div>
                         <label class="settings-switch" for="interface-sounds-toggle">
                             <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle onchange="toggleInterfaceSounds(this.checked)">
-                            <span class="settings-switch-track" aria-hidden="true">
-                                <span class="settings-switch-thumb"></span>
-                            </span>
+                            <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
                             <strong class="settings-switch-label">ON / OFF</strong>
                         </label>
+                    </article>
+
+                    <article class="settings-card settings-card--animation">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 16c2-7 6-11 16-12-1 10-5 14-12 16"></path><path d="M5 21c3-5 7-8 13-11"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Apariencia</span>
+                            <h2>Animaciones de interfaz</h2>
+                            <p>Activa transiciones suaves, efectos visuales y pequeñas animaciones en toda la plataforma.</p>
+                        </div>
+                        <label class="settings-switch" for="interface-animations-toggle">
+                            <input id="interface-animations-toggle" type="checkbox" data-setting-toggle="animations">
+                            <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
+                            <strong class="settings-switch-label">ON / OFF</strong>
+                        </label>
+                    </article>
+
+                    <article class="settings-card settings-card--tutor">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="13" rx="4"></rect><path d="M12 6V3M8 12h.01M16 12h.01M9 16h6"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Tutor IA</span>
+                            <h2>Sugerencias automáticas</h2>
+                            <p>Permite que el Tutor IA muestre recomendaciones inteligentes mientras estudias.</p>
+                        </div>
+                        <label class="settings-switch" for="tutor-suggestions-toggle">
+                            <input id="tutor-suggestions-toggle" type="checkbox" data-setting-toggle="tutorSuggestions">
+                            <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
+                            <strong class="settings-switch-label">ON / OFF</strong>
+                        </label>
+                    </article>
+
+                    <article class="settings-card settings-card--dashboard settings-card--wide">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Dashboard</span>
+                            <h2>Personalizar panel principal</h2>
+                            <p>Elige qué módulos deseas ver al iniciar sesión.</p>
+                        </div>
+                        <button class="settings-panel-button" type="button" data-settings-panel-button="dashboard" aria-expanded="false">Personalizar</button>
+                        <div class="settings-options-panel" data-settings-panel="dashboard" hidden>
+                            <label><input type="checkbox" data-dashboard-module="calendar"> <span>Calendario</span></label>
+                            <label><input type="checkbox" data-dashboard-module="subjects"> <span>Materias</span></label>
+                            <label><input type="checkbox" data-dashboard-module="tasks"> <span>Tareas</span></label>
+                            <label><input type="checkbox" data-dashboard-module="tutor"> <span>Tutor IA</span></label>
+                            <label><input type="checkbox" data-dashboard-module="exams"> <span>Próximos exámenes</span></label>
+                            <label><input type="checkbox" data-dashboard-module="notifications"> <span>Notificaciones</span></label>
+                        </div>
+                    </article>
+
+                    <article class="settings-card settings-card--notifications">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Notificaciones</span>
+                            <h2>Recordatorios inteligentes</h2>
+                            <p>Recibe avisos sobre tareas pendientes, sesiones de estudio y próximos exámenes.</p>
+                        </div>
+                        <label class="settings-switch" for="smart-notifications-toggle">
+                            <input id="smart-notifications-toggle" type="checkbox" data-setting-toggle="notifications">
+                            <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
+                            <strong class="settings-switch-label">ON / OFF</strong>
+                        </label>
+                    </article>
+
+                    <article class="settings-card settings-card--language">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Idioma</span>
+                            <h2>Idioma de la plataforma</h2>
+                            <p>Selecciona el idioma de la interfaz. La traducción completa estará disponible próximamente.</p>
+                        </div>
+                        <label class="settings-select-label" for="platform-language-select">
+                            <span>Idioma</span>
+                            <select id="platform-language-select" data-setting-select="language">
+                                <option value="es">Español</option>
+                                <option value="en">English</option>
+                            </select>
+                        </label>
+                    </article>
+
+                    <article class="settings-card settings-card--performance">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0"></path><path d="m12 14 5-5"></path><path d="M4 18h16"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Rendimiento</span>
+                            <h2>Modo rendimiento</h2>
+                            <p>Reduce efectos visuales no esenciales para mejorar el rendimiento en equipos de bajos recursos.</p>
+                        </div>
+                        <label class="settings-switch" for="performance-mode-toggle">
+                            <input id="performance-mode-toggle" type="checkbox" data-setting-toggle="performanceMode">
+                            <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
+                            <strong class="settings-switch-label">ON / OFF</strong>
+                        </label>
+                    </article>
+
+                    <article class="settings-card settings-card--about settings-card--wide">
+                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></svg></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Acerca de</span>
+                            <h2>Acerca de AC Edunity</h2>
+                            <p>Consulta la información técnica y la versión actual de la plataforma.</p>
+                        </div>
+                        <button class="settings-panel-button" type="button" data-settings-panel-button="about" aria-expanded="false">Ver información</button>
+                        <div class="settings-about-panel" data-settings-panel="about" hidden>
+                            <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity">
+                            <div>
+                                <strong>AC Edunity</strong>
+                                <span>Versión 1.0.0</span>
+                                <a href="https://edunity.me" target="_blank" rel="noopener noreferrer">edunity.me</a>
+                            </div>
+                            <p>Plataforma educativa inteligente para organizar estudios, mejorar el aprendizaje y avanzar con herramientas académicas personalizadas.</p>
+                            <ul aria-label="Tecnologías">
+                                <li>JavaScript</li><li>Supabase</li><li>CSS moderno</li><li>HTML5</li>
+                            </ul>
+                        </div>
                     </article>
                 </div>
             </section>
@@ -1480,6 +1592,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260727-password-recovery-session-v2"></script>
+    <script src="app.js?v=20260729-settings-premium-v1"></script>
 </body>
 </html>
