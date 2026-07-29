@@ -1,0 +1,437 @@
+/* AC Edunity — Configuración premium */
+#settings {
+    --settings-accent: #7c68ee;
+    --settings-accent-2: #49ccf9;
+    --settings-surface: rgba(20, 27, 54, .78);
+    --settings-surface-soft: rgba(30, 39, 73, .58);
+    --settings-border: rgba(139, 151, 206, .24);
+    --settings-text: #f2f4ff;
+    --settings-muted: #aeb7d2;
+}
+
+#settings .settings-page-header {
+    margin-bottom: 30px;
+}
+
+#settings .settings-page-eyebrow {
+    display: inline-flex;
+    margin-bottom: 8px;
+    color: #8ecbff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+#settings .settings-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    width: 100%;
+    max-width: 1280px;
+}
+
+#settings .settings-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid var(--settings-border);
+    border-radius: 22px;
+    color: var(--settings-text);
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.035), transparent 44%),
+        var(--settings-surface);
+    box-shadow: 0 18px 42px rgba(3, 7, 24, .22), inset 0 1px 0 rgba(255,255,255,.035);
+    backdrop-filter: blur(18px) saturate(118%);
+    -webkit-backdrop-filter: blur(18px) saturate(118%);
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+#settings .settings-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(114, 137, 239, .45);
+    box-shadow: 0 24px 52px rgba(3, 7, 24, .3), 0 0 30px rgba(91, 80, 212, .08);
+}
+
+#settings .settings-card--wide {
+    grid-column: 1 / -1;
+}
+
+#settings .settings-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border: 1px solid rgba(125, 113, 238, .34);
+    border-radius: 16px;
+    color: #a99aff;
+    background: linear-gradient(145deg, rgba(93, 71, 219, .22), rgba(73, 204, 249, .08));
+    flex-shrink: 0;
+}
+
+#settings .settings-card-icon svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#settings .settings-card-copy {
+    min-width: 0;
+}
+
+#settings .settings-kicker {
+    display: block;
+    margin-bottom: 5px;
+    color: #8f9bbc;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+#settings .settings-card h2 {
+    margin: 0 0 7px;
+    color: var(--settings-text);
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+#settings .settings-card p {
+    margin: 0;
+    color: var(--settings-muted);
+    font-size: 14px;
+    line-height: 1.55;
+}
+
+#settings .settings-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#settings .settings-switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+#settings .settings-switch-track {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    border: 1px solid rgba(137, 149, 190, .4);
+    border-radius: 999px;
+    background: rgba(7, 13, 34, .72);
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+#settings .settings-switch-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #aeb6cd;
+    transition: transform .22s ease, background .22s ease;
+}
+
+#settings .settings-switch input:checked + .settings-switch-track {
+    border-color: rgba(116, 139, 255, .72);
+    background: linear-gradient(110deg, #3a7eff, #7b4ee8);
+    box-shadow: 0 0 18px rgba(83, 91, 231, .22);
+}
+
+#settings .settings-switch input:checked + .settings-switch-track .settings-switch-thumb {
+    transform: translateX(22px);
+    background: #fff;
+}
+
+#settings .settings-switch input:focus-visible + .settings-switch-track,
+#settings button:focus-visible,
+#settings select:focus-visible,
+#settings .settings-options-panel input:focus-visible {
+    outline: 3px solid rgba(73, 204, 249, .45);
+    outline-offset: 3px;
+}
+
+#settings .settings-switch-label {
+    color: #8f99b6;
+    font-size: 10px;
+    letter-spacing: .08em;
+}
+
+#settings .settings-panel-button {
+    min-height: 42px;
+    padding: 0 17px;
+    border: 1px solid rgba(103, 132, 238, .42);
+    border-radius: 12px;
+    color: #e8ebff;
+    background: linear-gradient(120deg, rgba(66, 98, 209, .42), rgba(110, 70, 204, .34));
+    font-weight: 750;
+    cursor: pointer;
+}
+
+#settings .settings-options-panel,
+#settings .settings-about-panel {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    padding: 18px;
+    border: 1px solid rgba(132, 145, 198, .2);
+    border-radius: 16px;
+    background: rgba(7, 13, 32, .42);
+}
+
+#settings .settings-options-panel[hidden],
+#settings .settings-about-panel[hidden] {
+    display: none;
+}
+
+#settings .settings-options-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 11px;
+}
+
+#settings .settings-options-panel label {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 11px 12px;
+    border-radius: 12px;
+    color: #dfe4f5;
+    background: rgba(255,255,255,.035);
+    cursor: pointer;
+}
+
+#settings .settings-options-panel input {
+    width: 17px;
+    height: 17px;
+    accent-color: #7766ef;
+}
+
+#settings .settings-select-label {
+    display: grid;
+    gap: 5px;
+    min-width: 145px;
+    color: #98a3c1;
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+}
+
+#settings .settings-select-label select {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 36px 0 12px;
+    border: 1px solid rgba(132, 146, 194, .38);
+    border-radius: 12px;
+    color: #eef1ff;
+    background: #111831;
+    font: inherit;
+    font-size: 13px;
+    text-transform: none;
+}
+
+#settings .settings-about-panel {
+    display: grid;
+    grid-template-columns: auto minmax(160px, .55fr) minmax(240px, 1.45fr);
+    align-items: center;
+    gap: 18px;
+}
+
+#settings .settings-about-panel img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: contain;
+}
+
+#settings .settings-about-panel > div {
+    display: grid;
+    gap: 3px;
+}
+
+#settings .settings-about-panel strong {
+    font-size: 18px;
+}
+
+#settings .settings-about-panel span,
+#settings .settings-about-panel a {
+    color: #aab4d0;
+    font-size: 13px;
+}
+
+#settings .settings-about-panel a {
+    color: #64b7ff;
+}
+
+#settings .settings-about-panel ul {
+    grid-column: 2 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#settings .settings-about-panel li {
+    padding: 6px 10px;
+    border: 1px solid rgba(124, 104, 238, .25);
+    border-radius: 999px;
+    color: #cbd2e7;
+    background: rgba(124, 104, 238, .09);
+    font-size: 12px;
+}
+
+body.settings-tutor-suggestions-off #dashboard .recommendations,
+body.settings-notifications-off #dashboard [data-notification],
+body.settings-notifications-off .app-toast:not(.error) {
+    display: none !important;
+}
+
+body.settings-reduced-motion *,
+body.settings-reduced-motion *::before,
+body.settings-reduced-motion *::after,
+body.settings-performance-mode *,
+body.settings-performance-mode *::before,
+body.settings-performance-mode *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+}
+
+body.settings-performance-mode #settings .settings-card,
+body.settings-performance-mode .card,
+body.settings-performance-mode .stat-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+
+body.light-theme #settings {
+    --settings-surface: rgba(250, 250, 250, .92);
+    --settings-surface-soft: rgba(247, 248, 250, .94);
+    --settings-border: rgba(154, 164, 184, .38);
+    --settings-text: #1f2937;
+    --settings-muted: #5b6575;
+}
+
+body.light-theme #settings .settings-card {
+    box-shadow: 0 16px 36px rgba(60, 72, 96, .1), inset 0 1px 0 rgba(255,255,255,.7);
+}
+
+body.light-theme #settings .settings-kicker,
+body.light-theme #settings .settings-switch-label,
+body.light-theme #settings .settings-select-label {
+    color: #667085;
+}
+
+body.light-theme #settings .settings-switch-track {
+    background: #dfe4ec;
+}
+
+body.light-theme #settings .settings-panel-button {
+    color: #344054;
+    background: linear-gradient(120deg, rgba(89, 124, 230, .13), rgba(127, 86, 214, .12));
+}
+
+body.light-theme #settings .settings-options-panel,
+body.light-theme #settings .settings-about-panel {
+    background: rgba(238, 241, 245, .86);
+}
+
+body.light-theme #settings .settings-options-panel label {
+    color: #344054;
+    background: rgba(255,255,255,.55);
+}
+
+body.light-theme #settings .settings-select-label select {
+    color: #253047;
+    background: #f1f3f6;
+}
+
+body.light-theme #settings .settings-about-panel span {
+    color: #596579;
+}
+
+@media (max-width: 980px) {
+    #settings .settings-layout {
+        grid-template-columns: 1fr;
+    }
+
+    #settings .settings-card--wide {
+        grid-column: auto;
+    }
+
+    #settings .settings-options-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    #settings .settings-page-header {
+        margin-bottom: 22px;
+    }
+
+    #settings .settings-layout {
+        gap: 16px;
+    }
+
+    #settings .settings-card {
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 14px;
+        padding: 19px;
+        border-radius: 18px;
+    }
+
+    #settings .settings-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+    }
+
+    #settings .settings-switch,
+    #settings .settings-panel-button,
+    #settings .settings-select-label {
+        grid-column: 2;
+        justify-self: start;
+    }
+
+    #settings .settings-options-panel,
+    #settings .settings-about-panel {
+        grid-column: 1 / -1;
+    }
+
+    #settings .settings-options-panel {
+        grid-template-columns: 1fr;
+    }
+
+    #settings .settings-about-panel {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    #settings .settings-about-panel p,
+    #settings .settings-about-panel ul {
+        grid-column: 1 / -1;
+    }
+
+    #settings .settings-about-panel ul {
+        justify-content: flex-start;
+    }
+}
