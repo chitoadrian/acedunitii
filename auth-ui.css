@@ -1147,20 +1147,61 @@
 }
 
 
-/* Register login-access visibility and final content order. */
+/* Register layout without internal scrolling. */
+#register-page .auth-layout {
+    gap: clamp(108px, 8.4vw, 168px) !important;
+}
+
 #register-page .auth-card {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
+    width: min(100%, 600px) !important;
+    max-width: 600px !important;
+    max-height: none !important;
+    padding: 24px 48px 26px !important;
+    overflow: hidden !important;
 }
 
 #register-page .auth-brand { order: 1; }
 #register-page .auth-card > h2 { order: 2; }
 #register-page #register-form { order: 3; }
 
+#register-page .auth-brand {
+    margin-bottom: 5px !important;
+}
+
+#register-page .auth-brand-logo {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+}
+
+#register-page .auth-card h2 {
+    margin-bottom: 10px !important;
+    font-size: 36px !important;
+}
+
+#register-page #register-form {
+    gap: 7px !important;
+}
+
+#register-page .form-group {
+    gap: 4px !important;
+}
+
+#register-page .register-input-shell,
+#register-page .register-input-shell input {
+    min-height: 50px !important;
+}
+
+#register-page #register-form > .btn-primary {
+    min-height: 52px !important;
+    margin-top: 2px !important;
+}
+
 #register-page .auth-link {
     order: 4;
     flex-shrink: 0 !important;
-    margin: 22px 0 0 !important;
+    margin: 20px 0 0 !important;
     color: #b9c1d7 !important;
 }
 
@@ -1181,32 +1222,171 @@
     top: auto !important;
     align-self: center !important;
     flex-shrink: 0 !important;
-    margin: 14px auto 0 !important;
+    margin: 10px auto 0 !important;
 }
 
 @media (max-width: 1180px) and (min-width: 881px) {
+    #register-page .auth-layout {
+        gap: 54px !important;
+    }
+
+    #register-page .auth-card {
+        width: min(100%, 540px) !important;
+        padding: 20px 34px 22px !important;
+    }
+
+    #register-page .auth-brand-logo {
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        min-height: 58px !important;
+    }
+
+    #register-page .auth-card h2 {
+        margin-bottom: 8px !important;
+        font-size: 34px !important;
+    }
+
+    #register-page #register-form {
+        gap: 6px !important;
+    }
+
+    #register-page .register-input-shell,
+    #register-page .register-input-shell input {
+        min-height: 48px !important;
+    }
+
+    #register-page #register-form > .btn-primary {
+        min-height: 50px !important;
+    }
+
+    #register-page .auth-link {
+        margin-top: 16px !important;
+    }
+
+    #register-page .register-back-button {
+        margin-top: 8px !important;
+    }
+}
+
+@media (max-width: 880px) {
+    #register-page .auth-container {
+        display: grid !important;
+        min-height: 100vh !important;
+        padding: 18px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #register-page .auth-layout {
+        width: min(620px, 100%) !important;
+        min-height: 0 !important;
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+    }
+
+    #register-page .auth-study-visual {
+        display: none !important;
+    }
+
+    #register-page .auth-card {
+        width: min(100%, 560px) !important;
+        max-width: 560px !important;
+        padding: 22px 34px 24px !important;
+        overflow: hidden !important;
+    }
+
+    #register-page .auth-brand-logo {
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        min-height: 58px !important;
+    }
+
+    #register-page .auth-card h2 {
+        margin-bottom: 9px !important;
+        font-size: 34px !important;
+    }
+
+    #register-page #register-form {
+        gap: 7px !important;
+    }
+
+    #register-page .register-input-shell,
+    #register-page .register-input-shell input {
+        min-height: 50px !important;
+    }
+
+    #register-page #register-form > .btn-primary {
+        min-height: 52px !important;
+    }
+
     #register-page .auth-link {
         margin-top: 18px !important;
     }
 
     #register-page .register-back-button {
-        margin-top: 10px !important;
-    }
-}
-
-@media (max-width: 880px) {
-    #register-page .auth-card {
-        overflow: hidden !important;
+        margin: 10px auto 0 !important;
     }
 }
 
 @media (max-width: 560px) {
+    #register-page .auth-container {
+        padding: 12px !important;
+    }
+
+    #register-page .auth-card {
+        width: 100% !important;
+        padding: 18px 16px 20px !important;
+        border-radius: 24px !important;
+    }
+
+    #register-page .auth-brand-logo {
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+        min-height: 52px !important;
+    }
+
+    #register-page .auth-card h2 {
+        margin-bottom: 7px !important;
+        font-size: 31px !important;
+    }
+
+    #register-page #register-form {
+        gap: 6px !important;
+    }
+
+    #register-page .form-group {
+        gap: 3px !important;
+    }
+
+    #register-page .form-group label {
+        font-size: 13px !important;
+    }
+
+    #register-page .register-input-shell,
+    #register-page .register-input-shell input {
+        min-height: 46px !important;
+    }
+
+    #register-page .register-input-shell input {
+        font-size: 15px !important;
+    }
+
+    #register-page #register-form > .btn-primary {
+        min-height: 48px !important;
+        font-size: 16px !important;
+    }
+
     #register-page .auth-link {
-        margin-top: 20px !important;
+        margin-top: 16px !important;
+        font-size: 14px !important;
     }
 
     #register-page .register-back-button {
-        align-self: center !important;
-        margin: 12px auto 0 !important;
+        min-height: 32px !important;
+        margin-top: 8px !important;
+        padding: 5px 10px !important;
     }
 }
