@@ -1145,3 +1145,68 @@
         padding-right: 18px !important;
     }
 }
+
+
+/* Register login-access visibility and final content order. */
+#register-page .auth-card {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+#register-page .auth-brand { order: 1; }
+#register-page .auth-card > h2 { order: 2; }
+#register-page #register-form { order: 3; }
+
+#register-page .auth-link {
+    order: 4;
+    flex-shrink: 0 !important;
+    margin: 22px 0 0 !important;
+    color: #b9c1d7 !important;
+}
+
+#register-page .auth-link a {
+    color: #57a8ff !important;
+    transition: color .2s ease, text-shadow .2s ease;
+}
+
+#register-page .auth-link a:hover {
+    color: #86c7ff !important;
+    text-shadow: 0 0 14px rgba(87, 168, 255, .28);
+}
+
+#register-page .register-back-button {
+    order: 5;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    align-self: center !important;
+    flex-shrink: 0 !important;
+    margin: 14px auto 0 !important;
+}
+
+@media (max-width: 1180px) and (min-width: 881px) {
+    #register-page .auth-link {
+        margin-top: 18px !important;
+    }
+
+    #register-page .register-back-button {
+        margin-top: 10px !important;
+    }
+}
+
+@media (max-width: 880px) {
+    #register-page .auth-card {
+        overflow: hidden !important;
+    }
+}
+
+@media (max-width: 560px) {
+    #register-page .auth-link {
+        margin-top: 20px !important;
+    }
+
+    #register-page .register-back-button {
+        align-self: center !important;
+        margin: 12px auto 0 !important;
+    }
+}
