@@ -9148,6 +9148,7 @@ function showDashboard(sectionId = 'dashboard') {
     try {
         updateDashboardGreeting();
         refreshWorkspaceUI();
+        applyDashboardModulePreferences();
         navigateTo(targetSection);
     } catch (error) {
         console.error('[LOGIN] Error renderizando dashboard:', error);
@@ -9800,6 +9801,7 @@ async function initializeApp() {
     initInterfaceSound();
     bindInterfaceSoundEvents();
     updateInterfaceSoundControls();
+    initializeAppSettings();
 
     if (isDarkTheme) {
         document.body.classList.remove('light-theme');
@@ -9902,6 +9904,161 @@ async function initializeApp() {
         showLanding();
         notify(error.message || 'No se pudo iniciar Supabase.', 'error');
     }
+}
+
+
+/* ============================================
+   CONFIGURACIÓN DE EXPERIENCIA
+   Preferencias locales, aisladas de Auth y Supabase
+   ============================================ */
+const APP_SETTINGS_STORAGE_KEY = 'ac_edunity_settings_v1';
+const DEFAULT_APP_SETTINGS = Object.freeze({
+    animations: true,
+    tutorSuggestions: true,
+    notifications: true,
+    language: 'es',
+    performanceMode: false,
+    dashboardModules: {
+        calendar: true,
+        subjects: true,
+        tasks: true,
+        tutor: true,
+        exams: true,
+        notifications: true
+    }
+});
+let appSettings = null;
+
+function readAppSettings() {
+    try {
+        const stored = JSON.parse(localStorage.getItem(APP_SETTINGS_STORAGE_KEY) || '{}');
+        return {
+            ...DEFAULT_APP_SETTINGS,
+            ...stored,
+            dashboardModules: {
+                ...DEFAULT_APP_SETTINGS.dashboardModules,
+                ...(stored.dashboardModules || {})
+            }
+        };
+    } catch (error) {
+        console.warn('[SETTINGS] Preferencias locales inválidas; se usarán valores seguros.');
+        return {
+            ...DEFAULT_APP_SETTINGS,
+            dashboardModules: { ...DEFAULT_APP_SETTINGS.dashboardModules }
+        };
+    }
+}
+
+function saveAppSettings() {
+    try {
+        localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+    } catch (error) {
+        console.warn('[SETTINGS] No se pudieron guardar las preferencias:', error?.message || error);
+    }
+}
+
+function applyAppSettings() {
+    if (!appSettings) appSettings = readAppSettings();
+    document.body.classList.toggle('settings-reduced-motion', !appSettings.animations);
+    document.body.classList.toggle('settings-tutor-suggestions-off', !appSettings.tutorSuggestions);
+    document.body.classList.toggle('settings-notifications-off', !appSettings.notifications);
+    document.body.classList.toggle('settings-performance-mode', appSettings.performanceMode);
+    document.documentElement.lang = appSettings.language === 'en' ? 'en' : 'es';
+    applyDashboardModulePreferences();
+    syncAppSettingsControls();
+}
+
+function syncAppSettingsControls() {
+    if (!appSettings) return;
+    document.querySelectorAll('[data-setting-toggle]').forEach(input => {
+        const key = input.dataset.settingToggle;
+        input.checked = Boolean(appSettings[key]);
+        input.setAttribute('aria-checked', String(input.checked));
+    });
+    const languageSelect = document.querySelector('[data-setting-select="language"]');
+    if (languageSelect) languageSelect.value = appSettings.language;
+    document.querySelectorAll('[data-dashboard-module]').forEach(input => {
+        input.checked = appSettings.dashboardModules[input.dataset.dashboardModule] !== false;
+    });
+}
+
+function updateAppSetting(key, value) {
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key)) return;
+    appSettings[key] = key === 'language' ? (value === 'en' ? 'en' : 'es') : Boolean(value);
+    saveAppSettings();
+    applyAppSettings();
+    notify('Preferencia guardada.', 'success');
+}
+
+function updateDashboardModuleSetting(moduleKey, enabled) {
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS.dashboardModules, moduleKey)) return;
+    appSettings.dashboardModules[moduleKey] = Boolean(enabled);
+    saveAppSettings();
+    applyDashboardModulePreferences();
+}
+
+function applyDashboardModulePreferences() {
+    const dashboard = document.getElementById('dashboard');
+    if (!dashboard || !appSettings) return;
+    const keywords = {
+        calendar: ['calendario', 'agenda'],
+        subjects: ['materias activas', 'materias'],
+        tasks: ['tareas pendientes', 'tareas'],
+        tutor: ['tutor ia', 'recomendaciones'],
+        exams: ['próximo examen', 'próximos exámenes'],
+        notifications: ['notificaciones', 'avisos']
+    };
+    const candidates = dashboard.querySelectorAll('.dashboard-grid > *, .dashboard-row > *, .dashboard-main-grid > *, .dashboard-bottom-section > *');
+    candidates.forEach(card => {
+        const text = (card.textContent || '').toLocaleLowerCase('es');
+        let matched = null;
+        Object.entries(keywords).some(([key, words]) => {
+            if (words.some(word => text.includes(word))) {
+                matched = key;
+                return true;
+            }
+            return false;
+        });
+        if (matched) card.hidden = appSettings.dashboardModules[matched] === false;
+    });
+}
+
+function toggleSettingsPanel(panelName, button) {
+    const panel = document.querySelector('[data-settings-panel="' + panelName + '"]');
+    if (!panel) return;
+    const shouldOpen = panel.hidden;
+    panel.hidden = !shouldOpen;
+    if (button) button.setAttribute('aria-expanded', String(shouldOpen));
+}
+
+function bindAppSettingsControls() {
+    document.querySelectorAll('[data-setting-toggle]').forEach(input => {
+        if (input.dataset.settingsBound === 'true') return;
+        input.dataset.settingsBound = 'true';
+        input.addEventListener('change', () => updateAppSetting(input.dataset.settingToggle, input.checked));
+    });
+    const languageSelect = document.querySelector('[data-setting-select="language"]');
+    if (languageSelect && languageSelect.dataset.settingsBound !== 'true') {
+        languageSelect.dataset.settingsBound = 'true';
+        languageSelect.addEventListener('change', () => updateAppSetting('language', languageSelect.value));
+    }
+    document.querySelectorAll('[data-dashboard-module]').forEach(input => {
+        if (input.dataset.settingsBound === 'true') return;
+        input.dataset.settingsBound = 'true';
+        input.addEventListener('change', () => updateDashboardModuleSetting(input.dataset.dashboardModule, input.checked));
+    });
+    document.querySelectorAll('[data-settings-panel-button]').forEach(button => {
+        if (button.dataset.settingsBound === 'true') return;
+        button.dataset.settingsBound = 'true';
+        button.addEventListener('click', () => toggleSettingsPanel(button.dataset.settingsPanelButton, button));
+    });
+    syncAppSettingsControls();
+}
+
+function initializeAppSettings() {
+    appSettings = readAppSettings();
+    bindAppSettingsControls();
+    applyAppSettings();
 }
 
 // Forzamos que los handlers globales apunten a las funciones finales con Supabase.
