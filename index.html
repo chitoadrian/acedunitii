@@ -44,7 +44,7 @@
 
     <link rel="stylesheet" href="style.css?v=20260729-auth-ui-final-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
-    <link rel="stylesheet" href="auth-ui.css?v=20260730-auth-light-theme-v1">
+    <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <script id="theme-preload">
@@ -360,10 +360,11 @@
                                 <span class="auth-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v3"></path></svg>
                                 </span>
-                                <input type="password" id="login-password" placeholder="••••••••" required>
-                                <span class="auth-password-visual" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                                </span>
+                                <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+                                <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
+                                    <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                                    <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+                                </button>
                             </div>
                         </div>
 
@@ -449,10 +450,11 @@
                                 <span class="register-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v3"></path></svg>
                                 </span>
-                                <input type="password" id="register-password" placeholder="••••••••" required>
-                                <span class="register-password-visual" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                                </span>
+                                <input type="password" id="register-password" placeholder="••••••••" autocomplete="new-password" required>
+                                <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
+                                    <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                                    <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+                                </button>
                             </div>
                         </div>
 
@@ -463,9 +465,10 @@
                                     <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="m9 15 2 2 4-4"></path></svg>
                                 </span>
                                 <input type="password" class="register-password-confirmation" placeholder="••••••••" aria-label="Confirmar contraseña" autocomplete="new-password">
-                                <span class="register-password-visual" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
-                                </span>
+                                <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
+                                    <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                                    <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+                                </button>
                             </div>
                         </div>
 
@@ -1599,6 +1602,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260729-task-reminders-v1"></script>
+    <script src="app.js?v=20260730-password-toggle-v1"></script>
 </body>
 </html>
