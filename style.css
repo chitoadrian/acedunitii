@@ -36270,7 +36270,13 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
 }
 
 
-/* Progreso semanal real: datos por usuario servidos por Supabase */
+/* Progreso semanal real: ventana móvil de cinco días por usuario */
+.weekly-progress-card {
+    --weekly-orange: #C58A45;
+    --weekly-orange-light: #D29A59;
+    --weekly-track: rgba(132, 144, 168, 0.18);
+}
+
 .weekly-activity-content {
     width: 100%;
     min-width: 0;
@@ -36278,18 +36284,20 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
 
 .weekly-activity-grid {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     align-items: end;
-    gap: clamp(8px, 1.4vw, 18px);
+    gap: clamp(14px, 2.4vw, 34px);
+    width: 100%;
+    min-width: 0;
     min-height: 220px;
-    margin-top: 20px;
+    margin-top: 18px;
 }
 
 .weekly-activity-day {
     position: relative;
     display: grid;
-    grid-template-rows: 24px 164px 24px;
-    gap: 8px;
+    grid-template-rows: 174px 24px;
+    gap: 9px;
     min-width: 0;
     align-items: end;
     justify-items: center;
@@ -36298,41 +36306,39 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     outline: none;
 }
 
-.weekly-activity-value {
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
-}
-
 .weekly-activity-track {
     display: flex;
-    width: min(34px, 72%);
-    height: 164px;
+    width: min(44px, 68%);
+    height: 174px;
     align-items: flex-end;
     overflow: hidden;
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--bg-tertiary) 72%, transparent);
-    border: 1px solid color-mix(in srgb, var(--border-color) 76%, transparent);
+    border-radius: 13px 13px 7px 7px;
+    background: var(--weekly-track);
+    border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
 .weekly-activity-bar {
     display: block;
     width: 100%;
-    height: var(--weekly-bar-height, 4%);
-    min-height: 4px;
-    border-radius: 11px;
-    background: linear-gradient(180deg, var(--color-cyan), var(--color-purple));
-    transition: height 320ms ease, filter 180ms ease;
+    height: var(--weekly-bar-height, 0%);
+    min-height: 0;
+    border-radius: 12px 12px 6px 6px;
+    background: linear-gradient(180deg, var(--weekly-orange-light), var(--weekly-orange));
+    box-shadow: 0 5px 14px rgba(197, 138, 69, 0.18);
+    transition: height 300ms ease, filter 160ms ease;
 }
 
 .weekly-activity-bar.is-empty {
-    background: color-mix(in srgb, var(--text-tertiary) 36%, transparent);
+    height: 0;
+    min-height: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .weekly-activity-label {
-    font-size: 0.78rem;
-    font-weight: 650;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
     white-space: nowrap;
 }
 
@@ -36343,7 +36349,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     left: 50%;
     bottom: calc(100% + 8px);
     width: max-content;
-    max-width: 220px;
+    max-width: min(220px, 70vw);
     padding: 8px 10px;
     border-radius: 9px;
     color: var(--text-primary);
@@ -36359,24 +36365,49 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     transition: opacity 150ms ease, transform 150ms ease;
 }
 
+.weekly-activity-day:first-child::after {
+    left: 0;
+    transform: translate(0, 5px);
+}
+
+.weekly-activity-day:last-child::after {
+    right: 0;
+    left: auto;
+    transform: translate(0, 5px);
+}
+
 .weekly-activity-day:hover::after,
 .weekly-activity-day:focus-visible::after {
     opacity: 1;
+}
+
+.weekly-activity-day:hover::after,
+.weekly-activity-day:focus-visible::after,
+.weekly-activity-day:first-child:hover::after,
+.weekly-activity-day:first-child:focus-visible::after,
+.weekly-activity-day:last-child:hover::after,
+.weekly-activity-day:last-child:focus-visible::after {
+    transform: translate(0, 0);
+}
+
+.weekly-activity-day:not(:first-child):not(:last-child):hover::after,
+.weekly-activity-day:not(:first-child):not(:last-child):focus-visible::after {
     transform: translate(-50%, 0);
 }
 
 .weekly-activity-day:focus-visible {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-blue) 34%, transparent);
+    box-shadow: 0 0 0 3px rgba(197, 138, 69, 0.28);
 }
 
 .weekly-activity-grid.is-loading .weekly-activity-bar {
     height: 18%;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--color-cyan) 45%, transparent), color-mix(in srgb, var(--color-purple) 45%, transparent));
+    background: rgba(148, 163, 184, 0.3);
+    box-shadow: none;
     animation: weekly-activity-pulse 1.15s ease-in-out infinite alternate;
 }
 
 .weekly-activity-message {
-    margin: 18px 0 0;
+    margin: 16px 0 0;
     color: var(--text-secondary);
     text-align: center;
     line-height: 1.5;
@@ -36397,9 +36428,9 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
 .weekly-activity-retry {
     appearance: none;
     padding: 7px 12px;
-    border: 1px solid color-mix(in srgb, var(--color-blue) 48%, var(--border-color));
+    border: 1px solid var(--weekly-orange);
     border-radius: 9px;
-    color: var(--color-blue);
+    color: var(--weekly-orange-light);
     background: transparent;
     font: inherit;
     font-size: 0.82rem;
@@ -36409,40 +36440,57 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
 
 .weekly-activity-retry:hover,
 .weekly-activity-retry:focus-visible {
-    background: color-mix(in srgb, var(--color-blue) 12%, transparent);
+    background: rgba(197, 138, 69, 0.12);
     outline: none;
 }
 
 @keyframes weekly-activity-pulse {
     from { opacity: 0.42; }
-    to { opacity: 0.9; }
+    to { opacity: 0.85; }
 }
 
-body.light-theme .weekly-activity-track,
-body.light-mode .weekly-activity-track,
-[data-theme="light"] .weekly-activity-track {
-    background: color-mix(in srgb, var(--input-bg, #F1F3F6) 82%, transparent);
+body.light-theme .weekly-progress-card,
+body.light-mode .weekly-progress-card,
+[data-theme="light"] .weekly-progress-card {
+    --weekly-orange: #A96F2F;
+    --weekly-orange-light: #C58A45;
+    --weekly-track: rgba(71, 85, 105, 0.12);
+}
+
+body.light-theme .weekly-activity-label,
+body.light-mode .weekly-activity-label,
+[data-theme="light"] .weekly-activity-label {
+    color: #475569;
 }
 
 @media (max-width: 700px) {
     .weekly-activity-grid {
-        gap: 5px;
-        min-height: 178px;
+        gap: 7px;
+        min-height: 174px;
     }
 
     .weekly-activity-day {
-        grid-template-rows: 22px 126px 22px;
-        gap: 6px;
+        grid-template-rows: 132px 22px;
+        gap: 7px;
     }
 
     .weekly-activity-track {
-        width: min(25px, 78%);
-        height: 126px;
+        width: min(30px, 72%);
+        height: 132px;
     }
 
-    .weekly-activity-label,
-    .weekly-activity-value {
-        font-size: 0.7rem;
+    .weekly-activity-label {
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 390px) {
+    .weekly-activity-grid {
+        gap: 4px;
+    }
+
+    .weekly-activity-track {
+        width: min(24px, 70%);
     }
 }
 

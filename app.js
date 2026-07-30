@@ -1910,24 +1910,60 @@ function legacyHandleLoginWithLocalWorkspace(event) {
 }
 
 
-const WEEKLY_ACTIVITY_DAYS = Object.freeze([
-    { short: 'Lun', full: 'Lunes' },
-    { short: 'Mar', full: 'Martes' },
-    { short: 'Mié', full: 'Miércoles' },
-    { short: 'Jue', full: 'Jueves' },
-    { short: 'Vie', full: 'Viernes' },
-    { short: 'Sáb', full: 'Sábado' },
-    { short: 'Dom', full: 'Domingo' }
+const FIVE_DAY_LABELS = Object.freeze([
+    { key: 'sun', short: 'Dom', full: 'Domingo' },
+    { key: 'mon', short: 'Lun', full: 'Lunes' },
+    { key: 'tue', short: 'Mar', full: 'Martes' },
+    { key: 'wed', short: 'Mié', full: 'Miércoles' },
+    { key: 'thu', short: 'Jue', full: 'Jueves' },
+    { key: 'fri', short: 'Vie', full: 'Viernes' },
+    { key: 'sat', short: 'Sáb', full: 'Sábado' }
 ]);
 let weeklyActivityRequestId = 0;
 
-function normalizeWeeklyActivityRows(rows) {
-    const source = Array.isArray(rows) ? rows : [];
-    return WEEKLY_ACTIVITY_DAYS.map((day, index) => {
-        const row = source.find(item => Number(item?.day_index) === index + 1) || {};
+function getGuayaquilDateParts() {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Guayaquil',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(new Date());
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return {
+        year: Number(values.year),
+        month: Number(values.month),
+        day: Number(values.day)
+    };
+}
+
+function getFiveDayPlaceholders() {
+    const today = getGuayaquilDateParts();
+    return Array.from({ length: 5 }, (_, offset) => {
+        const date = new Date(Date.UTC(today.year, today.month - 1, today.day + offset));
+        const label = FIVE_DAY_LABELS[date.getUTCDay()];
         return {
-            day: day.short,
-            fullDay: day.full,
+            activityDate: date.toISOString().slice(0, 10),
+            dayKey: label.key,
+            day: label.short,
+            fullDay: label.full,
+            points: 0,
+            activityCount: 0
+        };
+    });
+}
+
+function normalizeFiveDayActivityRows(rows) {
+    const source = Array.isArray(rows) ? rows.slice(0, 5) : [];
+    const placeholders = getFiveDayPlaceholders();
+
+    return placeholders.map((fallback, index) => {
+        const row = source[index] || {};
+        const knownLabel = FIVE_DAY_LABELS.find(label => label.key === row.day_key);
+        return {
+            activityDate: String(row.activity_date || fallback.activityDate),
+            dayKey: knownLabel?.key || fallback.dayKey,
+            day: String(row.day_label || knownLabel?.short || fallback.day),
+            fullDay: String(row.full_day || knownLabel?.full || fallback.fullDay),
             points: Math.max(0, Number(row.points) || 0),
             activityCount: Math.max(0, Number(row.activity_count) || 0)
         };
@@ -1935,24 +1971,32 @@ function normalizeWeeklyActivityRows(rows) {
 }
 
 function weeklyActivityGridHTML(rows, { loading = false } = {}) {
-    const safeRows = normalizeWeeklyActivityRows(rows);
+    const safeRows = normalizeFiveDayActivityRows(rows);
     const maxPoints = Math.max(1, ...safeRows.map(item => item.points));
 
     return `
-        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}" aria-label="Actividad académica semanal de lunes a domingo">
+        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}" aria-label="Actividad académica en un periodo móvil de cinco días">
             ${safeRows.map(item => {
-                const height = item.points > 0 ? Math.max(12, Math.round((item.points / maxPoints) * 100)) : 4;
+                const height = item.points > 0 ? Math.max(22, Math.round((item.points / maxPoints) * 100)) : 0;
+                const pointLabel = item.points === 1 ? 'punto' : 'puntos';
                 const activityLabel = item.activityCount === 1 ? 'actividad' : 'actividades';
                 const description = loading
                     ? `Cargando actividad del ${item.fullDay}`
-                    : `Actividad del ${item.fullDay}: ${item.points} puntos en ${item.activityCount} ${activityLabel}`;
+                    : item.points > 0
+                        ? `Actividad del ${item.fullDay.toLowerCase()}: ${item.points} ${pointLabel} en ${item.activityCount} ${activityLabel}`
+                        : `Actividad del ${item.fullDay.toLowerCase()}: sin actividad`;
+                const tooltip = loading
+                    ? `Cargando ${item.fullDay}`
+                    : item.points > 0
+                        ? `${item.fullDay}: ${item.points} ${pointLabel} en ${item.activityCount} ${activityLabel}`
+                        : `${item.fullDay}: sin actividad`;
+
                 return `
-                    <div class="weekly-activity-day" tabindex="0" role="img" aria-label="${escapeHTML(description)}" data-tooltip="${escapeHTML(description)}">
-                        <span class="weekly-activity-value" aria-hidden="true">${loading ? '—' : item.points}</span>
+                    <div class="weekly-activity-day" tabindex="0" role="img" aria-label="${escapeHTML(description)}" data-tooltip="${escapeHTML(tooltip)}">
                         <span class="weekly-activity-track" aria-hidden="true">
                             <span class="weekly-activity-bar${item.points === 0 ? ' is-empty' : ''}" style="--weekly-bar-height:${loading ? 18 : height}%"></span>
                         </span>
-                        <span class="weekly-activity-label" aria-hidden="true">${item.day}</span>
+                        <span class="weekly-activity-label" aria-hidden="true">${escapeHTML(item.day)}</span>
                     </div>
                 `;
             }).join('')}
@@ -1967,12 +2011,12 @@ function weeklyActivityInitialHTML() {
                 ${appIconHTML('chart', 'panel-icon panel-icon-chart dashboard-icon')}
                 <div>
                     <h3>Progreso semanal</h3>
-                    <p>Actividad académica registrada durante esta semana.</p>
+                    <p>Consulta tu actividad académica en un periodo móvil de cinco días.</p>
                 </div>
             </div>
             <div class="weekly-activity-content" aria-live="polite" aria-busy="true">
                 ${weeklyActivityGridHTML([], { loading: true })}
-                <p class="chart-caption">Cargando tu actividad semanal…</p>
+                <p class="chart-caption">Cargando tu actividad…</p>
             </div>
         </div>
     `;
@@ -1986,7 +2030,7 @@ function renderWeeklyActivityState(rows, status = 'ready') {
         container.setAttribute('aria-busy', 'true');
         container.innerHTML = `
             ${weeklyActivityGridHTML([], { loading: true })}
-            <p class="chart-caption">Cargando tu actividad semanal…</p>
+            <p class="chart-caption">Cargando tu actividad…</p>
         `;
         return;
     }
@@ -1997,45 +2041,59 @@ function renderWeeklyActivityState(rows, status = 'ready') {
         container.innerHTML = `
             ${weeklyActivityGridHTML([])}
             <div class="weekly-activity-message is-error" role="alert">
-                <p>No se pudo cargar tu actividad semanal.</p>
-                <button type="button" class="weekly-activity-retry" onclick="loadWeeklyActivity(currentUser?.id)">Reintentar</button>
+                <p>No se pudo cargar tu actividad.</p>
+                <button type="button" class="weekly-activity-retry" onclick="refreshActivityChart()">Reintentar</button>
             </div>
         `;
         return;
     }
 
-    const safeRows = normalizeWeeklyActivityRows(rows);
+    const safeRows = normalizeFiveDayActivityRows(rows);
     const hasActivity = safeRows.some(item => item.points > 0);
     container.innerHTML = `
         ${weeklyActivityGridHTML(safeRows)}
         ${hasActivity
-            ? '<p class="chart-caption">Completa tareas y utiliza las herramientas académicas para aumentar tu actividad semanal.</p>'
-            : '<p class="weekly-activity-message">Todavía no tienes actividad registrada esta semana.</p>'}
+            ? '<p class="chart-caption">Tus barras crecen con la actividad académica registrada.</p>'
+            : '<p class="weekly-activity-message">Todavía no tienes actividad registrada.</p>'}
     `;
 }
 
-async function loadWeeklyActivity(userId = currentUser?.id) {
-    const safeUserId = String(userId || '');
+function waitForActivityRefresh(delay) {
+    return new Promise(resolve => window.setTimeout(resolve, delay));
+}
+
+async function refreshActivityChart({ confirmMutation = false } = {}) {
+    const safeUserId = String(currentUser?.id || '');
     const requestId = ++weeklyActivityRequestId;
     renderWeeklyActivityState([], 'loading');
 
     if (!safeUserId) {
         renderWeeklyActivityState([], 'ready');
-        return;
+        return [];
     }
 
+    const attempts = confirmMutation ? 2 : 1;
+    let latestRows = [];
+
     try {
-        const { data, error } = await getSupabaseClient().rpc('get_weekly_activity');
-        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return;
-        if (error) throw error;
-        renderWeeklyActivityState(data, 'ready');
+        for (let attempt = 0; attempt < attempts; attempt += 1) {
+            if (attempt > 0) await waitForActivityRefresh(140);
+            const { data, error } = await getSupabaseClient().rpc('get_five_day_activity');
+            if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
+            if (error) throw error;
+            latestRows = data;
+        }
+
+        renderWeeklyActivityState(latestRows, 'ready');
+        return normalizeFiveDayActivityRows(latestRows);
     } catch (error) {
-        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return;
-        console.error('No se pudo cargar el progreso semanal.', {
+        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
+        console.error('No se pudo cargar el progreso de cinco días.', {
             code: error?.code || null,
             message: error?.message || 'Error desconocido'
         });
         renderWeeklyActivityState([], 'error');
+        return [];
     }
 }
 
@@ -2098,7 +2156,7 @@ function renderDashboard(workspace) {
             ${weeklyActivityInitialHTML()}
         </div>
     `;
-    queueMicrotask(() => loadWeeklyActivity(currentUser?.id));
+    queueMicrotask(() => refreshActivityChart());
 }
 
 function dashboardCard(icon, label, value, subtext, progress) {
@@ -2589,6 +2647,7 @@ function openAttendanceForm(attendanceId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
+                if (!attendanceId) await refreshActivityChart({ confirmMutation: true });
                 notify(attendanceId ? 'Asistencia actualizada.' : 'Asistencia registrada.', 'success');
             } catch (error) {
                 console.error("[ATTENDANCE ERROR]", error);
@@ -3554,6 +3613,7 @@ function openEventForm(eventId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
+                if (!eventId) await refreshActivityChart({ confirmMutation: true });
                 notify(payload.emailReminder ? getReminderMessage(payload) : 'Evento guardado correctamente.', 'success');
                 if (payload.googleCalendar && savedEventId) {
                     openGoogleCalendarEvent(savedEventId);
@@ -3978,6 +4038,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
+            if (!gradeId) await refreshActivityChart({ confirmMutation: true });
             closeModal();
             notify(gradeId ? 'Calificación actualizada.' : 'Calificación registrada.', 'success');
         } catch (error) {
@@ -6867,7 +6928,7 @@ function renderDashboard(workspace) {
             </div>
         </div>
     `;
-    queueMicrotask(() => loadWeeklyActivity(currentUser?.id));
+    queueMicrotask(() => refreshActivityChart());
 }
 
 function dashboardCard(icon, label, value, subtext, progress) {
@@ -7423,6 +7484,7 @@ function openResourceForm(resourceId = null) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
+            if (!resourceId) await refreshActivityChart({ confirmMutation: true });
             notify(resourceId ? 'Recurso actualizado.' : 'PDF guardado correctamente.', 'success');
         }
     });
@@ -9606,6 +9668,7 @@ async function toggleTask(checkbox) {
 
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
+        if (justCompleted) await refreshActivityChart({ confirmMutation: true });
     } catch (error) {
         checkbox.checked = !checkbox.checked;
         notify(error.message || 'No se pudo actualizar la tarea.', 'error');
@@ -9882,6 +9945,7 @@ function openTaskForm(taskId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
+                if (!taskId) await refreshActivityChart({ confirmMutation: true });
                 notify(taskId ? 'Tarea actualizada.' : 'Tarea creada correctamente.', 'success');
             } catch (error) {
                 notify(error.message || 'No se pudo guardar la tarea.', 'error');
@@ -9942,6 +10006,7 @@ async function completeTask(taskId) {
         await updateProfileProgress(25, { bumpStreak: true });
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
+        await refreshActivityChart({ confirmMutation: true });
         notify('Tarea marcada como completada.', 'success');
     } catch (error) {
         notify(error.message || 'No se pudo completar la tarea.', 'error');

@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260730-weekly-activity-v1">
+    <link rel="stylesheet" href="style.css?v=20260730-five-day-activity-v2">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -772,20 +772,18 @@
                         <div class="panel-title">
                             <div>
                                 <h3>Progreso semanal</h3>
-                                <p>Actividad académica registrada durante esta semana.</p>
+                                <p>Consulta tu actividad académica en un periodo móvil de cinco días.</p>
                             </div>
                         </div>
                         <div class="weekly-activity-content" aria-live="polite" aria-busy="true">
-                            <div class="weekly-activity-grid is-loading" aria-label="Cargando actividad académica semanal">
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Lun</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Mar</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Mié</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Jue</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Vie</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Sáb</span></div>
-                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Dom</span></div>
+                            <div class="weekly-activity-grid is-loading" aria-label="Cargando actividad académica de cinco días">
+                                <div class="weekly-activity-day"><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Hoy</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">—</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">—</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">—</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">—</span></div>
                             </div>
-                            <p class="chart-caption">Cargando tu actividad semanal…</p>
+                            <p class="chart-caption">Cargando tu actividad…</p>
                         </div>
                     </div>
                 </div>
@@ -1612,6 +1610,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260730-weekly-activity-v1"></script>
+    <script src="app.js?v=20260730-five-day-activity-v2"></script>
 </body>
 </html>
