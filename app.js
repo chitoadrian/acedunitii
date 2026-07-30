@@ -8779,6 +8779,7 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     loadInterfaceSoundPreferenceFromUser(user);
     const profile = await ensureProfileRow(user, fallbackName);
     currentUser = getPublicUserFromAuth(user, profile);
+    switchAppSettingsUser(currentUser?.id || user?.id || null);
     console.log('[Supabase] Usuario actual autenticado', currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
@@ -9377,6 +9378,7 @@ async function handleLogout(event) {
         }
 
         setTutorAuthenticatedUser(null);
+        switchAppSettingsUser(null);
         currentUser = null;
         profileState = null;
         workspaceState = mergeWorkspaceState();
@@ -9856,6 +9858,7 @@ async function initializeApp() {
 
                 if (authEvent === 'SIGNED_OUT') {
                     setTutorAuthenticatedUser(null);
+                    switchAppSettingsUser(null);
                     currentUser = null;
                     profileState = null;
                     workspaceState = mergeWorkspaceState();
