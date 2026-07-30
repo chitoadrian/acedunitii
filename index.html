@@ -43,7 +43,7 @@
     </style>
 
     <link rel="stylesheet" href="style.css?v=20260729-auth-ui-final-v1">
-    <link rel="stylesheet" href="settings.css?v=20260729-settings-status-v3">
+    <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260729-auth-layout-premium-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
@@ -1478,7 +1478,7 @@
                             <p id="sounds-disabled-note" class="settings-disabled-note" aria-hidden="true">Los botones y acciones funcionarán normalmente, pero no se reproducirá ningún sonido de interfaz.</p>
                         </div>
                         <label class="settings-switch" for="interface-sounds-toggle">
-                            <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle onchange="toggleInterfaceSounds(this.checked)" role="switch" aria-label="Activar o desactivar sonidos de interfaz" aria-describedby="sounds-description sounds-disabled-note sounds-state">
+                            <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle data-setting-toggle="sounds" role="switch" aria-label="Activar o desactivar sonidos de interfaz" aria-describedby="sounds-description sounds-disabled-note sounds-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
                             <strong class="settings-switch-label" id="sounds-state" aria-live="polite">Activado</strong>
                         </label>
@@ -1592,6 +1592,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260729-settings-status-v3"></script>
+    <script src="app.js?v=20260729-user-preferences-v4"></script>
 </body>
 </html>
