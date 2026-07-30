@@ -43,7 +43,7 @@
     </style>
 
     <link rel="stylesheet" href="style.css?v=20260729-auth-ui-final-v1">
-    <link rel="stylesheet" href="settings.css?v=20260729-settings-functional-v2">
+    <link rel="stylesheet" href="settings.css?v=20260729-settings-status-v3">
     <link rel="stylesheet" href="auth-ui.css?v=20260729-auth-layout-premium-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
@@ -1471,31 +1471,46 @@
                 <div class="settings-layout">
                     <article class="settings-card settings-card--sound">
                         <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="16" cy="16" r="3"></circle></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Experiencia</span><h2>Sonidos de interfaz</h2><p>Controla los sonidos actuales de botones y acciones sin afectar las notificaciones.</p></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Experiencia</span>
+                            <h2>Sonidos de interfaz</h2>
+                            <p id="sounds-description">Reproduce sonidos breves al confirmar acciones importantes, navegar por el menú o abrir herramientas.</p>
+                            <p id="sounds-disabled-note" class="settings-disabled-note" aria-hidden="true">Los botones y acciones funcionarán normalmente, pero no se reproducirá ningún sonido de interfaz.</p>
+                        </div>
                         <label class="settings-switch" for="interface-sounds-toggle">
-                            <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle onchange="toggleInterfaceSounds(this.checked)" role="switch">
+                            <input id="interface-sounds-toggle" type="checkbox" data-interface-sound-toggle onchange="toggleInterfaceSounds(this.checked)" role="switch" aria-label="Activar o desactivar sonidos de interfaz" aria-describedby="sounds-description sounds-disabled-note sounds-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
-                            <strong class="settings-switch-label">Activado</strong>
+                            <strong class="settings-switch-label" id="sounds-state" aria-live="polite">Activado</strong>
                         </label>
                     </article>
 
                     <article class="settings-card settings-card--animation">
                         <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 16c2-7 6-11 16-12-1 10-5 14-12 16"></path><path d="M5 21c3-5 7-8 13-11"></path></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Apariencia</span><h2>Animaciones de interfaz</h2><p>Activa las transiciones y movimientos decorativos. Los indicadores de carga permanecen disponibles.</p></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Apariencia</span>
+                            <h2>Animaciones de interfaz</h2>
+                            <p id="animations-description">Activa transiciones suaves, efectos visuales y pequeñas animaciones en toda la plataforma.</p>
+                            <p id="animations-disabled-note" class="settings-disabled-note" aria-hidden="true">La navegación será más directa y los elementos aparecerán sin transiciones ni animaciones decorativas.</p>
+                        </div>
                         <label class="settings-switch" for="interface-animations-toggle">
-                            <input id="interface-animations-toggle" type="checkbox" data-setting-toggle="animations" role="switch">
+                            <input id="interface-animations-toggle" type="checkbox" data-setting-toggle="animations" role="switch" aria-label="Activar o desactivar animaciones de interfaz" aria-describedby="animations-description animations-disabled-note animations-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
-                            <strong class="settings-switch-label">Activado</strong>
+                            <strong class="settings-switch-label" id="animations-state" aria-live="polite">Activado</strong>
                         </label>
                     </article>
 
                     <article class="settings-card settings-card--tutor">
                         <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="13" rx="4"></rect><path d="M12 6V3M8 12h.01M16 12h.01M9 16h6"></path></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Tutor IA</span><h2>Sugerencias automáticas</h2><p>Muestra u oculta los accesos sugeridos del Tutor. El chat manual continúa funcionando siempre.</p></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Tutor IA</span>
+                            <h2>Sugerencias automáticas</h2>
+                            <p id="tutor-suggestions-description">Permite que el Tutor IA muestre recomendaciones inteligentes mientras estudias.</p>
+                            <p id="tutor-suggestions-disabled-note" class="settings-disabled-note" aria-hidden="true">El Tutor IA seguirá funcionando normalmente, pero no mostrará sugerencias automáticas.</p>
+                        </div>
                         <label class="settings-switch" for="tutor-suggestions-toggle">
-                            <input id="tutor-suggestions-toggle" type="checkbox" data-setting-toggle="tutorSuggestions" role="switch">
+                            <input id="tutor-suggestions-toggle" type="checkbox" data-setting-toggle="tutorSuggestions" role="switch" aria-label="Activar o desactivar sugerencias automáticas del Tutor IA" aria-describedby="tutor-suggestions-description tutor-suggestions-disabled-note tutor-suggestions-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
-                            <strong class="settings-switch-label">Activado</strong>
+                            <strong class="settings-switch-label" id="tutor-suggestions-state" aria-live="polite">Activado</strong>
                         </label>
                     </article>
 
@@ -1507,33 +1522,31 @@
 
                     <article class="settings-card settings-card--notifications">
                         <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Notificaciones</span><h2>Recordatorios inteligentes</h2><p>Avisa dentro de la aplicación sobre tareas reales vencidas o con vencimiento próximo.</p></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Notificaciones</span>
+                            <h2>Recordatorios inteligentes</h2>
+                            <p id="notifications-description">Recibe avisos sobre tareas pendientes, sesiones de estudio y próximos exámenes.</p>
+                            <p id="notifications-disabled-note" class="settings-disabled-note" aria-hidden="true">Tus tareas y exámenes seguirán guardados, pero no recibirás recordatorios automáticos.</p>
+                        </div>
                         <label class="settings-switch" for="smart-notifications-toggle">
-                            <input id="smart-notifications-toggle" type="checkbox" data-setting-toggle="notifications" role="switch">
+                            <input id="smart-notifications-toggle" type="checkbox" data-setting-toggle="notifications" role="switch" aria-label="Activar o desactivar recordatorios inteligentes" aria-describedby="notifications-description notifications-disabled-note notifications-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
-                            <strong class="settings-switch-label">Activado</strong>
+                            <strong class="settings-switch-label" id="notifications-state" aria-live="polite">Activado</strong>
                         </label>
                     </article>
 
-                    <article class="settings-card settings-card--language">
-                        <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Idioma</span><h2>Idioma de la plataforma</h2><p>La interfaz completa está disponible actualmente en español.</p></div>
-                        <label class="settings-select-label" for="platform-language-select">
-                            <span>Idioma</span>
-                            <select id="platform-language-select" data-setting-select="language">
-                                <option value="es">Español</option>
-                                <option value="en" disabled>English — Próximamente</option>
-                            </select>
-                        </label>
-                    </article>
-
-                    <article class="settings-card settings-card--performance">
+<article class="settings-card settings-card--performance">
                         <div class="settings-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 14a8 8 0 1 1 16 0"></path><path d="m12 14 5-5"></path><path d="M4 18h16"></path></svg></div>
-                        <div class="settings-card-copy"><span class="settings-kicker">Rendimiento</span><h2>Modo rendimiento</h2><p>Reduce partículas, fondos animados, desenfoques y sombras pesadas sin cambiar funciones ni datos.</p></div>
+                        <div class="settings-card-copy">
+                            <span class="settings-kicker">Rendimiento</span>
+                            <h2>Modo rendimiento</h2>
+                            <p id="performance-description">Reduce efectos visuales no esenciales para mejorar el rendimiento en equipos de bajos recursos.</p>
+                            <p id="performance-disabled-note" class="settings-disabled-note" aria-hidden="true">La plataforma utilizará todos los efectos visuales y animaciones disponibles.</p>
+                        </div>
                         <label class="settings-switch" for="performance-mode-toggle">
-                            <input id="performance-mode-toggle" type="checkbox" data-setting-toggle="performanceMode" role="switch">
+                            <input id="performance-mode-toggle" type="checkbox" data-setting-toggle="performanceMode" role="switch" aria-label="Activar o desactivar modo rendimiento" aria-describedby="performance-description performance-disabled-note performance-state">
                             <span class="settings-switch-track" aria-hidden="true"><span class="settings-switch-thumb"></span></span>
-                            <strong class="settings-switch-label">Desactivado</strong>
+                            <strong class="settings-switch-label" id="performance-state" aria-live="polite">Activado</strong>
                         </label>
                     </article>
 
@@ -1579,6 +1592,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260729-settings-functional-v2"></script>
+    <script src="app.js?v=20260729-settings-status-v3"></script>
 </body>
 </html>
