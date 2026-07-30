@@ -406,12 +406,42 @@ function openQuickForm(config) {
         }
     });
 
-    modal.querySelector('form').addEventListener('submit', event => {
+    modal.querySelector('form').addEventListener('submit', async event => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
+        const form = event.currentTarget;
+        if (form.dataset.submitting === 'true') return;
+
+        const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
-        closeModal();
-        config.onSubmit(values);
+
+        if (config.closeOnlyAfterSuccess !== true) {
+            closeModal();
+            config.onSubmit(values);
+            return;
+        }
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalLabel = submitButton?.textContent || '';
+        form.dataset.submitting = 'true';
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Guardando...';
+        }
+
+        try {
+            const succeeded = await config.onSubmit(values);
+            if (succeeded !== false) closeModal();
+        } catch (error) {
+            console.error('[FORM SUBMIT]', {
+                message: error?.message || 'Error desconocido'
+            });
+        } finally {
+            form.dataset.submitting = 'false';
+            if (submitButton?.isConnected) {
+                submitButton.disabled = false;
+                submitButton.textContent = originalLabel;
+            }
+        }
     });
 
     document.body.appendChild(modal);
@@ -9675,7 +9705,7 @@ async function toggleTask(checkbox) {
 
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
-        if (justCompleted) await refreshActivityChartAfterMutation();
+        if (justCompleted) await refreshTaskActivityAfterSave(taskId, 'task_completed');
     } catch (error) {
         checkbox.checked = !checkbox.checked;
         notify(error.message || 'No se pudo actualizar la tarea.', 'error');
@@ -9868,94 +9898,239 @@ function renderSubjects(workspace) {
     grid.querySelectorAll('[data-subject-delete]').forEach(button => button.addEventListener('click', () => deleteSubject(button.dataset.subjectDelete)));
 }
 
+function isValidTaskUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ''));
+}
+
+function normalizeTaskDateForDatabase(value) {
+    const cleanDate = String(value || '').trim();
+    if (!cleanDate) return null;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) return null;
+
+    const [year, month, day] = cleanDate.split('-').map(Number);
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+    if (
+        parsed.getUTCFullYear() !== year ||
+        parsed.getUTCMonth() !== month - 1 ||
+        parsed.getUTCDate() !== day
+    ) return null;
+
+    return cleanDate;
+}
+
+function normalizeTaskTimeForDatabase(value) {
+    const cleanTime = String(value || '').trim();
+    if (!cleanTime) return null;
+    const match = /^(\d{2}):(\d{2})$/.exec(cleanTime);
+    if (!match) return null;
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    if (hours > 23 || minutes > 59) return null;
+    return cleanTime;
+}
+
+function logTaskPersistenceError(stage, error) {
+    console.error('[TASK PERSISTENCE]', {
+        stage,
+        code: error?.code || null,
+        message: error?.message || 'Error desconocido',
+        details: error?.details || null
+    });
+}
+
+async function waitForTaskActivityEvent(taskId, activityType, attempts = 3) {
+    if (!isValidTaskUuid(taskId)) return false;
+    const sb = getSupabaseClient();
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+        const { data, error } = await sb
+            .from('user_activity_events')
+            .select('id, activity_points, occurred_at')
+            .eq('source_id', taskId)
+            .eq('activity_type', activityType)
+            .maybeSingle();
+
+        if (error) {
+            logTaskPersistenceError('activity confirmation', error);
+            return false;
+        }
+        if (data) return true;
+        if (attempt < attempts - 1) await waitForActivityRefresh(140);
+    }
+
+    console.warn('[TASK PERSISTENCE] El evento todavía no aparece tras el reintento controlado.', {
+        taskId,
+        activityType
+    });
+    return false;
+}
+
+async function refreshTaskActivityAfterSave(taskId, activityType) {
+    await waitForTaskActivityEvent(taskId, activityType, 3);
+    return refreshActivityChartAfterMutation();
+}
+
+function mapSavedTaskRow(row, subjectName = '') {
+    return {
+        id: row.id,
+        subjectId: row.subject_id || '',
+        subject: subjectName || 'General',
+        title: row.title || '',
+        description: row.description || '',
+        due: row.due_date || '',
+        dueTime: String(row.due_time || '').slice(0, 5),
+        priority: normalizeTaskPriority(row.priority),
+        status: normalizeTaskStatus(row.status),
+        createdAt: row.created_at || ''
+    };
+}
+
+function commitSavedTaskToWorkspace(savedRow, subjectName = '') {
+    if (!workspaceState || !savedRow?.id) return;
+    const savedTask = mapSavedTaskRow(savedRow, subjectName);
+    const otherTasks = (workspaceState.tasks || []).filter(item => item.id !== savedTask.id);
+    workspaceState = {
+        ...workspaceState,
+        tasks: [savedTask, ...otherTasks]
+    };
+}
+
 function openTaskForm(taskId = null) {
-    const workspace = loadWorkspace();
-    const task = workspace.tasks.find(item => item.id === taskId);
+    const initialWorkspace = loadWorkspace();
+    const task = initialWorkspace.tasks.find(item => item.id === taskId);
+    const formOwnerId = currentUser?.id || '';
 
     openQuickForm({
         title: task ? 'Editar tarea' : 'Crear tarea',
         submitLabel: task ? 'Actualizar tarea' : 'Guardar tarea',
+        closeOnlyAfterSuccess: true,
         fields: [
             { name: 'title', label: 'Título', value: task?.title || '', placeholder: 'Ej: Taller de funciones' },
-            { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: task?.subject || '' },
-            { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea' },
-            { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due) },
-            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se usarán las 18:00 (America/Guayaquil).' },
+            { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(initialWorkspace), value: task?.subject || 'General' },
+            { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea', required: false },
+            { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due), required: false },
+            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se guardará sin hora específica.' },
             { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' }
         ],
         onSubmit: async values => {
-            const title = values.title.trim();
-            const subjectName = values.subject || '';
-            const subject = workspace.subjects.find(item => item.name === subjectName);
-            let savedTaskId = taskId;
-
-            if (!title || !subject) {
-                notify('Selecciona una materia válida y escribe el título.', 'error');
-                return;
-            }
+            let savedRow = null;
+            let activityType = null;
 
             try {
-                const sb = getSupabaseClient();
+                const authUser = await getCurrentSupabaseUser();
+                if (!authUser?.id || !currentUser?.id || authUser.id !== currentUser.id) {
+                    notify('La sesión cambió. Abre nuevamente el formulario.', 'error');
+                    return false;
+                }
+                if (formOwnerId && formOwnerId !== authUser.id) {
+                    notify('La sesión cambió. Abre nuevamente el formulario.', 'error');
+                    return false;
+                }
+
+                const title = String(values.title || '').trim();
+                if (!title) {
+                    notify('Escribe un título para la tarea.', 'error');
+                    return false;
+                }
+
+                const workspace = loadWorkspace();
+                const subjectName = String(values.subject || 'General').trim() || 'General';
+                const subject = findSubjectByName(workspace, subjectName);
+                const usesGeneralSubject = normalizeTutorText(subjectName) === 'general';
+
+                if (!usesGeneralSubject && (!subject || !isValidTaskUuid(subject.id))) {
+                    notify('Selecciona una materia válida.', 'error');
+                    return false;
+                }
+
+                const dueInput = String(values.due || '').trim();
+                const dueDate = normalizeTaskDateForDatabase(dueInput);
+                if (dueInput && !dueDate) {
+                    notify('Selecciona una fecha válida.', 'error');
+                    return false;
+                }
+
+                const dueTimeInput = String(values.dueTime || '').trim();
+                const dueTime = normalizeTaskTimeForDatabase(dueTimeInput);
+                if (dueTimeInput && !dueTime) {
+                    notify('Selecciona una hora válida.', 'error');
+                    return false;
+                }
+
                 const payload = {
-                    user_id: currentUser.id,
-                    subject_id: subject.id,
+                    user_id: authUser.id,
+                    subject_id: subject?.id || null,
                     title,
-                    description: values.description.trim(),
-                    due_date: values.due || null,
-                    due_time: values.dueTime || null,
+                    description: String(values.description || '').trim() || null,
+                    due_date: dueDate,
+                    due_time: dueTime,
                     priority: normalizeTaskPriority(values.priority),
-                    status: task?.status === 'completed' ? 'completed' : 'pending'
+                    status: taskId && task?.status === 'completed' ? 'completed' : 'pending'
                 };
 
+                const sb = getSupabaseClient();
+
                 if (taskId) {
+                    if (!isValidTaskUuid(taskId)) {
+                        notify('No se pudo identificar la tarea.', 'error');
+                        return false;
+                    }
+
                     const { data, error } = await sb
                         .from('tasks')
                         .update(payload)
                         .eq('id', taskId)
-                        .eq('user_id', currentUser.id);
+                        .eq('user_id', authUser.id)
+                        .select('*')
+                        .single();
 
-                    if (error) {
-                        logSupabaseError('tasks update', error);
-                        throw error;
-                    }
-                    console.log('[Supabase] Tarea actualizada', {
-                        userId: currentUser.id,
-                        taskId,
-                        payload,
-                        result: data
-                    });
+                    if (error) throw error;
+                    savedRow = data;
                     pushRecentMessage(`Editaste la tarea ${title}.`);
                 } else {
                     const { data, error } = await sb
                         .from('tasks')
                         .insert(payload)
-                        .select('id')
+                        .select('*')
                         .single();
 
-                    if (error) {
-                        logSupabaseError('tasks insert', error);
-                        throw error;
-                    }
-                    savedTaskId = data.id;
-                    console.log('[Supabase] Tarea insertada', {
-                        userId: currentUser.id,
-                        task: payload,
-                        inserted: data
-                    });
+                    if (error) throw error;
+                    savedRow = data;
+                    activityType = 'task_created';
                     pushRecentMessage(`Agregaste la tarea ${title}.`);
-                    await updateProfileProgress(15, { bumpStreak: true });
+                }
+
+                if (!savedRow?.id || savedRow.user_id !== authUser.id) {
+                    throw new Error('Supabase no devolvió una tarea válida.');
+                }
+
+                commitSavedTaskToWorkspace(savedRow, subject?.name || 'General');
+
+                try {
+                    await syncWorkspaceFromSupabase();
+                } catch (syncError) {
+                    logTaskPersistenceError('workspace reload', syncError);
+                }
+
+                refreshWorkspaceUI();
+
+                if (activityType) {
+                    await refreshTaskActivityAfterSave(savedRow.id, activityType);
+                    updateProfileProgress(15, { bumpStreak: true }).catch(error => {
+                        logTaskPersistenceError('profile progress', error);
+                    });
                 }
 
                 const extras = loadWorkspaceExtras();
-                if (savedTaskId && extras.taskMeta) delete extras.taskMeta[savedTaskId];
+                if (savedRow.id && extras.taskMeta) delete extras.taskMeta[savedRow.id];
                 saveWorkspaceExtras(extras);
 
-                await syncWorkspaceFromSupabase();
-                refreshWorkspaceUI();
-                if (!taskId) await refreshActivityChartAfterMutation();
                 notify(taskId ? 'Tarea actualizada.' : 'Tarea creada correctamente.', 'success');
+                return true;
             } catch (error) {
-                notify(error.message || 'No se pudo guardar la tarea.', 'error');
+                logTaskPersistenceError(taskId ? 'update' : 'insert', error);
+                notify('No se pudo guardar la tarea. Inténtalo nuevamente.', 'error');
+                return false;
             }
         }
     });
@@ -10013,7 +10188,7 @@ async function completeTask(taskId) {
         await updateProfileProgress(25, { bumpStreak: true });
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
-        await refreshActivityChartAfterMutation();
+        await refreshTaskActivityAfterSave(taskId, 'task_completed');
         notify('Tarea marcada como completada.', 'success');
     } catch (error) {
         notify(error.message || 'No se pudo completar la tarea.', 'error');
