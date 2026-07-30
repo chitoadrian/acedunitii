@@ -259,8 +259,18 @@ function handlePasswordToggleClick(event) {
     }
 }
 
+function handlePasswordToggleKeyDown(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const toggle = event.target.closest?.('[data-password-toggle]');
+    if (!toggle) return;
+
+    event.preventDefault();
+    toggle.click();
+}
+
 document.addEventListener('pointerdown', handlePasswordTogglePointerDown, true);
 document.addEventListener('click', handlePasswordToggleClick);
+document.addEventListener('keydown', handlePasswordToggleKeyDown);
 
 function setAuthMessage(pageId, message, type = 'error', action = null) {
     const page = document.getElementById(`${pageId}-page`);
