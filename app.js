@@ -2097,6 +2097,13 @@ async function refreshActivityChart({ confirmMutation = false } = {}) {
     }
 }
 
+async function refreshActivityChartAfterMutation() {
+    // renderDashboard agenda una consulta inicial; dejamos que comience y luego
+    // hacemos que la confirmación posterior a la mutación sea la solicitud vigente.
+    await Promise.resolve();
+    return refreshActivityChart({ confirmMutation: true });
+}
+
 function clearWeeklyActivityState() {
     weeklyActivityRequestId += 1;
     renderWeeklyActivityState([], 'ready');
@@ -2647,7 +2654,7 @@ function openAttendanceForm(attendanceId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
-                if (!attendanceId) await refreshActivityChart({ confirmMutation: true });
+                if (!attendanceId) await refreshActivityChartAfterMutation();
                 notify(attendanceId ? 'Asistencia actualizada.' : 'Asistencia registrada.', 'success');
             } catch (error) {
                 console.error("[ATTENDANCE ERROR]", error);
@@ -3613,7 +3620,7 @@ function openEventForm(eventId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
-                if (!eventId) await refreshActivityChart({ confirmMutation: true });
+                if (!eventId) await refreshActivityChartAfterMutation();
                 notify(payload.emailReminder ? getReminderMessage(payload) : 'Evento guardado correctamente.', 'success');
                 if (payload.googleCalendar && savedEventId) {
                     openGoogleCalendarEvent(savedEventId);
@@ -4038,7 +4045,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
-            if (!gradeId) await refreshActivityChart({ confirmMutation: true });
+            if (!gradeId) await refreshActivityChartAfterMutation();
             closeModal();
             notify(gradeId ? 'Calificación actualizada.' : 'Calificación registrada.', 'success');
         } catch (error) {
@@ -7484,7 +7491,7 @@ function openResourceForm(resourceId = null) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
-            if (!resourceId) await refreshActivityChart({ confirmMutation: true });
+            if (!resourceId) await refreshActivityChartAfterMutation();
             notify(resourceId ? 'Recurso actualizado.' : 'PDF guardado correctamente.', 'success');
         }
     });
@@ -9668,7 +9675,7 @@ async function toggleTask(checkbox) {
 
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
-        if (justCompleted) await refreshActivityChart({ confirmMutation: true });
+        if (justCompleted) await refreshActivityChartAfterMutation();
     } catch (error) {
         checkbox.checked = !checkbox.checked;
         notify(error.message || 'No se pudo actualizar la tarea.', 'error');
@@ -9945,7 +9952,7 @@ function openTaskForm(taskId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
-                if (!taskId) await refreshActivityChart({ confirmMutation: true });
+                if (!taskId) await refreshActivityChartAfterMutation();
                 notify(taskId ? 'Tarea actualizada.' : 'Tarea creada correctamente.', 'success');
             } catch (error) {
                 notify(error.message || 'No se pudo guardar la tarea.', 'error');
@@ -10006,7 +10013,7 @@ async function completeTask(taskId) {
         await updateProfileProgress(25, { bumpStreak: true });
         await syncWorkspaceFromSupabase();
         refreshWorkspaceUI();
-        await refreshActivityChart({ confirmMutation: true });
+        await refreshActivityChartAfterMutation();
         notify('Tarea marcada como completada.', 'success');
     } catch (error) {
         notify(error.message || 'No se pudo completar la tarea.', 'error');
