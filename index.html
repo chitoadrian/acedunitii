@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260730-functions-badge-align-v1">
+    <link rel="stylesheet" href="style.css?v=20260730-weekly-activity-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -768,18 +768,25 @@
                         </div>
                     </div>
 
-                    <div class="card weekly-progress-card">
-                        <h3>Progreso semanal</h3>
-                        <div class="weekly-chart" aria-label="Grafico semanal simulado">
-                            <span class="week-day h-42"></span>
-                            <span class="week-day h-58"></span>
-                            <span class="week-day h-68"></span>
-                            <span class="week-day h-76"></span>
-                            <span class="week-day h-92"></span>
-                            <span class="week-day h-64"></span>
-                            <span class="week-day h-84"></span>
+                    <div class="card weekly-progress-card dashboard-panel-card" data-dashboard-module="weekly">
+                        <div class="panel-title">
+                            <div>
+                                <h3>Progreso semanal</h3>
+                                <p>Actividad académica registrada durante esta semana.</p>
+                            </div>
                         </div>
-                        <p class="chart-caption">78% de avance en tareas, repasos y notas esta semana.</p>
+                        <div class="weekly-activity-content" aria-live="polite" aria-busy="true">
+                            <div class="weekly-activity-grid is-loading" aria-label="Cargando actividad académica semanal">
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Lun</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Mar</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Mié</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Jue</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Vie</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Sáb</span></div>
+                                <div class="weekly-activity-day"><span class="weekly-activity-value">—</span><span class="weekly-activity-track"><span class="weekly-activity-bar"></span></span><span class="weekly-activity-label">Dom</span></div>
+                            </div>
+                            <p class="chart-caption">Cargando tu actividad semanal…</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1605,6 +1612,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260730-password-toggle-v2"></script>
+    <script src="app.js?v=20260730-weekly-activity-v1"></script>
 </body>
 </html>

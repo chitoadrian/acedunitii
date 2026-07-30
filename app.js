@@ -1909,6 +1909,141 @@ function legacyHandleLoginWithLocalWorkspace(event) {
     }
 }
 
+
+const WEEKLY_ACTIVITY_DAYS = Object.freeze([
+    { short: 'Lun', full: 'Lunes' },
+    { short: 'Mar', full: 'Martes' },
+    { short: 'Mié', full: 'Miércoles' },
+    { short: 'Jue', full: 'Jueves' },
+    { short: 'Vie', full: 'Viernes' },
+    { short: 'Sáb', full: 'Sábado' },
+    { short: 'Dom', full: 'Domingo' }
+]);
+let weeklyActivityRequestId = 0;
+
+function normalizeWeeklyActivityRows(rows) {
+    const source = Array.isArray(rows) ? rows : [];
+    return WEEKLY_ACTIVITY_DAYS.map((day, index) => {
+        const row = source.find(item => Number(item?.day_index) === index + 1) || {};
+        return {
+            day: day.short,
+            fullDay: day.full,
+            points: Math.max(0, Number(row.points) || 0),
+            activityCount: Math.max(0, Number(row.activity_count) || 0)
+        };
+    });
+}
+
+function weeklyActivityGridHTML(rows, { loading = false } = {}) {
+    const safeRows = normalizeWeeklyActivityRows(rows);
+    const maxPoints = Math.max(1, ...safeRows.map(item => item.points));
+
+    return `
+        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}" aria-label="Actividad académica semanal de lunes a domingo">
+            ${safeRows.map(item => {
+                const height = item.points > 0 ? Math.max(12, Math.round((item.points / maxPoints) * 100)) : 4;
+                const activityLabel = item.activityCount === 1 ? 'actividad' : 'actividades';
+                const description = loading
+                    ? `Cargando actividad del ${item.fullDay}`
+                    : `Actividad del ${item.fullDay}: ${item.points} puntos en ${item.activityCount} ${activityLabel}`;
+                return `
+                    <div class="weekly-activity-day" tabindex="0" role="img" aria-label="${escapeHTML(description)}" data-tooltip="${escapeHTML(description)}">
+                        <span class="weekly-activity-value" aria-hidden="true">${loading ? '—' : item.points}</span>
+                        <span class="weekly-activity-track" aria-hidden="true">
+                            <span class="weekly-activity-bar${item.points === 0 ? ' is-empty' : ''}" style="--weekly-bar-height:${loading ? 18 : height}%"></span>
+                        </span>
+                        <span class="weekly-activity-label" aria-hidden="true">${item.day}</span>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function weeklyActivityInitialHTML() {
+    return `
+        <div class="card weekly-progress-card dashboard-panel-card" data-dashboard-module="weekly">
+            <div class="panel-title">
+                ${appIconHTML('chart', 'panel-icon panel-icon-chart dashboard-icon')}
+                <div>
+                    <h3>Progreso semanal</h3>
+                    <p>Actividad académica registrada durante esta semana.</p>
+                </div>
+            </div>
+            <div class="weekly-activity-content" aria-live="polite" aria-busy="true">
+                ${weeklyActivityGridHTML([], { loading: true })}
+                <p class="chart-caption">Cargando tu actividad semanal…</p>
+            </div>
+        </div>
+    `;
+}
+
+function renderWeeklyActivityState(rows, status = 'ready') {
+    const container = document.querySelector('.weekly-activity-content');
+    if (!container) return;
+
+    if (status === 'loading') {
+        container.setAttribute('aria-busy', 'true');
+        container.innerHTML = `
+            ${weeklyActivityGridHTML([], { loading: true })}
+            <p class="chart-caption">Cargando tu actividad semanal…</p>
+        `;
+        return;
+    }
+
+    container.setAttribute('aria-busy', 'false');
+
+    if (status === 'error') {
+        container.innerHTML = `
+            ${weeklyActivityGridHTML([])}
+            <div class="weekly-activity-message is-error" role="alert">
+                <p>No se pudo cargar tu actividad semanal.</p>
+                <button type="button" class="weekly-activity-retry" onclick="loadWeeklyActivity(currentUser?.id)">Reintentar</button>
+            </div>
+        `;
+        return;
+    }
+
+    const safeRows = normalizeWeeklyActivityRows(rows);
+    const hasActivity = safeRows.some(item => item.points > 0);
+    container.innerHTML = `
+        ${weeklyActivityGridHTML(safeRows)}
+        ${hasActivity
+            ? '<p class="chart-caption">Completa tareas y utiliza las herramientas académicas para aumentar tu actividad semanal.</p>'
+            : '<p class="weekly-activity-message">Todavía no tienes actividad registrada esta semana.</p>'}
+    `;
+}
+
+async function loadWeeklyActivity(userId = currentUser?.id) {
+    const safeUserId = String(userId || '');
+    const requestId = ++weeklyActivityRequestId;
+    renderWeeklyActivityState([], 'loading');
+
+    if (!safeUserId) {
+        renderWeeklyActivityState([], 'ready');
+        return;
+    }
+
+    try {
+        const { data, error } = await getSupabaseClient().rpc('get_weekly_activity');
+        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return;
+        if (error) throw error;
+        renderWeeklyActivityState(data, 'ready');
+    } catch (error) {
+        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return;
+        console.error('No se pudo cargar el progreso semanal.', {
+            code: error?.code || null,
+            message: error?.message || 'Error desconocido'
+        });
+        renderWeeklyActivityState([], 'error');
+    }
+}
+
+function clearWeeklyActivityState() {
+    weeklyActivityRequestId += 1;
+    renderWeeklyActivityState([], 'ready');
+}
+
 function renderDashboard(workspace) {
     const section = document.getElementById('dashboard');
     if (!section) return;
@@ -1960,15 +2095,10 @@ function renderDashboard(workspace) {
 
 
 
-            <div class="card weekly-progress-card">
-                <h3>Progreso semanal</h3>
-                <div class="weekly-chart" aria-label="Progreso semanal simulado">
-                    ${[15, 20, 25, 30, 35, 40, Math.min(95, 20 + completed * 12)].map(value => `<span class="week-day" style="height:${value}%"></span>`).join('')}
-                </div>
-                <p class="chart-caption">${completed ? `Has completado ${completed} tarea(s).` : 'Tu gráfico crecerá cuando completes actividades.'}</p>
-            </div>
+            ${weeklyActivityInitialHTML()}
         </div>
     `;
+    queueMicrotask(() => loadWeeklyActivity(currentUser?.id));
 }
 
 function dashboardCard(icon, label, value, subtext, progress) {
@@ -6733,22 +6863,11 @@ function renderDashboard(workspace) {
                     </ol>
             </div>
 
-            <div class="card weekly-progress-card dashboard-panel-card" data-dashboard-module="weekly">
-                    <div class="panel-title">
-                        ${appIconHTML('chart', 'panel-icon panel-icon-chart dashboard-icon')}
-                        <div>
-                            <h3>Progreso semanal</h3>
-                            <p>Vista simulada de tu avance durante la semana.</p>
-                        </div>
-                    </div>
-                    <div class="weekly-chart" aria-label="Progreso semanal simulado">
-                        ${[15, 20, 25, 30, 35, 40, Math.min(95, 20 + completed * 12)].map(value => `<span class="week-day" style="height:${value}%"></span>`).join('')}
-                    </div>
-                    <p class="chart-caption">${completed ? `Has completado ${completed} tarea(s).` : 'Tu gráfico crecerá cuando completes actividades.'}</p>
-            </div>
+            ${weeklyActivityInitialHTML()}
             </div>
         </div>
     `;
+    queueMicrotask(() => loadWeeklyActivity(currentUser?.id));
 }
 
 function dashboardCard(icon, label, value, subtext, progress) {

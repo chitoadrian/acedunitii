@@ -36268,3 +36268,191 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
     margin-left: 0;
     margin-right: 0;
 }
+
+
+/* Progreso semanal real: datos por usuario servidos por Supabase */
+.weekly-activity-content {
+    width: 100%;
+    min-width: 0;
+}
+
+.weekly-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    gap: clamp(8px, 1.4vw, 18px);
+    min-height: 220px;
+    margin-top: 20px;
+}
+
+.weekly-activity-day {
+    position: relative;
+    display: grid;
+    grid-template-rows: 24px 164px 24px;
+    gap: 8px;
+    min-width: 0;
+    align-items: end;
+    justify-items: center;
+    color: var(--text-secondary);
+    border-radius: 12px;
+    outline: none;
+}
+
+.weekly-activity-value {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.weekly-activity-track {
+    display: flex;
+    width: min(34px, 72%);
+    height: 164px;
+    align-items: flex-end;
+    overflow: hidden;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--bg-tertiary) 72%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 76%, transparent);
+}
+
+.weekly-activity-bar {
+    display: block;
+    width: 100%;
+    height: var(--weekly-bar-height, 4%);
+    min-height: 4px;
+    border-radius: 11px;
+    background: linear-gradient(180deg, var(--color-cyan), var(--color-purple));
+    transition: height 320ms ease, filter 180ms ease;
+}
+
+.weekly-activity-bar.is-empty {
+    background: color-mix(in srgb, var(--text-tertiary) 36%, transparent);
+}
+
+.weekly-activity-label {
+    font-size: 0.78rem;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.weekly-activity-day::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    width: max-content;
+    max-width: 220px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+    font-size: 0.75rem;
+    line-height: 1.35;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 5px);
+    transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.weekly-activity-day:hover::after,
+.weekly-activity-day:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.weekly-activity-day:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-blue) 34%, transparent);
+}
+
+.weekly-activity-grid.is-loading .weekly-activity-bar {
+    height: 18%;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-cyan) 45%, transparent), color-mix(in srgb, var(--color-purple) 45%, transparent));
+    animation: weekly-activity-pulse 1.15s ease-in-out infinite alternate;
+}
+
+.weekly-activity-message {
+    margin: 18px 0 0;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.5;
+}
+
+.weekly-activity-message.is-error {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.weekly-activity-message p {
+    margin: 0;
+}
+
+.weekly-activity-retry {
+    appearance: none;
+    padding: 7px 12px;
+    border: 1px solid color-mix(in srgb, var(--color-blue) 48%, var(--border-color));
+    border-radius: 9px;
+    color: var(--color-blue);
+    background: transparent;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.weekly-activity-retry:hover,
+.weekly-activity-retry:focus-visible {
+    background: color-mix(in srgb, var(--color-blue) 12%, transparent);
+    outline: none;
+}
+
+@keyframes weekly-activity-pulse {
+    from { opacity: 0.42; }
+    to { opacity: 0.9; }
+}
+
+body.light-theme .weekly-activity-track,
+body.light-mode .weekly-activity-track,
+[data-theme="light"] .weekly-activity-track {
+    background: color-mix(in srgb, var(--input-bg, #F1F3F6) 82%, transparent);
+}
+
+@media (max-width: 700px) {
+    .weekly-activity-grid {
+        gap: 5px;
+        min-height: 178px;
+    }
+
+    .weekly-activity-day {
+        grid-template-rows: 22px 126px 22px;
+        gap: 6px;
+    }
+
+    .weekly-activity-track {
+        width: min(25px, 78%);
+        height: 126px;
+    }
+
+    .weekly-activity-label,
+    .weekly-activity-value {
+        font-size: 0.7rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .weekly-activity-grid.is-loading .weekly-activity-bar {
+        animation: none;
+    }
+
+    .weekly-activity-bar,
+    .weekly-activity-day::after {
+        transition: none;
+    }
+}
