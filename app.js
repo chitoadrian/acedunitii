@@ -18,7 +18,7 @@ let calendarViewDate = new Date();
 let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 const INTERFACE_SOUND_STORAGE_KEY = 'ac_interface_sounds_enabled';
 const INTERFACE_SOUND_SRC = 'assets/click.mp3';
-let interfaceSoundsEnabled = localStorage.getItem(INTERFACE_SOUND_STORAGE_KEY) !== 'false';
+let interfaceSoundsEnabled = true;
 let interfaceSoundAudio = null;
 let lastInterfaceSoundAt = 0;
 let lastInterfaceErrorAt = 0;
@@ -8776,10 +8776,10 @@ function requestWelcomeEmailForConfirmedUser(user) {
 
 async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     setTutorAuthenticatedUser(user);
-    loadInterfaceSoundPreferenceFromUser(user);
+
     const profile = await ensureProfileRow(user, fallbackName);
     currentUser = getPublicUserFromAuth(user, profile);
-    switchAppSettingsUser(currentUser?.id || user?.id || null);
+    await switchAppSettingsUser(user);
     console.log('[Supabase] Usuario actual autenticado', currentUser);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
@@ -9912,10 +9912,13 @@ async function initializeApp() {
 
 /* ============================================
    CONFIGURACIÓN DE EXPERIENCIA
-   Preferencias persistentes y aisladas por usuario
+   Supabase es la fuente principal; caché aislada por usuario
    ============================================ */
-const APP_SETTINGS_STORAGE_PREFIX = 'ac_edunity_settings_v2';
+const APP_SETTINGS_CACHE_PREFIX = 'acedunity_preferences';
+const LEGACY_USER_SETTINGS_PREFIX = 'ac_edunity_settings_v2';
+const LEGACY_GLOBAL_SETTINGS_KEYS = ['ac_edunity_settings_v1', INTERFACE_SOUND_STORAGE_KEY];
 const DEFAULT_APP_SETTINGS = Object.freeze({
+    sounds: true,
     animations: true,
     tutorSuggestions: true,
     notifications: true,
@@ -9946,42 +9949,156 @@ function cloneDefaultAppSettings() {
 
 function getAppSettingsStorageKey(ownerId = appSettingsOwnerId) {
     const safeOwner = String(ownerId || 'guest').replace(/[^a-zA-Z0-9_-]/g, '');
-    return `${APP_SETTINGS_STORAGE_PREFIX}:${safeOwner || 'guest'}`;
+    return `${APP_SETTINGS_CACHE_PREFIX}_${safeOwner || 'guest'}`;
 }
 
-function readAppSettings(ownerId = appSettingsOwnerId) {
+function getLegacyUserSettingsKey(ownerId = appSettingsOwnerId) {
+    return `${LEGACY_USER_SETTINGS_PREFIX}:${String(ownerId || 'guest')}`;
+}
+
+function mergeAppSettings(value) {
+    const stored = value && typeof value === 'object' ? value : {};
+    return {
+        ...cloneDefaultAppSettings(),
+        ...stored,
+        sounds: stored.sounds !== false,
+        dashboardModules: {
+            ...DEFAULT_APP_SETTINGS.dashboardModules,
+            ...(stored.dashboardModules || {})
+        }
+    };
+}
+
+function readCachedAppSettings(ownerId = appSettingsOwnerId) {
     try {
-        const stored = JSON.parse(localStorage.getItem(getAppSettingsStorageKey(ownerId)) || '{}');
-        return {
-            ...cloneDefaultAppSettings(),
-            ...stored,
-            dashboardModules: {
-                ...DEFAULT_APP_SETTINGS.dashboardModules,
-                ...(stored.dashboardModules || {})
-            }
-        };
+        const cacheValue = localStorage.getItem(getAppSettingsStorageKey(ownerId));
+        if (cacheValue) return mergeAppSettings(JSON.parse(cacheValue));
+
+        const legacyValue = localStorage.getItem(getLegacyUserSettingsKey(ownerId));
+        if (legacyValue) return mergeAppSettings(JSON.parse(legacyValue));
     } catch (error) {
-        console.warn('[SETTINGS] Preferencias inválidas; se usarán valores seguros.');
-        return cloneDefaultAppSettings();
+        console.warn('[SETTINGS] Caché local inválida; se usarán valores seguros.');
+    }
+    return cloneDefaultAppSettings();
+}
+
+function writeAppSettingsCache(settings = appSettings) {
+    try {
+        localStorage.setItem(getAppSettingsStorageKey(), JSON.stringify(settings));
+        localStorage.removeItem(getLegacyUserSettingsKey());
+    } catch (error) {
+        console.warn('[SETTINGS] No se pudo actualizar la caché local:', error?.message || 'storage_error');
     }
 }
 
-function persistAppSettings(nextSettings = appSettings) {
+function clearLegacyGlobalSettings() {
+    LEGACY_GLOBAL_SETTINGS_KEYS.forEach(key => {
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            // La preferencia global se ignora aunque el almacenamiento no esté disponible.
+        }
+    });
+}
+
+function appSettingsFromDatabase(row) {
+    return mergeAppSettings({
+        sounds: row?.sounds_enabled,
+        animations: row?.animations_enabled,
+        tutorSuggestions: row?.ai_suggestions_enabled,
+        notifications: row?.reminders_enabled,
+        performanceMode: row?.performance_mode,
+        dashboardModules: row?.dashboard_modules
+    });
+}
+
+function appSettingsToDatabase(settings = appSettings) {
+    return {
+        user_id: appSettingsOwnerId,
+        sounds_enabled: settings.sounds !== false,
+        animations_enabled: settings.animations !== false,
+        ai_suggestions_enabled: settings.tutorSuggestions !== false,
+        reminders_enabled: settings.notifications !== false,
+        performance_mode: Boolean(settings.performanceMode),
+        dashboard_modules: { ...settings.dashboardModules },
+        updated_at: new Date().toISOString()
+    };
+}
+
+async function persistAppSettings(nextSettings = appSettings) {
+    if (!currentUser?.id || appSettingsOwnerId === 'guest' || String(currentUser.id) !== String(appSettingsOwnerId)) {
+        notify('Inicia sesión para guardar tus preferencias.', 'error');
+        return false;
+    }
+
     try {
-        localStorage.setItem(getAppSettingsStorageKey(), JSON.stringify(nextSettings));
+        const { error } = await getSupabaseClient()
+            .from('user_preferences')
+            .upsert(appSettingsToDatabase(nextSettings), { onConflict: 'user_id' });
+
+        if (error) throw error;
+        writeAppSettingsCache(nextSettings);
         return true;
     } catch (error) {
-        console.error('[SETTINGS] No se pudieron guardar las preferencias:', error?.message || 'storage_error');
+        console.error('[SETTINGS] Error guardando preferencias:', {
+            message: error?.message || 'unknown_error',
+            code: error?.code || null
+        });
         notify('No se pudo guardar la preferencia. Se restauró el valor anterior.', 'error');
         return false;
     }
 }
 
-function switchAppSettingsUser(userId) {
-    appSettingsOwnerId = userId ? String(userId) : 'guest';
-    appSettings = readAppSettings(appSettingsOwnerId);
+async function switchAppSettingsUser(user) {
+    const userId = user?.id ? String(user.id) : '';
     dashboardSettingsDraft = null;
     settingsReminderKey = '';
+
+    if (!userId) {
+        appSettingsOwnerId = 'guest';
+        appSettings = cloneDefaultAppSettings();
+        clearLegacyGlobalSettings();
+        applyAppSettings();
+        return;
+    }
+
+    appSettingsOwnerId = userId;
+    const cached = readCachedAppSettings(userId);
+    appSettings = {
+        ...cached,
+        sounds: typeof user?.user_metadata?.interface_sounds_enabled === 'boolean'
+            ? user.user_metadata.interface_sounds_enabled
+            : cached.sounds
+    };
+    applyAppSettings();
+
+    try {
+        const { data, error } = await getSupabaseClient()
+            .from('user_preferences')
+            .select('user_id, sounds_enabled, animations_enabled, ai_suggestions_enabled, reminders_enabled, performance_mode, dashboard_modules, updated_at')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+            appSettings = appSettingsFromDatabase(data);
+            writeAppSettingsCache(appSettings);
+        } else {
+            const initialSettings = mergeAppSettings(appSettings);
+            appSettings = initialSettings;
+            if (!await persistAppSettings(initialSettings)) {
+                console.warn('[SETTINGS] Se mantiene la caché aislada hasta poder crear la fila remota.');
+            }
+        }
+    } catch (error) {
+        console.warn('[SETTINGS] No se pudieron cargar preferencias remotas; se usa la caché de esta cuenta.', {
+            message: error?.message || 'network_error',
+            code: error?.code || null
+        });
+    }
+
+    clearLegacyGlobalSettings();
     applyAppSettings();
 }
 
@@ -10005,16 +10122,6 @@ function syncAppSettingsControls() {
         input.setAttribute('aria-checked', String(input.checked));
         updateSettingsSwitchLabel(input);
     });
-    document.querySelectorAll('[data-interface-sound-toggle]').forEach(updateSettingsSwitchLabel);
-    document.querySelectorAll('[data-setting-toggle], [data-interface-sound-toggle]').forEach(input => {
-        if (input.dataset.settingsKeyboardBound === 'true') return;
-        input.dataset.settingsKeyboardBound = 'true';
-        input.addEventListener('keydown', event => {
-            if (event.key !== 'Enter') return;
-            event.preventDefault();
-            input.click();
-        });
-    });
     document.querySelectorAll('[data-dashboard-module]').forEach(input => {
         if (input.matches('input')) {
             const source = dashboardSettingsDraft || appSettings.dashboardModules;
@@ -10030,8 +10137,9 @@ function applyTutorSuggestionPreference() {
 }
 
 function applyAppSettings() {
-    if (!appSettings) appSettings = readAppSettings();
+    if (!appSettings) appSettings = cloneDefaultAppSettings();
     const reduceMotion = !appSettings.animations;
+    applyInterfaceSoundPreference(appSettings.sounds, { persistLocal: false });
     document.documentElement.classList.toggle('reduce-app-motion', reduceMotion);
     document.body.classList.toggle('reduce-app-motion', reduceMotion);
     document.documentElement.classList.toggle('performance-mode', appSettings.performanceMode);
@@ -10041,16 +10149,19 @@ function applyAppSettings() {
     syncAppSettingsControls();
 }
 
-function updateAppSetting(key, value, input) {
+async function updateAppSetting(key, value, input) {
     if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key) || key === 'dashboardModules') return;
-    const previous = appSettings[key];
-    appSettings[key] = Boolean(value);
-    if (!persistAppSettings()) {
-        appSettings[key] = previous;
+    const previousSettings = mergeAppSettings(appSettings);
+    appSettings = { ...appSettings, [key]: Boolean(value) };
+    applyAppSettings();
+
+    if (!await persistAppSettings(appSettings)) {
+        appSettings = previousSettings;
         applyAppSettings();
         return;
     }
-    applyAppSettings();
+
+    if (key === 'sounds' && appSettings.sounds) playInterfaceSound();
     if (key === 'notifications' && appSettings.notifications) runSmartReminders({ force: true });
     notify('Preferencia guardada.', 'success');
     if (input) updateSettingsSwitchLabel(input);
@@ -10096,15 +10207,19 @@ function updateDashboardSettingsDraft(key, enabled) {
     dashboardSettingsDraft[key] = Boolean(enabled);
 }
 
-function saveDashboardSettings() {
+async function saveDashboardSettings() {
     if (!dashboardSettingsDraft) return;
-    const previous = { ...appSettings.dashboardModules };
-    appSettings.dashboardModules = { ...dashboardSettingsDraft };
-    if (!persistAppSettings()) {
-        appSettings.dashboardModules = previous;
+    const previousSettings = mergeAppSettings(appSettings);
+    appSettings = { ...appSettings, dashboardModules: { ...dashboardSettingsDraft } };
+    applyAppSettings();
+
+    if (!await persistAppSettings(appSettings)) {
+        appSettings = previousSettings;
+        dashboardSettingsDraft = { ...previousSettings.dashboardModules };
         applyAppSettings();
         return;
     }
+
     closeSettingsModal('dashboard');
     applyAppSettings();
     notify('Panel principal actualizado.', 'success');
@@ -10155,6 +10270,15 @@ function bindAppSettingsControls() {
         input.dataset.settingsBound = 'true';
         input.addEventListener('change', () => updateAppSetting(input.dataset.settingToggle, input.checked, input));
     });
+    document.querySelectorAll('[data-setting-toggle]').forEach(input => {
+        if (input.dataset.settingsKeyboardBound === 'true') return;
+        input.dataset.settingsKeyboardBound = 'true';
+        input.addEventListener('keydown', event => {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            input.click();
+        });
+    });
     document.querySelectorAll('[data-dashboard-module]').forEach(input => {
         if (!input.matches('input') || input.dataset.settingsBound === 'true') return;
         input.dataset.settingsBound = 'true';
@@ -10170,23 +10294,36 @@ function bindAppSettingsControls() {
         button.dataset.settingsBound = 'true';
         button.addEventListener('click', () => closeSettingsModal(button.dataset.closeSettingsModal));
     });
-    document.querySelector('[data-save-dashboard-settings]')?.addEventListener('click', saveDashboardSettings);
-    document.querySelector('[data-restore-dashboard-settings]')?.addEventListener('click', restoreDashboardSettingsDefaults);
+    const saveDashboardButton = document.querySelector('[data-save-dashboard-settings]');
+    if (saveDashboardButton && saveDashboardButton.dataset.settingsBound !== 'true') {
+        saveDashboardButton.dataset.settingsBound = 'true';
+        saveDashboardButton.addEventListener('click', saveDashboardSettings);
+    }
+    const restoreDashboardButton = document.querySelector('[data-restore-dashboard-settings]');
+    if (restoreDashboardButton && restoreDashboardButton.dataset.settingsBound !== 'true') {
+        restoreDashboardButton.dataset.settingsBound = 'true';
+        restoreDashboardButton.addEventListener('click', restoreDashboardSettingsDefaults);
+    }
     document.querySelectorAll('[data-tutor-suggestion]').forEach(button => {
         if (button.dataset.settingsBound === 'true') return;
         button.dataset.settingsBound = 'true';
         button.addEventListener('click', () => useTutorSuggestion(button.dataset.tutorSuggestion));
     });
-    document.addEventListener('keydown', event => {
-        if (event.key !== 'Escape') return;
-        const openModal = document.querySelector('[data-settings-modal]:not([hidden])');
-        if (openModal) closeSettingsModal(openModal.dataset.settingsModal);
-    });
+    if (document.body.dataset.settingsEscapeBound !== 'true') {
+        document.body.dataset.settingsEscapeBound = 'true';
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Escape') return;
+            const openModal = document.querySelector('[data-settings-modal]:not([hidden])');
+            if (openModal) closeSettingsModal(openModal.dataset.settingsModal);
+        });
+    }
     syncAppSettingsControls();
 }
 
 function initializeAppSettings() {
-    appSettings = readAppSettings();
+    appSettingsOwnerId = 'guest';
+    appSettings = cloneDefaultAppSettings();
+    clearLegacyGlobalSettings();
     bindAppSettingsControls();
     applyAppSettings();
 }
