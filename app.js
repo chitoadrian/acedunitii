@@ -6595,7 +6595,7 @@ function renderDashboard(workspace) {
                     <button type="button" onclick="navigateTo('backpack')">+ Subir apunte</button>
                 </div>
             </div>
-            <div class="dashboard-hero-widget">
+            <div class="dashboard-hero-widget" data-dashboard-module="tutor">
                 ${appIconHTML('bot', 'hero-widget-icon stat-icon stat-icon-assistant dashboard-icon')}
                 <div>
                     <strong>Tutor IA</strong>
@@ -6613,7 +6613,7 @@ function renderDashboard(workspace) {
         </div>
 
         <div class="dashboard-layout dashboard-clean-layout">
-            <div class="card dashboard-panel-card dashboard-progress-card">
+            <div class="card dashboard-panel-card dashboard-progress-card" data-dashboard-module="progress">
                 <div class="panel-title">
                     ${appIconHTML('chart', 'panel-icon panel-icon-chart dashboard-icon')}
                     <div>
@@ -6639,7 +6639,7 @@ function renderDashboard(workspace) {
                 </div>
             </div>
 
-            <div class="card dashboard-panel-card dashboard-day-card">
+            <div class="card dashboard-panel-card dashboard-day-card" data-dashboard-module="day">
                     <div class="panel-title">
                         ${appIconHTML('clock', 'panel-icon panel-icon-day dashboard-icon')}
                         <div>
@@ -6668,7 +6668,7 @@ function renderDashboard(workspace) {
             </div>
 
             <div class="dashboard-bottom-section">
-                <div class="card starter-card dashboard-panel-card">
+                <div class="card starter-card dashboard-panel-card" data-dashboard-module="studentCenter">
                     <div class="panel-title">
                         ${appIconHTML('list', 'panel-icon panel-icon-steps dashboard-icon')}
                         <div>
@@ -6690,7 +6690,7 @@ function renderDashboard(workspace) {
                     </ol>
             </div>
 
-            <div class="card weekly-progress-card dashboard-panel-card">
+            <div class="card weekly-progress-card dashboard-panel-card" data-dashboard-module="weekly">
                     <div class="panel-title">
                         ${appIconHTML('chart', 'panel-icon panel-icon-chart dashboard-icon')}
                         <div>
@@ -6710,7 +6710,7 @@ function renderDashboard(workspace) {
 
 function dashboardCard(icon, label, value, subtext, progress) {
     return `
-        <div class="stat-card dashboard-stat-card">
+        <div class="stat-card dashboard-stat-card" data-dashboard-module="${escapeHTML(icon)}">
             <div class="stat-header">
                 ${appIconHTML(getDashboardIconName(icon), `stat-icon stat-icon-${escapeHTML(icon)} dashboard-icon`)}
                 <span class="stat-label">${escapeHTML(label)}</span>
@@ -9909,9 +9909,9 @@ async function initializeApp() {
 
 /* ============================================
    CONFIGURACIÓN DE EXPERIENCIA
-   Preferencias locales, aisladas de Auth y Supabase
+   Preferencias persistentes y aisladas por usuario
    ============================================ */
-const APP_SETTINGS_STORAGE_KEY = 'ac_edunity_settings_v1';
+const APP_SETTINGS_STORAGE_PREFIX = 'ac_edunity_settings_v2';
 const DEFAULT_APP_SETTINGS = Object.freeze({
     animations: true,
     tutorSuggestions: true,
@@ -9919,53 +9919,74 @@ const DEFAULT_APP_SETTINGS = Object.freeze({
     language: 'es',
     performanceMode: false,
     dashboardModules: {
-        calendar: true,
         subjects: true,
         tasks: true,
+        calendar: true,
+        grades: true,
         tutor: true,
-        exams: true,
-        notifications: true
+        progress: true,
+        day: true,
+        studentCenter: true,
+        weekly: true
     }
 });
 let appSettings = null;
+let appSettingsOwnerId = 'guest';
+let dashboardSettingsDraft = null;
+let settingsReminderKey = '';
 
-function readAppSettings() {
+function cloneDefaultAppSettings() {
+    return {
+        ...DEFAULT_APP_SETTINGS,
+        dashboardModules: { ...DEFAULT_APP_SETTINGS.dashboardModules }
+    };
+}
+
+function getAppSettingsStorageKey(ownerId = appSettingsOwnerId) {
+    const safeOwner = String(ownerId || 'guest').replace(/[^a-zA-Z0-9_-]/g, '');
+    return `${APP_SETTINGS_STORAGE_PREFIX}:${safeOwner || 'guest'}`;
+}
+
+function readAppSettings(ownerId = appSettingsOwnerId) {
     try {
-        const stored = JSON.parse(localStorage.getItem(APP_SETTINGS_STORAGE_KEY) || '{}');
+        const stored = JSON.parse(localStorage.getItem(getAppSettingsStorageKey(ownerId)) || '{}');
         return {
-            ...DEFAULT_APP_SETTINGS,
+            ...cloneDefaultAppSettings(),
             ...stored,
+            language: 'es',
             dashboardModules: {
                 ...DEFAULT_APP_SETTINGS.dashboardModules,
                 ...(stored.dashboardModules || {})
             }
         };
     } catch (error) {
-        console.warn('[SETTINGS] Preferencias locales inválidas; se usarán valores seguros.');
-        return {
-            ...DEFAULT_APP_SETTINGS,
-            dashboardModules: { ...DEFAULT_APP_SETTINGS.dashboardModules }
-        };
+        console.warn('[SETTINGS] Preferencias inválidas; se usarán valores seguros.');
+        return cloneDefaultAppSettings();
     }
 }
 
-function saveAppSettings() {
+function persistAppSettings(nextSettings = appSettings) {
     try {
-        localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+        localStorage.setItem(getAppSettingsStorageKey(), JSON.stringify(nextSettings));
+        return true;
     } catch (error) {
-        console.warn('[SETTINGS] No se pudieron guardar las preferencias:', error?.message || error);
+        console.error('[SETTINGS] No se pudieron guardar las preferencias:', error?.message || 'storage_error');
+        notify('No se pudo guardar la preferencia. Se restauró el valor anterior.', 'error');
+        return false;
     }
 }
 
-function applyAppSettings() {
-    if (!appSettings) appSettings = readAppSettings();
-    document.body.classList.toggle('settings-reduced-motion', !appSettings.animations);
-    document.body.classList.toggle('settings-tutor-suggestions-off', !appSettings.tutorSuggestions);
-    document.body.classList.toggle('settings-notifications-off', !appSettings.notifications);
-    document.body.classList.toggle('settings-performance-mode', appSettings.performanceMode);
-    document.documentElement.lang = appSettings.language === 'en' ? 'en' : 'es';
-    applyDashboardModulePreferences();
-    syncAppSettingsControls();
+function switchAppSettingsUser(userId) {
+    appSettingsOwnerId = userId ? String(userId) : 'guest';
+    appSettings = readAppSettings(appSettingsOwnerId);
+    dashboardSettingsDraft = null;
+    settingsReminderKey = '';
+    applyAppSettings();
+}
+
+function updateSettingsSwitchLabel(input) {
+    const label = input.closest('.settings-switch')?.querySelector('.settings-switch-label');
+    if (label) label.textContent = input.checked ? 'Activado' : 'Desactivado';
 }
 
 function syncAppSettingsControls() {
@@ -9974,83 +9995,177 @@ function syncAppSettingsControls() {
         const key = input.dataset.settingToggle;
         input.checked = Boolean(appSettings[key]);
         input.setAttribute('aria-checked', String(input.checked));
+        updateSettingsSwitchLabel(input);
     });
+    document.querySelectorAll('[data-interface-sound-toggle]').forEach(updateSettingsSwitchLabel);
     const languageSelect = document.querySelector('[data-setting-select="language"]');
-    if (languageSelect) languageSelect.value = appSettings.language;
+    if (languageSelect) languageSelect.value = 'es';
     document.querySelectorAll('[data-dashboard-module]').forEach(input => {
-        input.checked = appSettings.dashboardModules[input.dataset.dashboardModule] !== false;
+        if (input.matches('input')) {
+            const source = dashboardSettingsDraft || appSettings.dashboardModules;
+            input.checked = source[input.dataset.dashboardModule] !== false;
+        }
     });
 }
 
-function updateAppSetting(key, value) {
-    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key)) return;
-    appSettings[key] = key === 'language' ? (value === 'en' ? 'en' : 'es') : Boolean(value);
-    saveAppSettings();
-    applyAppSettings();
-    notify('Preferencia guardada.', 'success');
+function applyTutorSuggestionPreference() {
+    document.querySelectorAll('[data-tutor-auto-suggestions]').forEach(element => {
+        element.hidden = !appSettings?.tutorSuggestions;
+    });
 }
 
-function updateDashboardModuleSetting(moduleKey, enabled) {
-    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS.dashboardModules, moduleKey)) return;
-    appSettings.dashboardModules[moduleKey] = Boolean(enabled);
-    saveAppSettings();
+function applyAppSettings() {
+    if (!appSettings) appSettings = readAppSettings();
+    const reduceMotion = !appSettings.animations;
+    document.documentElement.classList.toggle('reduce-app-motion', reduceMotion);
+    document.body.classList.toggle('reduce-app-motion', reduceMotion);
+    document.documentElement.classList.toggle('performance-mode', appSettings.performanceMode);
+    document.body.classList.toggle('performance-mode', appSettings.performanceMode);
+    applyTutorSuggestionPreference();
     applyDashboardModulePreferences();
+    syncAppSettingsControls();
+}
+
+function updateAppSetting(key, value, input) {
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key) || key === 'language' || key === 'dashboardModules') return;
+    const previous = appSettings[key];
+    appSettings[key] = Boolean(value);
+    if (!persistAppSettings()) {
+        appSettings[key] = previous;
+        applyAppSettings();
+        return;
+    }
+    applyAppSettings();
+    if (key === 'notifications' && appSettings.notifications) runSmartReminders({ force: true });
+    notify('Preferencia guardada.', 'success');
+    if (input) updateSettingsSwitchLabel(input);
 }
 
 function applyDashboardModulePreferences() {
     const dashboard = document.getElementById('dashboard');
     if (!dashboard || !appSettings) return;
-    const keywords = {
-        calendar: ['calendario', 'agenda'],
-        subjects: ['materias activas', 'materias'],
-        tasks: ['tareas pendientes', 'tareas'],
-        tutor: ['tutor ia', 'recomendaciones'],
-        exams: ['próximo examen', 'próximos exámenes'],
-        notifications: ['notificaciones', 'avisos']
-    };
-    const candidates = dashboard.querySelectorAll('.dashboard-grid > *, .dashboard-row > *, .dashboard-main-grid > *, .dashboard-bottom-section > *');
-    candidates.forEach(card => {
-        const text = (card.textContent || '').toLocaleLowerCase('es');
-        let matched = null;
-        Object.entries(keywords).some(([key, words]) => {
-            if (words.some(word => text.includes(word))) {
-                matched = key;
-                return true;
-            }
-            return false;
-        });
-        if (matched) card.hidden = appSettings.dashboardModules[matched] === false;
+    dashboard.querySelectorAll('[data-dashboard-module]').forEach(module => {
+        const key = module.dataset.dashboardModule;
+        if (!module.matches('input') && Object.prototype.hasOwnProperty.call(appSettings.dashboardModules, key)) {
+            module.hidden = appSettings.dashboardModules[key] === false;
+        }
     });
 }
 
-function toggleSettingsPanel(panelName, button) {
-    const panel = document.querySelector('[data-settings-panel="' + panelName + '"]');
-    if (!panel) return;
-    const shouldOpen = panel.hidden;
-    panel.hidden = !shouldOpen;
-    if (button) button.setAttribute('aria-expanded', String(shouldOpen));
+function openSettingsModal(name) {
+    const modal = document.querySelector(`[data-settings-modal="${name}"]`);
+    if (!modal) return;
+    if (name === 'dashboard') {
+        dashboardSettingsDraft = { ...appSettings.dashboardModules };
+        syncAppSettingsControls();
+    }
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('settings-modal-open');
+    modal.querySelector('button, input, select, a')?.focus();
+}
+
+function closeSettingsModal(name) {
+    const modal = document.querySelector(`[data-settings-modal="${name}"]`);
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('settings-modal-open');
+    dashboardSettingsDraft = null;
+    syncAppSettingsControls();
+    document.querySelector(`[data-open-settings-modal="${name}"]`)?.focus();
+}
+
+function updateDashboardSettingsDraft(key, enabled) {
+    if (!dashboardSettingsDraft || !Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS.dashboardModules, key)) return;
+    dashboardSettingsDraft[key] = Boolean(enabled);
+}
+
+function saveDashboardSettings() {
+    if (!dashboardSettingsDraft) return;
+    const previous = { ...appSettings.dashboardModules };
+    appSettings.dashboardModules = { ...dashboardSettingsDraft };
+    if (!persistAppSettings()) {
+        appSettings.dashboardModules = previous;
+        applyAppSettings();
+        return;
+    }
+    closeSettingsModal('dashboard');
+    applyAppSettings();
+    notify('Panel principal actualizado.', 'success');
+}
+
+function restoreDashboardSettingsDefaults() {
+    dashboardSettingsDraft = { ...DEFAULT_APP_SETTINGS.dashboardModules };
+    syncAppSettingsControls();
+}
+
+function useTutorSuggestion(promptText) {
+    const input = document.getElementById('ai-topic');
+    if (!input) return;
+    input.value = String(promptText || '');
+    input.focus();
+}
+
+function getReminderCandidates(workspace) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return (workspace?.tasks || [])
+        .filter(task => task.status !== 'completed' && task.due)
+        .map(task => {
+            const normalized = normalizeDate(task.due);
+            const date = normalized ? new Date(`${normalized}T00:00:00`) : null;
+            const days = date && !Number.isNaN(date.getTime()) ? Math.round((date - today) / 86400000) : null;
+            return { task, days };
+        })
+        .filter(item => item.days !== null && item.days <= 3)
+        .sort((a, b) => a.days - b.days);
+}
+
+function runSmartReminders({ force = false } = {}) {
+    if (!appSettings?.notifications || !currentUser?.id) return;
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const reminderKey = `${currentUser.id}:${todayKey}`;
+    if (!force && settingsReminderKey === reminderKey) return;
+    const candidate = getReminderCandidates(loadWorkspace())[0];
+    settingsReminderKey = reminderKey;
+    if (!candidate) return;
+    const label = candidate.days < 0 ? 'está vencida' : candidate.days === 0 ? 'vence hoy' : `vence en ${candidate.days} día(s)`;
+    notify(`Recordatorio: ${candidate.task.title} ${label}.`, candidate.days < 0 ? 'error' : 'info');
 }
 
 function bindAppSettingsControls() {
     document.querySelectorAll('[data-setting-toggle]').forEach(input => {
         if (input.dataset.settingsBound === 'true') return;
         input.dataset.settingsBound = 'true';
-        input.addEventListener('change', () => updateAppSetting(input.dataset.settingToggle, input.checked));
+        input.addEventListener('change', () => updateAppSetting(input.dataset.settingToggle, input.checked, input));
     });
-    const languageSelect = document.querySelector('[data-setting-select="language"]');
-    if (languageSelect && languageSelect.dataset.settingsBound !== 'true') {
-        languageSelect.dataset.settingsBound = 'true';
-        languageSelect.addEventListener('change', () => updateAppSetting('language', languageSelect.value));
-    }
     document.querySelectorAll('[data-dashboard-module]').forEach(input => {
-        if (input.dataset.settingsBound === 'true') return;
+        if (!input.matches('input') || input.dataset.settingsBound === 'true') return;
         input.dataset.settingsBound = 'true';
-        input.addEventListener('change', () => updateDashboardModuleSetting(input.dataset.dashboardModule, input.checked));
+        input.addEventListener('change', () => updateDashboardSettingsDraft(input.dataset.dashboardModule, input.checked));
     });
-    document.querySelectorAll('[data-settings-panel-button]').forEach(button => {
+    document.querySelectorAll('[data-open-settings-modal]').forEach(button => {
         if (button.dataset.settingsBound === 'true') return;
         button.dataset.settingsBound = 'true';
-        button.addEventListener('click', () => toggleSettingsPanel(button.dataset.settingsPanelButton, button));
+        button.addEventListener('click', () => openSettingsModal(button.dataset.openSettingsModal));
+    });
+    document.querySelectorAll('[data-close-settings-modal]').forEach(button => {
+        if (button.dataset.settingsBound === 'true') return;
+        button.dataset.settingsBound = 'true';
+        button.addEventListener('click', () => closeSettingsModal(button.dataset.closeSettingsModal));
+    });
+    document.querySelector('[data-save-dashboard-settings]')?.addEventListener('click', saveDashboardSettings);
+    document.querySelector('[data-restore-dashboard-settings]')?.addEventListener('click', restoreDashboardSettingsDefaults);
+    document.querySelectorAll('[data-tutor-suggestion]').forEach(button => {
+        if (button.dataset.settingsBound === 'true') return;
+        button.dataset.settingsBound = 'true';
+        button.addEventListener('click', () => useTutorSuggestion(button.dataset.tutorSuggestion));
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        const openModal = document.querySelector('[data-settings-modal]:not([hidden])');
+        if (openModal) closeSettingsModal(openModal.dataset.settingsModal);
     });
     syncAppSettingsControls();
 }
