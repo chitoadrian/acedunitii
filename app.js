@@ -229,6 +229,39 @@ function toggleInterfaceSounds(enabled) {
     }
 }
 
+function getPasswordToggleInput(toggle) {
+    const shell = toggle?.closest('.auth-input-shell, .register-input-shell, .password-field-shell');
+    return shell?.querySelector('input[type="password"], input[type="text"]') || null;
+}
+
+function handlePasswordTogglePointerDown(event) {
+    const toggle = event.target.closest?.('[data-password-toggle]');
+    if (toggle) event.preventDefault();
+}
+
+function handlePasswordToggleClick(event) {
+    const toggle = event.target.closest?.('[data-password-toggle]');
+    if (!toggle) return;
+
+    const input = getPasswordToggleInput(toggle);
+    if (!input) return;
+
+    const wasHidden = input.type === 'password';
+    const selectionStart = input.selectionStart;
+    const selectionEnd = input.selectionEnd;
+
+    input.type = wasHidden ? 'text' : 'password';
+    toggle.setAttribute('aria-pressed', String(wasHidden));
+    toggle.setAttribute('aria-label', wasHidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+
+    if (document.activeElement === input && selectionStart !== null && selectionEnd !== null) {
+        input.setSelectionRange(selectionStart, selectionEnd);
+    }
+}
+
+document.addEventListener('pointerdown', handlePasswordTogglePointerDown, true);
+document.addEventListener('click', handlePasswordToggleClick);
+
 function setAuthMessage(pageId, message, type = 'error', action = null) {
     const page = document.getElementById(`${pageId}-page`);
     const card = page ? page.querySelector('.auth-card') : null;
@@ -8121,11 +8154,23 @@ function openPasswordUpdateModal() {
             <form class="quick-modal-form password-update-form">
                 <label>
                     <span>Nueva contraseña</span>
-                    <input type="password" name="newPassword" placeholder="Mínimo 8 caracteres" minlength="8" autocomplete="new-password" required>
+                    <span class="password-field-shell">
+                        <input type="password" name="newPassword" placeholder="Mínimo 8 caracteres" minlength="8" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
+                            <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                            <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+                        </button>
+                    </span>
                 </label>
                 <label>
                     <span>Confirmar contraseña</span>
-                    <input type="password" name="confirmPassword" placeholder="Repite la contraseña" minlength="8" autocomplete="new-password" required>
+                    <span class="password-field-shell">
+                        <input type="password" name="confirmPassword" placeholder="Repite la contraseña" minlength="8" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
+                            <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                            <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
+                        </button>
+                    </span>
                 </label>
                 <div class="quick-modal-actions password-modal-actions">
                     <button class="btn-secondary btn-small" type="button" data-cancel>Cancelar</button>
