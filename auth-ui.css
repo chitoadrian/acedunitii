@@ -2021,3 +2021,97 @@ body.light-theme .password-modal .btn-primary {
     color: #fff !important;
     background: linear-gradient(105deg, #1687df, #334ed8 52%, #7138dc) !important;
 }
+
+
+/* Accessible password visibility controls */
+#login-page .password-toggle,
+#register-page .password-toggle,
+.password-modal .password-toggle {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    color: #e9edff;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    pointer-events: auto;
+    transform: translateY(-50%);
+    transition: color .18s ease, background-color .18s ease, box-shadow .18s ease;
+}
+
+#register-page .password-toggle { right: 12px; }
+
+.password-toggle svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+.password-toggle .password-toggle-eye-closed,
+.password-toggle[aria-pressed="true"] .password-toggle-eye-open {
+    display: none;
+}
+
+.password-toggle[aria-pressed="true"] .password-toggle-eye-closed {
+    display: block;
+}
+
+#login-page .password-toggle:hover,
+#register-page .password-toggle:hover,
+.password-modal .password-toggle:hover {
+    color: #ffffff;
+    background: rgba(110, 93, 255, .16);
+}
+
+#login-page .password-toggle:focus-visible,
+#register-page .password-toggle:focus-visible,
+.password-modal .password-toggle:focus-visible {
+    outline: 2px solid #76a7ff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(118, 167, 255, .2);
+}
+
+.password-field-shell {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.password-field-shell > input {
+    width: 100%;
+    padding-right: 54px !important;
+    box-sizing: border-box;
+}
+
+.password-modal .password-toggle {
+    right: 7px;
+    color: #dce5ff;
+}
+
+body.light-theme #login-page .password-toggle,
+body.light-theme #register-page .password-toggle,
+body.light-theme .password-modal .password-toggle {
+    color: var(--auth-icon, #465575);
+}
+
+body.light-theme #login-page .password-toggle:hover,
+body.light-theme #register-page .password-toggle:hover,
+body.light-theme .password-modal .password-toggle:hover {
+    color: var(--auth-link, #2563eb);
+    background: rgba(37, 99, 235, .09);
+}
