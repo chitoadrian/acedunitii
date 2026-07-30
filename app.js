@@ -9919,7 +9919,6 @@ const DEFAULT_APP_SETTINGS = Object.freeze({
     animations: true,
     tutorSuggestions: true,
     notifications: true,
-    language: 'es',
     performanceMode: false,
     dashboardModules: {
         subjects: true,
@@ -9956,7 +9955,6 @@ function readAppSettings(ownerId = appSettingsOwnerId) {
         return {
             ...cloneDefaultAppSettings(),
             ...stored,
-            language: 'es',
             dashboardModules: {
                 ...DEFAULT_APP_SETTINGS.dashboardModules,
                 ...(stored.dashboardModules || {})
@@ -9988,8 +9986,15 @@ function switchAppSettingsUser(userId) {
 }
 
 function updateSettingsSwitchLabel(input) {
-    const label = input.closest('.settings-switch')?.querySelector('.settings-switch-label');
-    if (label) label.textContent = input.checked ? 'Activado' : 'Desactivado';
+    const switchControl = input.closest('.settings-switch');
+    const label = switchControl?.querySelector('.settings-switch-label');
+    const card = input.closest('.settings-card');
+    const disabledNote = card?.querySelector('.settings-disabled-note');
+    const enabled = Boolean(input.checked);
+
+    if (label) label.textContent = enabled ? 'Activado' : 'Desactivado';
+    if (card) card.dataset.settingState = enabled ? 'enabled' : 'disabled';
+    if (disabledNote) disabledNote.setAttribute('aria-hidden', String(enabled));
 }
 
 function syncAppSettingsControls() {
@@ -10001,8 +10006,15 @@ function syncAppSettingsControls() {
         updateSettingsSwitchLabel(input);
     });
     document.querySelectorAll('[data-interface-sound-toggle]').forEach(updateSettingsSwitchLabel);
-    const languageSelect = document.querySelector('[data-setting-select="language"]');
-    if (languageSelect) languageSelect.value = 'es';
+    document.querySelectorAll('[data-setting-toggle], [data-interface-sound-toggle]').forEach(input => {
+        if (input.dataset.settingsKeyboardBound === 'true') return;
+        input.dataset.settingsKeyboardBound = 'true';
+        input.addEventListener('keydown', event => {
+            if (event.key !== 'Enter') return;
+            event.preventDefault();
+            input.click();
+        });
+    });
     document.querySelectorAll('[data-dashboard-module]').forEach(input => {
         if (input.matches('input')) {
             const source = dashboardSettingsDraft || appSettings.dashboardModules;
@@ -10030,7 +10042,7 @@ function applyAppSettings() {
 }
 
 function updateAppSetting(key, value, input) {
-    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key) || key === 'language' || key === 'dashboardModules') return;
+    if (!Object.prototype.hasOwnProperty.call(DEFAULT_APP_SETTINGS, key) || key === 'dashboardModules') return;
     const previous = appSettings[key];
     appSettings[key] = Boolean(value);
     if (!persistAppSettings()) {
