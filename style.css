@@ -36256,3 +36256,15 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .robot-ha
         font-size: 34px !important;
     }
 }
+
+
+/* Functions section heading: share the cards' centered content width */
+#landing-page .benefits-heading-container {
+    width: min(1260px, 100%);
+    margin-inline: auto;
+}
+
+#landing-page .benefits-heading-container > .section-eyebrow {
+    margin-left: 0;
+    margin-right: 0;
+}
