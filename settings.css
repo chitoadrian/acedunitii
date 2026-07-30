@@ -223,29 +223,6 @@
     accent-color: #7766ef;
 }
 
-#settings .settings-select-label {
-    display: grid;
-    gap: 5px;
-    min-width: 145px;
-    color: #98a3c1;
-    font-size: 11px;
-    font-weight: 750;
-    text-transform: uppercase;
-}
-
-#settings .settings-select-label select {
-    width: 100%;
-    min-height: 42px;
-    padding: 0 36px 0 12px;
-    border: 1px solid rgba(132, 146, 194, .38);
-    border-radius: 12px;
-    color: #eef1ff;
-    background: #111831;
-    font: inherit;
-    font-size: 13px;
-    text-transform: none;
-}
-
 #settings .settings-about-panel {
     display: grid;
     grid-template-columns: auto minmax(160px, .55fr) minmax(240px, 1.45fr);
@@ -311,8 +288,7 @@ body.light-theme #settings .settings-card {
 }
 
 body.light-theme #settings .settings-kicker,
-body.light-theme #settings .settings-switch-label,
-body.light-theme #settings .settings-select-label {
+body.light-theme #settings .settings-switch-label {
     color: #667085;
 }
 
@@ -333,11 +309,6 @@ body.light-theme #settings .settings-about-panel {
 body.light-theme #settings .settings-options-panel label {
     color: #344054;
     background: rgba(255,255,255,.55);
-}
-
-body.light-theme #settings .settings-select-label select {
-    color: #253047;
-    background: #f1f3f6;
 }
 
 body.light-theme #settings .settings-about-panel span {
@@ -381,8 +352,7 @@ body.light-theme #settings .settings-about-panel span {
     }
 
     #settings .settings-switch,
-    #settings .settings-panel-button,
-    #settings .settings-select-label {
+    #settings .settings-panel-button {
         grid-column: 2;
         justify-self: start;
     }
@@ -724,5 +694,66 @@ body.light-theme .tutor-auto-suggestions button {
     .tutor-auto-suggestions button {
         flex: 1 1 100%;
         text-align: left;
+    }
+}
+
+
+#settings .settings-card-copy {
+    align-self: center;
+}
+
+#settings .settings-disabled-note {
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+    opacity: 0;
+    color: #929db9;
+    font-size: .78rem;
+    line-height: 1.45;
+    transform: translateY(-3px);
+    transition: max-height .24s ease, margin-top .24s ease, opacity .2s ease, transform .24s ease;
+}
+
+#settings .settings-card[data-setting-state="disabled"] .settings-disabled-note {
+    max-height: 96px;
+    margin-top: 9px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#settings .settings-card[data-setting-state="enabled"] .settings-switch-label {
+    color: #78d4ff;
+}
+
+#settings .settings-card[data-setting-state="disabled"] .settings-switch-label {
+    color: #9aa4bb;
+}
+
+#settings .settings-switch-label {
+    min-width: 74px;
+    text-align: center;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.light-theme #settings .settings-disabled-note {
+    color: #6b7280;
+}
+
+body.light-theme #settings .settings-card[data-setting-state="enabled"] .settings-switch-label {
+    color: #2563a8;
+}
+
+body.light-theme #settings .settings-card[data-setting-state="disabled"] .settings-switch-label {
+    color: #667085;
+}
+
+@media (max-width: 640px) {
+    #settings .settings-disabled-note {
+        font-size: .76rem;
+    }
+
+    #settings .settings-card[data-setting-state="disabled"] .settings-disabled-note {
+        max-height: 130px;
     }
 }
