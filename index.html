@@ -44,9 +44,16 @@
 
     <link rel="stylesheet" href="style.css?v=20260729-auth-ui-final-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
-    <link rel="stylesheet" href="auth-ui.css?v=20260729-auth-layout-premium-v1">
+    <link rel="stylesheet" href="auth-ui.css?v=20260730-auth-light-theme-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
+    <script id="theme-preload">
+        try {
+            if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-theme');
+        } catch (error) {
+            // Storage can be unavailable in hardened browser contexts; dark remains the safe default.
+        }
+    </script>
     <svg class="app-svg-definitions" aria-hidden="true" focusable="false">
         <defs>
             <symbol id="icon-tutor-robot" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="4"></rect><path d="M12 7V4"></path><circle cx="9" cy="12" r="1"></circle><circle cx="15" cy="12" r="1"></circle><path d="M9.5 15h5"></path><path d="M3 11v3"></path><path d="M21 11v3"></path></symbol>
