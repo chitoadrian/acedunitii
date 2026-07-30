@@ -1705,3 +1705,319 @@
         margin-top: 16px !important;
     }
 }
+
+
+/* Explicit light authentication theme.
+   The application theme contract is body.light-theme; dark rules above remain unchanged. */
+body.light-theme #login-page,
+body.light-theme #register-page {
+    --auth-bg: #f5f7ff;
+    --auth-bg-secondary: #eef4ff;
+    --auth-bg-lavender: #f4eeff;
+    --auth-card-bg: rgba(250, 251, 255, .92);
+    --auth-card-border: rgba(91, 110, 180, .24);
+    --auth-text: #17213d;
+    --auth-heading: #18223f;
+    --auth-muted: #5f6b85;
+    --auth-subtle: #7b849b;
+    --auth-input-bg: #f7f9ff;
+    --auth-input-text: #17213d;
+    --auth-input-border: rgba(78, 94, 145, .38);
+    --auth-icon: #465575;
+    --auth-link: #2563eb;
+    --auth-link-hover: #1d4ed8;
+    --auth-focus: #5b5ce2;
+    --auth-divider: rgba(78, 94, 145, .28);
+    color: var(--auth-text) !important;
+    background: var(--auth-bg) !important;
+}
+
+body.light-theme #login-page .auth-container,
+body.light-theme #register-page .auth-container {
+    color: var(--auth-text) !important;
+    background:
+        radial-gradient(circle at 8% 92%, rgba(124, 58, 237, .13), transparent 27%),
+        radial-gradient(circle at 94% 43%, rgba(37, 99, 235, .12), transparent 32%),
+        radial-gradient(circle at 49% 48%, rgba(96, 165, 250, .08), transparent 43%),
+        linear-gradient(116deg, var(--auth-bg) 0%, var(--auth-bg-secondary) 52%, var(--auth-bg-lavender) 100%) !important;
+}
+
+body.light-theme #login-page .auth-container::before,
+body.light-theme #register-page .auth-container::before {
+    opacity: .2 !important;
+    background-image:
+        linear-gradient(rgba(70, 96, 170, .14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(70, 96, 170, .14) 1px, transparent 1px) !important;
+}
+
+body.light-theme #login-page .auth-container::after,
+body.light-theme #register-page .auth-container::after {
+    opacity: .55 !important;
+    background:
+        radial-gradient(circle at 5% 16%, rgba(37, 99, 235, .62) 0 1px, transparent 2px),
+        radial-gradient(circle at 18% 11%, rgba(124, 58, 237, .56) 0 1.5px, transparent 2.5px),
+        radial-gradient(circle at 31% 36%, rgba(37, 99, 235, .46) 0 1px, transparent 2px),
+        radial-gradient(circle at 75% 14%, rgba(14, 116, 144, .42) 0 1px, transparent 2px),
+        radial-gradient(circle at 92% 28%, rgba(124, 58, 237, .52) 0 1.5px, transparent 2.5px) !important;
+}
+
+body.light-theme #login-page .auth-star,
+body.light-theme #register-page .auth-star {
+    background: #397be8 !important;
+    box-shadow: 0 0 7px rgba(37, 99, 235, .3) !important;
+}
+body.light-theme #login-page .star-b,
+body.light-theme #login-page .star-e,
+body.light-theme #register-page .star-b,
+body.light-theme #register-page .star-e {
+    background: #7c3aed !important;
+}
+
+body.light-theme #login-page .login-intro-brand,
+body.light-theme #register-page .register-intro-brand {
+    color: #6436b8 !important;
+}
+body.light-theme #login-page .login-intro-brand strong,
+body.light-theme #register-page .register-intro-brand strong {
+    color: #17213d !important;
+}
+body.light-theme #login-page .login-intro-logo,
+body.light-theme #register-page .register-intro-logo,
+body.light-theme #login-page .auth-brand-logo,
+body.light-theme #register-page .auth-brand-logo {
+    aspect-ratio: 1 / 1 !important;
+    object-fit: contain !important;
+    background: transparent !important;
+    filter: drop-shadow(0 8px 15px rgba(58, 70, 135, .16)) !important;
+}
+
+body.light-theme #login-page .login-intro-copy h1,
+body.light-theme #register-page .register-intro-copy h1 {
+    color: var(--auth-heading) !important;
+    text-shadow: none !important;
+}
+body.light-theme #login-page .login-title-line em,
+body.light-theme #register-page .register-title-line em {
+    background: linear-gradient(100deg, #0879c9 0%, #3f5fe5 52%, #7c3aed 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+body.light-theme #login-page .login-intro-copy p,
+body.light-theme #register-page .register-intro-copy p {
+    color: var(--auth-muted) !important;
+    text-shadow: none !important;
+}
+
+body.light-theme #login-page .auth-card,
+body.light-theme #register-page .auth-card {
+    color: var(--auth-text) !important;
+    border-color: var(--auth-card-border) !important;
+    background: var(--auth-card-bg) !important;
+    box-shadow: 0 24px 60px rgba(41, 55, 110, .16), inset 0 1px 0 rgba(255, 255, 255, .72) !important;
+    backdrop-filter: blur(18px) saturate(112%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(112%) !important;
+}
+body.light-theme #login-page .auth-card::before,
+body.light-theme #register-page .auth-card::before {
+    background: linear-gradient(135deg, rgba(255, 255, 255, .62), transparent 46%) !important;
+}
+body.light-theme #login-page .auth-card h2,
+body.light-theme #register-page .auth-card h2 {
+    color: var(--auth-heading) !important;
+    text-shadow: none !important;
+}
+body.light-theme #login-page .auth-subtitle,
+body.light-theme #register-page .auth-subtitle {
+    color: var(--auth-muted) !important;
+}
+body.light-theme #login-page .auth-subtitle strong,
+body.light-theme #register-page .auth-subtitle strong {
+    color: #6d37d5 !important;
+}
+
+body.light-theme #login-page .form-group label,
+body.light-theme #register-page .form-group label,
+body.light-theme #login-page .remember-option {
+    color: var(--auth-text) !important;
+}
+body.light-theme #login-page .auth-input-shell,
+body.light-theme #register-page .register-input-shell {
+    border-color: var(--auth-input-border) !important;
+    background: var(--auth-input-bg) !important;
+    box-shadow: 0 1px 2px rgba(35, 48, 91, .04) !important;
+}
+body.light-theme #login-page .auth-input-shell:focus-within,
+body.light-theme #register-page .register-input-shell:focus-within {
+    border-color: var(--auth-focus) !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(91, 92, 226, .14), 0 8px 20px rgba(57, 72, 140, .08) !important;
+}
+body.light-theme #login-page .auth-input-shell input,
+body.light-theme #register-page .register-input-shell input {
+    color: var(--auth-input-text) !important;
+    background: transparent !important;
+    caret-color: #4338ca !important;
+}
+body.light-theme #login-page .auth-input-shell input::placeholder,
+body.light-theme #register-page .register-input-shell input::placeholder {
+    color: var(--auth-subtle) !important;
+    opacity: 1 !important;
+}
+body.light-theme #login-page .auth-input-icon,
+body.light-theme #login-page .auth-password-visual,
+body.light-theme #register-page .register-input-icon,
+body.light-theme #register-page .register-password-visual {
+    color: var(--auth-icon) !important;
+}
+body.light-theme #login-page input:-webkit-autofill,
+body.light-theme #login-page input:-webkit-autofill:hover,
+body.light-theme #login-page input:-webkit-autofill:focus,
+body.light-theme #register-page input:-webkit-autofill,
+body.light-theme #register-page input:-webkit-autofill:hover,
+body.light-theme #register-page input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--auth-input-text) !important;
+    box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
+    transition: background-color 9999s ease-out 0s;
+}
+
+body.light-theme #login-page .remember-option input {
+    border-color: rgba(67, 81, 128, .48) !important;
+    background: #fff !important;
+}
+body.light-theme #login-page .remember-option input:checked {
+    border-color: #4f46e5 !important;
+    background: linear-gradient(135deg, #2589e9, #7145e8) !important;
+}
+body.light-theme #login-page .remember-option input:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .24) !important;
+    outline-offset: 2px !important;
+}
+
+body.light-theme #login-page .forgot-password-link,
+body.light-theme #login-page .auth-link a,
+body.light-theme #register-page .auth-link a {
+    color: var(--auth-link) !important;
+    text-shadow: none !important;
+}
+body.light-theme #login-page .forgot-password-link:hover,
+body.light-theme #login-page .auth-link a:hover,
+body.light-theme #register-page .auth-link a:hover {
+    color: var(--auth-link-hover) !important;
+    text-decoration: underline !important;
+}
+body.light-theme #login-page .auth-link,
+body.light-theme #register-page .auth-link {
+    color: var(--auth-muted) !important;
+}
+body.light-theme #login-page .auth-link::before,
+body.light-theme #login-page .auth-link::after,
+body.light-theme #register-page .auth-link::before,
+body.light-theme #register-page .auth-link::after {
+    background: var(--auth-divider) !important;
+}
+
+body.light-theme #register-page .register-back-button {
+    color: #334155 !important;
+    border-color: rgba(78, 94, 145, .3) !important;
+    background: rgba(247, 249, 255, .92) !important;
+}
+body.light-theme #register-page .register-back-button:hover {
+    color: #1e3a8a !important;
+    border-color: rgba(37, 99, 235, .42) !important;
+    background: #fff !important;
+}
+
+body.light-theme #login-page #login-form > .btn-primary,
+body.light-theme #register-page #register-form > .btn-primary {
+    color: #fff !important;
+    border-color: rgba(55, 82, 190, .38) !important;
+    background: linear-gradient(105deg, #1687df 0%, #334ed8 46%, #7138dc 78%, #a52cc6 100%) !important;
+    box-shadow: 0 13px 27px rgba(53, 70, 190, .2), inset 0 1px 0 rgba(255, 255, 255, .3) !important;
+}
+body.light-theme #login-page #login-form > .btn-primary:hover,
+body.light-theme #register-page #register-form > .btn-primary:hover {
+    filter: brightness(.96) saturate(108%) !important;
+    box-shadow: 0 16px 32px rgba(53, 70, 190, .26), inset 0 1px 0 rgba(255, 255, 255, .32) !important;
+}
+body.light-theme #login-page #login-form > .btn-primary:focus-visible,
+body.light-theme #register-page #register-form > .btn-primary:focus-visible,
+body.light-theme #login-page .forgot-password-link:focus-visible,
+body.light-theme #login-page .auth-link a:focus-visible,
+body.light-theme #register-page .auth-link a:focus-visible,
+body.light-theme #register-page .register-back-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .38) !important;
+    outline-offset: 3px !important;
+}
+body.light-theme #login-page #login-form > .btn-primary:disabled,
+body.light-theme #register-page #register-form > .btn-primary:disabled {
+    opacity: .58 !important;
+    filter: saturate(.58) !important;
+    cursor: not-allowed !important;
+}
+
+body.light-theme #login-page .auth-message,
+body.light-theme #register-page .auth-message {
+    color: #334155 !important;
+    border: 1px solid rgba(78, 94, 145, .24) !important;
+    background: #f3f6fc !important;
+}
+body.light-theme #login-page .auth-message.error,
+body.light-theme #register-page .auth-message.error {
+    color: #991b1b !important;
+    border-color: #fecaca !important;
+    background: #fef2f2 !important;
+}
+body.light-theme #login-page .auth-message.success,
+body.light-theme #register-page .auth-message.success {
+    color: #166534 !important;
+    border-color: #bbf7d0 !important;
+    background: #f0fdf4 !important;
+}
+
+/* Password recovery and password update reuse the active body theme. */
+body.light-theme .password-modal {
+    background: rgba(42, 52, 86, .24) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+body.light-theme .password-modal .password-modal-card {
+    color: var(--auth-text, #17213d) !important;
+    border: 1px solid rgba(91, 110, 180, .24) !important;
+    background: rgba(250, 251, 255, .96) !important;
+    box-shadow: 0 24px 60px rgba(41, 55, 110, .18) !important;
+}
+body.light-theme .password-modal .password-modal-card h3 {
+    color: #18223f !important;
+}
+body.light-theme .password-modal .password-modal-text,
+body.light-theme .password-modal .quick-modal-form label span {
+    color: #5f6b85 !important;
+}
+body.light-theme .password-modal .quick-modal-form input {
+    color: #17213d !important;
+    border-color: rgba(78, 94, 145, .38) !important;
+    background: #f7f9ff !important;
+}
+body.light-theme .password-modal .quick-modal-form input::placeholder {
+    color: #7b849b !important;
+    opacity: 1 !important;
+}
+body.light-theme .password-modal .quick-modal-form input:focus {
+    outline: 3px solid rgba(91, 92, 226, .14) !important;
+    border-color: #5b5ce2 !important;
+    background: #fff !important;
+}
+body.light-theme .password-modal .quick-modal-close {
+    color: #334155 !important;
+    border-color: rgba(78, 94, 145, .28) !important;
+    background: #eef2fa !important;
+}
+body.light-theme .password-modal .btn-secondary {
+    color: #334155 !important;
+    border-color: rgba(78, 94, 145, .32) !important;
+    background: #f4f6fb !important;
+}
+body.light-theme .password-modal .btn-primary {
+    color: #fff !important;
+    background: linear-gradient(105deg, #1687df, #334ed8 52%, #7138dc) !important;
+}
