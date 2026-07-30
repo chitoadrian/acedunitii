@@ -10095,6 +10095,7 @@ async function switchAppSettingsUser(user) {
 
     clearLegacyGlobalSettings();
     applyAppSettings();
+    await runSmartReminders();
 }
 
 function updateSettingsSwitchLabel(input) {
