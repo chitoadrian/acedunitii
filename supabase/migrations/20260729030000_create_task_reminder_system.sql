@@ -91,3 +91,12 @@ drop trigger if exists reset_task_reminder_schedule_trigger on public.tasks;
 create trigger reset_task_reminder_schedule_trigger
 before update on public.tasks
 for each row execute function public.reset_task_reminder_schedule();
+
+revoke execute on function public.reset_task_reminder_schedule() from public, anon, authenticated;
+grant execute on function public.reset_task_reminder_schedule() to postgres, service_role;
+
+create index if not exists task_reminder_deliveries_user_id_idx
+  on public.task_reminder_deliveries (user_id);
+
+create index if not exists internal_notifications_task_id_idx
+  on public.internal_notifications (task_id);
