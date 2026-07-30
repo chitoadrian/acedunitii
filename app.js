@@ -2929,11 +2929,10 @@ function getTaskPriorityClass(priority) {
 }
 
 function getTaskReminderAlert(task) {
-    // Futuro backend: aqui se puede conectar Supabase + Gmail API para enviar recordatorios reales.
     const visualStatus = getTaskVisualStatus(task);
-    if (!task.emailReminder || !task.email || task.status === 'completed') return '';
+    if (!appSettings?.notifications || task.status === 'completed') return '';
     if (visualStatus !== 'upcoming' && visualStatus !== 'overdue') return '';
-    return `Se enviaria un recordatorio a ${task.email} para la tarea: ${task.title}`;
+    return 'Recordatorio automático activo para esta tarea.';
 }
 
 function isEventSoon(event) {
@@ -3069,9 +3068,8 @@ function openTaskForm(taskId = null) {
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: task?.subject || '' },
             { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea' },
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due) },
-            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' },
-            { name: 'emailReminder', label: 'Recordarme por Gmail', type: 'checkbox', checked: !!task?.emailReminder, required: false, help: 'Mostrar alerta visual cuando esté próxima a vencer' },
-            { name: 'email', label: 'Correo para notificación', type: 'email', value: task?.email || currentUser?.email || '', required: false, placeholder: 'usuario@gmail.com' }
+            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se usarán las 18:00 (America/Guayaquil).' },
+            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' }
         ],
         onSubmit: values => {
             const fresh = loadWorkspace();
@@ -3233,7 +3231,7 @@ function renderTasks(workspace) {
                                     <span><strong>Fecha:</strong> ${escapeHTML(task.due || 'Sin fecha')}</span>
                                     <span><strong>Tiempo:</strong> ${escapeHTML(getTaskDaysText(task))}</span>
                                     <span><strong>Prioridad:</strong> <em class="task-priority ${priorityClass}">${escapeHTML(getTaskPriorityLabel(task.priority || 'media'))}</em></span>
-                                    <span><strong>Gmail:</strong> ${task.emailReminder ? escapeHTML(task.email || 'correo pendiente') : 'Sin recordatorio'}</span>
+                                    <span><strong>Recordatorios:</strong> ${appSettings?.notifications ? 'Activos' : 'Desactivados'}</span>
                                 </div>
                                 ${reminder ? `<div class="task-reminder-alert">${escapeHTML(reminder)}</div>` : ''}
                             </div>
@@ -3279,7 +3277,9 @@ function getGoogleCalendarUrl(event) {
     const details = [
         `Evento creado desde AC Edunity.`,
         `Tipo: ${event.type || 'Evento académico'}.`,
-        event.emailReminder ? 'Activa las notificaciones de Google Calendar para recibir avisos en correo y celular.' : ''
+        appSettings?.notifications
+            ? 'Los recordatorios de AC Edunity están activos. Las notificaciones propias de este evento se configuran al guardarlo en Google Calendar.'
+            : 'Los recordatorios de AC Edunity están desactivados. Las notificaciones configuradas directamente en Google Calendar se administran desde Google.'
     ].filter(Boolean).join('\n');
     const params = new URLSearchParams({
         action: 'TEMPLATE',
@@ -8641,6 +8641,7 @@ async function syncWorkspaceFromSupabase() {
         title: task.title,
         description: task.description || '',
         due: task.due_date || '',
+        dueTime: String(task.due_time || '').slice(0, 5),
         priority: normalizeTaskPriority(task.priority),
         status: normalizeTaskStatus(task.status),
         createdAt: task.created_at || ''
@@ -9635,9 +9636,8 @@ function openTaskForm(taskId = null) {
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: task?.subject || '' },
             { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea' },
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due) },
-            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' },
-            { name: 'emailReminder', label: 'Recordarme por Gmail', type: 'checkbox', checked: !!task?.emailReminder, required: false, help: 'Mostrar alerta visual cuando esté próxima a vencer' },
-            { name: 'email', label: 'Correo para notificación', type: 'email', value: task?.email || currentUser?.email || '', required: false, placeholder: 'usuario@gmail.com' }
+            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se usarán las 18:00 (America/Guayaquil).' },
+            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' }
         ],
         onSubmit: async values => {
             const title = values.title.trim();
@@ -9658,6 +9658,7 @@ function openTaskForm(taskId = null) {
                     title,
                     description: values.description.trim(),
                     due_date: values.due || null,
+                    due_time: values.dueTime || null,
                     priority: normalizeTaskPriority(values.priority),
                     status: task?.status === 'completed' ? 'completed' : 'pending'
                 };
@@ -9702,13 +9703,7 @@ function openTaskForm(taskId = null) {
                 }
 
                 const extras = loadWorkspaceExtras();
-                extras.taskMeta = extras.taskMeta || {};
-                if (savedTaskId) {
-                    extras.taskMeta[savedTaskId] = {
-                        emailReminder: values.emailReminder === 'yes',
-                        email: values.email.trim()
-                    };
-                }
+                if (savedTaskId && extras.taskMeta) delete extras.taskMeta[savedTaskId];
                 saveWorkspaceExtras(extras);
 
                 await syncWorkspaceFromSupabase();
@@ -10112,6 +10107,15 @@ function updateSettingsSwitchLabel(input) {
     if (label) label.textContent = enabled ? 'Activado' : 'Desactivado';
     if (card) card.dataset.settingState = enabled ? 'enabled' : 'disabled';
     if (disabledNote) disabledNote.setAttribute('aria-hidden', String(enabled));
+
+    if (input.dataset.settingToggle === 'notifications') {
+        const description = card?.querySelector('#notifications-description');
+        if (description) {
+            description.textContent = enabled
+                ? 'Recibe avisos internos y correos sobre tareas próximas a vencer, además de recordatorios para eventos compatibles creados desde AC Edunity.'
+                : 'No recibirás correos ni avisos automáticos de AC Edunity. Tus tareas, exámenes y eventos seguirán guardados. Las notificaciones configuradas directamente en Google Calendar se administran desde Google.';
+        }
+    }
 }
 
 function syncAppSettingsControls() {
@@ -10252,16 +10256,44 @@ function getReminderCandidates(workspace) {
         .sort((a, b) => a.days - b.days);
 }
 
-function runSmartReminders({ force = false } = {}) {
+async function runSmartReminders({ force = false } = {}) {
     if (!appSettings?.notifications || !currentUser?.id) return;
-    const todayKey = new Date().toISOString().slice(0, 10);
-    const reminderKey = `${currentUser.id}:${todayKey}`;
+    const reminderKey = `${currentUser.id}:unread`;
     if (!force && settingsReminderKey === reminderKey) return;
-    const candidate = getReminderCandidates(loadWorkspace())[0];
     settingsReminderKey = reminderKey;
-    if (!candidate) return;
-    const label = candidate.days < 0 ? 'está vencida' : candidate.days === 0 ? 'vence hoy' : `vence en ${candidate.days} día(s)`;
-    notify(`Recordatorio: ${candidate.task.title} ${label}.`, candidate.days < 0 ? 'error' : 'info');
+
+    try {
+        const sb = getSupabaseClient();
+        const { data, error } = await sb
+            .from('internal_notifications')
+            .select('id,title,message,notification_type,created_at')
+            .eq('user_id', currentUser.id)
+            .is('read_at', null)
+            .order('created_at', { ascending: true })
+            .limit(10);
+
+        if (error) throw error;
+        if (!data?.length) return;
+
+        data.forEach(item => notify(
+            `${item.title}: ${item.message}`,
+            item.notification_type === 'due_2h' || item.notification_type === 'overdue' ? 'error' : 'info'
+        ));
+
+        const ids = data.map(item => item.id);
+        const { error: readError } = await sb
+            .from('internal_notifications')
+            .update({ read_at: new Date().toISOString() })
+            .in('id', ids)
+            .eq('user_id', currentUser.id);
+        if (readError) throw readError;
+    } catch (error) {
+        settingsReminderKey = '';
+        console.warn('[REMINDERS] No se pudieron sincronizar avisos internos:', {
+            message: error?.message || 'network_error',
+            code: error?.code || null
+        });
+    }
 }
 
 function bindAppSettingsControls() {
