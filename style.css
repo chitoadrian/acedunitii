@@ -36617,3 +36617,55 @@ body.light-theme .session-choice-cancel:hover,
 body.light-theme .session-choice-cancel:focus-visible {
     color: #1f2937;
 }
+
+/* Back to landing button */
+#login-page .auth-back-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+    gap: 7px;
+    width: fit-content;
+    margin: 0 0 12px;
+    padding: 7px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 10px;
+    background: transparent;
+    color: #cbd5e1;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+}
+
+#login-page .auth-back-home:hover {
+    border-color: rgba(125, 211, 252, 0.58);
+    background: rgba(125, 211, 252, 0.08);
+    color: #f8fafc;
+}
+
+#login-page .auth-back-home:focus-visible {
+    outline: 2px solid #7dd3fc;
+    outline-offset: 3px;
+}
+
+body.light-theme #login-page .auth-back-home {
+    border-color: #cbd5e1;
+    color: #475569;
+}
+
+body.light-theme #login-page .auth-back-home:hover {
+    border-color: #7da6f8;
+    background: rgba(37, 99, 235, 0.07);
+    color: #1f2937;
+}
+
+@media (max-width: 600px) {
+    #login-page .auth-back-home {
+        margin-bottom: 8px;
+        padding: 6px 8px;
+        font-size: 0.82rem;
+    }
+}
