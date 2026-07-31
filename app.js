@@ -3254,13 +3254,6 @@ function getTaskPriorityClass(priority) {
     return 'medium';
 }
 
-function getTaskReminderAlert(task) {
-    const visualStatus = getTaskVisualStatus(task);
-    if (!appSettings?.notifications || task.status === 'completed') return '';
-    if (visualStatus !== 'upcoming' && visualStatus !== 'overdue') return '';
-    return 'Recordatorio automático activo para esta tarea.';
-}
-
 function isEventSoon(event) {
     const dateValue = `${event.date || event.day || ''}T${event.time || '00:00'}`;
     const eventDate = new Date(dateValue);
@@ -3533,7 +3526,6 @@ function renderTasks(workspace) {
                 <div class="task-board task-list-modern">
             ${filteredTasks.length ? filteredTasks.map(task => {
                 const visualStatus = task.visualStatus;
-                const reminder = getTaskReminderAlert(task);
                 const priorityClass = getTaskPriorityClass(task.priority || 'media');
                 const taskSubject = workspace.subjects.find(subject => subject.id === task.subjectId || subject.name === task.subject);
                 const subjectColor = getAcademicColorValue(taskSubject?.color);
@@ -3557,9 +3549,8 @@ function renderTasks(workspace) {
                                     <span><strong>Fecha:</strong> ${escapeHTML(task.due || 'Sin fecha')}</span>
                                     <span><strong>Tiempo:</strong> ${escapeHTML(getTaskDaysText(task))}</span>
                                     <span><strong>Prioridad:</strong> <em class="task-priority ${priorityClass}">${escapeHTML(getTaskPriorityLabel(task.priority || 'media'))}</em></span>
-                                    <span><strong>Recordatorios:</strong> ${appSettings?.notifications ? 'Activos' : 'Desactivados'}</span>
+                                    <span><strong>Recordatorios:</strong> ${task.remindersEnabled === true ? 'Activos' : 'Desactivados'}</span>
                                 </div>
-                                ${reminder ? `<div class="task-reminder-alert">${escapeHTML(reminder)}</div>` : ''}
                             </div>
                         </div>
                         <div class="task-card-actions ${actionLayoutClass}">
@@ -9174,6 +9165,7 @@ async function syncWorkspaceFromSupabase() {
         dueTime: String(task.due_time || '').slice(0, 5),
         priority: normalizeTaskPriority(task.priority),
         status: normalizeTaskStatus(task.status),
+        remindersEnabled: task.reminders_enabled === true,
         createdAt: task.created_at || ''
     }));
 
@@ -10184,6 +10176,7 @@ function mapSavedTaskRow(row, subjectName = '') {
         dueTime: String(row.due_time || '').slice(0, 5),
         priority: normalizeTaskPriority(row.priority),
         status: normalizeTaskStatus(row.status),
+        remindersEnabled: row.reminders_enabled === true,
         createdAt: row.created_at || ''
     };
 }
@@ -10213,7 +10206,8 @@ function openTaskForm(taskId = null) {
             { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea', required: false },
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due), required: false },
             { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se guardará sin hora específica.' },
-            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' }
+            { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' },
+            { name: 'remindersEnabled', label: 'Recordatorios', type: 'checkbox', checked: task ? task.remindersEnabled === true : false, help: 'Activar recordatorio para esta tarea' }
         ],
         onSubmit: async values => {
             let savedRow = null;
@@ -10268,7 +10262,8 @@ function openTaskForm(taskId = null) {
                     due_date: dueDate,
                     due_time: dueTime,
                     priority: normalizeTaskPriority(values.priority),
-                    status: taskId && task?.status === 'completed' ? 'completed' : 'pending'
+                    status: taskId && task?.status === 'completed' ? 'completed' : 'pending',
+                    reminders_enabled: values.remindersEnabled === 'yes'
                 };
 
                 const sb = getSupabaseClient();

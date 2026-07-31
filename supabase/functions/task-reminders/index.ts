@@ -17,6 +17,7 @@ type TaskRow = {
   due_date: string;
   due_time: string | null;
   status: string;
+  reminders_enabled: boolean;
   updated_at: string;
   subjects: { name?: string } | { name?: string }[] | null;
 };
@@ -190,7 +191,8 @@ Deno.serve(async (request) => {
   const throughDate = new Date(now.getTime() + 25 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   const { data: tasks, error: taskError } = await admin.from("tasks")
-    .select("id,user_id,title,due_date,due_time,status,updated_at,subjects(name)")
+    .select("id,user_id,title,due_date,due_time,status,reminders_enabled,updated_at,subjects(name)")
+    .eq("reminders_enabled", true)
     .eq("status", "pending").not("due_date", "is", null)
     .gte("due_date", fromDate).lte("due_date", throughDate).limit(500);
   if (taskError) {
