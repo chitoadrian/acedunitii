@@ -1995,7 +1995,7 @@ function normalizeFiveDayActivityRows(rows) {
             day: String(row.day_label || knownLabel?.short || fallback.day),
             fullDay: String(row.full_day || knownLabel?.full || fallback.fullDay),
             points: Math.max(0, Number(row.points) || 0),
-            activityCount: Math.max(0, Number(row.activity_count) || 0)
+            activityCount: Math.max(0, Number(row.activity_count ?? row.activityCount ?? row.activitycount) || 0)
         };
     });
 }
