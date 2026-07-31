@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260731-style-restore-v1">
+    <link rel="stylesheet" href="style.css?v=20260731-back-home-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -340,6 +340,15 @@
                 </div>
 
                 <div class="auth-card">
+                    <button
+                        type="button"
+                        class="auth-back-home"
+                        aria-label="Volver a la página principal"
+                        onclick="showLanding({ preserveAppView: true })"
+                    >
+                        <span aria-hidden="true">←</span>
+                        <span>Volver al inicio</span>
+                    </button>
                     <div class="auth-brand">
                         <img src="assets/ac-edunity-logo.png" alt="Logo AC Edunity" class="auth-brand-logo">
                     </div>
