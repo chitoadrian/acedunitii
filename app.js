@@ -2010,15 +2010,18 @@ function weeklyActivityGridHTML(rows, { loading = false } = {}) {
                 const height = item.points > 0 ? Math.max(22, Math.round((item.points / maxPoints) * 100)) : 0;
                 const pointLabel = item.points === 1 ? 'punto' : 'puntos';
                 const activityLabel = item.activityCount === 1 ? 'actividad' : 'actividades';
+                const activitySummary = item.activityCount > 0
+                    ? `${item.points} ${pointLabel} en ${item.activityCount} ${activityLabel}`
+                    : `${item.points} ${pointLabel}`;
                 const description = loading
                     ? `Cargando actividad del ${item.fullDay}`
                     : item.points > 0
-                        ? `Actividad del ${item.fullDay.toLowerCase()}: ${item.points} ${pointLabel} en ${item.activityCount} ${activityLabel}`
+                        ? `Actividad del ${item.fullDay.toLowerCase()}: ${activitySummary}`
                         : `Actividad del ${item.fullDay.toLowerCase()}: sin actividad`;
                 const tooltip = loading
                     ? `Cargando ${item.fullDay}`
                     : item.points > 0
-                        ? `${item.fullDay}: ${item.points} ${pointLabel} en ${item.activityCount} ${activityLabel}`
+                        ? `${item.fullDay}: ${activitySummary}`
                         : `${item.fullDay}: sin actividad`;
 
                 return `
@@ -2102,17 +2105,13 @@ async function refreshActivityChart({ confirmMutation = false } = {}) {
         return [];
     }
 
-    const attempts = confirmMutation ? 2 : 1;
     let latestRows = [];
 
     try {
-        for (let attempt = 0; attempt < attempts; attempt += 1) {
-            if (attempt > 0) await waitForActivityRefresh(140);
-            const { data, error } = await getSupabaseClient().rpc('get_five_day_activity');
-            if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
-            if (error) throw error;
-            latestRows = data;
-        }
+        const { data, error } = await getSupabaseClient().rpc('get_five_day_activity');
+        if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
+        if (error) throw error;
+        latestRows = data;
 
         renderWeeklyActivityState(latestRows, 'ready');
         return normalizeFiveDayActivityRows(latestRows);
@@ -2128,10 +2127,55 @@ async function refreshActivityChart({ confirmMutation = false } = {}) {
 }
 
 async function refreshActivityChartAfterMutation() {
-    // renderDashboard agenda una consulta inicial; dejamos que comience y luego
-    // hacemos que la confirmación posterior a la mutación sea la solicitud vigente.
+    // La solicitud posterior a la mutación obtiene un id nuevo e invalida
+    // cualquier respuesta inicial que siga pendiente.
     await Promise.resolve();
     return refreshActivityChart({ confirmMutation: true });
+}
+
+const ACADEMIC_ACTIVITY_TYPES = new Set([
+    'task_created',
+    'task_completed',
+    'grade_recorded',
+    'resource_added',
+    'event_created',
+    'attendance_recorded'
+]);
+
+async function waitForAcademicActivityEvent(sourceId, activityType, attempts = 4) {
+    const safeSourceId = String(sourceId || '');
+    const safeUserId = String(currentUser?.id || '');
+    if (!safeSourceId || !safeUserId || !ACADEMIC_ACTIVITY_TYPES.has(activityType)) return false;
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+        if (String(currentUser?.id || '') !== safeUserId) return false;
+        const { data, error } = await getSupabaseClient()
+            .from('user_activity_events')
+            .select('id')
+            .eq('user_id', safeUserId)
+            .eq('source_id', safeSourceId)
+            .eq('activity_type', activityType)
+            .maybeSingle();
+
+        if (error) {
+            console.error('[ACTIVITY CONFIRMATION]', {
+                activityType,
+                code: error?.code || null,
+                message: error?.message || 'Error desconocido'
+            });
+            return false;
+        }
+        if (data?.id) return true;
+        if (attempt < attempts - 1) await waitForActivityRefresh(140);
+    }
+    return false;
+}
+
+async function refreshActivityAfterSourceMutation(sourceId, activityType) {
+    const safeUserId = String(currentUser?.id || '');
+    await waitForAcademicActivityEvent(sourceId, activityType, 4);
+    if (!safeUserId || String(currentUser?.id || '') !== safeUserId) return [];
+    return refreshActivityChartAfterMutation();
 }
 
 function clearWeeklyActivityState() {
@@ -2641,6 +2685,8 @@ function openAttendanceForm(attendanceId = null) {
             const fresh = loadWorkspace();
             const subject = findSubjectByName(fresh, values.subject);
 
+            let savedAttendanceId = attendanceId;
+
             try {
                 const user = await getCurrentSupabaseUser();
                 const attendanceData = {
@@ -2670,7 +2716,8 @@ function openAttendanceForm(attendanceId = null) {
                     const { data, error } = await getSupabaseClient()
                         .from('attendance')
                         .insert(attendanceData)
-                        .select();
+                        .select('id')
+                        .single();
 
                     if (error) {
                         console.error("[ATTENDANCE ERROR]", error);
@@ -2678,13 +2725,14 @@ function openAttendanceForm(attendanceId = null) {
                         throw error;
                     }
                     console.log("[ATTENDANCE] guardado correcto", data);
+                    savedAttendanceId = data?.id || '';
                     await updateProfileProgress(values.status === 'Asisti' ? 10 : 4, { bumpStreak: values.status === 'Asisti' });
                     pushRecentMessage(`Registraste asistencia en ${values.subject}.`);
                 }
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
-                if (!attendanceId) await refreshActivityChartAfterMutation();
+                if (!attendanceId) await refreshActivityAfterSourceMutation(savedAttendanceId, 'attendance_recorded');
                 notify(attendanceId ? 'Asistencia actualizada.' : 'Asistencia registrada.', 'success');
             } catch (error) {
                 console.error("[ATTENDANCE ERROR]", error);
@@ -3650,7 +3698,7 @@ function openEventForm(eventId = null) {
 
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
-                if (!eventId) await refreshActivityChartAfterMutation();
+                if (!eventId) await refreshActivityAfterSourceMutation(savedEventId, 'event_created');
                 notify(payload.emailReminder ? getReminderMessage(payload) : 'Evento guardado correctamente.', 'success');
                 if (payload.googleCalendar && savedEventId) {
                     openGoogleCalendarEvent(savedEventId);
@@ -4075,7 +4123,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
-            if (!gradeId) await refreshActivityChartAfterMutation();
+            if (!gradeId) await refreshActivityAfterSourceMutation(savedGrade?.id, 'grade_recorded');
             closeModal();
             notify(gradeId ? 'Calificación actualizada.' : 'Calificación registrada.', 'success');
         } catch (error) {
@@ -7465,6 +7513,7 @@ function openResourceForm(resourceId = null) {
                 return;
             }
 
+            let savedResourceId = resourceId;
             const payload = {
                 title: values.title.trim(),
                 subject: values.subject,
@@ -7503,14 +7552,17 @@ function openResourceForm(resourceId = null) {
                     }
                     pushRecentMessage(`Editaste el recurso ${payload.title}.`);
                 } else {
-                    const { error } = await getSupabaseClient()
+                    const { data, error } = await getSupabaseClient()
                         .from('resources')
-                        .insert(resourceData);
+                        .insert(resourceData)
+                        .select('id')
+                        .single();
 
                     if (error) {
                         logSupabaseError('resources insert', error);
                         throw error;
                     }
+                    savedResourceId = data?.id || '';
                     await updateProfileProgress(20, { bumpStreak: true });
                     pushRecentMessage(`Subiste el PDF ${payload.title}.`);
                 }
@@ -7521,7 +7573,7 @@ function openResourceForm(resourceId = null) {
 
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
-            if (!resourceId) await refreshActivityChartAfterMutation();
+            if (!resourceId) await refreshActivityAfterSourceMutation(savedResourceId, 'resource_added');
             notify(resourceId ? 'Recurso actualizado.' : 'PDF guardado correctamente.', 'success');
         }
     });
@@ -9938,36 +9990,9 @@ function logTaskPersistenceError(stage, error) {
     });
 }
 
-async function waitForTaskActivityEvent(taskId, activityType, attempts = 3) {
-    if (!isValidTaskUuid(taskId)) return false;
-    const sb = getSupabaseClient();
-
-    for (let attempt = 0; attempt < attempts; attempt += 1) {
-        const { data, error } = await sb
-            .from('user_activity_events')
-            .select('id, activity_points, occurred_at')
-            .eq('source_id', taskId)
-            .eq('activity_type', activityType)
-            .maybeSingle();
-
-        if (error) {
-            logTaskPersistenceError('activity confirmation', error);
-            return false;
-        }
-        if (data) return true;
-        if (attempt < attempts - 1) await waitForActivityRefresh(140);
-    }
-
-    console.warn('[TASK PERSISTENCE] El evento todavía no aparece tras el reintento controlado.', {
-        taskId,
-        activityType
-    });
-    return false;
-}
-
 async function refreshTaskActivityAfterSave(taskId, activityType) {
-    await waitForTaskActivityEvent(taskId, activityType, 3);
-    return refreshActivityChartAfterMutation();
+    if (!isValidTaskUuid(taskId)) return [];
+    return refreshActivityAfterSourceMutation(taskId, activityType);
 }
 
 function mapSavedTaskRow(row, subjectName = '') {
