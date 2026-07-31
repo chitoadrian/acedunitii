@@ -1951,6 +1951,8 @@ const FIVE_DAY_LABELS = Object.freeze([
     { key: 'fri', short: 'Vie', full: 'Viernes' },
     { key: 'sat', short: 'Sáb', full: 'Sábado' }
 ]);
+const FIVE_DAY_BLOCK_ANCHOR_UTC = Date.UTC(2026, 6, 31);
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 let weeklyActivityRequestId = 0;
 
 function getGuayaquilDateParts() {
@@ -1970,8 +1972,13 @@ function getGuayaquilDateParts() {
 
 function getFiveDayPlaceholders() {
     const today = getGuayaquilDateParts();
+    const todayUtc = Date.UTC(today.year, today.month - 1, today.day);
+    const daysSinceAnchor = Math.floor((todayUtc - FIVE_DAY_BLOCK_ANCHOR_UTC) / DAY_IN_MILLISECONDS);
+    const blockIndex = Math.floor(daysSinceAnchor / 5);
+    const blockStartUtc = FIVE_DAY_BLOCK_ANCHOR_UTC + (blockIndex * 5 * DAY_IN_MILLISECONDS);
+
     return Array.from({ length: 5 }, (_, offset) => {
-        const date = new Date(Date.UTC(today.year, today.month - 1, today.day + offset));
+        const date = new Date(blockStartUtc + (offset * DAY_IN_MILLISECONDS));
         const label = FIVE_DAY_LABELS[date.getUTCDay()];
         return {
             activityDate: date.toISOString().slice(0, 10),
