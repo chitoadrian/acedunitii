@@ -8188,6 +8188,7 @@ let profileState = null;
 let authListenerReady = false;
 let loginInProgress = false;
 let logoutInProgress = false;
+let accountSwitchInProgress = false;
 let dashboardAuthorizedUserId = '';
 let authOperationGeneration = 0;
 const AUTH_PERSISTENCE_MODE_KEY = 'ac_auth_persistence_mode';
@@ -8388,19 +8389,24 @@ function showEmptyLogin() {
 async function useAnotherAccount() {
     const generation = ++authOperationGeneration;
     const sb = getSupabaseClient();
-    const { error } = await sb.auth.signOut({ scope: 'local' });
-    if (error) {
-        logSupabaseError('auth switch account signOut', error);
-        notify('No se pudo cerrar la sesión activa. Intenta nuevamente.', 'error');
-        return;
+    accountSwitchInProgress = true;
+    try {
+        const { error } = await sb.auth.signOut({ scope: 'local' });
+        if (error) {
+            logSupabaseError('auth switch account signOut', error);
+            notify('No se pudo cerrar la sesión activa. Intenta nuevamente.', 'error');
+            return;
+        }
+        const { data } = await sb.auth.getSession();
+        if (generation !== authOperationGeneration || data?.session) {
+            notify('No se pudo limpiar la sesión activa. Intenta nuevamente.', 'error');
+            return;
+        }
+        clearAuthenticatedClientState();
+        showEmptyLogin();
+    } finally {
+        accountSwitchInProgress = false;
     }
-    const { data } = await sb.auth.getSession();
-    if (generation !== authOperationGeneration || data?.session) {
-        notify('No se pudo limpiar la sesión activa. Intenta nuevamente.', 'error');
-        return;
-    }
-    clearAuthenticatedClientState();
-    showEmptyLogin();
 }
 
 async function continueExistingSession() {
@@ -10463,7 +10469,7 @@ async function initializeApp() {
                 }
 
                 if (authEvent === 'SIGNED_OUT') {
-                    if (!logoutInProgress) {
+                    if (!logoutInProgress && !accountSwitchInProgress) {
                         clearAuthenticatedClientState();
                         showLanding();
                     }
