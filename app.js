@@ -709,22 +709,21 @@ function legacyShowLandingLocal() {
 
 async function showLogin() {
     clearAuthMessages();
+    const generation = ++authOperationGeneration;
     try {
-        const sb = getSupabaseClient();
-        const { data: sessionData } = await sb.auth.getSession();
-        const authUser = sessionData?.session?.user;
+        const authUser = await getValidatedAuthUser();
+        if (generation !== authOperationGeneration) return;
         if (authUser) {
-            console.log("[APP] Sesión activa encontrada desde Iniciar sesión");
-            currentUser = getPublicUserFromAuth(authUser);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            await bootstrapAuthenticatedApp(authUser);
-            showDashboard(getStoredAppView());
+            console.log('[AUTH] Sesión válida disponible; esperando elección del usuario.');
+            showSessionChoice(authUser);
             return;
         }
     } catch (error) {
-        console.warn('[APP] No se pudo comprobar la sesión activa antes del login:', error);
+        console.warn('[AUTH] No se pudo validar la sesión antes del login:', error?.message || error);
     }
-    showPage('login-page');
+    if (generation !== authOperationGeneration) return;
+    clearAuthenticatedClientState();
+    showEmptyLogin();
 }
 
 function showRegister() {
@@ -8189,6 +8188,9 @@ let profileState = null;
 let authListenerReady = false;
 let loginInProgress = false;
 let logoutInProgress = false;
+let dashboardAuthorizedUserId = '';
+let authOperationGeneration = 0;
+const AUTH_PERSISTENCE_MODE_KEY = 'ac_auth_persistence_mode';
 const APP_INSIDE_SESSION_KEY = 'ac_inside_student_app';
 const APP_CURRENT_VIEW_SESSION_KEY = 'ac_current_student_view';
 const LEGACY_APP_INSIDE_SESSION_KEY = 'ac_inside_app';
@@ -8253,6 +8255,55 @@ function logSupabaseError(context, error) {
     });
 }
 
+function getAuthPersistenceMode() {
+    try {
+        return localStorage.getItem(AUTH_PERSISTENCE_MODE_KEY) === 'local' ? 'local' : 'session';
+    } catch (error) {
+        return 'session';
+    }
+}
+
+let authPersistenceMode = getAuthPersistenceMode();
+
+function setAuthPersistenceMode(remember) {
+    authPersistenceMode = remember ? 'local' : 'session';
+    try {
+        if (remember) {
+            localStorage.setItem(AUTH_PERSISTENCE_MODE_KEY, 'local');
+        } else {
+            localStorage.removeItem(AUTH_PERSISTENCE_MODE_KEY);
+        }
+    } catch (error) {
+        authPersistenceMode = 'session';
+    }
+}
+
+const supabaseAuthStorage = {
+    getItem(key) {
+        try {
+            const sessionValue = sessionStorage.getItem(key);
+            if (sessionValue !== null) return sessionValue;
+            return localStorage.getItem(key);
+        } catch (error) {
+            return null;
+        }
+    },
+    setItem(key, value) {
+        try {
+            const target = authPersistenceMode === 'local' ? localStorage : sessionStorage;
+            const other = authPersistenceMode === 'local' ? sessionStorage : localStorage;
+            target.setItem(key, value);
+            other.removeItem(key);
+        } catch (error) {
+            sessionStorage.setItem(key, value);
+        }
+    },
+    removeItem(key) {
+        try { sessionStorage.removeItem(key); } catch (error) {}
+        try { localStorage.removeItem(key); } catch (error) {}
+    }
+};
+
 function getSupabaseClient() {
     if (supabaseClient) return supabaseClient;
     if (!window.supabase || typeof window.supabase.createClient !== 'function') {
@@ -8262,18 +8313,146 @@ function getSupabaseClient() {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
         auth: {
             persistSession: true,
+            storage: supabaseAuthStorage,
             autoRefreshToken: true,
             detectSessionInUrl: true
         }
     });
 
-    console.log('[Supabase] Cliente iniciado');
     console.log('[Supabase] Cliente iniciado', {
         url: SUPABASE_URL,
-        authReady: true
+        authReady: true,
+        persistence: authPersistenceMode
     });
 
     return supabaseClient;
+}
+
+function maskSessionEmail(email = '') {
+    const [localPart = '', domain = ''] = String(email).split('@');
+    if (!domain) return 'cuenta activa';
+    const visible = localPart.slice(0, 2);
+    return `${visible}${'*'.repeat(Math.max(2, Math.min(6, localPart.length - 2)))}@${domain}`;
+}
+
+function closeSessionChoice() {
+    document.getElementById('session-choice-modal')?.remove();
+}
+
+function resetAuthForms() {
+    document.getElementById('login-form')?.reset();
+    document.getElementById('register-form')?.reset();
+    document.querySelectorAll('[data-password-toggle]').forEach(toggle => {
+        toggle.setAttribute('aria-pressed', 'false');
+        toggle.setAttribute('aria-label', 'Mostrar contraseña');
+    });
+    document.querySelectorAll('#login-form input[type="text"], #register-form input[type="text"]').forEach(input => {
+        if (input.id.includes('password')) input.type = 'password';
+    });
+}
+
+function clearAuthenticatedClientState() {
+    authOperationGeneration += 1;
+    dashboardAuthorizedUserId = '';
+    closeSessionChoice();
+    setTutorAuthenticatedUser(null);
+    switchAppSettingsUser(null);
+    currentUser = null;
+    profileState = null;
+    workspaceState = mergeWorkspaceState();
+    clearAppViewSession();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('acEdunityUser');
+    resetAuthForms();
+    document.body.classList.remove('is-dashboard', 'student-active');
+    document.documentElement.classList.remove('is-dashboard');
+}
+
+async function getValidatedAuthUser() {
+    const sb = getSupabaseClient();
+    const { data: sessionData, error: sessionError } = await sb.auth.getSession();
+    if (sessionError || !sessionData?.session) return null;
+    const { data: userData, error: userError } = await sb.auth.getUser();
+    if (userError || !userData?.user || userData.user.id !== sessionData.session.user?.id) return null;
+    return userData.user;
+}
+
+function showEmptyLogin() {
+    closeSessionChoice();
+    clearAuthMessages();
+    resetAuthForms();
+    showPage('login-page');
+    document.getElementById('login-email')?.focus();
+}
+
+async function useAnotherAccount() {
+    const generation = ++authOperationGeneration;
+    const sb = getSupabaseClient();
+    const { error } = await sb.auth.signOut({ scope: 'local' });
+    if (error) {
+        logSupabaseError('auth switch account signOut', error);
+        notify('No se pudo cerrar la sesión activa. Intenta nuevamente.', 'error');
+        return;
+    }
+    const { data } = await sb.auth.getSession();
+    if (generation !== authOperationGeneration || data?.session) {
+        notify('No se pudo limpiar la sesión activa. Intenta nuevamente.', 'error');
+        return;
+    }
+    clearAuthenticatedClientState();
+    showEmptyLogin();
+}
+
+async function continueExistingSession() {
+    const generation = ++authOperationGeneration;
+    const user = await getValidatedAuthUser();
+    if (generation !== authOperationGeneration) return;
+    if (!user) {
+        clearAuthenticatedClientState();
+        notify('La sesión expiró. Inicia sesión nuevamente.', 'error');
+        showEmptyLogin();
+        return;
+    }
+    closeSessionChoice();
+    await bootstrapAuthenticatedApp(user);
+    if (generation !== authOperationGeneration) return;
+    dashboardAuthorizedUserId = user.id;
+    await showDashboard(getStoredAppView(), { validatedUser: user });
+}
+
+function showSessionChoice(user) {
+    closeSessionChoice();
+    showPage('login-page');
+    const publicUser = getPublicUserFromAuth(user);
+    const displayName = String(publicUser.name || '').trim();
+    const identity = displayName || maskSessionEmail(user.email);
+    const modal = document.createElement('div');
+    modal.id = 'session-choice-modal';
+    modal.className = 'session-choice-modal';
+    modal.innerHTML = `
+        <div class="session-choice-card" role="dialog" aria-modal="true" aria-labelledby="session-choice-title">
+            <div class="session-choice-icon" aria-hidden="true">AC</div>
+            <p class="session-choice-eyebrow">Sesión disponible</p>
+            <h2 id="session-choice-title">¿Cómo quieres continuar?</h2>
+            <p class="session-choice-identity">${escapeHTML(identity)}</p>
+            <div class="session-choice-actions">
+                <button type="button" class="btn-primary" data-session-action="continue">Continuar como ${escapeHTML(identity)}</button>
+                <button type="button" class="btn-secondary" data-session-action="other">Usar otra cuenta</button>
+                <button type="button" class="session-choice-cancel" data-session-action="cancel">Cancelar</button>
+            </div>
+        </div>
+    `;
+    modal.addEventListener('click', event => {
+        const action = event.target.closest('[data-session-action]')?.dataset.sessionAction;
+        if (action === 'continue') continueExistingSession();
+        if (action === 'other') useAnotherAccount();
+        if (action === 'cancel' || event.target === modal) {
+            closeSessionChoice();
+            showLanding();
+        }
+    });
+    document.body.appendChild(modal);
+    modal.querySelector('[data-session-action="continue"]')?.focus();
 }
 
 function closePasswordResetModal() {
@@ -9106,10 +9285,11 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     const profile = await ensureProfileRow(user, fallbackName);
     currentUser = getPublicUserFromAuth(user, profile);
     await switchAppSettingsUser(user);
-    console.log('[Supabase] Usuario actual autenticado', currentUser);
+    console.log('[Supabase] Usuario autenticado validado', { userId: user.id });
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
     await syncWorkspaceFromSupabase();
+    dashboardAuthorizedUserId = user.id;
     updateDashboardGreeting();
 }
 
@@ -9448,7 +9628,20 @@ function showLanding(options = {}) {
     console.log("[APP] Mostrando landing");
 }
 
-function showDashboard(sectionId = 'dashboard') {
+async function showDashboard(sectionId = 'dashboard', options = {}) {
+    const generation = authOperationGeneration;
+    let authUser = options.validatedUser || null;
+    if (!authUser || dashboardAuthorizedUserId !== authUser.id) {
+        authUser = await getValidatedAuthUser();
+    }
+    if (generation !== authOperationGeneration) return;
+    if (!authUser || !currentUser || currentUser.id !== authUser.id || dashboardAuthorizedUserId !== authUser.id) {
+        clearAuthenticatedClientState();
+        showLanding();
+        notify('Valida tu sesión antes de entrar al panel.', 'info');
+        return;
+    }
+
     const appPage = document.getElementById('app-page');
     if (!appPage) {
         console.error('[LOGIN] No se encontro #app-page para mostrar el dashboard');
@@ -9591,18 +9784,19 @@ async function handleLogin(event) {
     if (loginInProgress) return;
 
     loginInProgress = true;
+    const generation = ++authOperationGeneration;
     const loginForm = document.getElementById('login-form');
-    const loginButton = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
-    const originalButtonText = loginButton ? loginButton.textContent : '';
+    const loginButton = loginForm?.querySelector('button[type="submit"]');
+    const originalButtonText = loginButton?.textContent || '';
     if (loginButton) {
         loginButton.disabled = true;
         loginButton.textContent = 'Entrando...';
     }
     clearAuthMessages();
-    console.log("[LOGIN] Botón presionado");
 
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value.trim();
+    const remember = Boolean(loginForm?.querySelector('.remember-option input[type="checkbox"]')?.checked);
 
     if (!email || !password) {
         setAuthMessage('login', 'Escribe tu correo y contraseña para iniciar sesión.', 'error');
@@ -9615,66 +9809,35 @@ async function handleLogin(event) {
     }
 
     try {
+        setAuthPersistenceMode(remember);
         const sb = getSupabaseClient();
-        console.log("[LOGIN] Intentando entrar con:", email);
-        console.log("[Supabase] Intentando login", email);
+        console.log('[LOGIN] Iniciando autenticación', { persistence: remember ? 'local' : 'session' });
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        console.log("[LOGIN] Resultado Supabase:", data);
         if (error) {
-            console.error("[LOGIN] Error Supabase:", error);
-            console.error("[Supabase] Error login", error);
             logSupabaseError('auth signInWithPassword', error);
             throw error;
         }
         const authUser = data.user || data.session?.user;
-        if (!data.session && !authUser) throw new Error('No se encontro la cuenta.');
-        console.log("[LOGIN] Supabase OK");
-        console.log("[Supabase] Login correcto", data);
+        if (!data.session || !authUser) throw new Error('No se encontró una sesión válida.');
 
-        currentUser = getPublicUserFromAuth(authUser);
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        console.log("[LOGIN] currentUser:", currentUser);
-        console.log("[LOGIN] Login correcto, entrando al dashboard");
-        console.log("[LOGIN] Mostrando dashboard");
-        showDashboard();
-
-        try {
-            await bootstrapAuthenticatedApp(authUser);
-            showDashboard();
-        } catch (bootstrapError) {
-            console.error("[LOGIN] Error cargando perfil o datos:", bootstrapError);
-            logSupabaseError('login bootstrap data', bootstrapError);
-            profileState = {
-                id: authUser.id,
-                full_name: currentUser.name,
-                role: 'Estudiante',
-                xp: 0,
-                streak: 0,
-                level: 1,
-                created_at: authUser.created_at || ''
-            };
-            workspaceState = mergeWorkspaceState({
-                subjects: [],
-                tasks: [],
-                xp: 0,
-                streak: 0
-            });
-            notify('Sesión iniciada. No se pudieron cargar algunos datos de Supabase.', 'info');
-            showDashboard();
+        const validatedUser = await getValidatedAuthUser();
+        if (generation !== authOperationGeneration) return;
+        if (!validatedUser || validatedUser.id !== authUser.id) {
+            throw new Error('La sesión no pudo validarse.');
         }
 
-        document.getElementById('login-email').value = '';
-        document.getElementById('login-password').value = '';
+        await bootstrapAuthenticatedApp(validatedUser);
+        if (generation !== authOperationGeneration) return;
 
-        console.log("[LOGIN] Entrando al dashboard");
+        resetAuthForms();
         notify('Sesión iniciada correctamente.', 'success');
         playInterfaceSound();
-        showApp();
+        await showDashboard('dashboard', { validatedUser });
     } catch (error) {
-        console.error("[LOGIN] Error Supabase:", error);
-        console.error("[Supabase] Error login", error);
-        logSupabaseError('login flow', error);
-        setAuthMessage('login', translateSupabaseError(error.message), 'error');
+        if (generation === authOperationGeneration) {
+            console.error('[LOGIN] Error de autenticación:', error?.message || error);
+            setAuthMessage('login', translateSupabaseError(error.message), 'error');
+        }
     } finally {
         loginInProgress = false;
         if (loginButton) {
@@ -9688,42 +9851,29 @@ async function handleLogout(event) {
     if (event?.preventDefault) event.preventDefault();
     if (logoutInProgress) return;
     logoutInProgress = true;
-    console.log("[LOGOUT] Botón presionado");
+    const generation = ++authOperationGeneration;
+    console.log('[LOGOUT] Cierre de sesión solicitado');
 
     try {
         const sb = getSupabaseClient();
-        const { error } = await sb.auth.signOut();
-        if (error) {
-            console.error("[LOGOUT ERROR]", error);
-            if (typeof showToast === 'function') {
-                showToast("No se pudo cerrar sesión. Intenta otra vez.");
-            } else {
-                notify("No se pudo cerrar sesión. Intenta otra vez.", "error");
-            }
-            return;
+        const { error } = await sb.auth.signOut({ scope: 'local' });
+        if (error) throw error;
+
+        const { data, error: verificationError } = await sb.auth.getSession();
+        if (verificationError || data?.session) {
+            throw verificationError || new Error('Supabase aún reporta una sesión activa.');
         }
+        if (generation !== authOperationGeneration) return;
 
-        setTutorAuthenticatedUser(null);
-        switchAppSettingsUser(null);
-        currentUser = null;
-        profileState = null;
-        workspaceState = mergeWorkspaceState();
-        localStorage.removeItem("currentUser");
-        localStorage.removeItem("acEdunityUser");
-        clearAppViewSession();
-
-        console.log("[LOGOUT] Sesión cerrada");
-        console.log("[APP] Mostrando landing");
+        clearAuthenticatedClientState();
+        setAuthPersistenceMode(false);
+        console.log('[LOGOUT] Sesión local eliminada y verificada');
         playInterfaceSound();
         showLanding();
-        notify("Sesión cerrada.", "info");
+        notify('Sesión cerrada.', 'info');
     } catch (error) {
-        console.error("[LOGOUT ERROR]", error);
-        if (typeof showToast === 'function') {
-            showToast("No se pudo cerrar sesión. Intenta otra vez.");
-        } else {
-            notify("No se pudo cerrar sesión. Intenta otra vez.", "error");
-        }
+        console.error('[LOGOUT] No se confirmó el cierre:', error?.message || error);
+        notify('No se pudo confirmar el cierre de sesión. Intenta otra vez.', 'error');
     } finally {
         logoutInProgress = false;
     }
@@ -10255,6 +10405,21 @@ async function initializeApp() {
     }
 
     window.addEventListener('resize', handleWindowResize);
+    if (!document.body.dataset.authPageShowBound) {
+        document.body.dataset.authPageShowBound = 'true';
+        window.addEventListener('pageshow', async event => {
+            if (!event.persisted && !document.body.classList.contains('is-dashboard')) return;
+            const user = await getValidatedAuthUser();
+            if (!user || (currentUser && currentUser.id !== user.id)) {
+                clearAuthenticatedClientState();
+                showLanding();
+                return;
+            }
+            if (document.body.classList.contains('is-dashboard')) {
+                dashboardAuthorizedUserId = user.id;
+            }
+        });
+    }
     generateCalendar();
     initStudyPet();
     initLandingReveal();
@@ -10298,15 +10463,10 @@ async function initializeApp() {
                 }
 
                 if (authEvent === 'SIGNED_OUT') {
-                    setTutorAuthenticatedUser(null);
-                    switchAppSettingsUser(null);
-                    currentUser = null;
-                    profileState = null;
-                    workspaceState = mergeWorkspaceState();
-                    localStorage.removeItem('currentUser');
-                    localStorage.removeItem('acEdunityUser');
-                    clearAppViewSession();
-                    showLanding();
+                    if (!logoutInProgress) {
+                        clearAuthenticatedClientState();
+                        showLanding();
+                    }
                     return;
                 }
             });
@@ -10324,14 +10484,14 @@ async function initializeApp() {
         }
 
         if (sessionData?.session?.user && shouldRestoreAppFromSession()) {
-            const authUser = sessionData.session.user;
-            const restoredView = getStoredAppView();
-            console.log("[APP] Restaurando menu estudiantil en:", restoredView);
-            currentUser = getPublicUserFromAuth(authUser);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            await bootstrapAuthenticatedApp(authUser);
-            showDashboard(restoredView);
-            return;
+            const authUser = await getValidatedAuthUser();
+            if (authUser) {
+                const restoredView = getStoredAppView();
+                console.log('[APP] Restaurando panel con sesión validada:', restoredView);
+                await bootstrapAuthenticatedApp(authUser);
+                await showDashboard(restoredView, { validatedUser: authUser });
+                return;
+            }
         }
 
         currentUser = null;
