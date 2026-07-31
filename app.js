@@ -344,8 +344,9 @@ function isAlreadyRegisteredError(message = '') {
     return translateSupabaseError(message) === 'Este correo ya está registrado. Inicia sesión o usa otro correo.';
 }
 
-function showLoginWithEmail(email = '') {
-    showLogin();
+async function showLoginWithEmail(email = '') {
+    await showLogin();
+    if (document.getElementById('session-choice-modal')) return;
     const loginEmail = document.getElementById('login-email');
     if (loginEmail) {
         loginEmail.value = email;
@@ -678,8 +679,9 @@ function showPage(pageId) {
     window.scrollTo(0, 0);
 
     // Si es la app, mostrar la seccion por defecto
-    if (pageId === 'app-page' && !currentUser) {
+    if (pageId === 'app-page' && (!currentUser || dashboardAuthorizedUserId !== currentUser.id)) {
         showLanding();
+        return;
     }
 
     if (pageId === 'app-page') {
@@ -9620,6 +9622,7 @@ function openProfileForm() {
 }
 
 function showLanding(options = {}) {
+    dashboardAuthorizedUserId = '';
     if (!options.preserveAppView) {
         clearAppViewSession();
     }
