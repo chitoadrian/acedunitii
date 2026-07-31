@@ -724,6 +724,7 @@ async function showLogin() {
         console.warn('[AUTH] No se pudo validar la sesión antes del login:', error?.message || error);
     }
     if (generation !== authOperationGeneration) return;
+    await discardInvalidAuthSession();
     clearAuthenticatedClientState();
     showEmptyLogin();
 }
@@ -8380,6 +8381,16 @@ async function getValidatedAuthUser() {
     return userData.user;
 }
 
+async function discardInvalidAuthSession() {
+    accountSwitchInProgress = true;
+    try {
+        const { error } = await getSupabaseClient().auth.signOut({ scope: 'local' });
+        if (error) console.warn('[AUTH] No se pudo descartar la sesión inválida:', error.message);
+    } finally {
+        accountSwitchInProgress = false;
+    }
+}
+
 function showEmptyLogin() {
     closeSessionChoice();
     clearAuthMessages();
@@ -9645,6 +9656,7 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
     }
     if (generation !== authOperationGeneration) return;
     if (!authUser || !currentUser || currentUser.id !== authUser.id || dashboardAuthorizedUserId !== authUser.id) {
+        await discardInvalidAuthSession();
         clearAuthenticatedClientState();
         showLanding();
         notify('Valida tu sesión antes de entrar al panel.', 'info');
@@ -10420,6 +10432,7 @@ async function initializeApp() {
             if (!event.persisted && !document.body.classList.contains('is-dashboard')) return;
             const user = await getValidatedAuthUser();
             if (!user || (currentUser && currentUser.id !== user.id)) {
+                await discardInvalidAuthSession();
                 clearAuthenticatedClientState();
                 showLanding();
                 return;
