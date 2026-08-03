@@ -36669,3 +36669,41 @@ body.light-theme #login-page .auth-back-home:hover {
         font-size: 0.82rem;
     }
 }
+
+/* Robot speech bubble tail */
+#landing-page .pet-bubble::before,
+#landing-page .pet-bubble::after {
+    content: "" !important;
+    position: absolute !important;
+    display: block !important;
+    border-radius: 50% !important;
+    background: #101936 !important;
+    border: 1px solid rgba(126, 112, 205, 0.42) !important;
+    transform: none !important;
+    filter: none !important;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+#landing-page .pet-bubble::before {
+    right: -15px !important;
+    bottom: 15px !important;
+    width: 11px !important;
+    height: 11px !important;
+    box-shadow: 0 4px 9px rgba(6, 12, 31, 0.18);
+}
+
+#landing-page .pet-bubble::after {
+    right: -26px !important;
+    bottom: 8px !important;
+    width: 7px !important;
+    height: 7px !important;
+    box-shadow: 0 3px 7px rgba(6, 12, 31, 0.15);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .pet-bubble::before,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .pet-bubble::after {
+    background: #f7f5fc !important;
+    border-color: rgba(140, 126, 190, 0.30) !important;
+    box-shadow: 0 3px 8px rgba(52, 61, 103, 0.12);
+}
