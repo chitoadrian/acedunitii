@@ -37135,4 +37135,83 @@ body #backpack .backpack-toolbar .btn-primary {
         justify-self: stretch !important;
     }
 }
+/* Attendance history card alignment fix */
+#attendance .attendance-card {
+    grid-template-columns: 50px minmax(0, 1fr) auto;
+    column-gap: 16px;
+}
 
+#attendance .attendance-card-icon {
+    display: grid;
+    place-items: center;
+    align-self: center;
+    justify-self: center;
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+#attendance .attendance-card-icon .attendance-icon-svg {
+    width: 24px;
+    height: 24px;
+}
+
+#attendance .attendance-card h3,
+#attendance .attendance-status {
+    vertical-align: middle;
+}
+
+#attendance .attendance-card .card-actions {
+    align-self: center;
+}
+
+@media (max-width: 900px) {
+    #attendance .attendance-card {
+        grid-template-columns: 46px minmax(0, 1fr);
+        column-gap: 14px;
+    }
+
+    #attendance .attendance-card-icon {
+        width: 46px;
+        height: 46px;
+    }
+
+    #attendance .attendance-card .card-actions {
+        padding-left: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    #attendance .attendance-card {
+        grid-template-columns: 44px minmax(0, 1fr);
+        column-gap: 12px;
+    }
+
+    #attendance .attendance-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        transform: none;
+        transform-origin: center;
+    }
+
+    #attendance .attendance-card-icon .attendance-icon-svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    #attendance .attendance-status {
+        margin-left: 6px;
+    }
+
+    #attendance .attendance-card .card-actions {
+        grid-column: 1 / -1;
+        padding-left: 56px;
+    }
+}
+
+@media (max-width: 375px) {
+    #attendance .attendance-card .card-actions {
+        padding-left: 0;
+    }
+}
