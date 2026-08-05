@@ -36924,7 +36924,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
 
 /* Compact digital backpack filters */
 body #backpack .backpack-toolbar {
-    grid-template-columns: minmax(320px, 2fr) repeat(3, minmax(132px, 0.72fr)) auto !important;
+    grid-template-columns: minmax(320px, 1.8fr) minmax(150px, 0.72fr) minmax(210px, 0.9fr) minmax(145px, 0.72fr) auto !important;
     align-items: end !important;
     gap: 14px !important;
     margin: 18px 0 22px !important;
@@ -36971,7 +36971,7 @@ body #backpack .backpack-toolbar .btn-primary {
 
 @media (max-width: 1180px) and (min-width: 701px) {
     body #backpack .backpack-toolbar {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.3fr) minmax(0, 0.95fr) minmax(118px, 0.8fr) !important;
         gap: 12px 14px !important;
         padding: 20px !important;
     }
