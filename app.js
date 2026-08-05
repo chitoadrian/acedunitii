@@ -387,7 +387,12 @@ function openQuickForm(config) {
             <button class="quick-modal-close" type="button" aria-label="Cerrar">x</button>
             <h3>${escapeHTML(config.title)}</h3>
             <form class="quick-modal-form">
-                ${config.fields.map(field => `
+                ${config.fields.map(field => field.type === 'icon-grid' ? `
+                    <fieldset class="subject-icon-field">
+                        <legend>${escapeHTML(field.label)}</legend>
+                        ${renderQuickField(field)}
+                    </fieldset>
+                ` : `
                     <label>
                         <span>${escapeHTML(field.label)}</span>
                         ${renderQuickField(field)}
@@ -404,6 +409,18 @@ function openQuickForm(config) {
     modal.addEventListener('click', event => {
         if (event.target === modal || event.target.classList.contains('quick-modal-close')) {
             closeModal();
+            return;
+        }
+
+        const iconButton = event.target.closest('.subject-icon-option');
+        if (iconButton && modal.contains(iconButton)) {
+            const picker = iconButton.closest('.subject-icon-picker');
+            const input = picker?.querySelector('input[type="hidden"]');
+            if (!picker || !input) return;
+            input.value = iconButton.dataset.iconValue || '';
+            picker.querySelectorAll('.subject-icon-option').forEach(option => {
+                option.setAttribute('aria-pressed', String(option === iconButton));
+            });
         }
     });
 
@@ -471,6 +488,35 @@ function renderQuickField(field) {
         }).join('');
 
         return `<select name="${escapeHTML(field.name)}" ${field.required === false ? '' : 'required'}>${options}</select>`;
+    }
+
+    if (field.type === 'icon-grid') {
+        const selectedValue = String(field.selectedValue || field.value || '');
+        const options = (field.options || []).map((option, index) => {
+            const value = getOptionValue(option);
+            const label = getOptionLabel(option);
+            const iconName = option.iconName || 'book-closed';
+            const pressed = String(selectedValue) === String(value) || (!selectedValue && index === 0);
+            return `
+                <button
+                    class="subject-icon-option"
+                    type="button"
+                    data-icon-value="${escapeHTML(value)}"
+                    title="${escapeHTML(label)}"
+                    aria-label="Usar icono de ${escapeHTML(label.toLowerCase())}"
+                    aria-pressed="${pressed}"
+                >
+                    <span aria-hidden="true">${subjectIconSvg(iconName)}</span>
+                </button>
+            `;
+        }).join('');
+
+        return `
+            <div class="subject-icon-picker" role="group" aria-label="${escapeHTML(field.label)}">
+                <input type="hidden" name="${escapeHTML(field.name)}" value="${escapeHTML(field.value || selectedValue)}">
+                ${options}
+            </div>
+        `;
     }
 
     if (field.type === 'choice-grid') {
@@ -1326,6 +1372,39 @@ function appIconSvg(name) {
     return icons[name] || icons.book;
 }
 
+function subjectIconSvg(name) {
+    const icons = {
+        flag: '<svg viewBox="0 0 24 24"><path d="M5 21V4"></path><path d="M5 5h11l-2 4 2 4H5"></path></svg>',
+        'book-open': '<svg viewBox="0 0 24 24"><path d="M3 5.5A3.5 3.5 0 0 1 6.5 2H11v17H6.5A3.5 3.5 0 0 0 3 22V5.5Z"></path><path d="M21 5.5A3.5 3.5 0 0 0 17.5 2H13v17h4.5A3.5 3.5 0 0 1 21 22V5.5Z"></path></svg>',
+        'book-closed': '<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 3v18"></path><path d="M12 7h4"></path></svg>',
+        computer: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>',
+        atom: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.5"></circle><ellipse cx="12" cy="12" rx="9" ry="3.8"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"></ellipse></svg>',
+        calculator: '<svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"></rect><path d="M8 6h8v4H8z"></path><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path></svg>',
+        sigma: '<svg viewBox="0 0 24 24"><path d="M18 4H6l6 8-6 8h12"></path></svg>',
+        ruler: '<svg viewBox="0 0 24 24"><path d="m4 17 13-13 3 3L7 20l-3-3Z"></path><path d="m14 7 3 3M11 10l2 2M8 13l3 3"></path></svg>',
+        lightbulb: '<svg viewBox="0 0 24 24"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8.5 15.5A7 7 0 1 1 15.5 15.5c-.9.7-1.5 1.4-1.5 2.5h-4c0-1.1-.6-1.8-1.5-2.5Z"></path></svg>',
+        brain: '<svg viewBox="0 0 24 24"><path d="M9.5 4A3 3 0 0 0 6 7a3 3 0 0 0-1 5.8A3.5 3.5 0 0 0 9 19h1V5.5A1.5 1.5 0 0 0 9.5 4Z"></path><path d="M14.5 4A3 3 0 0 1 18 7a3 3 0 0 1 1 5.8A3.5 3.5 0 0 1 15 19h-1V5.5A1.5 1.5 0 0 1 14.5 4Z"></path><path d="M6 9h4M14 9h4M7 15h3M14 15h3"></path></svg>',
+        microscope: '<svg viewBox="0 0 24 24"><path d="m9 3 5 5"></path><path d="m8 4 2-2 6 6-2 2z"></path><path d="M12 10a5 5 0 0 0-2 9"></path><path d="M5 21h14"></path><path d="M15 12h3v5h-3z"></path></svg>',
+        dna: '<svg viewBox="0 0 24 24"><path d="M7 3c0 6 10 12 10 18"></path><path d="M17 3C17 9 7 15 7 21"></path><path d="M8 6h8M8 18h8M10 10h4M10 14h4"></path></svg>',
+        planet: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"></circle><path d="M3 14c2 2 7 2 12 0s8-5 6-7"></path></svg>',
+        rocket: '<svg viewBox="0 0 24 24"><path d="M14 4c3-2 5-1 6-1 0 1 1 3-1 6l-7 7-4-4 6-8Z"></path><path d="M8 12H4l-2 4 6 1"></path><path d="M12 16v4l-4 2-1-6"></path><circle cx="16" cy="7" r="1.5"></circle></svg>',
+        languages: '<svg viewBox="0 0 24 24"><path d="M4 5h8M8 3v2M6 5c0 4 3 7 7 8"></path><path d="M11 7c-1 3-3 5-7 7"></path><path d="m14 20 3-8 3 8M15 17h4"></path></svg>',
+        pencil: '<svg viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z"></path><path d="m13.5 7 3.5 3.5"></path></svg>',
+        monument: '<svg viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 18h14"></path><path d="M7 8v10M12 8v10M17 8v10"></path><path d="m3 8 9-5 9 5H3Z"></path></svg>',
+        music: '<svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="16" cy="16" r="3"></circle></svg>',
+        activity: '<svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"></path></svg>',
+        tools: '<svg viewBox="0 0 24 24"><path d="m14 7 3-3 3 3-3 3"></path><path d="m4 20 11-11"></path><path d="m5 4 4 4-2 2-4-4 2-2Z"></path><path d="m14 14 6 6"></path></svg>',
+        circuit: '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"></circle><circle cx="18" cy="6" r="2"></circle><circle cx="6" cy="18" r="2"></circle><circle cx="18" cy="18" r="2"></circle><path d="M8 6h8M6 8v8M18 8v8M8 18h8M12 6v12"></path></svg>',
+        database: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"></path></svg>',
+        sparkles: '<svg viewBox="0 0 24 24"><path d="m12 3 1.3 4.2L17 9l-3.7 1.8L12 15l-1.3-4.2L7 9l3.7-1.8L12 3Z"></path><path d="m19 14 .8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14Z"></path><path d="m5 3 .7 1.8L7.5 5.5l-1.8.7L5 8l-.7-1.8-1.8-.7 1.8-.7L5 3Z"></path></svg>',
+        star: '<svg viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"></path></svg>',
+        leaf: '<svg viewBox="0 0 24 24"><path d="M20 4C12 4 5 7 5 14c0 4 3 6 6 6 7 0 9-8 9-16Z"></path><path d="M4 21c3-6 7-9 13-12"></path></svg>',
+        heart: '<svg viewBox="0 0 24 24"><path d="M20 5.5a5 5 0 0 0-7.1 0L12 6.4l-.9-.9A5 5 0 0 0 4 12.6l8 8 8-8a5 5 0 0 0 0-7.1Z"></path></svg>',
+        shield: '<svg viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.4 8-8 10-4.6-2-8-5-8-10V6l8-3Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>'
+    };
+    return icons[name] || appIconSvg(name);
+}
+
 function appIconHTML(name, className = 'app-icon') {
     return `<span class="${className}" aria-hidden="true">${appIconSvg(name)}</span>`;
 }
@@ -1368,19 +1447,8 @@ function getDashboardIconName(icon) {
 }
 
 function getSubjectVisualIconName(icon) {
-    const map = {
-        math: 'chart',
-        chemistry: 'flask',
-        history: 'globe',
-        programming: 'code',
-        robotics: 'bot',
-        literature: 'book',
-        sports: 'trend',
-        art: 'palette',
-        biology: 'globe',
-        'book-blue': 'book'
-    };
-    return map[normalizeSubjectIcon(icon)] || 'book';
+    const normalized = normalizeSubjectIcon(icon);
+    return subjectBookOptions.find(option => option.value === normalized)?.iconName || 'book';
 }
 
 function getProfileStatIconName(label, icon) {
@@ -3094,16 +3162,50 @@ const subjectColorOptions = [
 ];
 
 const subjectBookOptions = [
-    { value: 'math', label: 'Matematicas', iconClass: 'choice-icon-math' },
-    { value: 'chemistry', label: 'Química', iconClass: 'choice-icon-chemistry' },
-    { value: 'history', label: 'Historia', iconClass: 'choice-icon-history' },
-    { value: 'programming', label: 'Programación', iconClass: 'choice-icon-programming' },
-    { value: 'robotics', label: 'Robotica', iconClass: 'choice-icon-robotics' },
-    { value: 'literature', label: 'Literatura', iconClass: 'choice-icon-literature' },
-    { value: 'sports', label: 'Educacion física', iconClass: 'choice-icon-sports' },
-    { value: 'art', label: 'Arte', iconClass: 'choice-icon-art' },
-    { value: 'biology', label: 'Biologia', iconClass: 'choice-icon-biology' },
-    { value: 'book-blue', label: 'Libro azul', iconClass: 'choice-icon-book' }
+    { value: 'math', label: 'Matemáticas', iconName: 'chart' },
+    { value: 'chemistry', label: 'Química', iconName: 'flask' },
+    { value: 'history', label: 'Historia', iconName: 'globe' },
+    { value: 'programming', label: 'Programación', iconName: 'code' },
+    { value: 'robotics', label: 'Robótica', iconName: 'bot' },
+    { value: 'literature', label: 'Literatura', iconName: 'book' },
+    { value: 'sports', label: 'Educación física', iconName: 'trend' },
+    { value: 'art', label: 'Arte', iconName: 'palette' },
+    { value: 'biology', label: 'Biología', iconName: 'globe' },
+    { value: 'book-blue', label: 'Libro clásico', iconName: 'book' },
+    { value: 'chart', label: 'Gráfico o estadísticas', iconName: 'chart' },
+    { value: 'globe', label: 'Globo', iconName: 'globe' },
+    { value: 'flag', label: 'Bandera', iconName: 'flag' },
+    { value: 'book-open', label: 'Libro abierto', iconName: 'book-open' },
+    { value: 'book-closed', label: 'Libro cerrado', iconName: 'book-closed' },
+    { value: 'code', label: 'Código', iconName: 'code' },
+    { value: 'computer', label: 'Computadora', iconName: 'computer' },
+    { value: 'robot', label: 'Robot', iconName: 'bot' },
+    { value: 'atom', label: 'Átomo', iconName: 'atom' },
+    { value: 'flask', label: 'Matraz de laboratorio', iconName: 'flask' },
+    { value: 'calculator', label: 'Calculadora', iconName: 'calculator' },
+    { value: 'sigma', label: 'Símbolo matemático', iconName: 'sigma' },
+    { value: 'ruler', label: 'Regla o geometría', iconName: 'ruler' },
+    { value: 'lightbulb', label: 'Bombilla o ideas', iconName: 'lightbulb' },
+    { value: 'brain', label: 'Cerebro', iconName: 'brain' },
+    { value: 'microscope', label: 'Microscopio', iconName: 'microscope' },
+    { value: 'dna', label: 'ADN', iconName: 'dna' },
+    { value: 'planet', label: 'Planeta', iconName: 'planet' },
+    { value: 'rocket', label: 'Cohete', iconName: 'rocket' },
+    { value: 'languages', label: 'Idiomas o letras', iconName: 'languages' },
+    { value: 'pencil', label: 'Escritura o lápiz', iconName: 'pencil' },
+    { value: 'monument', label: 'Historia o monumento', iconName: 'monument' },
+    { value: 'music', label: 'Música', iconName: 'music' },
+    { value: 'activity', label: 'Actividad física', iconName: 'activity' },
+    { value: 'tools', label: 'Ingeniería o herramientas', iconName: 'tools' },
+    { value: 'circuit', label: 'Circuito o electrónica', iconName: 'circuit' },
+    { value: 'database', label: 'Base de datos', iconName: 'database' },
+    { value: 'ai', label: 'Inteligencia artificial', iconName: 'sparkles' },
+    { value: 'folder', label: 'Carpeta', iconName: 'folder' },
+    { value: 'calendar', label: 'Calendario', iconName: 'calendar' },
+    { value: 'star', label: 'Estrella', iconName: 'star' },
+    { value: 'leaf', label: 'Hoja o naturaleza', iconName: 'leaf' },
+    { value: 'health', label: 'Corazón o salud', iconName: 'heart' },
+    { value: 'shield', label: 'Escudo', iconName: 'shield' }
 ];
 
 let subjectFilterText = '';
@@ -9943,13 +10045,13 @@ function openSubjectForm(subjectId = null) {
         submitLabel: subject ? 'Actualizar materia' : 'Guardar materia',
         fields: [
             { name: 'name', label: 'Nombre de la materia', value: subject?.name || '', placeholder: 'Ej: Matemática' },
-            { name: 'icon', label: 'Icono de la materia', type: 'choice-grid', options: subjectBookOptions, value: normalizeSubjectIcon(subject?.icon) },
             {
-                name: 'customIcon',
-                label: 'Icono personalizado opcional',
-                value: subject?.customIcon || (!isKnownSubjectIcon(String(subject?.icon || '')) ? subject?.icon || '' : ''),
-                required: false,
-                placeholder: 'Ej: MAT, BIO, IA'
+                name: 'icon',
+                label: 'Icono de la materia',
+                type: 'icon-grid',
+                options: subjectBookOptions,
+                value: String(subject?.icon || 'book-blue'),
+                selectedValue: normalizeSubjectIcon(subject?.icon)
             },
             { name: 'color', label: 'Color identificador', type: 'choice-grid', options: subjectColorOptions, value: normalizeSubjectColor(subject?.color || 'Azul') },
             { name: 'description', label: 'Descripción corta', type: 'textarea', rows: 3, value: subject?.description || '', required: false, placeholder: 'Ej: Álgebra, geometría y resolución de problemas.' },
@@ -9964,11 +10066,12 @@ function openSubjectForm(subjectId = null) {
 
             try {
                 const sb = getSupabaseClient();
-                const customIcon = String(values.customIcon || '').trim().slice(0, 4);
+                const requestedIcon = String(values.icon || '').trim();
+                const existingIcon = String(subject?.icon || '').trim();
                 const payload = {
                     user_id: currentUser.id,
                     name,
-                    icon: customIcon || normalizeSubjectIcon(values.icon),
+                    icon: isKnownSubjectIcon(requestedIcon) ? requestedIcon : (existingIcon || 'book-blue'),
                     color: normalizeSubjectColor(values.color || 'Azul')
                 };
 

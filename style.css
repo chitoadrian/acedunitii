@@ -36707,3 +36707,164 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .pet-bubb
     border-color: rgba(140, 126, 190, 0.30) !important;
     box-shadow: 0 3px 8px rgba(52, 61, 103, 0.12);
 }
+
+/* Modern subject icon picker */
+.quick-modal-card[aria-label="Crear materia"],
+.quick-modal-card[aria-label="Editar materia"] {
+    width: min(94vw, 720px);
+    max-height: min(90vh, 820px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .quick-modal-form,
+.quick-modal-card[aria-label="Editar materia"] .quick-modal-form {
+    gap: 16px;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-field,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-field {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-field legend,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-field legend {
+    margin-bottom: 9px;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-picker,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+    gap: 8px;
+    max-height: 190px;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.26);
+    scrollbar-width: thin;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option {
+    display: inline-grid;
+    place-items: center;
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.045);
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option > span,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option > span {
+    display: inline-grid;
+    width: 24px;
+    height: 24px;
+    place-items: center;
+    pointer-events: none;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option svg,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option:hover,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option:hover {
+    border-color: rgba(96, 165, 250, 0.72);
+    background: rgba(59, 130, 246, 0.12);
+    color: #bfdbfe;
+    transform: translateY(-1px);
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option[aria-pressed="true"],
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option[aria-pressed="true"] {
+    border-color: #8b5cf6;
+    background: rgba(124, 58, 237, 0.18);
+    color: #ddd6fe;
+    box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.3);
+}
+
+.quick-modal-card[aria-label="Crear materia"] .subject-icon-option:focus-visible,
+.quick-modal-card[aria-label="Editar materia"] .subject-icon-option:focus-visible {
+    outline: 3px solid rgba(56, 189, 248, 0.55);
+    outline-offset: 2px;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Crear materia"] .subject-icon-picker,
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Editar materia"] .subject-icon-picker {
+    border-color: #d5dae2;
+    background: #eef1f5;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Crear materia"] .subject-icon-option,
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Editar materia"] .subject-icon-option {
+    border-color: #cbd5e1;
+    background: #fafafa;
+    color: #475569;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Crear materia"] .subject-icon-option:hover,
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Editar materia"] .subject-icon-option:hover {
+    border-color: #7da6f8;
+    background: #eef4ff;
+    color: #1d4ed8;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Crear materia"] .subject-icon-option[aria-pressed="true"],
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Editar materia"] .subject-icon-option[aria-pressed="true"] {
+    border-color: #7c3aed;
+    background: #f1eafe;
+    color: #6d28d9;
+}
+
+@media (max-width: 600px) {
+    .quick-modal-card[aria-label="Crear materia"],
+    .quick-modal-card[aria-label="Editar materia"] {
+        width: min(96vw, 520px);
+        max-height: 92vh;
+        padding-inline: 18px;
+    }
+
+    .quick-modal-card[aria-label="Crear materia"] .subject-icon-picker,
+    .quick-modal-card[aria-label="Editar materia"] .subject-icon-picker {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        max-height: 176px;
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .quick-modal-card[aria-label="Crear materia"] .subject-icon-option,
+    .quick-modal-card[aria-label="Editar materia"] .subject-icon-option {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 390px) {
+    .quick-modal-card[aria-label="Crear materia"] .subject-icon-picker,
+    .quick-modal-card[aria-label="Editar materia"] .subject-icon-picker {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
