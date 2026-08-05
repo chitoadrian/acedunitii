@@ -7244,7 +7244,7 @@ function getSubjectIconMarkup(subject) {
     const storedIcon = String(subject.icon || '').trim();
     const iconValue = isKnownSubjectIcon(storedIcon) ? storedIcon : 'book-blue';
     const iconName = getSubjectVisualIconName(iconValue);
-    return `<span class="subject-icon subject-symbol subject-icon-${escapeHTML(normalizeSubjectIcon(iconValue))}" aria-hidden="true">${appIconSvg(iconName)}</span>`;
+    return `<span class="subject-icon subject-symbol subject-icon-${escapeHTML(normalizeSubjectIcon(iconValue))}" aria-hidden="true">${subjectIconSvg(iconName)}</span>`;
 }
 
 function ensureSubjectsToolbar(grid) {
