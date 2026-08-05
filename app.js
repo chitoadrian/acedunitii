@@ -536,7 +536,7 @@ function renderQuickField(field) {
             return `
                 <label class="choice-pill ${escapeHTML(iconClass)}" style="${tone ? `--choice-color:${escapeHTML(tone)}` : ''}">
                     <input type="radio" name="${escapeHTML(field.name)}" value="${escapeHTML(value)}" ${checked} ${field.required === false ? '' : 'required'}>
-                    <span class="choice-dot" aria-hidden="true"></span>
+                    <span class="choice-dot" aria-hidden="true">${typeof option === 'string' || !option.attendanceIcon ? '' : attendanceIconSvg(option.attendanceIcon)}</span>
                     <strong>${escapeHTML(label)}</strong>
                 </label>
             `;
@@ -2715,6 +2715,20 @@ function addAttendanceUI() {
     openAttendanceForm();
 }
 
+const attendanceIcons = Object.freeze({
+    classes: '<rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path>',
+    present: '<circle cx="12" cy="12" r="9"></circle><path d="m8 12 2.6 2.6L16.5 9"></path>',
+    absent: '<circle cx="12" cy="12" r="9"></circle><path d="m9 9 6 6M15 9l-6 6"></path>',
+    late: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>',
+    justified: '<path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M9 14l2 2 4-4"></path>',
+    percent: '<circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 1 9 9h-9zM8.5 15.5l7-7M9 9h.01M15 15h.01"></path>'
+});
+
+function attendanceIconSvg(name) {
+    const paths = attendanceIcons[name] || attendanceIcons.classes;
+    return `<svg class="attendance-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths}</svg>`;
+}
+
 function getAttendanceStatusLabel(status) {
     if (status === 'Asisti') return 'Presente';
     if (status === 'Falta') return 'Falta';
@@ -2938,7 +2952,7 @@ function renderAttendance(workspace) {
                         const key = getAttendanceStatusKey(item.status);
                         return `
                             <article class="attendance-card attendance-${key}">
-                                <div class="attendance-card-icon" aria-hidden="true"></div>
+                                <div class="attendance-card-icon" aria-hidden="true">${attendanceIconSvg(key)}</div>
                                 <div class="attendance-card-main">
                                     <h3>${escapeHTML(item.subject || 'General')}</h3>
                                     <span class="attendance-status">${escapeHTML(getAttendanceStatusLabel(item.status))}</span>
@@ -2989,7 +3003,7 @@ function renderAttendance(workspace) {
 function attendanceStatCard(type, label, value) {
     return `
         <div class="attendance-stat-card stat-${type}">
-            <span class="attendance-stat-icon" aria-hidden="true"></span>
+            <span class="attendance-stat-icon" aria-hidden="true">${attendanceIconSvg(type)}</span>
             <div>
                 <strong>${escapeHTML(value)}</strong>
                 <p>${escapeHTML(label)}</p>
@@ -3244,10 +3258,10 @@ const eventTypeOptions = [
 ];
 
 const attendanceStatusOptions = [
-    { value: 'Asisti', label: 'Presente', tone: '#00c875', iconClass: 'choice-icon-present' },
-    { value: 'Falta', label: 'Falta', tone: '#fd71af', iconClass: 'choice-icon-absent' },
-    { value: 'Atraso', label: 'Atraso', tone: '#ffc800', iconClass: 'choice-icon-late' },
-    { value: 'Justificado', label: 'Justificado', tone: '#49ccf9', iconClass: 'choice-icon-justified' }
+    { value: 'Asisti', label: 'Presente', tone: '#00c875', iconClass: 'choice-icon-present', attendanceIcon: 'present' },
+    { value: 'Falta', label: 'Falta', tone: '#fd71af', iconClass: 'choice-icon-absent', attendanceIcon: 'absent' },
+    { value: 'Atraso', label: 'Atraso', tone: '#ffc800', iconClass: 'choice-icon-late', attendanceIcon: 'late' },
+    { value: 'Justificado', label: 'Justificado', tone: '#49ccf9', iconClass: 'choice-icon-justified', attendanceIcon: 'justified' }
 ];
 
 let currentAttendanceFilter = 'all';

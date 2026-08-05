@@ -36868,3 +36868,57 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
     }
 }
 
+/* Modern attendance icons */
+#attendance .attendance-icon-svg,
+.quick-modal .choice-pill[class*="choice-icon-"] .attendance-icon-svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    color: currentColor;
+    overflow: visible;
+    pointer-events: none;
+}
+
+#attendance .attendance-stat-icon::before,
+#attendance .attendance-stat-icon::after,
+#attendance .attendance-card-icon::before,
+#attendance .attendance-card-icon::after,
+.quick-modal .choice-icon-present .choice-dot::before,
+.quick-modal .choice-icon-present .choice-dot::after,
+.quick-modal .choice-icon-absent .choice-dot::before,
+.quick-modal .choice-icon-absent .choice-dot::after,
+.quick-modal .choice-icon-late .choice-dot::before,
+.quick-modal .choice-icon-late .choice-dot::after,
+.quick-modal .choice-icon-justified .choice-dot::before,
+.quick-modal .choice-icon-justified .choice-dot::after {
+    content: none;
+}
+
+#attendance .attendance-stat-icon,
+#attendance .attendance-card-icon {
+    color: var(--attendance-color, var(--attendance-card-color));
+}
+
+#attendance .attendance-card-icon .attendance-icon-svg {
+    color: var(--attendance-card-color);
+}
+
+.quick-modal .choice-pill[class*="choice-icon-"] .choice-dot {
+    display: inline-grid;
+    place-items: center;
+    color: #ffffff;
+}
+
+.quick-modal .choice-pill[class*="choice-icon-"] .choice-dot .attendance-icon-svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 520px) {
+    #attendance .attendance-stat-icon .attendance-icon-svg,
+    #attendance .attendance-card-icon .attendance-icon-svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
