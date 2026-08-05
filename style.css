@@ -36922,3 +36922,99 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
     }
 }
 
+/* Compact digital backpack filters */
+body #backpack .backpack-toolbar {
+    grid-template-columns: minmax(320px, 2fr) repeat(3, minmax(132px, 0.72fr)) auto !important;
+    align-items: end !important;
+    gap: 14px !important;
+    margin: 18px 0 22px !important;
+    padding: 20px 22px !important;
+}
+
+body #backpack .backpack-toolbar label {
+    gap: 5px !important;
+}
+
+body #backpack .backpack-toolbar label > span {
+    min-height: 16px !important;
+    font-size: 0.7rem !important;
+    font-weight: 650 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.035em !important;
+}
+
+body #backpack .backpack-toolbar label > span::before {
+    width: 5px !important;
+    height: 5px !important;
+    box-shadow: 0 0 8px rgba(73, 204, 249, 0.35) !important;
+}
+
+body #backpack .backpack-toolbar input,
+body #backpack .backpack-toolbar select,
+body #backpack .backpack-toolbar .btn-primary {
+    height: 48px !important;
+    min-height: 48px !important;
+}
+
+body #backpack .backpack-toolbar input,
+body #backpack .backpack-toolbar select {
+    padding-block: 0 !important;
+    font-size: 0.86rem !important;
+    line-height: 1.25 !important;
+}
+
+body #backpack .backpack-toolbar .btn-primary {
+    min-width: 118px !important;
+    padding: 0 16px !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 1180px) and (min-width: 701px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 12px 14px !important;
+        padding: 20px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search {
+        grid-column: 1 / -1 !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(4),
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-self: stretch !important;
+    }
+}
+
+@media (max-width: 700px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        margin: 16px 0 18px !important;
+        padding: 16px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search {
+        grid-column: 1 / -1 !important;
+    }
+
+    body #backpack .backpack-toolbar label,
+    body #backpack .backpack-toolbar label:nth-of-type(4),
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        justify-self: stretch !important;
+    }
+
+    body #backpack .backpack-toolbar input,
+    body #backpack .backpack-toolbar select,
+    body #backpack .backpack-toolbar .btn-primary {
+        height: 48px !important;
+        min-height: 48px !important;
+    }
+}
+
