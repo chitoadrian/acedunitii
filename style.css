@@ -37163,6 +37163,7 @@ body #backpack .backpack-toolbar .btn-primary {
 
 #attendance .attendance-card .card-actions {
     align-self: center;
+    margin: 0;
 }
 
 @media (max-width: 900px) {
