@@ -424,6 +424,13 @@ function openQuickForm(config) {
         }
     });
 
+    modal.addEventListener('keydown', event => {
+        const iconButton = event.target.closest('.subject-icon-option');
+        if (!iconButton || !modal.contains(iconButton) || !['Enter', ' '].includes(event.key)) return;
+        event.preventDefault();
+        iconButton.click();
+    });
+
     modal.querySelector('form').addEventListener('submit', async event => {
         event.preventDefault();
         const form = event.currentTarget;
