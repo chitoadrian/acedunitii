@@ -37018,3 +37018,121 @@ body #backpack .backpack-toolbar .btn-primary {
     }
 }
 
+/* Digital backpack filter overflow fix */
+body #backpack .backpack-toolbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+}
+
+body #backpack .backpack-toolbar > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body #backpack .backpack-toolbar input,
+body #backpack .backpack-toolbar select {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body #backpack .backpack-toolbar select {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+body #backpack .backpack-toolbar .btn-primary {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding-inline: 14px !important;
+    white-space: nowrap !important;
+    justify-self: end !important;
+}
+
+@media (min-width: 1281px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns:
+            minmax(280px, 1.8fr)
+            minmax(180px, 0.8fr)
+            minmax(210px, 1fr)
+            minmax(170px, 0.8fr)
+            auto !important;
+        gap: 14px !important;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1280px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(150px, 0.8fr) !important;
+        gap: 12px 14px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search {
+        grid-column: 1 / 3 !important;
+        grid-row: 1 !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(2) {
+        grid-column: 3 !important;
+        grid-row: 1 !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(3) {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+    }
+
+    body #backpack .backpack-toolbar label:nth-of-type(4) {
+        grid-column: 2 !important;
+        grid-row: 2 !important;
+    }
+
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: 3 !important;
+        grid-row: 2 !important;
+        width: 100% !important;
+        justify-self: stretch !important;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search {
+        grid-column: 1 / -1 !important;
+    }
+
+    body #backpack .backpack-toolbar label,
+    body #backpack .backpack-toolbar label:nth-of-type(4),
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: auto !important;
+        width: 100% !important;
+        justify-self: stretch !important;
+    }
+}
+
+@media (max-width: 600px) {
+    body #backpack .backpack-toolbar {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 11px !important;
+        padding: 15px !important;
+    }
+
+    body #backpack .backpack-toolbar .backpack-search,
+    body #backpack .backpack-toolbar label,
+    body #backpack .backpack-toolbar label:nth-of-type(4),
+    body #backpack .backpack-toolbar .btn-primary {
+        grid-column: 1 !important;
+        width: 100% !important;
+        justify-self: stretch !important;
+    }
+}
+
