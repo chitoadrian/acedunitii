@@ -9920,10 +9920,26 @@ async function resendSignupConfirmation(email, pageId = 'login') {
 }
 
 async function showConfirmedAccountLogin(sb) {
+    const { data: sessionData, error: sessionError } = await sb.auth.getSession();
+    let confirmedUser = null;
+
+    if (!sessionError && sessionData?.session) {
+        const { data: userData, error: userError } = await sb.auth.getUser();
+        if (!userError && isConfirmedAuthUser(userData?.user)) {
+            confirmedUser = userData.user;
+        }
+    }
+
+    if (!confirmedUser) {
+        clearEmailConfirmationMarker();
+        showEmptyLogin();
+        setAuthMessage('login', 'No se pudo validar la confirmación. Solicita un correo nuevo e inténtalo otra vez.', 'error');
+        return;
+    }
+
     accountSwitchInProgress = true;
     try {
-        const { data } = await sb.auth.getSession();
-        if (data?.session) await sb.auth.signOut({ scope: 'local' });
+        await sb.auth.signOut({ scope: 'local' });
     } finally {
         accountSwitchInProgress = false;
     }
