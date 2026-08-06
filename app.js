@@ -326,7 +326,7 @@ function translateSupabaseError(message = '') {
     }
 
     if (text.includes('password should be at least') || text.includes('weak password')) {
-        return 'La contraseña es muy corta o débil. Usa una contraseña más segura.';
+        return 'La contraseña debe tener al menos 6 caracteres.';
     }
 
     if (text.includes('invalid email')) {
@@ -368,6 +368,12 @@ function bindAuthForms() {
     if (registerForm && !registerForm.dataset.supabaseBound) {
         registerForm.dataset.supabaseBound = 'true';
         registerForm.addEventListener('submit', handleRegister);
+        registerForm.querySelectorAll('#register-password, #register-password-confirmation').forEach(input => {
+            input.addEventListener('input', () => {
+                input.setCustomValidity('');
+                input.removeAttribute('aria-invalid');
+            });
+        });
     }
 
     if (logoutBtn && !logoutBtn.dataset.supabaseBound) {
@@ -8344,6 +8350,7 @@ let workspaceState = null;
 let profileState = null;
 let authListenerReady = false;
 let loginInProgress = false;
+let registerInProgress = false;
 let logoutInProgress = false;
 let accountSwitchInProgress = false;
 let dashboardAuthorizedUserId = '';
@@ -9793,7 +9800,7 @@ function showLanding(options = {}) {
         clearAppViewSession();
     }
     clearAuthMessages();
-    ['login-email', 'login-password', 'register-name', 'register-email', 'register-password'].forEach(id => {
+    ['login-email', 'login-password', 'register-name', 'register-email', 'register-password', 'register-password-confirmation'].forEach(id => {
         const input = document.getElementById(id);
         if (input) input.value = '';
     });
@@ -9865,18 +9872,81 @@ function showApp() {
     showDashboard('dashboard');
 }
 
+const SIGNUP_PASSWORD_MIN_LENGTH = 6;
+
+function invalidateRegisterField(input, message) {
+    if (!input) return;
+    input.setCustomValidity(message);
+    input.setAttribute('aria-invalid', 'true');
+    setAuthMessage('register', message, 'error');
+    input.focus();
+    input.reportValidity();
+}
+
 async function handleRegister(event) {
     event.preventDefault();
+    if (registerInProgress) return;
+
     clearAuthMessages();
 
-    const name = document.getElementById('register-name').value.trim();
-    const email = document.getElementById('register-email').value.trim();
-    const password = document.getElementById('register-password').value.trim();
+    const registerForm = event.currentTarget || document.getElementById('register-form');
+    const nameInput = document.getElementById('register-name');
+    const emailInput = document.getElementById('register-email');
+    const passwordInput = document.getElementById('register-password');
+    const confirmPasswordInput = document.getElementById('register-password-confirmation');
+    const submitButton = registerForm?.querySelector('button[type="submit"]');
+    const submitLabel = submitButton?.querySelector('span');
+    const originalSubmitLabel = submitLabel?.textContent || 'Crear cuenta';
 
-    if (!name || !email || !password) {
-        setAuthMessage('register', 'Completa nombre, correo y contraseña para crear tu cuenta.', 'error');
+    [passwordInput, confirmPasswordInput].forEach(input => {
+        input?.setCustomValidity('');
+        input?.removeAttribute('aria-invalid');
+    });
+
+    const name = String(nameInput?.value || '').trim();
+    const email = String(emailInput?.value || '').trim();
+    const password = String(passwordInput?.value || '');
+    const confirmPassword = String(confirmPasswordInput?.value || '');
+
+    if (!name) {
+        setAuthMessage('register', 'Ingresa tu nombre completo.', 'error');
+        nameInput?.focus();
         return;
     }
+
+    if (!email || !emailInput?.validity.valid) {
+        setAuthMessage('register', 'Escribe un correo válido.', 'error');
+        emailInput?.focus();
+        emailInput?.reportValidity();
+        return;
+    }
+
+    if (!password.trim()) {
+        invalidateRegisterField(passwordInput, 'Ingresa una contraseña.');
+        return;
+    }
+
+    if (!confirmPassword.trim()) {
+        invalidateRegisterField(confirmPasswordInput, 'Confirma tu contraseña.');
+        return;
+    }
+
+    if (password.length < SIGNUP_PASSWORD_MIN_LENGTH) {
+        invalidateRegisterField(passwordInput, `La contraseña debe tener al menos ${SIGNUP_PASSWORD_MIN_LENGTH} caracteres.`);
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        invalidateRegisterField(confirmPasswordInput, 'Las contraseñas no coinciden.');
+        return;
+    }
+
+    registerInProgress = true;
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.setAttribute('aria-busy', 'true');
+    }
+    if (submitLabel) submitLabel.textContent = 'Creando cuenta...';
 
     try {
         const sb = getSupabaseClient();
@@ -9928,12 +9998,10 @@ async function handleRegister(event) {
         currentUser = { id: data.user.id, email: data.user.email, name };
         saveWorkspaceExtras(extras);
 
-        document.getElementById('register-name').value = '';
-        document.getElementById('register-email').value = '';
-        document.getElementById('register-password').value = '';
+        registerForm?.reset();
 
         if (!data.session) {
-            setAuthMessage('register', 'Cuenta creada. Ahora inicia sesión.', 'success', {
+            setAuthMessage('register', 'Cuenta creada. Revisa tu correo para confirmar la cuenta y luego inicia sesión.', 'success', {
                 label: 'Iniciar sesión con este correo',
                 onClick: () => showLoginWithEmail(email)
             });
@@ -9946,12 +10014,22 @@ async function handleRegister(event) {
         playInterfaceSound();
         showApp();
     } catch (error) {
-        const message = translateSupabaseError(error.message);
+        const translated = translateSupabaseError(error.message);
+        const message = translated === 'No se pudo completar la acción. Revisa los datos e intenta otra vez.'
+            ? 'No se pudo crear la cuenta. Revisa los datos e inténtalo otra vez.'
+            : translated;
         const action = isAlreadyRegisteredError(error.message) ? {
             label: 'Iniciar sesión con este correo',
             onClick: () => showLoginWithEmail(email)
         } : null;
         setAuthMessage('register', message, 'error', action);
+    } finally {
+        registerInProgress = false;
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.removeAttribute('aria-busy');
+        }
+        if (submitLabel) submitLabel.textContent = originalSubmitLabel;
     }
 }
 

@@ -435,14 +435,14 @@
                     </div>
                     <h2>Crear cuenta</h2>
 
-                    <form id="register-form">
+                    <form id="register-form" novalidate>
                         <div class="form-group">
                             <label for="register-name">Nombre completo</label>
                             <div class="register-input-shell">
                                 <span class="register-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>
                                 </span>
-                                <input type="text" id="register-name" placeholder="Adrian Lopez" required>
+                                <input type="text" id="register-name" name="full_name" placeholder="Adrian Lopez" autocomplete="name" required>
                             </div>
                         </div>
 
@@ -452,7 +452,7 @@
                                 <span class="register-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg>
                                 </span>
-                                <input type="email" id="register-email" placeholder="tu@correo.com" required>
+                                <input type="email" id="register-email" name="email" placeholder="tu@correo.com" autocomplete="email" required>
                             </div>
                         </div>
 
@@ -462,7 +462,7 @@
                                 <span class="register-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="M12 14v3"></path></svg>
                                 </span>
-                                <input type="password" id="register-password" placeholder="••••••••" autocomplete="new-password" required>
+                                <input type="password" id="register-password" name="password" placeholder="••••••••" minlength="6" autocomplete="new-password" required>
                                 <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
                                     <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
                                     <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
@@ -471,12 +471,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Confirmar contraseña</label>
+                            <label for="register-password-confirmation">Confirmar contraseña</label>
                             <div class="register-input-shell">
                                 <span class="register-input-icon" aria-hidden="true">
                                     <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path><path d="m9 15 2 2 4-4"></path></svg>
                                 </span>
-                                <input type="password" class="register-password-confirmation" placeholder="••••••••" aria-label="Confirmar contraseña" autocomplete="new-password">
+                                <input type="password" id="register-password-confirmation" name="password_confirmation" class="register-password-confirmation" placeholder="••••••••" minlength="6" aria-label="Confirmar contraseña" autocomplete="new-password" required>
                                 <button type="button" class="password-toggle" data-password-toggle aria-label="Mostrar contraseña" aria-pressed="false">
                                     <svg class="password-toggle-eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
                                     <svg class="password-toggle-eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 6.2A10.8 10.8 0 0 1 12 6c6.5 0 10 6 10 6a17 17 0 0 1-2.1 2.9"></path><path d="M6.1 6.1C3.5 8 2 12 2 12s3.5 6 10 6c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>
@@ -1619,6 +1619,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260806-attendance-calendar-today-fix-v1"></script>
+    <script src="app.js?v=20260806-signup-password-validation-v1"></script>
 </body>
 </html>
