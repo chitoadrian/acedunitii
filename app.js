@@ -291,15 +291,18 @@ function setAuthMessage(pageId, message, type = 'error', action = null) {
     messageBox.textContent = message;
     messageBox.className = `auth-message ${type}`;
 
-    if (action?.label && typeof action.onClick === 'function') {
-        const actionButton = document.createElement('button');
-        actionButton.type = 'button';
-        actionButton.className = 'btn-secondary btn-small';
-        actionButton.textContent = action.label;
-        actionButton.addEventListener('click', action.onClick);
-        messageBox.appendChild(document.createElement('br'));
-        messageBox.appendChild(actionButton);
-    }
+    const actions = Array.isArray(action) ? action : (action ? [action] : []);
+    actions
+        .filter(item => item?.label && typeof item.onClick === 'function')
+        .forEach((item, index) => {
+            const actionButton = document.createElement('button');
+            actionButton.type = 'button';
+            actionButton.className = 'btn-secondary btn-small';
+            actionButton.textContent = item.label;
+            actionButton.addEventListener('click', item.onClick);
+            messageBox.appendChild(index === 0 ? document.createElement('br') : document.createTextNode(' '));
+            messageBox.appendChild(actionButton);
+        });
 }
 
 function clearAuthMessages() {
@@ -8533,12 +8536,17 @@ function clearAuthenticatedClientState() {
     document.documentElement.classList.remove('is-dashboard');
 }
 
+function isConfirmedAuthUser(user) {
+    return Boolean(user?.email_confirmed_at || user?.confirmed_at);
+}
+
 async function getValidatedAuthUser() {
     const sb = getSupabaseClient();
     const { data: sessionData, error: sessionError } = await sb.auth.getSession();
     if (sessionError || !sessionData?.session) return null;
     const { data: userData, error: userError } = await sb.auth.getUser();
     if (userError || !userData?.user || userData.user.id !== sessionData.session.user?.id) return null;
+    if (!isConfirmedAuthUser(userData.user)) return null;
     return userData.user;
 }
 
@@ -9817,7 +9825,7 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
         authUser = await getValidatedAuthUser();
     }
     if (generation !== authOperationGeneration) return;
-    if (!authUser || !currentUser || currentUser.id !== authUser.id || dashboardAuthorizedUserId !== authUser.id) {
+    if (!authUser || !isConfirmedAuthUser(authUser) || !currentUser || currentUser.id !== authUser.id || dashboardAuthorizedUserId !== authUser.id) {
         await discardInvalidAuthSession();
         clearAuthenticatedClientState();
         showLanding();
@@ -9873,6 +9881,57 @@ function showApp() {
 }
 
 const SIGNUP_PASSWORD_MIN_LENGTH = 6;
+const SIGNUP_EMAIL_REDIRECT_URL = 'https://edunity.me/?email-confirmed=1';
+const SIGNUP_CONFIRMATION_MESSAGE = 'Cuenta creada. Revisa tu correo y confirma tu cuenta antes de iniciar sesión.';
+let resendConfirmationInProgress = false;
+
+function isEmailConfirmationReturn() {
+    return new URLSearchParams(window.location.search).get('email-confirmed') === '1';
+}
+
+function clearEmailConfirmationMarker() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('email-confirmed');
+    if (url.hash.includes('access_token') || url.hash.includes('refresh_token')) url.hash = '';
+    window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
+async function resendSignupConfirmation(email, pageId = 'login') {
+    const cleanEmail = String(email || '').trim();
+    if (!cleanEmail || resendConfirmationInProgress) return;
+
+    resendConfirmationInProgress = true;
+    try {
+        const { error } = await getSupabaseClient().auth.resend({
+            type: 'signup',
+            email: cleanEmail,
+            options: {
+                emailRedirectTo: SIGNUP_EMAIL_REDIRECT_URL
+            }
+        });
+        if (error) throw error;
+        setAuthMessage(pageId, 'Si la dirección es válida, recibirás un nuevo correo de confirmación.', 'success');
+    } catch (error) {
+        logSupabaseError('auth resend signup confirmation', error);
+        setAuthMessage(pageId, translateSupabaseError(error?.message), 'error');
+    } finally {
+        resendConfirmationInProgress = false;
+    }
+}
+
+async function showConfirmedAccountLogin(sb) {
+    accountSwitchInProgress = true;
+    try {
+        const { data } = await sb.auth.getSession();
+        if (data?.session) await sb.auth.signOut({ scope: 'local' });
+    } finally {
+        accountSwitchInProgress = false;
+    }
+    clearAuthenticatedClientState();
+    clearEmailConfirmationMarker();
+    showEmptyLogin();
+    setAuthMessage('login', 'Tu cuenta fue confirmada correctamente. Ya puedes iniciar sesión.', 'success');
+}
 
 function invalidateRegisterField(input, message) {
     if (!input) return;
@@ -9954,7 +10013,8 @@ async function handleRegister(event) {
             email,
             password,
             options: {
-                data: { full_name: name }
+                data: { full_name: name },
+                emailRedirectTo: SIGNUP_EMAIL_REDIRECT_URL
             }
         });
 
@@ -9978,41 +10038,41 @@ async function handleRegister(event) {
             hasSession: !!data.session
         });
 
-        const extras = {
-            events: [],
-            grades: [],
-            attendance: [],
-            resources: [],
-            recent: [],
-            taskMeta: {},
-            profileExtras: {
-                career: '',
-                bio: '',
-                interests: '',
-                avatarStyle: 'initials',
-                avatarText: '',
-                goals: []
-            },
-            tutorHistory: []
-        };
-        currentUser = { id: data.user.id, email: data.user.email, name };
-        saveWorkspaceExtras(extras);
-
         registerForm?.reset();
 
         if (!data.session) {
-            setAuthMessage('register', 'Cuenta creada. Revisa tu correo para confirmar la cuenta y luego inicia sesión.', 'success', {
-                label: 'Iniciar sesión con este correo',
-                onClick: () => showLoginWithEmail(email)
-            });
+            setAuthMessage('register', SIGNUP_CONFIRMATION_MESSAGE, 'success', [
+                {
+                    label: 'Ir a iniciar sesión',
+                    onClick: () => showLoginWithEmail(email)
+                },
+                {
+                    label: 'Reenviar correo de confirmación',
+                    onClick: () => resendSignupConfirmation(email, 'register')
+                }
+            ]);
             return;
         }
 
-        await bootstrapAuthenticatedApp(data.user, name);
-
-        notify('Cuenta creada correctamente. Tu espacio académico empieza vacío.', 'success');
-        playInterfaceSound();
-        showApp();
+        // Cierre seguro: una cuenta nueva nunca debe entrar al panel antes de confirmar.
+        accountSwitchInProgress = true;
+        try {
+            await sb.auth.signOut({ scope: 'local' });
+        } finally {
+            accountSwitchInProgress = false;
+        }
+        clearAuthenticatedClientState();
+        showRegister();
+        setAuthMessage('register', SIGNUP_CONFIRMATION_MESSAGE, 'success', [
+            {
+                label: 'Ir a iniciar sesión',
+                onClick: () => showLoginWithEmail(email)
+            },
+            {
+                label: 'Reenviar correo de confirmación',
+                onClick: () => resendSignupConfirmation(email, 'register')
+            }
+        ]);
     } catch (error) {
         const translated = translateSupabaseError(error.message);
         const message = translated === 'No se pudo completar la acción. Revisa los datos e intenta otra vez.'
@@ -10090,7 +10150,12 @@ async function handleLogin(event) {
     } catch (error) {
         if (generation === authOperationGeneration) {
             console.error('[LOGIN] Error de autenticación:', error?.message || error);
-            setAuthMessage('login', translateSupabaseError(error.message), 'error');
+            const translated = translateSupabaseError(error.message);
+            const needsConfirmation = translated === 'Debes confirmar tu correo antes de iniciar sesión.';
+            setAuthMessage('login', translated, 'error', needsConfirmation ? {
+                label: 'Reenviar correo de confirmación',
+                onClick: () => resendSignupConfirmation(email, 'login')
+            } : null);
         }
     } finally {
         loginInProgress = false;
@@ -10739,6 +10804,11 @@ async function initializeApp() {
         if (isPasswordRecoveryUrl()) {
             console.log('[PASSWORD UPDATE] Link de recuperación detectado en URL; validando sesión');
             await openPasswordRecoveryFlow(sb);
+            return;
+        }
+
+        if (isEmailConfirmationReturn()) {
+            await showConfirmedAccountLogin(sb);
             return;
         }
 
