@@ -2872,22 +2872,43 @@ function filterAttendance(filter, button) {
     renderAttendance(loadWorkspace());
 }
 
-function getAttendanceCalendarDays(records) {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const offset = (firstDay.getDay() + 6) % 7;
+const ATTENDANCE_TIME_ZONE = 'America/Guayaquil';
+
+function getAttendanceTodayParts(referenceDate = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: ATTENDANCE_TIME_ZONE,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(referenceDate);
+    const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    const year = Number(values.year);
+    const month = Number(values.month);
+    const day = Number(values.day);
+    return {
+        year,
+        month,
+        day,
+        iso: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    };
+}
+
+function getAttendanceCalendarDays(records, referenceDate = new Date()) {
+    const today = getAttendanceTodayParts(referenceDate);
+    const year = today.year;
+    const month = today.month;
+    const firstDay = new Date(Date.UTC(year, month - 1, 1));
+    const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const offset = (firstDay.getUTCDay() + 6) % 7;
     const cells = [];
 
     for (let i = 0; i < offset; i += 1) {
         cells.push({ empty: true });
     }
     for (let day = 1; day <= daysInMonth; day += 1) {
-        const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const record = records.find(item => normalizeDate(item.date) === iso);
-        cells.push({ day, record });
+        cells.push({ day, record, isToday: iso === today.iso, iso });
     }
     return cells;
 }
@@ -2974,7 +2995,7 @@ function renderAttendance(workspace) {
                     <h3>Calendario del mes</h3>
                     <div class="attendance-calendar-weekdays"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
                     <div class="attendance-calendar-grid">
-                        ${calendarDays.map(cell => cell.empty ? '<span class="attendance-day empty"></span>' : `<span class="attendance-day ${cell.record ? `day-${getAttendanceStatusKey(cell.record.status)}` : ''}">${cell.day}</span>`).join('')}
+                        ${calendarDays.map(cell => cell.empty ? '<span class="attendance-day empty"></span>' : `<span class="attendance-day ${cell.isToday ? 'is-today' : ''} ${cell.record ? `day-${getAttendanceStatusKey(cell.record.status)}` : ''}" data-attendance-date="${cell.iso}"${cell.isToday ? ' aria-current="date"' : ''}>${cell.day}</span>`).join('')}
                     </div>
                 </section>
 
@@ -2999,6 +3020,18 @@ function renderAttendance(workspace) {
     container.querySelectorAll('[data-attendance-edit]').forEach(button => button.addEventListener('click', () => openAttendanceForm(button.dataset.attendanceEdit)));
     container.querySelectorAll('[data-attendance-delete]').forEach(button => button.addEventListener('click', () => deleteAttendance(button.dataset.attendanceDelete)));
 }
+
+function refreshAttendanceCalendarToday() {
+    const section = document.getElementById('attendance');
+    if (!section || !section.classList.contains('active')) return;
+    renderAttendance(loadWorkspace());
+}
+
+window.addEventListener('pageshow', refreshAttendanceCalendarToday);
+window.addEventListener('focus', refreshAttendanceCalendarToday);
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') refreshAttendanceCalendarToday();
+});
 
 function attendanceStatCard(type, label, value) {
     return `

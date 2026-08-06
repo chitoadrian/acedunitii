@@ -37216,3 +37216,36 @@ body #backpack .backpack-toolbar .btn-primary {
         padding-left: 0;
     }
 }
+
+/* Attendance calendar current day */
+#attendance .attendance-day.is-today {
+    border-color: #36c98f;
+    background: rgba(54, 201, 143, 0.14);
+    color: #68d9ad;
+    font-weight: 800;
+    box-shadow: inset 0 0 0 1px rgba(54, 201, 143, 0.42);
+}
+
+#attendance .attendance-day.is-today.day-present::after {
+    background: #36c98f;
+}
+
+#attendance .attendance-day.is-today.day-absent::after {
+    background: #f06a83;
+}
+
+#attendance .attendance-day.is-today.day-late::after {
+    background: #e7ab48;
+}
+
+#attendance .attendance-day.is-today.day-justified::after {
+    background: #55bfe8;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance-day.is-today {
+    border-color: #218a63;
+    background: rgba(54, 201, 143, 0.13);
+    color: #176b4d;
+    box-shadow: inset 0 0 0 1px rgba(33, 138, 99, 0.34);
+}
+
