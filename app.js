@@ -9910,7 +9910,7 @@ async function resendSignupConfirmation(email, pageId = 'login') {
             }
         });
         if (error) throw error;
-        setAuthMessage(pageId, 'Si la dirección es válida, recibirás un nuevo correo de confirmación.', 'success');
+        showToast('Si la dirección es válida, recibirás un nuevo correo de confirmación.', 'success');
     } catch (error) {
         logSupabaseError('auth resend signup confirmation', error);
         setAuthMessage(pageId, translateSupabaseError(error?.message), 'error');
@@ -10059,16 +10059,7 @@ async function handleRegister(event) {
         registerForm?.reset();
 
         if (!data.session) {
-            setAuthMessage('register', SIGNUP_CONFIRMATION_MESSAGE, 'success', [
-                {
-                    label: 'Ir a iniciar sesión',
-                    onClick: () => showLoginWithEmail(email)
-                },
-                {
-                    label: 'Reenviar correo de confirmación',
-                    onClick: () => resendSignupConfirmation(email, 'register')
-                }
-            ]);
+            showToast(SIGNUP_CONFIRMATION_MESSAGE, 'success');
             return;
         }
 
@@ -10081,16 +10072,7 @@ async function handleRegister(event) {
         }
         clearAuthenticatedClientState();
         showRegister();
-        setAuthMessage('register', SIGNUP_CONFIRMATION_MESSAGE, 'success', [
-            {
-                label: 'Ir a iniciar sesión',
-                onClick: () => showLoginWithEmail(email)
-            },
-            {
-                label: 'Reenviar correo de confirmación',
-                onClick: () => resendSignupConfirmation(email, 'register')
-            }
-        ]);
+        showToast(SIGNUP_CONFIRMATION_MESSAGE, 'success');
     } catch (error) {
         const translated = translateSupabaseError(error.message);
         const message = translated === 'No se pudo completar la acción. Revisa los datos e intenta otra vez.'
