@@ -9933,6 +9933,7 @@ async function showConfirmedAccountLogin(sb) {
     if (!confirmedUser) {
         clearEmailConfirmationMarker();
         showEmptyLogin();
+        finishBooting();
         setAuthMessage('login', 'No se pudo validar la confirmación. Solicita un correo nuevo e inténtalo otra vez.', 'error');
         return;
     }
@@ -9946,6 +9947,7 @@ async function showConfirmedAccountLogin(sb) {
     clearAuthenticatedClientState();
     clearEmailConfirmationMarker();
     showEmptyLogin();
+    finishBooting();
     setAuthMessage('login', 'Tu cuenta fue confirmada correctamente. Ya puedes iniciar sesión.', 'success');
 }
 
