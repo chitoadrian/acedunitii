@@ -9883,6 +9883,10 @@ function showApp() {
 const SIGNUP_PASSWORD_MIN_LENGTH = 6;
 const SIGNUP_EMAIL_REDIRECT_URL = 'https://edunity.me/?email-confirmed=1';
 const SIGNUP_CONFIRMATION_MESSAGE = 'Cuenta creada. Revisa tu correo y confirma tu cuenta antes de iniciar sesión.';
+const EMAIL_CONFIRMATION_SUCCESS_MESSAGE = 'Correo confirmado. Inicia sesión cuando quieras.';
+const EMAIL_CONFIRMATION_INVALID_MESSAGE = 'El enlace de confirmación no es válido o ha vencido. Solicita un nuevo correo.';
+const RECENT_EMAIL_CONFIRMATION_KEY = 'acEdunityRecentEmailConfirmation';
+const RECENT_EMAIL_CONFIRMATION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 let resendConfirmationInProgress = false;
 
 function isEmailConfirmationReturn() {
@@ -9892,8 +9896,34 @@ function isEmailConfirmationReturn() {
 function clearEmailConfirmationMarker() {
     const url = new URL(window.location.href);
     url.searchParams.delete('email-confirmed');
-    if (url.hash.includes('access_token') || url.hash.includes('refresh_token')) url.hash = '';
+    if (url.hash.includes('access_token') || url.hash.includes('refresh_token') || url.hash.includes('error_code')) url.hash = '';
     window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
+function getEmailConfirmationErrorCode() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+    return String(searchParams.get('error_code') || hashParams.get('error_code') || '').trim().toLowerCase();
+}
+
+function rememberSuccessfulEmailConfirmation() {
+    try {
+        localStorage.setItem(RECENT_EMAIL_CONFIRMATION_KEY, String(Date.now()));
+    } catch (error) {
+        console.warn('[EMAIL CONFIRMATION] No se pudo guardar el comprobante local:', error?.message || error);
+    }
+}
+
+function hasRecentSuccessfulEmailConfirmation() {
+    try {
+        const confirmedAt = Number(localStorage.getItem(RECENT_EMAIL_CONFIRMATION_KEY));
+        return Number.isFinite(confirmedAt)
+            && confirmedAt > 0
+            && Date.now() - confirmedAt <= RECENT_EMAIL_CONFIRMATION_MAX_AGE_MS;
+    } catch (error) {
+        console.warn('[EMAIL CONFIRMATION] No se pudo leer el comprobante local:', error?.message || error);
+        return false;
+    }
 }
 
 async function resendSignupConfirmation(email, pageId = 'login') {
@@ -9920,6 +9950,7 @@ async function resendSignupConfirmation(email, pageId = 'login') {
 }
 
 async function showConfirmedAccountLogin(sb) {
+    const confirmationErrorCode = getEmailConfirmationErrorCode();
     const { data: sessionData, error: sessionError } = await sb.auth.getSession();
     let confirmedUser = null;
 
@@ -9931,13 +9962,20 @@ async function showConfirmedAccountLogin(sb) {
     }
 
     if (!confirmedUser) {
+        const isUsedOrExpiredToken = confirmationErrorCode === 'otp_expired';
+        const wasRecentlyConfirmed = isUsedOrExpiredToken && hasRecentSuccessfulEmailConfirmation();
         clearEmailConfirmationMarker();
         showEmptyLogin();
         finishBooting();
-        setAuthMessage('login', 'No se pudo validar la confirmación. Solicita un correo nuevo e inténtalo otra vez.', 'error');
+        setAuthMessage(
+            'login',
+            wasRecentlyConfirmed ? EMAIL_CONFIRMATION_SUCCESS_MESSAGE : EMAIL_CONFIRMATION_INVALID_MESSAGE,
+            wasRecentlyConfirmed ? 'success' : 'error'
+        );
         return;
     }
 
+    rememberSuccessfulEmailConfirmation();
     accountSwitchInProgress = true;
     try {
         await sb.auth.signOut({ scope: 'local' });
@@ -9948,7 +9986,7 @@ async function showConfirmedAccountLogin(sb) {
     clearEmailConfirmationMarker();
     showEmptyLogin();
     finishBooting();
-    setAuthMessage('login', 'Tu cuenta fue confirmada correctamente. Ya puedes iniciar sesión.', 'success');
+    setAuthMessage('login', EMAIL_CONFIRMATION_SUCCESS_MESSAGE, 'success');
 }
 
 function invalidateRegisterField(input, message) {
