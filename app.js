@@ -8571,21 +8571,76 @@ function openEvaluationDetail(evaluationId) {
     document.body.appendChild(modal);
 }
 
-async function deleteEvaluation(evaluationId) {
+function deleteEvaluation(evaluationId, triggerElement = null) {
     const workspace = loadWorkspace();
     const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
-    if (!evaluation || !window.confirm('¿Eliminar esta evaluación?')) return;
-    try {
-        const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient().from('evaluations').delete().eq('id', evaluationId).eq('user_id', user.id);
-        if (error) throw error;
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
-        notify('Evaluación eliminada.', 'info');
-    } catch (error) {
-        logSupabaseError('evaluations delete', error);
-        notify(error.message || 'No se pudo eliminar la evaluación.', 'error');
-    }
+    if (!evaluation) return;
+
+    closeEvaluationMenus();
+    document.querySelector('.evaluation-delete-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal evaluation-delete-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card evaluation-delete-card" role="dialog" aria-modal="true" aria-labelledby="evaluation-delete-title" aria-describedby="evaluation-delete-description">
+            <button class="quick-modal-close" type="button" data-cancel-evaluation-delete aria-label="Cerrar">×</button>
+            <span class="evaluations-kicker">Evaluaciones</span>
+            <h3 id="evaluation-delete-title">¿Eliminar esta evaluación?</h3>
+            <p id="evaluation-delete-description">Esta acción no se puede deshacer.</p>
+            <strong class="evaluation-delete-name">${escapeHTML(evaluation.title)}</strong>
+            <div class="evaluation-delete-actions">
+                <button class="btn-secondary btn-small" type="button" data-cancel-evaluation-delete>No, cancelar</button>
+                <button class="btn-danger btn-small" type="button" data-confirm-evaluation-delete>Sí, eliminar</button>
+            </div>
+        </div>`;
+
+    const cancelButton = modal.querySelector('[data-cancel-evaluation-delete]');
+    const confirmButton = modal.querySelector('[data-confirm-evaluation-delete]');
+    let isDeleting = false;
+    const close = (restoreFocus = true) => {
+        document.removeEventListener('keydown', handleKeydown);
+        modal.remove();
+        if (restoreFocus && triggerElement?.isConnected) triggerElement.focus();
+    };
+    const handleKeydown = event => {
+        if (event.key === 'Escape' && !isDeleting) close();
+    };
+
+    modal.addEventListener('click', event => {
+        if (!isDeleting && (event.target === modal || event.target.closest('[data-cancel-evaluation-delete]'))) close();
+    });
+    confirmButton.addEventListener('click', async () => {
+        if (isDeleting) return;
+        isDeleting = true;
+        confirmButton.disabled = true;
+        confirmButton.textContent = 'Eliminando…';
+        try {
+            const user = await getCurrentSupabaseUser();
+            const { data, error } = await getSupabaseClient()
+                .from('evaluations')
+                .delete()
+                .eq('id', evaluationId)
+                .eq('user_id', user.id)
+                .select('id')
+                .maybeSingle();
+            if (error) throw error;
+            if (!data?.id) throw new Error('No se encontró la evaluación seleccionada.');
+            await syncWorkspaceFromSupabase();
+            refreshWorkspaceUI();
+            close(false);
+            notify('Evaluación eliminada.', 'info');
+        } catch (error) {
+            logSupabaseError('evaluations delete', error);
+            notify(error.message || 'No se pudo eliminar la evaluación.', 'error');
+            isDeleting = false;
+            confirmButton.disabled = false;
+            confirmButton.textContent = 'Sí, eliminar';
+            confirmButton.focus();
+        }
+    });
+
+    document.addEventListener('keydown', handleKeydown);
+    document.body.appendChild(modal);
+    cancelButton.focus();
 }
 
 async function setEvaluationCalendarState(evaluationId, enabled) {
@@ -8762,7 +8817,7 @@ function renderEvaluations(workspace) {
     });
     container.querySelectorAll('[data-evaluation-view]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.evaluationView)));
     container.querySelectorAll('[data-evaluation-edit]').forEach(button => button.addEventListener('click', () => openEvaluationForm(button.dataset.evaluationEdit)));
-    container.querySelectorAll('[data-evaluation-delete]').forEach(button => button.addEventListener('click', () => deleteEvaluation(button.dataset.evaluationDelete)));
+    container.querySelectorAll('[data-evaluation-delete]').forEach(button => button.addEventListener('click', () => deleteEvaluation(button.dataset.evaluationDelete, button)));
     container.querySelectorAll('[data-evaluation-tutor]').forEach(button => button.addEventListener('click', () => prepareEvaluationWithTutor(button.dataset.evaluationTutor)));
     container.querySelectorAll('[data-evaluation-calendar]').forEach(button => button.addEventListener('click', () => setEvaluationCalendarState(button.dataset.evaluationCalendar, button.dataset.calendarEnabled !== 'true')));
     container.querySelectorAll('[data-evaluation-reminder]').forEach(button => button.addEventListener('click', () => openEvaluationReminderModal(button.dataset.evaluationReminder)));

@@ -37507,3 +37507,71 @@ body.light-theme .evaluation-priority.priority-high { color: #b91c1c; }
     .evaluation-card .card-actions { grid-template-columns: 1fr; }
     .evaluation-topic-input-row { grid-template-columns: 1fr; }
 }
+
+/* Evaluation delete modal */
+.evaluation-delete-card {
+    width: min(430px, calc(100vw - 32px));
+    padding: 26px;
+    text-align: left;
+}
+
+.evaluation-delete-card h3 {
+    margin: 0 42px 8px 0;
+}
+
+.evaluation-delete-card > p {
+    margin: 0;
+    color: var(--text-secondary, #a7b0c2);
+    line-height: 1.5;
+}
+
+.evaluation-delete-name {
+    display: block;
+    margin-top: 16px;
+    padding: 12px 14px;
+    overflow-wrap: break-word;
+    border: 1px solid var(--border-color, rgba(148, 163, 184, .22));
+    border-radius: 12px;
+    background: var(--surface-soft, rgba(15, 23, 42, .5));
+}
+
+.evaluation-delete-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.evaluation-delete-actions button {
+    width: 100%;
+}
+
+.evaluation-delete-actions .btn-danger {
+    color: #fff;
+    background: #c93f4f;
+    border-color: #d75b69;
+}
+
+.evaluation-delete-actions .btn-danger:hover:not(:disabled) {
+    background: #b73343;
+}
+
+.evaluation-delete-actions .btn-danger:disabled {
+    cursor: wait;
+    opacity: .68;
+}
+
+body.light-theme .evaluation-delete-actions .btn-danger {
+    color: #fff;
+}
+
+@media (max-width: 420px) {
+    .evaluation-delete-card {
+        width: min(100%, calc(100vw - 20px));
+        padding: 22px 18px;
+    }
+
+    .evaluation-delete-actions {
+        grid-template-columns: 1fr;
+    }
+}
