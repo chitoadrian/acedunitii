@@ -19705,9 +19705,1300 @@ body.light-theme #register-page .auth-container {
     top: 92px;
     width: 154px;
     height: 118px;
-    bo
-... 32576 bytes omitted ...
+    border-radius: 22px;
+    background: rgba(15, 23, 42, 0.58);
+    border: 1px solid rgba(125, 211, 252, 0.18);
+    box-shadow: 0 18px 40px rgba(14, 165, 233, 0.14);
+}
 
+.profile-card-mini::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #7b68ee, #49ccf9);
+    box-shadow: 0 14px 30px rgba(73, 204, 249, 0.24);
+}
+
+.profile-card-mini::after {
+    content: "";
+    position: absolute;
+    left: 82px;
+    top: 28px;
+    width: 46px;
+    height: 46px;
+    border-radius: 6px;
+    background:
+        linear-gradient(#93c5fd 0 0) 0 0 / 100% 8px no-repeat,
+        linear-gradient(#49ccf9 0 0) 0 18px / 78% 7px no-repeat,
+        linear-gradient(#fd71af 0 0) 0 36px / 58% 7px no-repeat;
+    opacity: 0.95;
+}
+
+.writing-line {
+    position: absolute;
+    left: 54px;
+    right: 54px;
+    bottom: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.56);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.writing-line::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    top: 18px;
+    height: 8px;
+    width: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #49ccf9, #fd71af);
+    box-shadow: 0 0 18px rgba(73, 204, 249, 0.34);
+    animation: authWriteLine 4.8s ease-in-out infinite;
+}
+
+.writing-line::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    bottom: 16px;
+    width: 64%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.18);
+}
+
+.chart-line {
+    position: absolute;
+    right: 52px;
+    top: 96px;
+    width: 190px;
+    height: 132px;
+    border-radius: 22px;
+    background:
+        linear-gradient(180deg, transparent 0 70%, rgba(73, 204, 249, 0.12) 71%),
+        rgba(15, 23, 42, 0.54);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.chart-line::before {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 20px;
+    bottom: 26px;
+    height: 72px;
+    clip-path: polygon(0 78%, 22% 52%, 42% 64%, 62% 26%, 82% 38%, 100% 10%, 100% 100%, 0 100%);
+    background: linear-gradient(135deg, rgba(123, 104, 238, 0.78), rgba(73, 204, 249, 0.88));
+    transform-origin: left bottom;
+    animation: authChartDraw 4.5s ease-in-out infinite;
+}
+
+.chart-line::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 20px;
+    bottom: 22px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.22);
+}
+
+.floating-chat {
+    position: absolute;
+    width: 190px;
+    height: 78px;
+    border-radius: 22px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(125, 211, 252, 0.20);
+    box-shadow: 0 24px 50px rgba(2, 8, 23, 0.24);
+    animation: authChatFloat 6s ease-in-out infinite;
+}
+
+.floating-chat::before,
+.floating-chat::after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.68);
+}
+
+.floating-chat::before {
+    top: 24px;
+    width: 112px;
+}
+
+.floating-chat::after {
+    top: 44px;
+    width: 78px;
+    background: linear-gradient(90deg, #49ccf9, #fd71af);
+}
+
+.chat-one {
+    left: 0;
+    top: 70px;
+}
+
+.chat-two {
+    right: 0;
+    bottom: 70px;
+    animation-delay: -2.6s;
+}
+
+.gear {
+    position: absolute;
+    left: 42px;
+    bottom: 86px;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 12px solid rgba(73, 204, 249, 0.68);
+    box-shadow:
+        inset 0 0 0 14px rgba(15, 23, 42, 0.82),
+        0 18px 38px rgba(73, 204, 249, 0.20);
+    animation: authGearSpin 10s linear infinite;
+}
+
+.gear::before {
+    content: "";
+    position: absolute;
+    inset: -18px;
+    background: conic-gradient(from 0deg, transparent 0 12deg, rgba(253, 113, 175, 0.78) 13deg 23deg, transparent 24deg 72deg, rgba(123, 104, 238, 0.78) 73deg 84deg, transparent 85deg 144deg, rgba(73, 204, 249, 0.78) 145deg 156deg, transparent 157deg 216deg, rgba(253, 113, 175, 0.72) 217deg 228deg, transparent 229deg);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+.pencil {
+    position: absolute;
+    right: 86px;
+    top: 44px;
+    width: 104px;
+    height: 18px;
+    border-radius: 999px 4px 4px 999px;
+    background:
+        linear-gradient(90deg, #fd71af 0 18%, #ffc800 18% 76%, #f8fafc 76% 88%, #49ccf9 88%);
+    box-shadow: 0 16px 34px rgba(253, 113, 175, 0.20);
+    transform-origin: center;
+    animation: authPencilWrite 5.2s ease-in-out infinite;
+}
+
+.pencil::after {
+    content: "";
+    position: absolute;
+    right: -16px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+    border-left: 16px solid #e2e8f0;
+}
+
+@keyframes authVisualFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes authChatFloat {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(10px, -14px, 0); }
+}
+
+@keyframes authGearSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes authPencilWrite {
+    0%, 100% { transform: translate3d(0, 0, 0) rotate(-10deg); }
+    50% { transform: translate3d(-28px, 18px, 0) rotate(-10deg); }
+}
+
+@keyframes authWriteLine {
+    0%, 12% { width: 0; }
+    58%, 78% { width: 72%; }
+    100% { width: 0; }
+}
+
+@keyframes authChartDraw {
+    0%, 15% { transform: scaleX(0.1); opacity: 0.55; }
+    55%, 82% { transform: scaleX(1); opacity: 1; }
+    100% { transform: scaleX(0.1); opacity: 0.55; }
+}
+
+body.light-theme .tech-window,
+body.light-theme .floating-chat {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(37, 99, 235, 0.18);
+    box-shadow: 0 32px 72px rgba(37, 99, 235, 0.14);
+}
+
+body.light-theme .profile-card-mini,
+body.light-theme .writing-line,
+body.light-theme .chart-line {
+    background: rgba(255, 255, 255, 0.64);
+    border-color: rgba(37, 99, 235, 0.16);
+}
+
+body.light-theme .floating-chat::before {
+    background: rgba(30, 41, 59, 0.46);
+}
+
+@media (max-width: 980px) {
+    #login-page .auth-container,
+    #register-page .auth-container {
+        padding: 32px 18px !important;
+    }
+
+    .auth-layout {
+        grid-template-columns: 1fr !important;
+        min-height: calc(100vh - 64px) !important;
+        gap: 0 !important;
+    }
+
+    .auth-visual {
+        display: none !important;
+    }
+
+    #login-page .auth-card,
+    #register-page .auth-card {
+        justify-self: center !important;
+        width: 100% !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tech-window,
+    .floating-chat,
+    .gear,
+    .pencil,
+    .writing-line::before,
+    .chart-line::before {
+        animation: none !important;
+    }
+}
+
+/* Ilustracion auth realista: laptop limpia con dashboard educativo */
+.auth-visual {
+    position: relative !important;
+    width: min(560px, 100%) !important;
+    min-height: 560px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+}
+
+.auth-laptop {
+    position: relative;
+    width: min(470px, 100%);
+    height: 330px;
+    border-radius: 28px;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow:
+        0 35px 90px rgba(0, 0, 0, 0.35),
+        0 0 45px rgba(56, 189, 248, 0.15);
+    overflow: visible;
+    animation: laptopFloat 6s ease-in-out infinite;
+}
+
+.laptop-screen {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.laptop-screen::before {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    border-radius: 22px;
+    background:
+        linear-gradient(90deg, rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(rgba(56, 189, 248, 0.06) 1px, transparent 1px),
+        linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(236, 72, 153, 0.08));
+    background-size: 42px 42px, 42px 42px, auto;
+    border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.laptop-topbar {
+    position: absolute;
+    left: 34px;
+    right: 34px;
+    top: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.laptop-topbar::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    width: 68px;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #38bdf8, #a78bfa);
+    transform: translateY(-50%);
+}
+
+.laptop-topbar::after {
+    content: "";
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    width: 92px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.18);
+    transform: translateY(-50%);
+}
+
+.laptop-sidebar {
+    position: absolute;
+    left: 42px;
+    top: 88px;
+    width: 78px;
+    height: 190px;
+    border-radius: 18px;
+    background: rgba(15, 23, 42, 0.52);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
+.laptop-sidebar::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    top: 20px;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #7b68ee, #49ccf9);
+    box-shadow: 0 12px 26px rgba(73, 204, 249, 0.20);
+}
+
+.laptop-sidebar::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    top: 82px;
+    height: 78px;
+    border-radius: 999px;
+    background:
+        linear-gradient(rgba(226, 232, 240, 0.42) 0 0) 0 0 / 100% 7px no-repeat,
+        linear-gradient(rgba(226, 232, 240, 0.24) 0 0) 0 24px / 82% 7px no-repeat,
+        linear-gradient(rgba(226, 232, 240, 0.18) 0 0) 0 48px / 68% 7px no-repeat;
+}
+
+.laptop-card-main {
+    position: absolute;
+    left: 138px;
+    top: 88px;
+    width: 280px;
+    height: 118px;
+    border-radius: 22px;
+    background: rgba(30, 41, 59, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    box-shadow: inset 0 0 30px rgba(56, 189, 248, 0.06);
+}
+
+.laptop-card-main::before {
+    content: "";
+    position: absolute;
+    left: 24px;
+    bottom: 26px;
+    width: 210px;
+    height: 54px;
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
+    clip-path: polygon(0 85%, 20% 60%, 38% 72%, 55% 35%, 72% 52%, 100% 12%, 100% 100%, 0 100%);
+    opacity: 0.9;
+    transform-origin: left bottom;
+    animation: laptopGraphPulse 4.8s ease-in-out infinite;
+}
+
+.laptop-card-main::after {
+    content: "";
+    position: absolute;
+    left: 24px;
+    top: 24px;
+    width: 120px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #38bdf8, #ec4899);
+}
+
+.laptop-card-small {
+    position: absolute;
+    left: 138px;
+    top: 224px;
+    width: 130px;
+    height: 64px;
+    border-radius: 18px;
+    background: rgba(30, 41, 59, 0.68);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.laptop-card-small::before {
+    content: "";
+    position: absolute;
+    left: 18px;
+    top: 18px;
+    width: 78px;
+    height: 8px;
+    border-radius: 999px;
+    background: #38bdf8;
+}
+
+.laptop-card-small::after {
+    content: "";
+    position: absolute;
+    left: 18px;
+    top: 36px;
+    width: 96px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.45);
+}
+
+.laptop-card-small.two {
+    left: 288px;
+}
+
+.laptop-card-small.two::before {
+    background: #fd71af;
+}
+
+.laptop-base {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: -32px;
+    height: 42px;
+    border-radius: 0 0 28px 28px;
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.35), rgba(15, 23, 42, 0.90));
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.24);
+}
+
+.laptop-base::after {
+    content: "";
+    position: absolute;
+    left: 36%;
+    right: 36%;
+    top: 10px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.34);
+}
+
+.auth-chat-bubble {
+    position: absolute;
+    width: 150px;
+    min-height: 70px;
+    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+    animation: bubbleFloat 5s ease-in-out infinite;
+}
+
+.auth-chat-bubble.one {
+    top: 52px;
+    left: -10px;
+}
+
+.auth-chat-bubble.two {
+    right: -24px;
+    bottom: 88px;
+    animation-delay: -2s;
+}
+
+.auth-chat-bubble::before {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 22px;
+    width: 92px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.75);
+}
+
+.auth-chat-bubble::after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    top: 42px;
+    width: 112px;
+    height: 8px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #38bdf8, #ec4899);
+}
+
+.auth-gear {
+    position: absolute;
+    right: -10px;
+    top: 96px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 8px dashed rgba(56, 189, 248, 0.75);
+    animation: spinGear 8s linear infinite;
+    opacity: 0.85;
+}
+
+.auth-gear::after {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(226, 232, 240, 0.22);
+}
+
+.auth-pencil {
+    position: absolute;
+    left: 70px;
+    bottom: 96px;
+    width: 82px;
+    height: 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #facc15 0 62%, #f8fafc 62% 78%, #38bdf8 78%);
+    transform: rotate(-22deg);
+    animation: pencilMove 3s ease-in-out infinite;
+    box-shadow: 0 10px 22px rgba(250, 204, 21, 0.18);
+}
+
+.auth-pencil::after {
+    content: "";
+    position: absolute;
+    right: -12px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 12px solid #e2e8f0;
+}
+
+@keyframes laptopFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes bubbleFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+}
+
+@keyframes spinGear {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pencilMove {
+    0%, 100% { transform: translateX(0) rotate(-22deg); }
+    50% { transform: translateX(18px) rotate(-22deg); }
+}
+
+@keyframes laptopGraphPulse {
+    0%, 100% { transform: scaleY(0.92); opacity: 0.82; }
+    50% { transform: scaleY(1); opacity: 1; }
+}
+
+body.light-theme .auth-laptop {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(226, 232, 240, 0.82));
+    border-color: rgba(37, 99, 235, 0.16);
+    box-shadow:
+        0 35px 80px rgba(37, 99, 235, 0.16),
+        0 0 45px rgba(56, 189, 248, 0.12);
+}
+
+body.light-theme .laptop-screen::before,
+body.light-theme .laptop-sidebar,
+body.light-theme .laptop-card-main,
+body.light-theme .laptop-card-small,
+body.light-theme .auth-chat-bubble {
+    background-color: rgba(255, 255, 255, 0.64);
+    border-color: rgba(37, 99, 235, 0.16);
+}
+
+body.light-theme .auth-chat-bubble::before {
+    background: rgba(30, 41, 59, 0.48);
+}
+
+@media (max-width: 980px) {
+    .auth-visual {
+        display: none !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-laptop,
+    .laptop-card-main::before,
+    .auth-chat-bubble,
+    .auth-gear,
+    .auth-pencil {
+        animation: none !important;
+    }
+}
+
+/* Proporciones equilibradas para login, registro y recuperacion */
+#login-page .auth-container,
+#register-page .auth-container {
+    display: grid !important;
+    place-items: center !important;
+    min-height: 100vh !important;
+    padding: 48px 6vw !important;
+    overflow: hidden !important;
+}
+
+.auth-layout {
+    width: min(1240px, 100%) !important;
+    min-height: min(760px, calc(100vh - 96px)) !important;
+    display: grid !important;
+    grid-template-columns: minmax(420px, 560px) minmax(420px, 560px) !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 56px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+.auth-visual {
+    width: 100% !important;
+    max-width: 560px !important;
+    height: 620px !important;
+    min-height: 620px !important;
+    justify-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: visible !important;
+}
+
+#login-page .auth-card,
+#register-page .auth-card,
+.auth-card,
+.login-card,
+.register-card,
+.password-card {
+    width: 100% !important;
+    max-width: 560px !important;
+    min-height: 620px !important;
+    max-height: none !important;
+    justify-self: center !important;
+    box-sizing: border-box !important;
+}
+
+#login-page .auth-card,
+#register-page .auth-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+.auth-laptop {
+    width: 500px !important;
+    height: 390px !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+.auth-laptop,
+.auth-laptop * {
+    box-sizing: border-box !important;
+}
+
+.laptop-screen::before {
+    inset: 20px !important;
+}
+
+.laptop-topbar {
+    left: 38px !important;
+    right: 38px !important;
+    top: 38px !important;
+}
+
+.laptop-sidebar {
+    left: 48px !important;
+    top: 96px !important;
+    width: 84px !important;
+    height: 220px !important;
+}
+
+.laptop-card-main {
+    left: 152px !important;
+    top: 96px !important;
+    width: 292px !important;
+    height: 136px !important;
+}
+
+.laptop-card-main::before {
+    width: 222px !important;
+    height: 64px !important;
+}
+
+.laptop-card-small {
+    left: 152px !important;
+    top: 256px !important;
+    width: 138px !important;
+    height: 70px !important;
+}
+
+.laptop-card-small.two {
+    left: 306px !important;
+}
+
+.auth-chat-bubble,
+.auth-gear,
+.auth-pencil {
+    transform-origin: center !important;
+}
+
+.auth-chat-bubble {
+    width: 142px !important;
+    min-height: 66px !important;
+}
+
+.auth-chat-bubble.one {
+    top: 44px !important;
+    left: 24px !important;
+}
+
+.auth-chat-bubble.two {
+    right: 24px !important;
+    bottom: 58px !important;
+}
+
+.auth-gear {
+    right: 54px !important;
+    top: 104px !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-width: 7px !important;
+}
+
+.auth-gear::after {
+    inset: 11px !important;
+}
+
+.auth-pencil {
+    left: 72px !important;
+    bottom: 106px !important;
+    width: 72px !important;
+    height: 11px !important;
+}
+
+@media (max-width: 1120px) {
+    .auth-layout {
+        grid-template-columns: minmax(360px, 500px) minmax(380px, 520px) !important;
+        gap: 34px !important;
+    }
+
+    .auth-visual {
+        max-width: 500px !important;
+    }
+
+    .auth-laptop {
+        width: 450px !important;
+        height: 352px !important;
+    }
+}
+
+@media (max-width: 980px) {
+    #login-page .auth-container,
+    #register-page .auth-container {
+        padding: 32px 18px !important;
+        overflow: auto !important;
+    }
+
+    .auth-layout {
+        grid-template-columns: 1fr !important;
+        width: min(560px, 100%) !important;
+        min-height: calc(100vh - 64px) !important;
+        gap: 0 !important;
+    }
+
+    .auth-visual {
+        display: none !important;
+    }
+
+    #login-page .auth-card,
+    #register-page .auth-card,
+    .auth-card,
+    .login-card,
+    .register-card,
+    .password-card {
+        max-width: 560px !important;
+        min-height: auto !important;
+    }
+}
+
+/* Progreso: vista didactica compacta y moderna */
+#progress .progress-container {
+    display: grid !important;
+    gap: 20px !important;
+    max-width: 1180px !important;
+    margin: 0 auto !important;
+}
+
+#progress .premium-border::before {
+    opacity: 0.72 !important;
+}
+
+#progress .progress-hero {
+    grid-template-columns: minmax(0, 1fr) 190px !important;
+    min-height: 250px !important;
+    padding: 28px !important;
+    border-radius: 28px !important;
+    background:
+        linear-gradient(135deg, rgba(73, 204, 249, 0.12), rgba(253, 113, 175, 0.08) 48%, rgba(123, 104, 238, 0.12)),
+        rgba(25, 29, 43, 0.88) !important;
+    box-shadow: 0 24px 58px rgba(2, 8, 23, 0.24) !important;
+}
+
+#progress .progress-hero-copy {
+    min-width: 0 !important;
+}
+
+#progress .progress-eyebrow {
+    min-height: 28px !important;
+    padding: 5px 11px !important;
+    font-size: 11px !important;
+}
+
+#progress .progress-hero h2 {
+    margin: 14px 0 8px !important;
+    font-size: clamp(3rem, 5vw, 4.6rem) !important;
+    letter-spacing: 0 !important;
+}
+
+#progress .progress-hero p {
+    max-width: 560px !important;
+    font-size: 16px !important;
+    line-height: 1.55 !important;
+}
+
+#progress .progress-xp-meta {
+    margin: 18px 0 12px !important;
+    gap: 8px !important;
+}
+
+#progress .progress-xp-meta span,
+#progress .progress-hero small {
+    min-height: 30px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    background: rgba(255, 255, 255, 0.075) !important;
+}
+
+#progress .progress-xp-bar {
+    height: 12px !important;
+    max-width: 620px !important;
+    overflow: hidden !important;
+}
+
+#progress .progress-xp-bar .xp-fill {
+    animation: acBorderFlow 7s linear infinite, xpGlow 4s ease-in-out infinite !important;
+    transition: width 600ms ease !important;
+}
+
+#progress .progress-level-orb {
+    width: 170px !important;
+    height: 170px !important;
+    align-self: center !important;
+}
+
+#progress .progress-level-orb strong {
+    font-size: 4.3rem !important;
+}
+
+#progress .progress-level-orb span {
+    margin-top: -28px !important;
+    font-size: 10px !important;
+}
+
+#progress .progress-stat-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+}
+
+#progress .premium-progress-stat {
+    min-height: 92px !important;
+    padding: 14px !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    border-radius: 20px !important;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03)),
+        rgba(31, 34, 46, 0.80) !important;
+}
+
+#progress .progress-stat-icon {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 24px rgba(73, 204, 249, 0.14) !important;
+}
+
+#progress .progress-stat-icon::before {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+#progress .premium-progress-stat .stat-label {
+    font-size: 10px !important;
+    letter-spacing: 0.02em !important;
+}
+
+#progress .premium-progress-stat .stat-value {
+    margin: 2px 0 !important;
+    font-size: 22px !important;
+    line-height: 1.05 !important;
+}
+
+#progress .premium-progress-stat small {
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+}
+
+#progress .progress-path,
+#progress .progress-achievements,
+#progress .progress-empty-callout {
+    padding: 22px !important;
+    border-radius: 24px !important;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)),
+        rgba(31, 34, 46, 0.78) !important;
+}
+
+#progress .progress-section-title {
+    display: flex !important;
+    align-items: end !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    margin-bottom: 20px !important;
+}
+
+#progress .progress-section-title h3 {
+    font-size: 22px !important;
+}
+
+#progress .progress-section-title p {
+    max-width: 420px !important;
+    text-align: right !important;
+}
+
+#progress .student-path {
+    position: relative !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    padding: 16px 8px 4px !important;
+}
+
+#progress .student-path::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 8% !important;
+    right: 8% !important;
+    top: 48px !important;
+    height: 4px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(90deg, rgba(123, 104, 238, 0.85), rgba(73, 204, 249, 0.7), rgba(100, 116, 139, 0.36)) !important;
+}
+
+#progress .path-step {
+    min-height: 96px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    z-index: 1 !important;
+    gap: 10px !important;
+}
+
+#progress .path-step span {
+    width: 48px !important;
+    height: 48px !important;
+    border: 2px solid rgba(148, 163, 184, 0.28) !important;
+    background: #222836 !important;
+    box-shadow: 0 10px 24px rgba(2, 8, 23, 0.20) !important;
+}
+
+#progress .path-step.active span {
+    border-color: rgba(73, 204, 249, 0.62) !important;
+    background: linear-gradient(135deg, #7b68ee, #49ccf9) !important;
+    box-shadow: 0 0 0 6px rgba(73, 204, 249, 0.10), 0 16px 34px rgba(73, 204, 249, 0.24) !important;
+}
+
+#progress .path-step.current span {
+    animation: xpGlow 3.8s ease-in-out infinite !important;
+}
+
+#progress .path-step small {
+    color: rgba(226, 232, 240, 0.72) !important;
+    font-size: 12px !important;
+    font-weight: 900 !important;
+}
+
+#progress .premium-achievements-grid {
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)) !important;
+    gap: 12px !important;
+}
+
+#progress .premium-achievement {
+    min-height: 132px !important;
+    padding: 16px 12px !important;
+    border-radius: 20px !important;
+    gap: 8px !important;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.065), rgba(255, 255, 255, 0.025)),
+        rgba(255, 255, 255, 0.035) !important;
+}
+
+#progress .premium-achievement .achievement-icon {
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 15px !important;
+}
+
+#progress .premium-achievement p {
+    margin: 2px 0 0 !important;
+    font-size: 13px !important;
+    line-height: 1.18 !important;
+}
+
+#progress .premium-achievement small {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+}
+
+#progress .premium-achievement.locked::after {
+    right: 10px !important;
+    top: 10px !important;
+    width: 13px !important;
+    height: 11px !important;
+    border-width: 2px !important;
+}
+
+#progress .premium-progress-stat:hover,
+#progress .premium-achievement:hover,
+#progress .path-step:hover span {
+    transform: translateY(-4px) !important;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease !important;
+}
+
+#progress .progress-empty-callout {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+}
+
+body.light-theme #progress .progress-hero,
+body.light-theme #progress .premium-progress-stat,
+body.light-theme #progress .progress-path,
+body.light-theme #progress .progress-achievements,
+body.light-theme #progress .progress-empty-callout,
+body.light-theme #progress .premium-achievement {
+    background: #ffffff !important;
+    border-color: rgba(15, 23, 42, 0.10) !important;
+    box-shadow: 0 18px 44px rgba(37, 99, 235, 0.08) !important;
+}
+
+body.light-theme #progress .progress-xp-meta span,
+body.light-theme #progress .progress-hero small {
+    background: #f1f5f9 !important;
+    color: #475569 !important;
+}
+
+body.light-theme #progress .student-path::before {
+    background: linear-gradient(90deg, #6366f1, #38bdf8, #cbd5e1) !important;
+}
+
+body.light-theme #progress .path-step span {
+    background: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+body.light-theme #progress .path-step.active span {
+    color: #ffffff !important;
+}
+
+body.light-theme #progress .path-step small,
+body.light-theme #progress .progress-section-title p {
+    color: #64748b !important;
+}
+
+@media (max-width: 1120px) {
+    #progress .progress-stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #progress .progress-hero {
+        grid-template-columns: 1fr 160px !important;
+    }
+
+    #progress .progress-level-orb {
+        width: 150px !important;
+        height: 150px !important;
+    }
+}
+
+@media (max-width: 760px) {
+    #progress .progress-hero {
+        grid-template-columns: 1fr !important;
+        padding: 22px !important;
+    }
+
+    #progress .progress-level-orb {
+        justify-self: start !important;
+    }
+
+    #progress .progress-stat-grid,
+    #progress .premium-achievements-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    #progress .progress-section-title {
+        display: grid !important;
+    }
+
+    #progress .progress-section-title p {
+        text-align: left !important;
+    }
+
+    #progress .student-path {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding: 0 !important;
+    }
+
+    #progress .student-path::before {
+        left: 24px !important;
+        right: auto !important;
+        top: 18px !important;
+        bottom: 18px !important;
+        width: 4px !important;
+        height: auto !important;
+    }
+
+    #progress .path-step {
+        grid-template-columns: 52px 1fr !important;
+        justify-items: start !important;
+        min-height: 60px !important;
+    }
+}
+
+/* Perfil: rediseño didáctico y compacto */
+#profile .profile-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr) !important;
+    gap: 16px !important;
+    align-items: start !important;
+}
+
+#profile .profile-hero {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: 150px minmax(0, 1fr) minmax(260px, 340px) !important;
+    gap: 22px !important;
+    align-items: center !important;
+    padding: 26px !important;
+    min-height: 0 !important;
+}
+
+#profile .profile-hero::after {
+    width: 360px !important;
+    height: 170px !important;
+    right: 18px !important;
+    top: auto !important;
+    bottom: -70px !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, rgba(73, 204, 249, 0.16), rgba(253, 113, 175, 0.12)) !important;
+    filter: blur(16px) !important;
+}
+
+#profile .profile-avatar-zone {
+    gap: 12px !important;
+}
+
+#profile .profile-avatar-premium {
+    width: 126px !important;
+    height: 126px !important;
+    border-radius: 32px !important;
+    font-size: 40px !important;
+    transform: none !important;
+}
+
+#profile .profile-avatar-premium:hover {
+    transform: translateY(-3px) !important;
+}
+
+#profile .profile-details-premium h2 {
+    font-size: clamp(38px, 4.2vw, 62px) !important;
+    letter-spacing: 0 !important;
+    line-height: 1 !important;
+}
+
+#profile .profile-details-premium p {
+    max-width: 660px;
+}
+
+#profile .profile-career {
+    margin-bottom: 6px !important;
+    font-size: 17px !important;
+}
+
+#profile .profile-tags {
+    margin-top: 14px !important;
+}
+
+#profile .profile-tags span {
+    padding: 8px 14px !important;
+    border-radius: 999px !important;
+    color: #dff7ff !important;
+    background: rgba(73, 204, 249, 0.10) !important;
+}
+
+#profile .profile-hero-summary {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 10px;
+    align-self: stretch;
+}
+
+#profile .profile-hero-summary div {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    min-height: 66px;
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.03));
+}
+
+#profile .profile-hero-summary span {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+#profile .profile-hero-summary strong {
     color: #ffffff;
     font-size: 20px;
     line-height: 1;
@@ -36015,4 +37306,3 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-tabs button { min-height: 34px; padding-inline: 10px; font-size: 0.78rem; }
     #ai-assistant .tutor-send { min-height: 34px; }
 }
-
