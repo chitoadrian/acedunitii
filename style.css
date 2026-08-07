@@ -37566,6 +37566,10 @@ body.light-theme .evaluation-delete-actions .btn-danger {
 }
 
 @media (max-width: 420px) {
+    .evaluation-delete-modal {
+        align-items: center;
+    }
+
     .evaluation-delete-card {
         width: min(100%, calc(100vw - 20px));
         padding: 22px 18px;
