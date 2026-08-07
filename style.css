@@ -37626,7 +37626,7 @@ body #calendar .event-item.event-evaluation .card-actions {
 }
 
 body #calendar .event-item.event-evaluation .card-actions button {
-    flex: 1 1 142px !important;
+    flex: 1 1 118px !important;
     width: auto !important;
     min-width: 0 !important;
     max-width: 100% !important;
