@@ -1947,6 +1947,7 @@ function refreshWorkspaceUI() {
     renderSubjects(workspace);
     renderTasks(workspace);
     renderCalendarSection(workspace);
+    renderEvaluations(workspace);
     renderGrades(workspace);
     renderAttendance(workspace);
     renderProgress(workspace);
@@ -2286,7 +2287,7 @@ function renderDashboard(workspace) {
     const nextEvent = getNextEvent(workspace);
     const average = getAverageGrade(workspace);
     const level = getLevel(workspace.xp);
-    const isEmpty = !workspace.subjects.length && !workspace.tasks.length && !workspace.events.length && !workspace.grades.length && !workspace.resources.length;
+    const isEmpty = !workspace.subjects.length && !workspace.tasks.length && !workspace.events.length && !(workspace.evaluations || []).length && !workspace.grades.length && !workspace.resources.length;
 
     section.innerHTML = `
         <div class="section-header">
@@ -2557,7 +2558,11 @@ function generateCalendar() {
     const visibleCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
     const todayKey = getCalendarDateKey(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
 
-    const eventsByDate = workspace.events.reduce((acc, event) => {
+    const calendarItems = [
+        ...workspace.events,
+        ...(workspace.evaluations || []).filter(evaluation => evaluation.showInCalendar)
+    ];
+    const eventsByDate = calendarItems.reduce((acc, event) => {
         const dateKey = getEventDateKey(event);
         if (dateKey) {
             acc[dateKey] = acc[dateKey] || [];
@@ -3910,7 +3915,13 @@ function renderCalendarSection(workspace) {
     const container = document.querySelector('.calendar-container');
     if (!container) return;
 
-    const events = [...workspace.events].sort((a, b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
+    const evaluationEvents = (workspace.evaluations || [])
+        .filter(evaluation => evaluation.showInCalendar)
+        .map(evaluation => ({ ...evaluation, kind: 'evaluation', calendarType: `Evaluación · ${evaluation.type}` }));
+    const events = [
+        ...workspace.events.map(event => ({ ...event, kind: 'event', calendarType: event.type })),
+        ...evaluationEvents
+    ].sort((a, b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
     container.innerHTML = `
         <div class="calendar-side">
             <div class="calendar-sync-card">
@@ -3926,17 +3937,17 @@ function renderCalendarSection(workspace) {
             <div id="custom-events-list">
                 ${events.length ? events.map(event => {
                     return `
-                        <div class="event-item event-custom ${isEventSoon(event) ? 'event-soon' : ''}">
+                        <div class="event-item event-custom ${event.kind === 'evaluation' ? 'event-evaluation' : ''} ${isEventSoon(event) ? 'event-soon' : ''}">
                             <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML((event.date || '').slice(5, 7) || 'AC')}</span></div>
                             <div class="event-content">
                                 <h4>${escapeHTML(event.title)}</h4>
                                 <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(event.time || 'Sin hora')}</p>
-                                <span class="event-badge">${escapeHTML(event.type)}</span>
+                                <span class="event-badge">${escapeHTML(event.calendarType || event.type)}</span>
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions">
-                                    <button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button>
-                                    <button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>
-                                    <button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>
+                                    ${event.kind === 'evaluation'
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>`
+                                        : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
                         </div>
@@ -3949,6 +3960,7 @@ function renderCalendarSection(workspace) {
     container.querySelectorAll('[data-google-event]').forEach(button => button.addEventListener('click', () => openGoogleCalendarEvent(button.dataset.googleEvent)));
     container.querySelectorAll('[data-event-edit]').forEach(button => button.addEventListener('click', () => openEventForm(button.dataset.eventEdit)));
     container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
+    container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
 }
 
 function showAddGradeForm() {
@@ -7041,9 +7053,10 @@ function renderDashboard(workspace) {
     const pending = taskCounts.pending + taskCounts.upcoming + taskCounts.overdue;
     const completed = taskCounts.completed;
     const nextEvent = getNextEvent(workspace);
+    const nextEvaluation = sortEvaluations(workspace.evaluations || []).find(evaluation => evaluation.status !== 'completed' && (getEvaluationDaysUntil(evaluation.date) ?? -1) >= 0) || null;
     const average = getAverageGrade(workspace);
     const level = getLevel(workspace.xp);
-    const isEmpty = !workspace.subjects.length && !workspace.tasks.length && !workspace.events.length && !workspace.grades.length && !workspace.resources.length;
+    const isEmpty = !workspace.subjects.length && !workspace.tasks.length && !workspace.events.length && !(workspace.evaluations || []).length && !workspace.grades.length && !workspace.resources.length;
     const taskProgress = workspace.tasks.length ? Math.round((completed / workspace.tasks.length) * 100) : 0;
     const gradeProgress = average ? average * 10 : 0;
     const xpProgress = Math.min(100, ((workspace.xp || 0) % 250) / 2.5);
@@ -7081,6 +7094,7 @@ function renderDashboard(workspace) {
                     <button type="button" onclick="navigateTo('subjects')">+ Nueva materia</button>
                     <button type="button" onclick="navigateTo('tasks')">+ Nueva tarea</button>
                     <button type="button" onclick="navigateTo('calendar')">+ Nuevo evento</button>
+                    <button type="button" onclick="navigateTo('evaluations')">+ Nueva evaluación</button>
                     <button type="button" onclick="navigateTo('backpack')">+ Subir apunte</button>
                 </div>
             </div>
@@ -7100,6 +7114,13 @@ function renderDashboard(workspace) {
             ${dashboardCard('calendar', 'Próximo evento', nextEvent ? nextEvent.title : 'Sin eventos', nextEvent ? `${nextEvent.day || nextEvent.date || 'Sin fecha'} - ${nextEvent.type || 'Evento'}` : 'Agenda tu primer examen', nextEvent ? 70 : 0)}
             ${dashboardCard('grades', 'Promedio actual', average ? average.toFixed(2) : '--', workspace.grades.length ? `${workspace.grades.length} calificaciones registradas` : 'Registra tus calificaciones', gradeProgress)}
         </div>
+
+        <button class="dashboard-next-evaluation ${nextEvaluation ? '' : 'is-empty'}" type="button" onclick="navigateTo('evaluations')">
+            <span>Próxima evaluación</span>
+            <strong>${escapeHTML(nextEvaluation?.subject || 'Sin evaluaciones próximas')}</strong>
+            <b>${escapeHTML(nextEvaluation?.title || 'Agrega una evaluación para planificar tu estudio.')}</b>
+            <em>${escapeHTML(nextEvaluation ? getEvaluationCountdown(nextEvaluation) : 'Abrir Evaluaciones')}</em>
+        </button>
 
         <div class="dashboard-layout dashboard-clean-layout">
             <div class="card dashboard-panel-card dashboard-progress-card" data-dashboard-module="progress">
@@ -8276,7 +8297,352 @@ function refreshWorkspaceUI() {
     renderProgress(workspace);
     renderBackpack(workspace);
     renderProfile(workspace);
+    renderEvaluations(workspace);
     updateGradeSubjectOptions(workspace);
+}
+
+// ============================================
+// EVALUACIONES
+// ============================================
+
+const evaluationStatusOptions = [
+    { value: 'pending', label: 'Pendiente' },
+    { value: 'preparing', label: 'Preparando' },
+    { value: 'prepared', label: 'Preparada' },
+    { value: 'completed', label: 'Realizada' }
+];
+const evaluationPriorityOptions = [
+    { value: 'low', label: 'Baja' },
+    { value: 'medium', label: 'Media' },
+    { value: 'high', label: 'Alta' }
+];
+const evaluationTypeOptions = ['Examen', 'Prueba', 'Lección', 'Quiz', 'Exposición', 'Evaluación práctica', 'Otro'];
+let evaluationStatusFilter = 'all';
+let evaluationSubjectFilter = 'all';
+let evaluationSubmitInProgress = false;
+
+function getGuayaquilDateKey() {
+    return new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Guayaquil',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).format(new Date());
+}
+
+function getEvaluationDaysUntil(dateKey) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || ''))) return null;
+    const today = Date.parse(`${getGuayaquilDateKey()}T00:00:00Z`);
+    const target = Date.parse(`${dateKey}T00:00:00Z`);
+    return Number.isNaN(target) ? null : Math.round((target - today) / 86400000);
+}
+
+function getEvaluationCountdown(evaluation) {
+    const days = getEvaluationDaysUntil(evaluation?.date);
+    if (days === null) return 'Sin fecha';
+    if (days < 0) return 'Fecha pasada';
+    if (days === 0) return 'Hoy';
+    if (days === 1) return 'Mañana';
+    if (days < 14) return `Faltan ${days} días`;
+    const weeks = Math.floor(days / 7);
+    return `Faltan ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+}
+
+function getEvaluationStatusLabel(status) {
+    return evaluationStatusOptions.find(option => option.value === status)?.label || 'Pendiente';
+}
+
+function getEvaluationPriorityLabel(priority) {
+    return evaluationPriorityOptions.find(option => option.value === priority)?.label || 'Media';
+}
+
+function formatEvaluationDate(dateKey) {
+    if (!dateKey) return 'Sin fecha';
+    const date = new Date(`${dateKey}T12:00:00Z`);
+    return Number.isNaN(date.getTime()) ? dateKey : new Intl.DateTimeFormat('es-EC', {
+        timeZone: 'America/Guayaquil',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    }).format(date);
+}
+
+function sortEvaluations(evaluations = []) {
+    return [...evaluations].sort((a, b) => {
+        const aPast = getEvaluationDaysUntil(a.date) < 0 || a.status === 'completed';
+        const bPast = getEvaluationDaysUntil(b.date) < 0 || b.status === 'completed';
+        if (aPast !== bPast) return aPast ? 1 : -1;
+        return aPast
+            ? `${b.date || ''} ${b.time || ''}`.localeCompare(`${a.date || ''} ${a.time || ''}`)
+            : `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`);
+    });
+}
+
+function getEvaluationSubject(workspace, evaluation) {
+    return workspace.subjects.find(subject => subject.id === evaluation.subjectId) || null;
+}
+
+function evaluationSubjectOptionsHTML(workspace, selectedId = '') {
+    return workspace.subjects.map(subject => `
+        <option value="${escapeHTML(subject.id)}" ${subject.id === selectedId ? 'selected' : ''}>${escapeHTML(subject.name)}</option>
+    `).join('');
+}
+
+function openEvaluationForm(evaluationId = null) {
+    const workspace = loadWorkspace();
+    const evaluation = workspace.evaluations.find(item => item.id === evaluationId) || null;
+    if (!workspace.subjects.length) {
+        notify('Crea una materia antes de registrar una evaluación.', 'info');
+        navigateTo('subjects');
+        return;
+    }
+
+    document.querySelector('.quick-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal evaluation-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card evaluation-modal-card" role="dialog" aria-modal="true" aria-labelledby="evaluation-form-title">
+            <button class="quick-modal-close" type="button" aria-label="Cerrar">×</button>
+            <div class="evaluation-modal-heading">
+                <span class="evaluations-kicker">Planificación académica</span>
+                <h3 id="evaluation-form-title">${evaluation ? 'Editar evaluación' : 'Nueva evaluación'}</h3>
+            </div>
+            <form class="quick-modal-form evaluation-form">
+                <label class="evaluation-field-wide"><span>Título de la evaluación</span><input name="title" maxlength="160" value="${escapeHTML(evaluation?.title || '')}" placeholder="Ej: Examen de identidades trigonométricas" required></label>
+                <div class="evaluation-form-grid">
+                    <label><span>Materia</span><select name="subjectId" required><option value="">Selecciona una materia</option>${evaluationSubjectOptionsHTML(workspace, evaluation?.subjectId || '')}</select></label>
+                    <label><span>Tipo de evaluación</span><select name="type">${evaluationTypeOptions.map(type => `<option value="${escapeHTML(type)}" ${type === (evaluation?.type || 'Examen') ? 'selected' : ''}>${escapeHTML(type)}</option>`).join('')}</select></label>
+                    <label><span>Fecha</span><input name="date" type="date" value="${escapeHTML(evaluation?.date || '')}" required></label>
+                    <label><span>Hora <small>(opcional)</small></span><input name="time" type="time" value="${escapeHTML(evaluation?.time || '')}"></label>
+                    <label><span>Estado</span><select name="status">${evaluationStatusOptions.map(option => `<option value="${option.value}" ${option.value === (evaluation?.status || 'pending') ? 'selected' : ''}>${option.label}</option>`).join('')}</select></label>
+                    <label><span>Prioridad</span><select name="priority">${evaluationPriorityOptions.map(option => `<option value="${option.value}" ${option.value === (evaluation?.priority || 'medium') ? 'selected' : ''}>${option.label}</option>`).join('')}</select></label>
+                </div>
+                <label class="evaluation-field-wide"><span>Temas que entran</span><div class="evaluation-topic-builder"><div class="evaluation-topic-input-row"><input data-topic-input placeholder="Escribe un tema y pulsa Enter"><button class="btn-secondary btn-small" data-add-topic type="button">+ Agregar</button></div><div class="evaluation-topic-chips" data-topic-chips></div></div></label>
+                <label class="evaluation-field-wide"><span>Descripción / notas</span><textarea name="description" rows="3" maxlength="2000" placeholder="Indicaciones, material o notas importantes">${escapeHTML(evaluation?.description || '')}</textarea></label>
+                <label class="evaluation-calendar-check"><input name="showInCalendar" type="checkbox" ${evaluation?.showInCalendar !== false ? 'checked' : ''}><span>Mostrar también en mi Calendario</span></label>
+                <div class="quick-modal-actions"><button class="btn-secondary btn-small" type="button" data-cancel-evaluation>Cancelar</button><button class="btn-primary btn-small" type="submit">${evaluation ? 'Actualizar evaluación' : 'Guardar evaluación'}</button></div>
+            </form>
+        </div>`;
+
+    const topics = [...(evaluation?.topics || [])];
+    const topicInput = modal.querySelector('[data-topic-input]');
+    const chips = modal.querySelector('[data-topic-chips]');
+    const renderTopicChips = () => {
+        chips.innerHTML = topics.map((topic, index) => `<button type="button" data-remove-topic="${index}" title="Quitar tema"><span>${escapeHTML(topic)}</span><b aria-hidden="true">×</b></button>`).join('');
+    };
+    const addTopic = () => {
+        const topic = topicInput.value.trim();
+        if (!topic) return;
+        if (!topics.some(item => item.toLocaleLowerCase('es') === topic.toLocaleLowerCase('es'))) topics.push(topic.slice(0, 180));
+        topicInput.value = '';
+        renderTopicChips();
+        topicInput.focus();
+    };
+    const close = () => modal.remove();
+    renderTopicChips();
+    modal.addEventListener('click', event => {
+        if (event.target === modal || event.target.closest('.quick-modal-close') || event.target.closest('[data-cancel-evaluation]')) close();
+        if (event.target.closest('[data-add-topic]')) addTopic();
+        const remove = event.target.closest('[data-remove-topic]');
+        if (remove) {
+            topics.splice(Number(remove.dataset.removeTopic), 1);
+            renderTopicChips();
+        }
+    });
+    topicInput.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            addTopic();
+        }
+    });
+    modal.querySelector('form').addEventListener('submit', async event => {
+        event.preventDefault();
+        if (evaluationSubmitInProgress) return;
+        const form = event.currentTarget;
+        const values = new FormData(form);
+        const title = String(values.get('title') || '').trim();
+        const subjectId = String(values.get('subjectId') || '');
+        const date = String(values.get('date') || '');
+        if (!title || !subjectId || !date) {
+            notify('Completa título, materia y fecha.', 'error');
+            return;
+        }
+        const submit = form.querySelector('[type="submit"]');
+        evaluationSubmitInProgress = true;
+        submit.disabled = true;
+        try {
+            const user = await getCurrentSupabaseUser();
+            const payload = {
+                user_id: user.id,
+                subject_id: subjectId,
+                title,
+                evaluation_type: String(values.get('type') || 'Examen'),
+                evaluation_date: date,
+                evaluation_time: values.get('time') || null,
+                topics,
+                description: String(values.get('description') || '').trim() || null,
+                status: String(values.get('status') || 'pending'),
+                priority: String(values.get('priority') || 'medium'),
+                show_in_calendar: values.get('showInCalendar') === 'on',
+                updated_at: new Date().toISOString()
+            };
+            let result;
+            if (evaluation) {
+                result = await getSupabaseClient().from('evaluations').update(payload).eq('id', evaluation.id).eq('user_id', user.id).select().single();
+            } else {
+                result = await getSupabaseClient().from('evaluations').insert(payload).select().single();
+            }
+            if (result.error) throw result.error;
+            await syncWorkspaceFromSupabase();
+            refreshWorkspaceUI();
+            close();
+            notify(evaluation ? 'Evaluación actualizada correctamente.' : 'Evaluación creada correctamente.', 'success');
+        } catch (error) {
+            logSupabaseError(evaluation ? 'evaluations update' : 'evaluations insert', error);
+            notify(error.message || 'No se pudo guardar la evaluación.', 'error');
+        } finally {
+            evaluationSubmitInProgress = false;
+            if (submit.isConnected) submit.disabled = false;
+        }
+    });
+    document.body.appendChild(modal);
+    modal.querySelector('[name="title"]')?.focus();
+}
+
+function openEvaluationDetail(evaluationId) {
+    const workspace = loadWorkspace();
+    const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
+    if (!evaluation) return;
+    const subject = getEvaluationSubject(workspace, evaluation);
+    document.querySelector('.quick-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal evaluation-detail-modal';
+    modal.innerHTML = `
+        <article class="quick-modal-card evaluation-detail-card" style="${getAcademicCardStyle(subject?.color || 'Morado')}" role="dialog" aria-modal="true" aria-labelledby="evaluation-detail-title">
+            <button class="quick-modal-close" type="button" aria-label="Cerrar">×</button>
+            <span class="evaluations-kicker">${escapeHTML(subject?.name || evaluation.subject)}</span>
+            <h3 id="evaluation-detail-title">${escapeHTML(evaluation.title)}</h3>
+            <div class="evaluation-detail-meta"><span>${escapeHTML(evaluation.type)}</span><span>${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(evaluation.time)}` : ''}</span><span>${escapeHTML(getEvaluationCountdown(evaluation))}</span></div>
+            <div class="evaluation-detail-status"><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
+            ${evaluation.description ? `<section><h4>Descripción / notas</h4><p>${escapeHTML(evaluation.description)}</p></section>` : ''}
+            <section><h4>Temas</h4>${evaluation.topics.length ? `<div class="evaluation-topic-list">${evaluation.topics.map(topic => `<span>${escapeHTML(topic)}</span>`).join('')}</div>` : '<p class="evaluation-muted">Sin temas registrados.</p>'}</section>
+            <div class="quick-modal-actions"><button class="btn-secondary btn-small" type="button" data-detail-google>Google Calendar</button><button class="btn-secondary btn-small" type="button" data-detail-tutor>Preparar con Tutor IA</button><button class="btn-primary btn-small" type="button" data-detail-edit>Editar</button></div>
+        </article>`;
+    modal.addEventListener('click', event => {
+        if (event.target === modal || event.target.closest('.quick-modal-close')) modal.remove();
+        if (event.target.closest('[data-detail-google]')) openGoogleCalendarForEvaluation(evaluation.id);
+        if (event.target.closest('[data-detail-tutor]')) prepareEvaluationWithTutor(evaluation.id);
+        if (event.target.closest('[data-detail-edit]')) {
+            modal.remove();
+            openEvaluationForm(evaluation.id);
+        }
+    });
+    document.body.appendChild(modal);
+}
+
+async function deleteEvaluation(evaluationId) {
+    const workspace = loadWorkspace();
+    const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
+    if (!evaluation || !window.confirm('¿Eliminar esta evaluación?')) return;
+    try {
+        const user = await getCurrentSupabaseUser();
+        const { error } = await getSupabaseClient().from('evaluations').delete().eq('id', evaluationId).eq('user_id', user.id);
+        if (error) throw error;
+        await syncWorkspaceFromSupabase();
+        refreshWorkspaceUI();
+        notify('Evaluación eliminada.', 'info');
+    } catch (error) {
+        logSupabaseError('evaluations delete', error);
+        notify(error.message || 'No se pudo eliminar la evaluación.', 'error');
+    }
+}
+
+function openGoogleCalendarForEvaluation(evaluationId) {
+    const workspace = loadWorkspace();
+    const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
+    if (!evaluation) return;
+    openGoogleCalendarForEvent({
+        title: evaluation.title,
+        date: evaluation.date,
+        time: evaluation.time || '08:00',
+        subject: evaluation.subject,
+        type: evaluation.type,
+        description: [evaluation.description, evaluation.topics.length ? `Temas: ${evaluation.topics.join(', ')}` : ''].filter(Boolean).join('\n')
+    });
+}
+
+function prepareEvaluationWithTutor(evaluationId) {
+    const workspace = loadWorkspace();
+    const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
+    if (!evaluation) return;
+    const topics = evaluation.topics.length ? evaluation.topics.join(', ') : 'los temas registrados';
+    const message = `Quiero prepararme para mi evaluación de ${evaluation.subject} sobre: ${topics}. La evaluación es el ${formatEvaluationDate(evaluation.date)}. Ayúdame a organizar el estudio y practicar.`;
+    document.querySelector('.quick-modal')?.remove();
+    navigateTo('ai-assistant');
+    const input = document.getElementById('ai-topic');
+    if (!input) return;
+    input.value = message;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+}
+
+function renderEvaluations(workspace) {
+    const container = document.getElementById('evaluations-content');
+    if (!container) return;
+    const counts = {
+        upcoming: workspace.evaluations.filter(item => item.status !== 'completed' && (getEvaluationDaysUntil(item.date) ?? -1) >= 0).length,
+        prepared: workspace.evaluations.filter(item => item.status === 'prepared').length,
+        completed: workspace.evaluations.filter(item => item.status === 'completed').length
+    };
+    const filtered = sortEvaluations(workspace.evaluations).filter(item => {
+        const statusMatches = evaluationStatusFilter === 'all' || item.status === evaluationStatusFilter;
+        const subjectMatches = evaluationSubjectFilter === 'all' || item.subjectId === evaluationSubjectFilter;
+        return statusMatches && subjectMatches;
+    });
+    const statusFilters = [['all', 'Todas'], ...evaluationStatusOptions.map(option => [option.value, option.label])];
+    container.innerHTML = `
+        <div class="evaluation-summary-grid">
+            <article><span>Próximas</span><strong>${counts.upcoming}</strong></article>
+            <article><span>Preparadas</span><strong>${counts.prepared}</strong></article>
+            <article><span>Realizadas</span><strong>${counts.completed}</strong></article>
+        </div>
+        <div class="evaluation-toolbar">
+            <div class="evaluation-filter-group" aria-label="Filtrar evaluaciones por estado">${statusFilters.map(([value, label]) => `<button type="button" class="${evaluationStatusFilter === value ? 'active' : ''}" data-evaluation-status="${value}">${label}</button>`).join('')}</div>
+            <label><span>Materia</span><select data-evaluation-subject><option value="all">Todas las materias</option>${workspace.subjects.map(subject => `<option value="${escapeHTML(subject.id)}" ${evaluationSubjectFilter === subject.id ? 'selected' : ''}>${escapeHTML(subject.name)}</option>`).join('')}</select></label>
+        </div>
+        <div class="evaluation-card-grid">
+            ${workspace.evaluations.length ? (filtered.length ? filtered.map(evaluation => {
+                const subject = getEvaluationSubject(workspace, evaluation);
+                const isFuture = (getEvaluationDaysUntil(evaluation.date) ?? -1) >= 0 && evaluation.status !== 'completed';
+                return `<article class="evaluation-card" style="${getAcademicCardStyle(subject?.color || 'Morado')}" data-evaluation-id="${escapeHTML(evaluation.id)}">
+                    <div class="evaluation-card-top"><span class="evaluation-subject">${escapeHTML(subject?.name || evaluation.subject)}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
+                    <h3>${escapeHTML(evaluation.title)}</h3>
+                    <p class="evaluation-card-schedule">${escapeHTML(evaluation.type)} · ${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(evaluation.time)}` : ''}</p>
+                    <strong class="evaluation-countdown">${escapeHTML(getEvaluationCountdown(evaluation))}</strong>
+                    <div class="evaluation-card-meta"><span>${evaluation.topics.length} ${evaluation.topics.length === 1 ? 'tema' : 'temas'}</span><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span></div>
+                    ${isFuture ? `<button class="evaluation-tutor-button" type="button" data-evaluation-tutor="${escapeHTML(evaluation.id)}">Preparar con Tutor IA</button>` : ''}
+                    <div class="card-actions"><button class="btn-secondary btn-small" type="button" data-evaluation-view="${escapeHTML(evaluation.id)}">Ver</button><button class="btn-secondary btn-small" type="button" data-evaluation-edit="${escapeHTML(evaluation.id)}">Editar</button><button class="btn-danger btn-small" type="button" data-evaluation-delete="${escapeHTML(evaluation.id)}">Eliminar</button></div>
+                </article>`;
+            }).join('') : `<div class="evaluations-empty filtered"><h3>No hay evaluaciones con estos filtros.</h3><button class="btn-secondary btn-small" type="button" data-clear-evaluation-filters>Mostrar todas</button></div>`) : `<div class="evaluations-empty"><span class="evaluations-empty-icon" aria-hidden="true">✓</span><h3>Aún no tienes evaluaciones registradas.</h3><p>Agrega tu próxima evaluación para organizar tu preparación.</p><button class="btn-primary btn-small" type="button" onclick="openEvaluationForm()">+ Nueva evaluación</button></div>`}
+        </div>`;
+    container.querySelectorAll('[data-evaluation-status]').forEach(button => button.addEventListener('click', () => {
+        evaluationStatusFilter = button.dataset.evaluationStatus;
+        renderEvaluations(loadWorkspace());
+    }));
+    container.querySelector('[data-evaluation-subject]')?.addEventListener('change', event => {
+        evaluationSubjectFilter = event.target.value;
+        renderEvaluations(loadWorkspace());
+    });
+    container.querySelector('[data-clear-evaluation-filters]')?.addEventListener('click', () => {
+        evaluationStatusFilter = 'all';
+        evaluationSubjectFilter = 'all';
+        renderEvaluations(loadWorkspace());
+    });
+    container.querySelectorAll('[data-evaluation-view]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.evaluationView)));
+    container.querySelectorAll('[data-evaluation-edit]').forEach(button => button.addEventListener('click', () => openEvaluationForm(button.dataset.evaluationEdit)));
+    container.querySelectorAll('[data-evaluation-delete]').forEach(button => button.addEventListener('click', () => deleteEvaluation(button.dataset.evaluationDelete)));
+    container.querySelectorAll('[data-evaluation-tutor]').forEach(button => button.addEventListener('click', () => prepareEvaluationWithTutor(button.dataset.evaluationTutor)));
 }
 
 function initStudyPet() {
@@ -8373,6 +8739,7 @@ const VALID_APP_VIEWS = new Set([
     'subjects',
     'tasks',
     'calendar',
+    'evaluations',
     'grades',
     'attendance',
     'ai-assistant',
@@ -8956,6 +9323,7 @@ function getEmptyWorkspace() {
         subjects: [],
         tasks: [],
         events: [],
+        evaluations: [],
         grades: [],
         attendance: [],
         resources: [],
@@ -9099,6 +9467,7 @@ function mergeWorkspaceState(remoteState = {}) {
         ...remoteState,
         subjects: remoteState.subjects || [],
         tasks,
+        evaluations: remoteState.evaluations || [],
         xp: Number(remoteState.xp || 0),
         streak: Number(remoteState.streak || 0),
         taskMeta
@@ -9120,7 +9489,8 @@ function saveWorkspace(workspace) {
         ...current,
         ...workspace,
         subjects: Array.isArray(workspace.subjects) ? workspace.subjects : current.subjects,
-        tasks: Array.isArray(workspace.tasks) ? workspace.tasks : current.tasks
+        tasks: Array.isArray(workspace.tasks) ? workspace.tasks : current.tasks,
+        evaluations: Array.isArray(workspace.evaluations) ? workspace.evaluations : current.evaluations
     };
 
     const extras = loadWorkspaceExtras();
@@ -9139,6 +9509,7 @@ function saveWorkspace(workspace) {
     saveWorkspaceExtras(nextExtras);
     workspaceState = mergeWorkspaceState({
         subjects: merged.subjects || [],
+        evaluations: merged.evaluations || [],
         tasks: (merged.tasks || []).map(task => ({
             ...task,
             emailReminder: !!nextExtras.taskMeta[task.id]?.emailReminder,
@@ -9260,11 +9631,12 @@ async function syncWorkspaceFromSupabase() {
     }
 
     const sb = getSupabaseClient();
-    const [profileRes, subjectsRes, tasksRes, eventsRes, attendanceRes, resourcesRes, gradesRes] = await Promise.all([
+    const [profileRes, subjectsRes, tasksRes, eventsRes, evaluationsRes, attendanceRes, resourcesRes, gradesRes] = await Promise.all([
         sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
         sb.from('subjects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
         sb.from('tasks').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
         sb.from('events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true }),
+        sb.from('evaluations').select('*').eq('user_id', currentUser.id).order('evaluation_date', { ascending: true }),
         sb.from('attendance').select('*').eq('user_id', currentUser.id).order('date', { ascending: false }),
         sb.from('resources').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
         sb.from('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
@@ -9285,6 +9657,10 @@ async function syncWorkspaceFromSupabase() {
     if (eventsRes.error) {
         logSupabaseError('events sync select', eventsRes.error);
         throw eventsRes.error;
+    }
+    if (evaluationsRes.error) {
+        logSupabaseError('evaluations sync select', evaluationsRes.error);
+        throw evaluationsRes.error;
     }
     if (attendanceRes.error) {
         logSupabaseError('attendance sync select', attendanceRes.error);
@@ -9356,6 +9732,23 @@ async function syncWorkspaceFromSupabase() {
         time: String(event.event_time || '').slice(0, 5),
         description: event.description || '',
         createdAt: event.created_at || ''
+    }));
+
+    const evaluations = (evaluationsRes.data || []).map(evaluation => ({
+        id: evaluation.id,
+        subjectId: evaluation.subject_id || '',
+        subject: subjectMap.get(evaluation.subject_id) || 'Materia eliminada',
+        title: evaluation.title || '',
+        type: evaluation.evaluation_type || 'Examen',
+        date: evaluation.evaluation_date || '',
+        time: String(evaluation.evaluation_time || '').slice(0, 5),
+        topics: Array.isArray(evaluation.topics) ? evaluation.topics.filter(Boolean) : [],
+        description: evaluation.description || '',
+        status: evaluation.status || 'pending',
+        priority: evaluation.priority || 'medium',
+        showInCalendar: evaluation.show_in_calendar !== false,
+        createdAt: evaluation.created_at || '',
+        updatedAt: evaluation.updated_at || ''
     }));
 
     const attendance = (attendanceRes.data || []).map(record => ({
@@ -9434,6 +9827,7 @@ async function syncWorkspaceFromSupabase() {
         subjects,
         tasks,
         events,
+        evaluations,
         attendance,
         resources,
         grades,

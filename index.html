@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260806-tutor-suggestions-layout-v1">
+    <link rel="stylesheet" href="style.css?v=20260807-evaluations-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -532,6 +532,12 @@
                         <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 10h16"></path><path d="M8 14h3"></path><path d="M14 14h2"></path></svg>
                     </span>
                     <span class="nav-label">Calendario</span>
+                </a>
+                <a href="#" onclick="navigateTo('evaluations')" class="nav-item" data-section="evaluations">
+                    <span class="nav-icon sidebar-icon sidebar-icon-evaluations" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><path d="M9 3h6l1.2 2H20v16H4V5h3.8L9 3Z"></path><path d="M9 8h6"></path><path d="m8 13 2 2 4-4"></path><path d="M8 18h8"></path></svg>
+                    </span>
+                    <span class="nav-label">Evaluaciones</span>
                 </a>
                 <a href="#" onclick="navigateTo('grades')" class="nav-item" data-section="grades">
                     <span class="nav-icon sidebar-icon sidebar-icon-grades" aria-hidden="true">
@@ -1089,6 +1095,18 @@
                 </div>
             </section>
 
+            <!-- EVALUATIONS SECTION -->
+            <section id="evaluations" class="section">
+                <div class="section-header evaluations-header">
+                    <div>
+                        <h1>Evaluaciones</h1>
+                        <p class="subtitle">Organiza tus exámenes, pruebas y evaluaciones académicas.</p>
+                    </div>
+                    <button class="btn-primary btn-small" type="button" onclick="openEvaluationForm()">+ Nueva evaluación</button>
+                </div>
+                <div id="evaluations-content" class="evaluations-content" aria-live="polite"></div>
+            </section>
+
             <!-- GRADES SECTION -->
             <section id="grades" class="section">
                 <div class="section-header">
@@ -1619,6 +1637,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260806-google-calendar-direct-open-v1"></script>
+    <script src="app.js?v=20260807-evaluations-v1"></script>
 </body>
 </html>
