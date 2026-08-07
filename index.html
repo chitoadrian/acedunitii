@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260806-compact-tutor-layout-v3">
+    <link rel="stylesheet" href="style.css?v=20260806-tutor-suggestions-layout-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -1253,18 +1253,18 @@
                             <button type="button" onclick="clearTutorChat()">Limpiar chat</button>
                         </div>
 
-                        <div class="tutor-auto-suggestions" data-tutor-auto-suggestions aria-label="Sugerencias para comenzar">
-                            <span>Prueba una sugerencia:</span>
-                            <button type="button" data-tutor-suggestion="Explícame un tema paso a paso con un ejemplo sencillo.">Explicar un tema</button>
-                            <button type="button" data-tutor-suggestion="Crea cinco preguntas para repasar mi próxima evaluación.">Preparar evaluación</button>
-                            <button type="button" data-tutor-suggestion="Ayúdame a crear un plan breve de estudio para hoy.">Plan de estudio</button>
-                        </div>
-
                         <div class="tutor-messages" id="tutor-messages">
                             <div class="tutor-message tutor-bot">
                                 <strong>Tutor</strong>
                                 <p>Puedes escribirme un tema, pegar un texto corto o pedirme explicaciones, ejercicios, flashcards o preguntas de práctica.</p>
                             </div>
+                        </div>
+
+                        <div class="tutor-auto-suggestions" data-tutor-auto-suggestions aria-label="Sugerencias para comenzar">
+                            <span>Prueba una sugerencia:</span>
+                            <button type="button" data-tutor-suggestion="Explícame un tema paso a paso con un ejemplo sencillo.">Explicar un tema</button>
+                            <button type="button" data-tutor-suggestion="Crea cinco preguntas para repasar mi próxima evaluación.">Preparar evaluación</button>
+                            <button type="button" data-tutor-suggestion="Ayúdame a crear un plan breve de estudio para hoy.">Plan de estudio</button>
                         </div>
 
                         <div class="tutor-composer">
@@ -1619,6 +1619,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260806-confirmed-email-message-v1"></script>
+    <script src="app.js?v=20260806-tutor-suggestions-layout-v1"></script>
 </body>
 </html>
