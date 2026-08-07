@@ -3753,10 +3753,17 @@ function addMinutesToTime(time, minutes) {
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
+function getNextCalendarDate(date) {
+    const parsed = new Date(`${date}T12:00:00Z`);
+    if (Number.isNaN(parsed.getTime())) return date.replaceAll('-', '');
+    parsed.setUTCDate(parsed.getUTCDate() + 1);
+    return parsed.toISOString().slice(0, 10).replaceAll('-', '');
+}
+
 function getGoogleCalendarUrl(event) {
-    const start = toGoogleCalendarDate(event.date, event.time || '08:00');
-    const end = toGoogleCalendarDate(event.date, addMinutesToTime(event.time || '08:00', 60));
-    const details = [
+    const start = event.allDay ? event.date.replaceAll('-', '') : toGoogleCalendarDate(event.date, event.time || '08:00');
+    const end = event.allDay ? getNextCalendarDate(event.date) : toGoogleCalendarDate(event.date, addMinutesToTime(event.time || '08:00', 60));
+    const details = event.calendarDetails || [
         event.description || 'Evento creado desde AC Edunity.',
         event.subject ? `Materia: ${event.subject}.` : '',
         `Tipo: ${event.type || 'Evento académico'}.`
@@ -3948,7 +3955,7 @@ function renderCalendarSection(workspace) {
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>`
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Agendar en Google Calendar</button>`
                                         : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
@@ -3963,6 +3970,7 @@ function renderCalendarSection(workspace) {
     container.querySelectorAll('[data-event-edit]').forEach(button => button.addEventListener('click', () => openEventForm(button.dataset.eventEdit)));
     container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
+    container.querySelectorAll('[data-google-evaluation]').forEach(button => button.addEventListener('click', () => openGoogleCalendarForEvaluation(button.dataset.googleEvaluation)));
 }
 
 function showAddGradeForm() {
@@ -8505,7 +8513,7 @@ function openEvaluationForm(evaluationId = null) {
                 description: String(values.get('description') || '').trim() || null,
                 status: String(values.get('status') || 'pending'),
                 priority: String(values.get('priority') || 'medium'),
-                show_in_calendar: evaluation ? evaluation.showInCalendar === true : false,
+                show_in_calendar: evaluation ? evaluation.showInCalendar === true : true,
                 reminders_enabled: evaluation ? evaluation.remindersEnabled === true : false,
                 updated_at: new Date().toISOString()
             };
@@ -8519,7 +8527,7 @@ function openEvaluationForm(evaluationId = null) {
             await syncWorkspaceFromSupabase();
             refreshWorkspaceUI();
             close();
-            notify(evaluation ? 'Evaluación actualizada correctamente.' : 'Evaluación creada correctamente.', 'success');
+            notify(evaluation ? 'Evaluación actualizada correctamente.' : 'Evaluación creada. Revisa Calendario para agendarla en Google Calendar.', 'success');
         } catch (error) {
             logSupabaseError(evaluation ? 'evaluations update' : 'evaluations insert', error);
             notify(error.message || 'No se pudo guardar la evaluación.', 'error');
@@ -8667,13 +8675,21 @@ function openGoogleCalendarForEvaluation(evaluationId) {
     const workspace = loadWorkspace();
     const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
     if (!evaluation) return;
+    const details = [
+        'Evaluación académica — AC Edunity',
+        evaluation.subject ? `Materia: ${evaluation.subject}` : '',
+        evaluation.type ? `Tipo: ${evaluation.type}` : '',
+        evaluation.topics.length ? `Temas:\n${evaluation.topics.map(topic => `- ${topic}`).join('\n')}` : '',
+        evaluation.description ? `Notas:\n${evaluation.description}` : ''
+    ].filter(Boolean).join('\n\n');
     openGoogleCalendarForEvent({
         title: evaluation.title,
         date: evaluation.date,
-        time: evaluation.time || '08:00',
+        time: evaluation.time || '',
+        allDay: !evaluation.time,
         subject: evaluation.subject,
         type: evaluation.type,
-        description: [evaluation.description, evaluation.topics.length ? `Temas: ${evaluation.topics.join(', ')}` : ''].filter(Boolean).join('\n')
+        calendarDetails: details
     });
 }
 
