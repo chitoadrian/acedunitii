@@ -3766,26 +3766,26 @@ function getGoogleCalendarUrl(event) {
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-function openGoogleCalendarForEvent(event, reservedWindow = null) {
+function openGoogleCalendarForEvent(event) {
     if (!event?.date) {
-        reservedWindow?.close();
         notify('Agrega una fecha antes de abrir Google Calendar.', 'error');
-        return false;
+        return null;
     }
 
     const calendarUrl = getGoogleCalendarUrl(event);
-    if (reservedWindow && !reservedWindow.closed) {
-        reservedWindow.location.replace(calendarUrl);
-    } else {
-        const calendarWindow = window.open(calendarUrl, '_blank', 'noopener');
-        if (!calendarWindow) {
-            notify('Permite ventanas emergentes para abrir Google Calendar.', 'error');
-            return false;
-        }
+    const calendarWindow = window.open(calendarUrl, '_blank');
+    if (!calendarWindow) {
+        notify('Permite ventanas emergentes para abrir Google Calendar.', 'error');
+        return null;
     }
 
+    try {
+        calendarWindow.opener = null;
+    } catch (error) {
+        // La pestaña ya se abrió directamente; algunos navegadores aíslan su referencia.
+    }
     notify('Google Calendar se abrio con el evento listo para guardar.', 'info');
-    return true;
+    return calendarWindow;
 }
 
 function openGoogleCalendarEvent(eventId) {
@@ -3825,9 +3825,8 @@ function openEventForm(eventId = null) {
             };
             let savedEventId = eventId;
             const googleCalendarWindow = payload.googleCalendar
-                ? window.open('about:blank', '_blank')
+                ? openGoogleCalendarForEvent(payload)
                 : null;
-            if (googleCalendarWindow) googleCalendarWindow.opener = null;
 
             try {
                 const user = await getCurrentSupabaseUser();
@@ -3874,10 +3873,6 @@ function openEventForm(eventId = null) {
                 refreshWorkspaceUI();
                 if (!eventId) await refreshActivityAfterSourceMutation(savedEventId, 'event_created');
                 notify('Evento guardado correctamente.', 'success');
-                if (payload.googleCalendar && savedEventId) {
-                    const savedEvent = loadWorkspace().events.find(item => item.id === savedEventId);
-                    openGoogleCalendarForEvent(savedEvent || { ...payload, id: savedEventId }, googleCalendarWindow);
-                }
             } catch (error) {
                 googleCalendarWindow?.close();
                 notify(error.message || 'No se pudo guardar el evento.', 'error');
