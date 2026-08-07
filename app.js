@@ -5282,6 +5282,7 @@ function renderTutorConversation() {
                     : 'Inicia sesión para usar tu historial privado del Tutor.'}</p>
             </div>
         `;
+        applyTutorSuggestionPreference();
         return;
     }
 
@@ -5289,6 +5290,7 @@ function renderTutorConversation() {
         appendTutorMessage(item.role === 'user' ? 'user' : 'bot', item.content, item.role === 'assistant' ? 'Tutor' : '');
     });
     messages.scrollTop = messages.scrollHeight;
+    applyTutorSuggestionPreference();
 }
 
 function resetTutorConversationMemory() {
@@ -5410,6 +5412,7 @@ function clearTutorChat() {
 
     const label = document.getElementById('tutor-mode-label');
     if (label) label.textContent = 'Modo explicar';
+    applyTutorSuggestionPreference();
 }
 
 function resetTutorState() {
@@ -5440,6 +5443,7 @@ function addTutorHistory(role, content, userId = activeTutorUserId) {
         tutorState.lastAnswer = content;
     }
     saveTutorHistory(normalizedUserId);
+    applyTutorSuggestionPreference();
     return true;
 }
 
@@ -11109,8 +11113,11 @@ function syncAppSettingsControls() {
 }
 
 function applyTutorSuggestionPreference() {
+    const hasConversationMessages = Boolean(activeTutorUserId && Array.isArray(tutorState?.history) && tutorState.history.length);
+    const shouldShowSuggestions = Boolean(appSettings?.tutorSuggestions && activeTutorUserId && !hasConversationMessages);
+
     document.querySelectorAll('[data-tutor-auto-suggestions]').forEach(element => {
-        element.hidden = !appSettings?.tutorSuggestions;
+        element.hidden = !shouldShowSuggestions;
     });
 }
 
@@ -11209,10 +11216,13 @@ function restoreDashboardSettingsDefaults() {
 }
 
 function useTutorSuggestion(promptText) {
-    const input = document.getElementById('ai-topic');
-    if (!input) return;
-    input.value = String(promptText || '');
-    input.focus();
+    const cleanPrompt = String(promptText || '').trim();
+    if (!cleanPrompt) return;
+
+    document.querySelectorAll('[data-tutor-auto-suggestions]').forEach(element => {
+        element.hidden = true;
+    });
+    sendTutorMessage(cleanPrompt);
 }
 
 function getReminderCandidates(workspace) {
