@@ -3936,9 +3936,11 @@ function renderCalendarSection(workspace) {
             <h3>Agenda académica</h3>
             <div id="custom-events-list">
                 ${events.length ? events.map(event => {
+                    const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(event.date || '') ? new Date(`${event.date}T12:00:00-05:00`) : null;
+                    const eventMonth = eventDate ? new Intl.DateTimeFormat('es-EC', { month: 'short', timeZone: 'America/Guayaquil' }).format(eventDate).replace('.', '').toUpperCase() : 'AC';
                     return `
                         <div class="event-item event-custom ${event.kind === 'evaluation' ? 'event-evaluation' : ''} ${isEventSoon(event) ? 'event-soon' : ''}">
-                            <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML((event.date || '').slice(5, 7) || 'AC')}</span></div>
+                            <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML(eventMonth)}</span></div>
                             <div class="event-content">
                                 <h4>${escapeHTML(event.title)}</h4>
                                 <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(event.time || 'Sin hora')}</p>
@@ -8320,6 +8322,7 @@ const evaluationTypeOptions = ['Examen', 'Prueba', 'Lección', 'Quiz', 'Exposici
 let evaluationStatusFilter = 'all';
 let evaluationSubjectFilter = 'all';
 let evaluationSubmitInProgress = false;
+let evaluationCountdownTimer = null;
 
 function getGuayaquilDateKey() {
     return new Intl.DateTimeFormat('en-CA', {
@@ -8338,14 +8341,34 @@ function getEvaluationDaysUntil(dateKey) {
 }
 
 function getEvaluationCountdown(evaluation) {
-    const days = getEvaluationDaysUntil(evaluation?.date);
-    if (days === null) return 'Sin fecha';
-    if (days < 0) return 'Fecha pasada';
-    if (days === 0) return 'Hoy';
-    if (days === 1) return 'Mañana';
-    if (days < 14) return `Faltan ${days} días`;
-    const weeks = Math.floor(days / 7);
-    return `Faltan ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`;
+    const dateKey = String(evaluation?.date || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return 'Sin fecha';
+    const hasTime = /^\d{2}:\d{2}/.test(String(evaluation?.time || ''));
+    const target = new Date(`${dateKey}T${hasTime ? `${String(evaluation.time).slice(0, 5)}:00` : '23:59:59'}-05:00`);
+    const remaining = target.getTime() - Date.now();
+    if (!Number.isFinite(target.getTime())) return 'Sin fecha';
+    if (remaining <= 0 || evaluation?.status === 'completed') return 'Evaluación finalizada';
+    const totalSeconds = Math.floor(remaining / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    if (days === 0 && hours === 0) return `${minutes} min · ${String(seconds).padStart(2, '0')} s`;
+    if (days === 0) return `Hoy · ${String(hours).padStart(2, '0')} h · ${String(minutes).padStart(2, '0')} min · ${String(seconds).padStart(2, '0')} s`;
+    return `${String(days).padStart(2, '0')} días · ${String(hours).padStart(2, '0')} h · ${String(minutes).padStart(2, '0')} min · ${String(seconds).padStart(2, '0')} s`;
+}
+
+function updateEvaluationCountdowns() {
+    document.querySelectorAll('[data-evaluation-countdown]').forEach(element => {
+        const evaluation = (workspaceState?.evaluations || []).find(item => item.id === element.dataset.evaluationCountdown);
+        if (evaluation) element.textContent = getEvaluationCountdown(evaluation);
+    });
+}
+
+function ensureEvaluationCountdownTimer() {
+    updateEvaluationCountdowns();
+    if (evaluationCountdownTimer) return;
+    evaluationCountdownTimer = window.setInterval(updateEvaluationCountdowns, 1000);
 }
 
 function getEvaluationStatusLabel(status) {
@@ -8419,7 +8442,6 @@ function openEvaluationForm(evaluationId = null) {
                 </div>
                 <label class="evaluation-field-wide"><span>Temas que entran</span><div class="evaluation-topic-builder"><div class="evaluation-topic-input-row"><input data-topic-input placeholder="Escribe un tema y pulsa Enter"><button class="btn-secondary btn-small" data-add-topic type="button">+ Agregar</button></div><div class="evaluation-topic-chips" data-topic-chips></div></div></label>
                 <label class="evaluation-field-wide"><span>Descripción / notas</span><textarea name="description" rows="3" maxlength="2000" placeholder="Indicaciones, material o notas importantes">${escapeHTML(evaluation?.description || '')}</textarea></label>
-                <label class="evaluation-calendar-check"><input name="showInCalendar" type="checkbox" ${evaluation?.showInCalendar !== false ? 'checked' : ''}><span>Mostrar también en mi Calendario</span></label>
                 <div class="quick-modal-actions"><button class="btn-secondary btn-small" type="button" data-cancel-evaluation>Cancelar</button><button class="btn-primary btn-small" type="submit">${evaluation ? 'Actualizar evaluación' : 'Guardar evaluación'}</button></div>
             </form>
         </div>`;
@@ -8483,7 +8505,8 @@ function openEvaluationForm(evaluationId = null) {
                 description: String(values.get('description') || '').trim() || null,
                 status: String(values.get('status') || 'pending'),
                 priority: String(values.get('priority') || 'medium'),
-                show_in_calendar: values.get('showInCalendar') === 'on',
+                show_in_calendar: evaluation ? evaluation.showInCalendar === true : false,
+                reminders_enabled: evaluation ? evaluation.remindersEnabled === true : false,
                 updated_at: new Date().toISOString()
             };
             let result;
@@ -8557,6 +8580,89 @@ async function deleteEvaluation(evaluationId) {
     }
 }
 
+async function setEvaluationCalendarState(evaluationId, enabled) {
+    try {
+        const user = await getCurrentSupabaseUser();
+        const { error } = await getSupabaseClient().from('evaluations')
+            .update({ show_in_calendar: Boolean(enabled), updated_at: new Date().toISOString() })
+            .eq('id', evaluationId).eq('user_id', user.id);
+        if (error) throw error;
+        await syncWorkspaceFromSupabase();
+        refreshWorkspaceUI();
+        notify(enabled ? 'Evaluación agregada al Calendario.' : 'Evaluación quitada del Calendario.', 'success');
+    } catch (error) {
+        logSupabaseError('evaluations calendar toggle', error);
+        notify('No se pudo actualizar el Calendario.', 'error');
+    }
+}
+
+function openEvaluationReminderModal(evaluationId) {
+    const evaluation = (loadWorkspace().evaluations || []).find(item => item.id === evaluationId);
+    if (!evaluation) return;
+    document.querySelector('.quick-modal')?.remove();
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal evaluation-reminder-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card evaluation-reminder-card" role="dialog" aria-modal="true" aria-labelledby="evaluation-reminder-title">
+            <button class="quick-modal-close" type="button" aria-label="Cerrar">×</button>
+            <span class="evaluations-kicker">Evaluaciones</span>
+            <h3 id="evaluation-reminder-title">Recordatorio por correo</h3>
+            <p>Recibe recordatorios antes de esta evaluación.</p>
+            <label class="evaluation-reminder-toggle"><span><strong>Activar recordatorios</strong><small>${evaluation.remindersEnabled ? 'Activado' : 'Desactivado'}</small></span><input type="checkbox" ${evaluation.remindersEnabled ? 'checked' : ''} aria-label="Activar recordatorios por correo"></label>
+            <div class="evaluation-reminder-times"><span>✓ 1 día antes</span><span class="${evaluation.time ? '' : 'is-disabled'}">✓ 1 hora antes${evaluation.time ? '' : ' (requiere hora)'}</span></div>
+            <div class="quick-modal-actions"><button class="btn-primary btn-small" type="button" data-save-evaluation-reminder>Guardar</button></div>
+        </div>`;
+    const close = () => modal.remove();
+    modal.addEventListener('click', async event => {
+        if (event.target === modal || event.target.closest('.quick-modal-close')) close();
+        if (!event.target.closest('[data-save-evaluation-reminder]')) return;
+        const button = event.target.closest('[data-save-evaluation-reminder]');
+        button.disabled = true;
+        try {
+            const user = await getCurrentSupabaseUser();
+            const enabled = modal.querySelector('input[type="checkbox"]').checked;
+            const { error } = await getSupabaseClient().from('evaluations')
+                .update({ reminders_enabled: enabled, updated_at: new Date().toISOString() })
+                .eq('id', evaluationId).eq('user_id', user.id);
+            if (error) throw error;
+            await syncWorkspaceFromSupabase();
+            refreshWorkspaceUI();
+            close();
+            notify(enabled ? 'Recordatorios por correo activados.' : 'Recordatorios por correo desactivados.', 'success');
+        } catch (error) {
+            logSupabaseError('evaluations reminder toggle', error);
+            notify('No se pudo actualizar el recordatorio.', 'error');
+            button.disabled = false;
+        }
+    });
+    document.body.appendChild(modal);
+    modal.querySelector('input')?.focus();
+}
+
+function closeEvaluationMenus(except = null) {
+    document.querySelectorAll('.evaluation-menu.is-open').forEach(menu => {
+        if (menu !== except) {
+            menu.classList.remove('is-open');
+            menu.previousElementSibling?.setAttribute('aria-expanded', 'false');
+        }
+    });
+}
+
+if (!document.documentElement.dataset.evaluationMenuBound) {
+    document.documentElement.dataset.evaluationMenuBound = 'true';
+    document.addEventListener('click', event => {
+        if (!event.target.closest('.evaluation-menu-wrap')) closeEvaluationMenus();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key !== 'Escape') return;
+        const openMenu = document.querySelector('.evaluation-menu.is-open');
+        if (!openMenu) return;
+        const trigger = openMenu.previousElementSibling;
+        closeEvaluationMenus();
+        trigger?.focus();
+    });
+}
+
 function openGoogleCalendarForEvaluation(evaluationId) {
     const workspace = loadWorkspace();
     const evaluation = workspace.evaluations.find(item => item.id === evaluationId);
@@ -8616,13 +8722,12 @@ function renderEvaluations(workspace) {
                 const subject = getEvaluationSubject(workspace, evaluation);
                 const isFuture = (getEvaluationDaysUntil(evaluation.date) ?? -1) >= 0 && evaluation.status !== 'completed';
                 return `<article class="evaluation-card" style="${getAcademicCardStyle(subject?.color || 'Morado')}" data-evaluation-id="${escapeHTML(evaluation.id)}">
-                    <div class="evaluation-card-top"><span class="evaluation-subject">${escapeHTML(subject?.name || evaluation.subject)}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
+                    <div class="evaluation-card-top"><span class="evaluation-subject">${escapeHTML(subject?.name || evaluation.subject)}</span><div class="evaluation-menu-wrap"><button class="evaluation-menu-button" type="button" aria-label="Opciones de ${escapeHTML(evaluation.title)}" aria-haspopup="menu" aria-expanded="false" data-evaluation-menu-button="${escapeHTML(evaluation.id)}">⋯</button><div class="evaluation-menu" role="menu"><button role="menuitem" type="button" data-evaluation-view="${escapeHTML(evaluation.id)}">Ver detalles</button><button role="menuitem" type="button" data-evaluation-edit="${escapeHTML(evaluation.id)}">Editar</button><button role="menuitem" type="button" data-evaluation-calendar="${escapeHTML(evaluation.id)}" data-calendar-enabled="${evaluation.showInCalendar}">${evaluation.showInCalendar ? 'Quitar del Calendario' : 'Agendar en Calendario'}</button><button role="menuitem" type="button" data-evaluation-reminder="${escapeHTML(evaluation.id)}">Recordatorio por correo${evaluation.remindersEnabled ? ' · Activado' : ''}</button><button class="is-danger" role="menuitem" type="button" data-evaluation-delete="${escapeHTML(evaluation.id)}">Eliminar</button></div></div></div>
                     <h3>${escapeHTML(evaluation.title)}</h3>
                     <p class="evaluation-card-schedule">${escapeHTML(evaluation.type)} · ${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(evaluation.time)}` : ''}</p>
-                    <strong class="evaluation-countdown">${escapeHTML(getEvaluationCountdown(evaluation))}</strong>
-                    <div class="evaluation-card-meta"><span>${evaluation.topics.length} ${evaluation.topics.length === 1 ? 'tema' : 'temas'}</span><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span></div>
+                    <div class="evaluation-countdown-wrap"><span>⏱ Faltan</span><strong class="evaluation-countdown" data-evaluation-countdown="${escapeHTML(evaluation.id)}">${escapeHTML(getEvaluationCountdown(evaluation))}</strong></div>
+                    <div class="evaluation-card-meta"><span>${evaluation.topics.length} ${evaluation.topics.length === 1 ? 'tema' : 'temas'}</span><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
                     ${isFuture ? `<button class="evaluation-tutor-button" type="button" data-evaluation-tutor="${escapeHTML(evaluation.id)}">Preparar con Tutor IA</button>` : ''}
-                    <div class="card-actions"><button class="btn-secondary btn-small" type="button" data-evaluation-view="${escapeHTML(evaluation.id)}">Ver</button><button class="btn-secondary btn-small" type="button" data-evaluation-edit="${escapeHTML(evaluation.id)}">Editar</button><button class="btn-danger btn-small" type="button" data-evaluation-delete="${escapeHTML(evaluation.id)}">Eliminar</button></div>
                 </article>`;
             }).join('') : `<div class="evaluations-empty filtered"><h3>No hay evaluaciones con estos filtros.</h3><button class="btn-secondary btn-small" type="button" data-clear-evaluation-filters>Mostrar todas</button></div>`) : `<div class="evaluations-empty"><span class="evaluations-empty-icon" aria-hidden="true">✓</span><h3>Aún no tienes evaluaciones registradas.</h3><p>Agrega tu próxima evaluación para organizar tu preparación.</p><button class="btn-primary btn-small" type="button" onclick="openEvaluationForm()">+ Nueva evaluación</button></div>`}
         </div>`;
@@ -8643,6 +8748,18 @@ function renderEvaluations(workspace) {
     container.querySelectorAll('[data-evaluation-edit]').forEach(button => button.addEventListener('click', () => openEvaluationForm(button.dataset.evaluationEdit)));
     container.querySelectorAll('[data-evaluation-delete]').forEach(button => button.addEventListener('click', () => deleteEvaluation(button.dataset.evaluationDelete)));
     container.querySelectorAll('[data-evaluation-tutor]').forEach(button => button.addEventListener('click', () => prepareEvaluationWithTutor(button.dataset.evaluationTutor)));
+    container.querySelectorAll('[data-evaluation-calendar]').forEach(button => button.addEventListener('click', () => setEvaluationCalendarState(button.dataset.evaluationCalendar, button.dataset.calendarEnabled !== 'true')));
+    container.querySelectorAll('[data-evaluation-reminder]').forEach(button => button.addEventListener('click', () => openEvaluationReminderModal(button.dataset.evaluationReminder)));
+    container.querySelectorAll('[data-evaluation-menu-button]').forEach(button => button.addEventListener('click', event => {
+        event.stopPropagation();
+        const menu = button.nextElementSibling;
+        const opening = !menu.classList.contains('is-open');
+        closeEvaluationMenus(opening ? menu : null);
+        menu.classList.toggle('is-open', opening);
+        button.setAttribute('aria-expanded', String(opening));
+        if (opening) menu.querySelector('[role="menuitem"]')?.focus();
+    }));
+    ensureEvaluationCountdownTimer();
 }
 
 function initStudyPet() {
@@ -9747,6 +9864,7 @@ async function syncWorkspaceFromSupabase() {
         status: evaluation.status || 'pending',
         priority: evaluation.priority || 'medium',
         showInCalendar: evaluation.show_in_calendar !== false,
+        remindersEnabled: evaluation.reminders_enabled === true,
         createdAt: evaluation.created_at || '',
         updatedAt: evaluation.updated_at || ''
     }));
@@ -11141,6 +11259,7 @@ function refreshWorkspaceUI() {
     renderProgress(workspace);
     renderBackpack(workspace);
     renderProfile(workspace);
+    renderEvaluations(workspace);
     updateGradeSubjectOptions(workspace);
 }
 

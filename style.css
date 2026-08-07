@@ -37403,13 +37403,15 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .evaluation-toolbar label { display: flex; align-items: center; gap: 10px; color: var(--text-secondary, #a7b0c2); white-space: nowrap; }
 .evaluation-toolbar select { min-width: 190px; border: 1px solid var(--border-color, rgba(148, 163, 184, .2)); border-radius: 12px; padding: 10px 36px 10px 12px; color: var(--text-primary, #eef2ff); background: var(--input-bg, #111827); }
 .evaluation-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; min-width: 0; }
-.evaluation-card { position: relative; display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 21px; overflow: hidden; border: 1px solid color-mix(in srgb, var(--subject-color) 42%, var(--border-color, transparent)); border-radius: 20px; background: var(--surface, rgba(15, 23, 42, .76)); box-shadow: 0 16px 38px rgba(2, 6, 23, .14); }
+.evaluation-card { position: relative; display: flex; flex-direction: column; gap: 11px; min-width: 0; padding: 19px; overflow: visible; border: 1px solid color-mix(in srgb, var(--subject-color) 42%, var(--border-color, transparent)); border-radius: 20px; background: var(--surface, rgba(15, 23, 42, .76)); box-shadow: 0 16px 38px rgba(2, 6, 23, .14); }
 .evaluation-card::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--subject-color); }
 .evaluation-card-top, .evaluation-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .evaluation-subject { color: var(--subject-color); font-weight: 800; }
 .evaluation-card h3 { margin: 0; color: var(--text-primary, #eef2ff); font-size: 1.08rem; line-height: 1.35; overflow-wrap: break-word; }
 .evaluation-card-schedule { margin: 0; color: var(--text-secondary, #a7b0c2); line-height: 1.5; }
-.evaluation-countdown { color: var(--text-primary, #eef2ff); font-size: 1.12rem; }
+.evaluation-countdown-wrap { display: grid; gap: 3px; padding: 11px 12px; border-radius: 13px; background: color-mix(in srgb, var(--subject-color) 9%, transparent); }
+.evaluation-countdown-wrap > span { color: var(--text-secondary, #a7b0c2); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; }
+.evaluation-countdown { color: var(--text-primary, #eef2ff); font-size: .98rem; font-variant-numeric: tabular-nums; }
 .evaluation-status, .evaluation-priority { display: inline-flex; align-items: center; width: fit-content; border-radius: 999px; padding: 6px 10px; font-size: .78rem; font-weight: 750; }
 .status-pending { color: #93c5fd; background: rgba(37, 99, 235, .16); }
 .status-preparing { color: #fcd34d; background: rgba(245, 158, 11, .16); }
@@ -37420,7 +37422,14 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .priority-high { color: #fca5a5; background: rgba(239, 68, 68, .14); }
 .evaluation-tutor-button { width: 100%; margin-top: auto; border: 1px solid color-mix(in srgb, var(--subject-color) 60%, transparent); border-radius: 12px; padding: 10px 12px; color: var(--text-primary, #eef2ff); background: color-mix(in srgb, var(--subject-color) 13%, transparent); cursor: pointer; font-weight: 700; }
 .evaluation-tutor-button:hover { background: color-mix(in srgb, var(--subject-color) 22%, transparent); }
-.evaluation-card .card-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.evaluation-menu-wrap { position: relative; margin-left: auto; }
+.evaluation-menu-button { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--border-color, rgba(148, 163, 184, .22)); border-radius: 10px; color: var(--text-primary, #eef2ff); background: var(--surface-soft, rgba(15, 23, 42, .5)); font-size: 1.35rem; line-height: 1; cursor: pointer; }
+.evaluation-menu-button:hover, .evaluation-menu-button:focus-visible { border-color: var(--subject-color); outline: 2px solid color-mix(in srgb, var(--subject-color) 28%, transparent); outline-offset: 2px; }
+.evaluation-menu { position: absolute; z-index: 50; top: calc(100% + 7px); right: 0; display: none; width: min(230px, calc(100vw - 48px)); padding: 7px; border: 1px solid var(--border-color, rgba(148, 163, 184, .24)); border-radius: 14px; background: var(--surface, #111827); box-shadow: 0 18px 44px rgba(2, 6, 23, .28); }
+.evaluation-menu.is-open { display: grid; }
+.evaluation-menu button { width: 100%; border: 0; border-radius: 9px; padding: 10px 11px; color: var(--text-primary, #eef2ff); background: transparent; text-align: left; cursor: pointer; }
+.evaluation-menu button:hover, .evaluation-menu button:focus-visible { outline: none; background: color-mix(in srgb, var(--subject-color) 12%, transparent); }
+.evaluation-menu button.is-danger { color: #ef8e8e; }
 .evaluations-empty { grid-column: 1 / -1; display: grid; justify-items: center; gap: 10px; padding: 48px 24px; border: 1px dashed var(--border-color, rgba(148, 163, 184, .28)); border-radius: 20px; color: var(--text-secondary, #a7b0c2); text-align: center; background: var(--surface-soft, rgba(15, 23, 42, .45)); }
 .evaluations-empty h3, .evaluations-empty p { margin: 0; }
 .evaluations-empty-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; color: #a78bfa; background: rgba(124, 58, 237, .15); font-size: 1.5rem; }
@@ -37438,6 +37447,16 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .evaluation-calendar-check { display: flex !important; flex-direction: row !important; align-items: center; gap: 10px; }
 .evaluation-calendar-check input { width: 18px; height: 18px; accent-color: #7c3aed; }
 .evaluation-detail-card { width: min(650px, calc(100vw - 32px)); }
+.evaluation-reminder-card { width: min(470px, calc(100vw - 32px)); }
+.evaluation-reminder-card h3, .evaluation-reminder-card p { margin-top: 0; }
+.evaluation-reminder-card > p { color: var(--text-secondary, #a7b0c2); }
+.evaluation-reminder-toggle { display: flex !important; flex-direction: row !important; align-items: center; justify-content: space-between; gap: 18px; margin: 20px 0 14px; padding: 15px; border: 1px solid var(--border-color, rgba(148, 163, 184, .22)); border-radius: 14px; background: var(--surface-soft, rgba(15, 23, 42, .5)); }
+.evaluation-reminder-toggle > span { display: grid; gap: 3px; }
+.evaluation-reminder-toggle small { color: var(--text-secondary, #a7b0c2); }
+.evaluation-reminder-toggle input { width: 21px; height: 21px; accent-color: #7c3aed; }
+.evaluation-reminder-times { display: grid; gap: 8px; color: var(--text-secondary, #a7b0c2); }
+.evaluation-reminder-times span { padding: 9px 12px; border-radius: 10px; background: rgba(124, 58, 237, .1); }
+.evaluation-reminder-times .is-disabled { opacity: .58; }
 .evaluation-detail-card h3 { margin: 0 0 15px; font-size: clamp(1.35rem, 3vw, 2rem); }
 .evaluation-detail-meta, .evaluation-detail-status { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 16px; }
 .evaluation-detail-meta span { padding: 7px 10px; border-radius: 10px; color: var(--text-secondary, #a7b0c2); background: var(--surface-soft, rgba(15, 23, 42, .5)); }
@@ -37446,6 +37465,16 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .evaluation-detail-card section p { margin: 0; color: var(--text-secondary, #a7b0c2); white-space: pre-wrap; }
 .event-item.event-evaluation { border-color: rgba(124, 58, 237, .45); }
 .event-item.event-evaluation .event-date { background: linear-gradient(145deg, #2563eb, #7c3aed); }
+.events-list #custom-events-list { scrollbar-width: thin; scrollbar-color: rgba(124, 58, 237, .45) transparent; }
+.events-list .event-item.event-custom { min-height: 0; align-items: center; gap: 13px; padding: 13px; }
+.events-list .event-item.event-custom .event-date { width: 58px; min-width: 58px; min-height: 58px; border-radius: 14px; }
+.events-list .event-item.event-custom .event-date .day { font-size: 1.25rem; }
+.events-list .event-item.event-custom .event-date .month { font-size: .67rem; }
+.events-list .event-item.event-custom .event-content { min-width: 0; }
+.events-list .event-item.event-custom .event-content h4 { margin: 0 0 3px; overflow-wrap: break-word; }
+.events-list .event-item.event-custom .event-content p { margin: 0 0 6px; }
+.events-list .event-item.event-custom .card-actions { margin-top: 8px; gap: 7px; }
+.events-list .event-item.event-custom .card-actions button { min-height: 32px; padding: 7px 10px; }
 .dashboard-next-evaluation { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px 18px; width: 100%; margin: 18px 0 0; padding: 17px 20px; border: 1px solid rgba(124, 58, 237, .28); border-radius: 18px; color: var(--text-primary, #eef2ff); background: linear-gradient(135deg, rgba(37, 99, 235, .1), rgba(124, 58, 237, .12)); text-align: left; cursor: pointer; }
 .dashboard-next-evaluation span { grid-row: 1 / span 2; color: #a78bfa; font-weight: 800; }
 .dashboard-next-evaluation strong, .dashboard-next-evaluation b, .dashboard-next-evaluation em { min-width: 0; overflow-wrap: break-word; }
