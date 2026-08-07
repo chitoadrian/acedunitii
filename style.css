@@ -37579,3 +37579,78 @@ body.light-theme .evaluation-delete-actions .btn-danger {
         grid-template-columns: 1fr;
     }
 }
+
+/* Calendar evaluation cards */
+@media (min-width: 1101px) {
+    body #calendar .calendar-container {
+        grid-template-columns: minmax(0, 1.75fr) minmax(420px, 1.1fr) !important;
+    }
+}
+
+body #calendar .events-list {
+    padding: 18px !important;
+}
+
+body #calendar #custom-events-list {
+    padding-right: 10px !important;
+}
+
+body #calendar .event-item.event-evaluation {
+    min-height: 0 !important;
+    align-items: start !important;
+    padding: 14px !important;
+}
+
+body #calendar .event-item.event-evaluation .event-content h4 {
+    display: -webkit-box !important;
+    margin-bottom: 4px !important;
+    overflow: hidden !important;
+    overflow-wrap: anywhere !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 3 !important;
+}
+
+body #calendar .event-item.event-evaluation .event-badge,
+body #calendar .event-item.event-evaluation .event-alert {
+    min-height: 22px !important;
+    margin-bottom: 4px !important;
+    padding: 3px 8px !important;
+}
+
+body #calendar .event-item.event-evaluation .card-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    margin-top: 7px !important;
+}
+
+body #calendar .event-item.event-evaluation .card-actions button {
+    flex: 1 1 142px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 38px !important;
+    padding: 8px 10px !important;
+    white-space: normal !important;
+}
+
+@media (max-width: 720px) {
+    body #calendar .events-list {
+        padding: 16px !important;
+    }
+
+    body #calendar #custom-events-list {
+        padding-right: 0 !important;
+    }
+
+    body #calendar .event-item.event-evaluation .card-actions {
+        flex-direction: column !important;
+    }
+
+    body #calendar .event-item.event-evaluation .card-actions button {
+        flex-basis: auto !important;
+        width: 100% !important;
+    }
+}

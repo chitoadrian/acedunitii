@@ -3955,7 +3955,7 @@ function renderCalendarSection(workspace) {
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Agendar en Google Calendar</button>`
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Google Calendar</button>`
                                         : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
