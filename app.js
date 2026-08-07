@@ -3428,11 +3428,6 @@ function isEventSoon(event) {
     return diff >= 0 && diff <= 1000 * 60 * 60 * 48;
 }
 
-function getReminderMessage(event) {
-    if (!event.emailReminder || !event.email) return '';
-    return `Se enviaria un correo a ${event.email} recordando el evento.`;
-}
-
 function addSubjectUI() {
     openSubjectForm();
 }
@@ -3757,11 +3752,9 @@ function getGoogleCalendarUrl(event) {
     const start = toGoogleCalendarDate(event.date, event.time || '08:00');
     const end = toGoogleCalendarDate(event.date, addMinutesToTime(event.time || '08:00', 60));
     const details = [
-        `Evento creado desde AC Edunity.`,
-        `Tipo: ${event.type || 'Evento académico'}.`,
-        appSettings?.notifications
-            ? 'Los recordatorios de AC Edunity están activos. Las notificaciones propias de este evento se configuran al guardarlo en Google Calendar.'
-            : 'Los recordatorios de AC Edunity están desactivados. Las notificaciones configuradas directamente en Google Calendar se administran desde Google.'
+        event.description || 'Evento creado desde AC Edunity.',
+        event.subject ? `Materia: ${event.subject}.` : '',
+        `Tipo: ${event.type || 'Evento académico'}.`
     ].filter(Boolean).join('\n');
     const params = new URLSearchParams({
         action: 'TEMPLATE',
@@ -3773,18 +3766,34 @@ function getGoogleCalendarUrl(event) {
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+function openGoogleCalendarForEvent(event, reservedWindow = null) {
+    if (!event?.date) {
+        reservedWindow?.close();
+        notify('Agrega una fecha antes de abrir Google Calendar.', 'error');
+        return false;
+    }
+
+    const calendarUrl = getGoogleCalendarUrl(event);
+    if (reservedWindow && !reservedWindow.closed) {
+        reservedWindow.location.replace(calendarUrl);
+    } else {
+        const calendarWindow = window.open(calendarUrl, '_blank', 'noopener');
+        if (!calendarWindow) {
+            notify('Permite ventanas emergentes para abrir Google Calendar.', 'error');
+            return false;
+        }
+    }
+
+    notify('Google Calendar se abrio con el evento listo para guardar.', 'info');
+    return true;
+}
+
 function openGoogleCalendarEvent(eventId) {
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
     if (!event) return;
-    if (!event.date) {
-        notify('Agrega una fecha antes de abrir Google Calendar.', 'error');
-        return;
-    }
-    window.open(getGoogleCalendarUrl(event), '_blank', 'noopener');
-    notify('Google Calendar se abrio con el evento listo para guardar.', 'info');
+    openGoogleCalendarForEvent(event);
 }
-
 function openEventForm(eventId = null) {
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
@@ -3798,8 +3807,6 @@ function openEventForm(eventId = null) {
             { name: 'date', label: 'Fecha', type: 'date', value: normalizeDate(event?.date) },
             { name: 'time', label: 'Hora', type: 'time', value: event?.time || '08:00' },
             { name: 'description', label: 'Descripción', type: 'textarea', rows: 3, value: event?.description || '', required: false, placeholder: 'Detalle del evento' },
-            { name: 'email', label: 'Correo del usuario', type: 'email', value: event?.email || currentUser?.email || '', placeholder: 'usuario@email.com' },
-            { name: 'emailReminder', label: 'Recordatorio por correo', type: 'checkbox', checked: Boolean(event?.emailReminder), help: 'Activar recordatorio por correo' },
             { name: 'googleCalendar', label: 'Abrir también en Google Calendar', type: 'checkbox', checked: !eventId, help: 'Se abrirá Google Calendar para guardar el evento y activar notificaciones reales.' }
         ],
         onSubmit: async values => {
@@ -3814,11 +3821,13 @@ function openEventForm(eventId = null) {
                 day: values.date,
                 time: values.time,
                 description: values.description?.trim() || '',
-                email: values.email.trim(),
-                emailReminder: values.emailReminder === 'yes',
                 googleCalendar: values.googleCalendar === 'yes'
             };
             let savedEventId = eventId;
+            const googleCalendarWindow = payload.googleCalendar
+                ? window.open('about:blank', '_blank')
+                : null;
+            if (googleCalendarWindow) googleCalendarWindow.opener = null;
 
             try {
                 const user = await getCurrentSupabaseUser();
@@ -3864,16 +3873,15 @@ function openEventForm(eventId = null) {
                 await syncWorkspaceFromSupabase();
                 refreshWorkspaceUI();
                 if (!eventId) await refreshActivityAfterSourceMutation(savedEventId, 'event_created');
-                notify(payload.emailReminder ? getReminderMessage(payload) : 'Evento guardado correctamente.', 'success');
+                notify('Evento guardado correctamente.', 'success');
                 if (payload.googleCalendar && savedEventId) {
-                    openGoogleCalendarEvent(savedEventId);
+                    const savedEvent = loadWorkspace().events.find(item => item.id === savedEventId);
+                    openGoogleCalendarForEvent(savedEvent || { ...payload, id: savedEventId }, googleCalendarWindow);
                 }
             } catch (error) {
+                googleCalendarWindow?.close();
                 notify(error.message || 'No se pudo guardar el evento.', 'error');
             }
-
-            // Futuro real: aqui se podria conectar EmailJS, un backend propio,
-            // funciones de Supabase o servicios desplegados en Hostinger para enviar correos reales.
         }
     });
 }
@@ -3922,7 +3930,6 @@ function renderCalendarSection(workspace) {
             <h3>Agenda académica</h3>
             <div id="custom-events-list">
                 ${events.length ? events.map(event => {
-                    const reminder = getReminderMessage(event);
                     return `
                         <div class="event-item event-custom ${isEventSoon(event) ? 'event-soon' : ''}">
                             <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML((event.date || '').slice(5, 7) || 'AC')}</span></div>
@@ -3931,7 +3938,6 @@ function renderCalendarSection(workspace) {
                                 <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(event.time || 'Sin hora')}</p>
                                 <span class="event-badge">${escapeHTML(event.type)}</span>
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
-                                ${reminder ? `<p class="email-simulation">${escapeHTML(reminder)}</p>` : ''}
                                 <div class="card-actions">
                                     <button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button>
                                     <button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>
