@@ -11216,13 +11216,32 @@ function restoreDashboardSettingsDefaults() {
 }
 
 function useTutorSuggestion(promptText) {
-    const cleanPrompt = String(promptText || '').trim();
-    if (!cleanPrompt) return;
+    const input = document.getElementById('ai-topic');
+    if (!input) return;
 
-    document.querySelectorAll('[data-tutor-auto-suggestions]').forEach(element => {
-        element.hidden = true;
-    });
-    sendTutorMessage(cleanPrompt);
+    const suggestionTemplates = {
+        'Explícame un tema paso a paso con un ejemplo sencillo.': 'Explícame un tema sobre ',
+        'Crea cinco preguntas para repasar mi próxima evaluación.': 'Prepárame una evaluación sobre ',
+        'Ayúdame a crear un plan breve de estudio para hoy.': 'Crea un plan de estudio sobre '
+    };
+    const template = suggestionTemplates[String(promptText || '').trim()];
+    if (!template) return;
+
+    const currentText = String(input.value || '');
+    const currentTrimmed = currentText.trim();
+    const isPreviousTemplate = Object.values(suggestionTemplates)
+        .some(value => value.trim() === currentTrimmed);
+
+    if (currentTrimmed && !isPreviousTemplate) {
+        notify('Borra el texto actual para usar esta sugerencia.', 'info');
+        input.focus();
+        input.setSelectionRange(currentText.length, currentText.length);
+        return;
+    }
+
+    input.value = template;
+    input.focus();
+    input.setSelectionRange(template.length, template.length);
 }
 
 function getReminderCandidates(workspace) {
