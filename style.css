@@ -37307,3 +37307,83 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-tabs button { min-height: 32px; padding-inline: 9px; font-size: 0.78rem; }
     #ai-assistant .tutor-send { min-height: 32px; }
 }
+
+/* Tutor IA automatic suggestions layout */
+#ai-assistant .tutor-auto-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 2px 4px 5px;
+    box-sizing: border-box;
+}
+
+#ai-assistant .tutor-auto-suggestions[hidden] {
+    display: none !important;
+}
+
+#ai-assistant .tutor-auto-suggestions > span {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+#ai-assistant .tutor-auto-suggestions button {
+    min-height: 28px;
+    padding: 5px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.045);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+#ai-assistant .tutor-auto-suggestions button:hover {
+    border-color: rgba(73, 204, 249, 0.55);
+    background: rgba(73, 204, 249, 0.1);
+    color: var(--color-cyan);
+}
+
+#ai-assistant .tutor-auto-suggestions button:focus-visible {
+    outline: 3px solid rgba(73, 204, 249, 0.38);
+    outline-offset: 2px;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-auto-suggestions button {
+    border-color: #cbd5e1;
+    background: #f1f3f6;
+    color: #334155;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-auto-suggestions button:hover {
+    border-color: #7da6f8;
+    background: #eef4ff;
+    color: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+    #ai-assistant .tutor-auto-suggestions {
+        gap: 5px;
+        padding-inline: 2px;
+    }
+
+    #ai-assistant .tutor-auto-suggestions > span {
+        flex-basis: 100%;
+    }
+
+    #ai-assistant .tutor-auto-suggestions button {
+        flex: 1 1 auto;
+        min-height: 30px;
+        padding-inline: 8px;
+    }
+}
