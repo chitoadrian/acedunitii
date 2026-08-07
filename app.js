@@ -7211,8 +7211,7 @@ function renderDashboard(workspace) {
                     `}
             </div>
 
-            <div class="dashboard-bottom-section">
-                <div class="card starter-card dashboard-panel-card" data-dashboard-module="studentCenter">
+            <div class="card starter-card dashboard-panel-card" data-dashboard-module="studentCenter">
                     <div class="panel-title">
                         ${appIconHTML('list', 'panel-icon panel-icon-steps dashboard-icon')}
                         <div>
@@ -7233,11 +7232,15 @@ function renderDashboard(workspace) {
                         `).join('')}
                     </ol>
             </div>
-
             ${weeklyActivityInitialHTML()}
-            </div>
+        </div>
+        <div class="dashboard-modules-empty" data-dashboard-modules-empty hidden>
+            <strong>No tienes módulos visibles.</strong>
+            <p>Elige qué información quieres ver en tu panel principal.</p>
+            <button class="btn-primary btn-small" type="button" onclick="openSettingsModal('dashboard')">Personalizar panel</button>
         </div>
     `;
+    applyDashboardModulePreferences();
     ensureEvaluationCountdownTimer();
     queueMicrotask(() => refreshActivityChart());
 }
@@ -11781,12 +11784,17 @@ async function updateAppSetting(key, value, input) {
 function applyDashboardModulePreferences() {
     const dashboard = document.getElementById('dashboard');
     if (!dashboard || !appSettings) return;
+    let visibleModules = 0;
     dashboard.querySelectorAll('[data-dashboard-module]').forEach(module => {
         const key = module.dataset.dashboardModule;
         if (!module.matches('input') && Object.prototype.hasOwnProperty.call(appSettings.dashboardModules, key)) {
-            module.hidden = appSettings.dashboardModules[key] === false;
+            const isVisible = appSettings.dashboardModules[key] !== false;
+            module.hidden = !isVisible;
+            if (isVisible) visibleModules += 1;
         }
     });
+    const emptyState = dashboard.querySelector('[data-dashboard-modules-empty]');
+    if (emptyState) emptyState.hidden = visibleModules > 0;
 }
 
 function openSettingsModal(name) {
@@ -11833,12 +11841,13 @@ async function saveDashboardSettings() {
 
     closeSettingsModal('dashboard');
     applyAppSettings();
-    notify('Panel principal actualizado.', 'success');
+    notify('Panel actualizado correctamente.', 'success');
 }
 
-function restoreDashboardSettingsDefaults() {
+async function restoreDashboardSettingsDefaults() {
     dashboardSettingsDraft = { ...DEFAULT_APP_SETTINGS.dashboardModules };
     syncAppSettingsControls();
+    await saveDashboardSettings();
 }
 
 function useTutorSuggestion(promptText) {
