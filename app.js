@@ -7064,6 +7064,9 @@ function renderDashboard(workspace) {
     const completed = taskCounts.completed;
     const nextEvent = getNextEvent(workspace);
     const nextEvaluation = sortEvaluations(workspace.evaluations || []).find(evaluation => evaluation.status !== 'completed' && (getEvaluationDaysUntil(evaluation.date) ?? -1) >= 0) || null;
+    const nextEvaluationSubject = nextEvaluation ? getEvaluationSubject(workspace, nextEvaluation) : null;
+    const nextEvaluationTarget = nextEvaluation ? new Date(`${nextEvaluation.date}T${/^\d{2}:\d{2}/.test(String(nextEvaluation.time || '')) ? `${String(nextEvaluation.time).slice(0, 5)}:00` : '23:59:59'}-05:00`).getTime() : 0;
+    const nextEvaluationIsSoon = nextEvaluationTarget > Date.now() && nextEvaluationTarget - Date.now() < 86400000;
     const average = getAverageGrade(workspace);
     const level = getLevel(workspace.xp);
     const isEmpty = !workspace.subjects.length && !workspace.tasks.length && !workspace.events.length && !(workspace.evaluations || []).length && !workspace.grades.length && !workspace.resources.length;
@@ -7125,12 +7128,33 @@ function renderDashboard(workspace) {
             ${dashboardCard('grades', 'Promedio actual', average ? average.toFixed(2) : '--', workspace.grades.length ? `${workspace.grades.length} calificaciones registradas` : 'Registra tus calificaciones', gradeProgress)}
         </div>
 
-        <button class="dashboard-next-evaluation ${nextEvaluation ? '' : 'is-empty'}" type="button" onclick="navigateTo('evaluations')">
-            <span>Próxima evaluación</span>
-            <strong>${escapeHTML(nextEvaluation?.subject || 'Sin evaluaciones próximas')}</strong>
-            <b>${escapeHTML(nextEvaluation?.title || 'Agrega una evaluación para planificar tu estudio.')}</b>
-            <em>${escapeHTML(nextEvaluation ? getEvaluationCountdown(nextEvaluation) : 'Abrir Evaluaciones')}</em>
-        </button>
+        <article class="card dashboard-panel-card dashboard-next-evaluation ${nextEvaluation ? '' : 'is-empty'}" data-dashboard-module="nextEvaluation">
+            <header class="dashboard-next-evaluation-header">
+                ${appIconHTML('calendar', 'dashboard-next-evaluation-icon dashboard-icon')}
+                <div>
+                    <span>Próxima evaluación</span>
+                    <strong>${escapeHTML(nextEvaluationSubject?.name || nextEvaluation?.subject || 'Planificación académica')}</strong>
+                </div>
+                ${nextEvaluationIsSoon ? '<small class="dashboard-next-evaluation-badge">Muy pronto</small>' : ''}
+            </header>
+            ${nextEvaluation ? `
+                <div class="dashboard-next-evaluation-copy">
+                    <h3>${escapeHTML(nextEvaluation.title)}</h3>
+                    <p>${escapeHTML(nextEvaluation.type || 'Evaluación')} · ${escapeHTML(formatEvaluationCompactDate(nextEvaluation.date))}${nextEvaluation.time ? ` · ${escapeHTML(String(nextEvaluation.time).slice(0, 5))}` : ''}</p>
+                </div>
+                <div class="dashboard-next-evaluation-countdown">
+                    <span>⏱ Faltan</span>
+                    <strong data-evaluation-countdown="${escapeHTML(nextEvaluation.id)}">${escapeHTML(getEvaluationCountdown(nextEvaluation))}</strong>
+                </div>
+                <button class="btn-secondary btn-small dashboard-next-evaluation-action" type="button" onclick="viewEvaluationFromDashboard('${escapeHTML(nextEvaluation.id)}')">Ver evaluación <span aria-hidden="true">→</span></button>
+            ` : `
+                <div class="dashboard-next-evaluation-copy">
+                    <h3>No tienes evaluaciones próximas.</h3>
+                    <p>Crea una evaluación cuando quieras comenzar a planificar.</p>
+                </div>
+                <button class="btn-secondary btn-small dashboard-next-evaluation-action" type="button" onclick="navigateTo('evaluations')">Crear evaluación <span aria-hidden="true">→</span></button>
+            `}
+        </article>
 
         <div class="dashboard-layout dashboard-clean-layout">
             <div class="card dashboard-panel-card dashboard-progress-card" data-dashboard-module="progress">
@@ -7214,7 +7238,13 @@ function renderDashboard(workspace) {
             </div>
         </div>
     `;
+    ensureEvaluationCountdownTimer();
     queueMicrotask(() => refreshActivityChart());
+}
+
+function viewEvaluationFromDashboard(evaluationId) {
+    navigateTo('evaluations');
+    openEvaluationDetail(evaluationId);
 }
 
 function dashboardCard(icon, label, value, subtext, progress) {
@@ -8396,6 +8426,16 @@ function formatEvaluationDate(dateKey) {
         month: 'long',
         year: 'numeric'
     }).format(date);
+}
+
+function formatEvaluationCompactDate(dateKey) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || ''))) return 'Sin fecha';
+    const date = new Date(`${dateKey}T12:00:00-05:00`);
+    return new Intl.DateTimeFormat('es-EC', {
+        day: '2-digit',
+        month: 'short',
+        timeZone: 'America/Guayaquil'
+    }).format(date).replace('.', '').toUpperCase();
 }
 
 function sortEvaluations(evaluations = []) {
@@ -11485,6 +11525,7 @@ const DEFAULT_APP_SETTINGS = Object.freeze({
         tasks: true,
         calendar: true,
         grades: true,
+        nextEvaluation: true,
         tutor: true,
         progress: true,
         day: true,

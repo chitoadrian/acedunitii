@@ -28753,6 +28753,205 @@ body.light-mode .quick-modal-card[aria-label="Editar materia"] .choice-pill:hove
     }
 }
 
+/* Dashboard next evaluation card */
+body #dashboard .dashboard-next-evaluation {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.25fr) minmax(260px, .75fr);
+    grid-template-areas: "header header" "copy countdown" "copy action";
+    align-items: center;
+    gap: 14px 24px;
+    width: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    margin: 18px 0 0;
+    padding: 20px 22px !important;
+    overflow: hidden;
+    border-color: color-mix(in srgb, #7c6ff0 34%, var(--border-color, transparent)) !important;
+    background: linear-gradient(135deg, rgba(37, 99, 235, .07), rgba(124, 58, 237, .09)), var(--surface, var(--bg-secondary)) !important;
+    text-align: left;
+    cursor: default;
+}
+
+body #dashboard .dashboard-next-evaluation span {
+    grid-row: auto;
+    grid-column: auto;
+}
+
+body #dashboard .dashboard-next-evaluation::after {
+    content: "";
+    position: absolute;
+    inset: 16px auto 16px 0;
+    width: 3px;
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(180deg, #38bdf8, #8b5cf6);
+}
+
+body #dashboard .dashboard-next-evaluation-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+body #dashboard .dashboard-next-evaluation-icon {
+    display: inline-grid;
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    place-items: center;
+    border: 1px solid rgba(124, 111, 240, .26);
+    border-radius: 14px;
+    color: #9ebeff;
+    background: rgba(99, 102, 241, .12);
+}
+
+body #dashboard .dashboard-next-evaluation-icon svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: currentColor;
+}
+
+body #dashboard .dashboard-next-evaluation-header > div {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+body #dashboard .dashboard-next-evaluation-header > div > span {
+    color: var(--text-secondary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+body #dashboard .dashboard-next-evaluation-header > div > strong {
+    min-width: 0;
+    color: #a9bfff;
+    font-size: .88rem;
+    overflow-wrap: break-word;
+}
+
+body #dashboard .dashboard-next-evaluation-badge {
+    margin-left: auto;
+    padding: 5px 9px;
+    border: 1px solid rgba(248, 113, 113, .28);
+    border-radius: 999px;
+    color: #fca5a5;
+    background: rgba(248, 113, 113, .10);
+    font-size: .68rem;
+    font-weight: 800;
+}
+
+body #dashboard .dashboard-next-evaluation-copy {
+    grid-area: copy;
+    min-width: 0;
+}
+
+body #dashboard .dashboard-next-evaluation-copy h3 {
+    margin: 0 0 6px;
+    color: var(--text-primary);
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    line-height: 1.25;
+    overflow-wrap: break-word;
+}
+
+body #dashboard .dashboard-next-evaluation-copy p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: .8rem;
+    line-height: 1.45;
+}
+
+body #dashboard .dashboard-next-evaluation-countdown {
+    grid-area: countdown;
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    padding: 11px 13px;
+    border: 1px solid rgba(124, 111, 240, .20);
+    border-radius: 13px;
+    background: rgba(99, 102, 241, .07);
+}
+
+body #dashboard .dashboard-next-evaluation-countdown span {
+    color: var(--text-secondary);
+    font-size: .7rem;
+    font-weight: 750;
+}
+
+body #dashboard .dashboard-next-evaluation-countdown strong {
+    min-width: 0;
+    color: var(--text-primary);
+    font-size: .86rem;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+body #dashboard .dashboard-next-evaluation-action {
+    grid-area: action;
+    justify-self: end;
+    width: fit-content !important;
+    max-width: 100%;
+    min-height: 38px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+body #dashboard .dashboard-next-evaluation.is-empty {
+    grid-template-areas: "header header" "copy action";
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-next-evaluation {
+    border-color: rgba(99, 102, 241, .20) !important;
+    background: linear-gradient(135deg, rgba(37, 99, 235, .045), rgba(124, 58, 237, .06)), var(--surface, #fafafa) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-next-evaluation-header > div > strong {
+    color: #4f46e5;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #dashboard .dashboard-next-evaluation-icon {
+    color: #4f46e5;
+    background: #eef2ff;
+}
+
+@media (max-width: 768px) {
+    body #dashboard .dashboard-next-evaluation,
+    body #dashboard .dashboard-next-evaluation.is-empty {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas: "header" "copy" "countdown" "action";
+        gap: 13px;
+    }
+
+    body #dashboard .dashboard-next-evaluation.is-empty {
+        grid-template-areas: "header" "copy" "action";
+    }
+
+    body #dashboard .dashboard-next-evaluation-action {
+        justify-self: stretch;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 420px) {
+    body #dashboard .dashboard-next-evaluation {
+        padding: 17px 16px !important;
+    }
+
+    body #dashboard .dashboard-next-evaluation-header {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    body #dashboard .dashboard-next-evaluation-badge {
+        margin-left: 58px;
+    }
+}
+
 @media (max-width: 620px) {
     body #subjects .subjects-grid {
         grid-template-columns: 1fr !important;
