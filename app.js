@@ -2560,7 +2560,8 @@ function generateCalendar() {
 
     const calendarItems = [
         ...workspace.events,
-        ...(workspace.evaluations || []).filter(evaluation => evaluation.showInCalendar)
+        ...(workspace.evaluations || []).filter(evaluation => evaluation.showInCalendar),
+        ...(typeof getGoalsProjectsCalendarItems === 'function' ? getGoalsProjectsCalendarItems(workspace) : [])
     ];
     const eventsByDate = calendarItems.reduce((acc, event) => {
         const dateKey = getEventDateKey(event);
@@ -3925,9 +3926,13 @@ function renderCalendarSection(workspace) {
     const evaluationEvents = (workspace.evaluations || [])
         .filter(evaluation => evaluation.showInCalendar)
         .map(evaluation => ({ ...evaluation, kind: 'evaluation', calendarType: `Evaluación · ${evaluation.type}` }));
+    const planningEvents = typeof getGoalsProjectsCalendarItems === 'function'
+        ? getGoalsProjectsCalendarItems(workspace)
+        : [];
     const events = [
         ...workspace.events.map(event => ({ ...event, kind: 'event', calendarType: event.type })),
-        ...evaluationEvents
+        ...evaluationEvents,
+        ...planningEvents
     ].sort((a, b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
     container.innerHTML = `
         <div class="calendar-side">
@@ -3956,7 +3961,9 @@ function renderCalendarSection(workspace) {
                                 <div class="card-actions">
                                     ${event.kind === 'evaluation'
                                         ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Google Calendar</button>`
-                                        : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
+                                        : event.kind !== 'event'
+                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>`
+                                            : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
                         </div>
@@ -3971,6 +3978,11 @@ function renderCalendarSection(workspace) {
     container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
     container.querySelectorAll('[data-google-evaluation]').forEach(button => button.addEventListener('click', () => openGoogleCalendarForEvaluation(button.dataset.googleEvaluation)));
+    container.querySelectorAll('[data-calendar-planning]').forEach(button => button.addEventListener('click', () => {
+        navigateTo('goals-projects');
+        const projectId = button.dataset.calendarPlanning;
+        if (projectId && typeof openProjectDetail === 'function') openProjectDetail(projectId);
+    }));
 }
 
 function showAddGradeForm() {
@@ -8341,6 +8353,7 @@ function refreshWorkspaceUI() {
     renderBackpack(workspace);
     renderProfile(workspace);
     renderEvaluations(workspace);
+    renderGoalsProjects(workspace);
     updateGradeSubjectOptions(workspace);
 }
 
@@ -8971,6 +8984,7 @@ const VALID_APP_VIEWS = new Set([
     'tasks',
     'calendar',
     'evaluations',
+    'goals-projects',
     'grades',
     'attendance',
     'ai-assistant',
@@ -9555,6 +9569,10 @@ function getEmptyWorkspace() {
         tasks: [],
         events: [],
         evaluations: [],
+        projects: [],
+        goals: [],
+        projectStages: [],
+        projectSubtasks: [],
         grades: [],
         attendance: [],
         resources: [],
@@ -9699,6 +9717,10 @@ function mergeWorkspaceState(remoteState = {}) {
         subjects: remoteState.subjects || [],
         tasks,
         evaluations: remoteState.evaluations || [],
+        projects: remoteState.projects || [],
+        goals: remoteState.goals || [],
+        projectStages: remoteState.projectStages || [],
+        projectSubtasks: remoteState.projectSubtasks || [],
         xp: Number(remoteState.xp || 0),
         streak: Number(remoteState.streak || 0),
         taskMeta
@@ -9862,7 +9884,7 @@ async function syncWorkspaceFromSupabase() {
     }
 
     const sb = getSupabaseClient();
-    const [profileRes, subjectsRes, tasksRes, eventsRes, evaluationsRes, attendanceRes, resourcesRes, gradesRes] = await Promise.all([
+    const [profileRes, subjectsRes, tasksRes, eventsRes, evaluationsRes, attendanceRes, resourcesRes, gradesRes, projectsRes, goalsRes, stagesRes, subtasksRes] = await Promise.all([
         sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
         sb.from('subjects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
         sb.from('tasks').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
@@ -9870,7 +9892,11 @@ async function syncWorkspaceFromSupabase() {
         sb.from('evaluations').select('*').eq('user_id', currentUser.id).order('evaluation_date', { ascending: true }),
         sb.from('attendance').select('*').eq('user_id', currentUser.id).order('date', { ascending: false }),
         sb.from('resources').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false })
+        sb.from('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sb.from('projects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sb.from('goals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        sb.from('project_stages').select('*').eq('user_id', currentUser.id).order('position', { ascending: true }),
+        sb.from('project_subtasks').select('*').eq('user_id', currentUser.id).order('position', { ascending: true })
     ]);
 
     if (profileRes.error) {
@@ -9904,6 +9930,12 @@ async function syncWorkspaceFromSupabase() {
     if (gradesRes.error) {
         logSupabaseError('grades sync select', gradesRes.error);
         throw gradesRes.error;
+    }
+    for (const [label, response] of [['projects', projectsRes], ['goals', goalsRes], ['project_stages', stagesRes], ['project_subtasks', subtasksRes]]) {
+        if (response.error) {
+            logSupabaseError(`${label} sync select`, response.error);
+            throw response.error;
+        }
     }
 
     profileState = profileRes.data || {
@@ -9983,6 +10015,11 @@ async function syncWorkspaceFromSupabase() {
         updatedAt: evaluation.updated_at || ''
     }));
 
+    const projects = (projectsRes.data || []).map(row => mapProjectRow(row, subjectMap));
+    const goals = (goalsRes.data || []).map(row => mapGoalRow(row, subjectMap));
+    const projectStages = (stagesRes.data || []).map(mapProjectStageRow);
+    const projectSubtasks = (subtasksRes.data || []).map(mapProjectSubtaskRow);
+
     const attendance = (attendanceRes.data || []).map(record => ({
         id: record.id,
         subjectId: record.subject_id || '',
@@ -10060,6 +10097,10 @@ async function syncWorkspaceFromSupabase() {
         tasks,
         events,
         evaluations,
+        projects,
+        goals,
+        projectStages,
+        projectSubtasks,
         attendance,
         resources,
         grades,
@@ -11374,6 +11415,7 @@ function refreshWorkspaceUI() {
     renderBackpack(workspace);
     renderProfile(workspace);
     renderEvaluations(workspace);
+    renderGoalsProjects(workspace);
     updateGradeSubjectOptions(workspace);
 }
 

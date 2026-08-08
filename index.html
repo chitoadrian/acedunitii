@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260807-dashboard-customization-fix-v1">
+    <link rel="stylesheet" href="style.css?v=20260808-goals-projects-map-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -538,6 +538,12 @@
                         <svg viewBox="0 0 24 24"><path d="M9 3h6l1.2 2H20v16H4V5h3.8L9 3Z"></path><path d="M9 8h6"></path><path d="m8 13 2 2 4-4"></path><path d="M8 18h8"></path></svg>
                     </span>
                     <span class="nav-label">Evaluaciones</span>
+                </a>
+                <a href="#" onclick="navigateTo('goals-projects')" class="nav-item" data-section="goals-projects">
+                    <span class="nav-icon sidebar-icon sidebar-icon-goals-projects" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"></path></svg>
+                    </span>
+                    <span class="nav-label">Metas y Proyectos</span>
                 </a>
                 <a href="#" onclick="navigateTo('grades')" class="nav-item" data-section="grades">
                     <span class="nav-icon sidebar-icon sidebar-icon-grades" aria-hidden="true">
@@ -1107,6 +1113,10 @@
                 <div id="evaluations-content" class="evaluations-content" aria-live="polite"></div>
             </section>
 
+            <section id="goals-projects" class="section">
+                <div id="goals-projects-content" class="goals-projects-content" aria-live="polite"></div>
+            </section>
+
             <!-- GRADES SECTION -->
             <section id="grades" class="section">
                 <div class="section-header">
@@ -1638,6 +1648,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="app.js?v=20260807-dashboard-customization-fix-v1"></script>
+    <script src="app.js?v=20260808-goals-projects-map-v1"></script>
+    <script src="goals-projects.js?v=20260808-goals-projects-map-v1"></script>
 </body>
 </html>
