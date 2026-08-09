@@ -38885,3 +38885,51 @@ body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .
     #goals-projects-content .gp-map-hidden-count,
     #goals-projects-content .gp-map-no-subtasks { margin-left: 8px; }
 }
+
+/* Project progress completion workflow */
+#goals-projects-content .gp-subtask-list { grid-template-columns: repeat(2,minmax(0,1fr)); }
+#goals-projects-content .gp-stage-menu { position: relative; margin-left: auto; }
+#goals-projects-content .gp-stage-menu > summary {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--gp-border);
+    border-radius: 10px;
+    color: var(--gp-text);
+    background: var(--gp-surface);
+    cursor: pointer;
+    list-style: none;
+    font-size: 1.2rem;
+}
+#goals-projects-content .gp-stage-menu > summary::-webkit-details-marker { display: none; }
+#goals-projects-content .gp-stage-menu > summary:hover,
+#goals-projects-content .gp-stage-menu > summary:focus-visible { border-color: color-mix(in srgb, var(--gp-accent) 55%, var(--gp-border)); outline: 2px solid color-mix(in srgb, var(--gp-accent-2) 38%, transparent); outline-offset: 2px; }
+#goals-projects-content .gp-stage-menu > div {
+    position: absolute;
+    z-index: 8;
+    top: 46px;
+    right: 0;
+    width: 215px;
+    display: grid;
+    gap: 2px;
+    padding: 7px;
+    border: 1px solid var(--gp-border);
+    border-radius: 12px;
+    background: var(--gp-surface);
+    box-shadow: 0 16px 36px rgba(3,8,28,.26);
+}
+#goals-projects-content .gp-stage-menu button { width: 100%; min-height: 36px; padding: 8px 10px; border: 0; border-radius: 8px; color: var(--gp-text); background: transparent; text-align: left; cursor: pointer; }
+#goals-projects-content .gp-stage-menu button:hover { background: var(--gp-surface-soft); }
+#goals-projects-content .gp-stage-menu button.danger { color: #ff9aa5; }
+#goals-projects-content .gp-confirm-copy { margin: 22px 0 8px; color: var(--gp-muted); line-height: 1.65; }
+#goals-projects-content .gp-subtask-card .gp-subtask-state.completed { animation: gp-project-check-pop .22s ease-out; }
+@keyframes gp-project-check-pop { 0% { transform: scale(.82); } 65% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+@media (max-width: 1024px) {
+    #goals-projects-content .gp-subtask-list { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 520px) {
+    #goals-projects-content .gp-stage-menu { width: auto; align-self: flex-end; }
+    #goals-projects-content .gp-stage-menu > div { width: min(215px,calc(100vw - 54px)); }
+}
