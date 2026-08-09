@@ -38604,3 +38604,116 @@ body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .
     #goals-projects-content .gp-stage-actions { gap: 9px; }
     #goals-projects-content .gp-stage-actions button { padding-inline: 10px; }
 }
+
+/* Interactive project subtasks and progress */
+#goals-projects-content .gp-project-hero.is-complete {
+    border-color: color-mix(in srgb, #54d2a4 48%, var(--gp-border));
+}
+#goals-projects-content .gp-project-complete-note {
+    margin: 13px 0 0;
+    color: #67d7ad;
+    font-size: .82rem;
+    font-weight: 800;
+}
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-project-complete-note { color: #237856; }
+#goals-projects-content .gp-stage-card.is-completed::before { background: linear-gradient(180deg, #54d2a4, #39b8e9); }
+#goals-projects-content .gp-stage-subtasks { margin: 19px 0 14px; padding-top: 17px; border-top: 1px solid var(--gp-border); }
+#goals-projects-content .gp-stage-subtasks-title { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 11px; }
+#goals-projects-content .gp-stage-subtasks-title > span { color: var(--gp-text); font-size: .74rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+#goals-projects-content .gp-stage-subtasks-title small { color: var(--gp-muted); font-size: .75rem; }
+#goals-projects-content .gp-subtask-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 0; list-style: none; }
+#goals-projects-content .gp-subtask-list .gp-subtask-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 220px;
+    padding: 15px;
+    border: 1px solid color-mix(in srgb, var(--gp-border) 86%, transparent);
+    border-radius: 15px;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--gp-surface) 92%, transparent), color-mix(in srgb, var(--gp-surface-soft) 82%, transparent));
+    box-shadow: 0 9px 22px rgba(3,8,28,.08);
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+#goals-projects-content .gp-subtask-list .gp-subtask-card:hover { border-color: color-mix(in srgb, var(--gp-accent) 38%, var(--gp-border)); transform: translateY(-1px); }
+#goals-projects-content .gp-subtask-list .gp-subtask-card.is-completed { border-color: color-mix(in srgb, #54d2a4 42%, var(--gp-border)); background: linear-gradient(145deg, color-mix(in srgb, #54d2a4 8%, var(--gp-surface)), var(--gp-surface-soft)); }
+#goals-projects-content .gp-subtask-list .gp-subtask-card.is-overdue { border-color: color-mix(in srgb, #ef6c7a 43%, var(--gp-border)); }
+#goals-projects-content .gp-subtask-card-head { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: start; gap: 11px; }
+#goals-projects-content .gp-subtask-card .gp-subtask-state {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--gp-accent) 52%, var(--gp-border));
+    border-radius: 50%;
+    color: var(--gp-accent-2);
+    background: color-mix(in srgb, var(--gp-accent) 12%, transparent);
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: transform .18s ease, color .18s ease, background .18s ease;
+}
+#goals-projects-content .gp-subtask-card .gp-subtask-state:hover,
+#goals-projects-content .gp-subtask-card .gp-subtask-state:focus-visible { transform: scale(1.07); outline: 2px solid color-mix(in srgb, var(--gp-accent-2) 60%, transparent); outline-offset: 2px; }
+#goals-projects-content .gp-subtask-card .gp-subtask-state.completed { color: #09261d; border-color: #54d2a4; background: #54d2a4; }
+#goals-projects-content .gp-subtask-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; min-width: 0; }
+#goals-projects-content .gp-subtask-title > strong { min-width: 0; color: var(--gp-text); font-size: .95rem; line-height: 1.35; overflow-wrap: break-word; word-break: normal; }
+#goals-projects-content .gp-subtask-status { flex: 0 0 auto; padding: 4px 7px; border: 1px solid var(--gp-border); border-radius: 999px; color: var(--gp-muted); background: var(--gp-surface); font-size: .65rem; font-weight: 850; }
+#goals-projects-content .gp-subtask-status.completed { color: #67d7ad; border-color: rgba(84,210,164,.36); background: rgba(84,210,164,.1); }
+#goals-projects-content .gp-subtask-status.overdue { color: #ff9aa5; border-color: rgba(239,108,122,.4); background: rgba(239,108,122,.1); }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-status.completed { color: #237856; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-status.overdue { color: #a83242; }
+#goals-projects-content .gp-subtask-menu { position: relative; }
+#goals-projects-content .gp-subtask-menu > summary { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid var(--gp-border); border-radius: 9px; color: var(--gp-muted); background: var(--gp-surface); cursor: pointer; list-style: none; font-size: 1.1rem; }
+#goals-projects-content .gp-subtask-menu > summary::-webkit-details-marker { display: none; }
+#goals-projects-content .gp-subtask-menu > div { position: absolute; z-index: 6; top: 37px; right: 0; width: 120px; display: grid; padding: 6px; border: 1px solid var(--gp-border); border-radius: 10px; background: var(--gp-surface); box-shadow: 0 14px 30px rgba(3,8,28,.24); }
+#goals-projects-content .gp-subtask-menu button { min-height: 34px; padding: 7px 9px; border: 0; border-radius: 7px; color: var(--gp-text); background: transparent; text-align: left; cursor: pointer; }
+#goals-projects-content .gp-subtask-menu button:hover { background: var(--gp-surface-soft); }
+#goals-projects-content .gp-subtask-menu button.danger { color: #ff9aa5; }
+#goals-projects-content .gp-subtask-description { margin: 14px 0 13px 45px; }
+#goals-projects-content .gp-subtask-description p { display: -webkit-box; overflow: hidden; margin: 0; color: var(--gp-muted); font-size: .82rem; line-height: 1.55; overflow-wrap: break-word; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+#goals-projects-content .gp-subtask-description.is-expanded p { display: block; overflow: visible; }
+#goals-projects-content .gp-subtask-description button { margin-top: 6px; padding: 0; border: 0; color: var(--gp-accent-2); background: transparent; font-size: .75rem; font-weight: 800; cursor: pointer; }
+#goals-projects-content .gp-subtask-meta { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin: auto 0 13px 45px; }
+#goals-projects-content .gp-subtask-meta > span { min-width: 0; padding: 9px 10px; border: 1px solid color-mix(in srgb, var(--gp-border) 76%, transparent); border-radius: 10px; background: color-mix(in srgb, var(--gp-surface) 72%, transparent); }
+#goals-projects-content .gp-subtask-meta small,
+#goals-projects-content .gp-subtask-meta strong { display: block; overflow-wrap: break-word; }
+#goals-projects-content .gp-subtask-meta small { margin-bottom: 3px; color: var(--gp-muted); font-size: .64rem; text-transform: uppercase; }
+#goals-projects-content .gp-subtask-meta strong { color: var(--gp-text); font-size: .74rem; }
+#goals-projects-content .gp-subtask-meta .priority-high,
+#goals-projects-content .gp-subtask-meta .overdue { color: #ff9aa5; }
+#goals-projects-content .gp-subtask-meta .priority-medium { color: #f4c76b; }
+#goals-projects-content .gp-subtask-meta .priority-low { color: #67d7ad; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-meta .priority-high,
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-meta .overdue { color: #a83242; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-meta .priority-medium { color: #8a6412; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-subtask-meta .priority-low { color: #237856; }
+#goals-projects-content .gp-stage-empty { padding: 14px; }
+#goals-projects-content .gp-stage-empty > div { display: grid; gap: 8px; }
+#goals-projects-content .gp-stage-manual-complete { width: fit-content; min-height: 36px; padding: 7px 11px; border: 1px solid color-mix(in srgb, var(--gp-accent) 45%, var(--gp-border)); border-radius: 9px; color: #d9d4ff; background: color-mix(in srgb, var(--gp-accent) 13%, transparent); cursor: pointer; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-stage-manual-complete { color: #5549a6; }
+#goals-projects-content .gp-derived-status { display: flex; align-items: center; min-height: 48px; padding: 0 14px; border: 1px solid var(--gp-border); border-radius: 11px; color: var(--gp-muted); background: var(--gp-surface-soft); font-size: .82rem; }
+#goals-projects-content .gp-progress-overview { display: grid; justify-items: center; gap: 12px; }
+#goals-projects-content .gp-progress-overview p { max-width: 260px; margin: 0; color: var(--gp-muted); text-align: center; font-size: .82rem; }
+#goals-projects-content .gp-progress-view.is-complete .gp-progress-overview p { color: #67d7ad; font-weight: 800; }
+#goals-projects-content .gp-progress-metrics article { display: grid; grid-template-columns: auto minmax(0,1fr); align-items: center; gap: 11px; text-align: left; }
+#goals-projects-content .gp-progress-metrics article > div { min-width: 0; }
+#goals-projects-content .gp-progress-metrics article > div strong,
+#goals-projects-content .gp-progress-metrics article > div span { display: block; }
+#goals-projects-content .gp-progress-stat-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: #d9d4ff; background: color-mix(in srgb, var(--gp-accent) 18%, transparent); font-weight: 900; }
+body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .gp-progress-stat-icon { color: #5549a6; }
+#goals-projects-content .gp-node.project.completed { border-color: color-mix(in srgb, #54d2a4 58%, var(--gp-border)); }
+
+@media (max-width: 1024px) {
+    #goals-projects-content .gp-subtask-list { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 520px) {
+    #goals-projects-content .gp-stage-subtasks-title { align-items: flex-start; flex-direction: column; gap: 4px; }
+    #goals-projects-content .gp-subtask-list .gp-subtask-card { min-height: 0; padding: 13px; }
+    #goals-projects-content .gp-subtask-title { display: grid; gap: 6px; }
+    #goals-projects-content .gp-subtask-status { width: fit-content; }
+    #goals-projects-content .gp-subtask-description,
+    #goals-projects-content .gp-subtask-meta { margin-left: 0; }
+    #goals-projects-content .gp-subtask-meta { grid-template-columns: minmax(0,1fr); }
+    #goals-projects-content .gp-stage-empty { align-items: flex-start; justify-content: flex-start; }
+}
