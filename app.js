@@ -10921,6 +10921,9 @@ async function toggleTask(checkbox) {
         const nextStatus = checkbox.checked ? 'completed' : 'pending';
         const justCompleted = task.status !== 'completed' && nextStatus === 'completed';
 
+        commitTaskStatusToWorkspace(taskId, nextStatus);
+        refreshTaskDependentUI();
+
         const { error } = await getSupabaseClient()
             .from('tasks')
             .update({ status: nextStatus })
@@ -10931,14 +10934,17 @@ async function toggleTask(checkbox) {
 
         if (justCompleted) {
             pushRecentMessage(`Completaste la tarea ${task.title}.`);
-            await updateProfileProgress(25, { bumpStreak: true });
+            updateProfileProgress(25, { bumpStreak: true }).catch(error => logTaskPersistenceError('profile progress', error));
+            refreshTaskActivityAfterSave(taskId, 'task_completed').catch(error => logTaskPersistenceError('activity refresh', error));
         }
-
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
-        if (justCompleted) await refreshTaskActivityAfterSave(taskId, 'task_completed');
     } catch (error) {
         checkbox.checked = !checkbox.checked;
+        const workspace = loadWorkspace();
+        const task = workspace.tasks.find(item => item.id === taskId);
+        if (task) {
+            commitTaskStatusToWorkspace(taskId, checkbox.checked ? 'completed' : 'pending');
+            refreshTaskDependentUI();
+        }
         notify(error.message || 'No se pudo actualizar la tarea.', 'error');
     }
 }
@@ -11201,6 +11207,30 @@ function commitSavedTaskToWorkspace(savedRow, subjectName = '') {
     };
 }
 
+function commitTaskStatusToWorkspace(taskId, status) {
+    if (!workspaceState || !taskId) return;
+    workspaceState = {
+        ...workspaceState,
+        tasks: (workspaceState.tasks || []).map(task => task.id === taskId ? { ...task, status } : task)
+    };
+}
+
+function removeTaskFromWorkspace(taskId) {
+    if (!workspaceState || !taskId) return;
+    workspaceState = {
+        ...workspaceState,
+        tasks: (workspaceState.tasks || []).filter(task => task.id !== taskId)
+    };
+}
+
+function refreshTaskDependentUI() {
+    const workspace = loadWorkspace();
+    renderDashboard(workspace);
+    renderSubjects(workspace);
+    renderTasks(workspace);
+    renderProgress(workspace);
+}
+
 function openTaskForm(taskId = null) {
     const initialWorkspace = loadWorkspace();
     const task = initialWorkspace.tasks.find(item => item.id === taskId);
@@ -11314,16 +11344,12 @@ function openTaskForm(taskId = null) {
 
                 commitSavedTaskToWorkspace(savedRow, subject?.name || 'General');
 
-                try {
-                    await syncWorkspaceFromSupabase();
-                } catch (syncError) {
-                    logTaskPersistenceError('workspace reload', syncError);
-                }
-
-                refreshWorkspaceUI();
+                refreshTaskDependentUI();
 
                 if (activityType) {
-                    await refreshTaskActivityAfterSave(savedRow.id, activityType);
+                    refreshTaskActivityAfterSave(savedRow.id, activityType).catch(error => {
+                        logTaskPersistenceError('activity refresh', error);
+                    });
                     updateProfileProgress(15, { bumpStreak: true }).catch(error => {
                         logTaskPersistenceError('profile progress', error);
                     });
@@ -11366,8 +11392,8 @@ async function deleteTask(taskId) {
         saveWorkspaceExtras(extras);
 
         pushRecentMessage(`Eliminaste la tarea ${task.title}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeTaskFromWorkspace(taskId);
+        refreshTaskDependentUI();
         notify('Tarea eliminada.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar la tarea.', 'error');
@@ -11393,10 +11419,10 @@ async function completeTask(taskId) {
         }
 
         pushRecentMessage(`Completaste la tarea ${task.title}.`);
-        await updateProfileProgress(25, { bumpStreak: true });
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
-        await refreshTaskActivityAfterSave(taskId, 'task_completed');
+        commitTaskStatusToWorkspace(taskId, 'completed');
+        refreshTaskDependentUI();
+        updateProfileProgress(25, { bumpStreak: true }).catch(error => logTaskPersistenceError('profile progress', error));
+        refreshTaskActivityAfterSave(taskId, 'task_completed').catch(error => logTaskPersistenceError('activity refresh', error));
         notify('Tarea marcada como completada.', 'success');
     } catch (error) {
         notify(error.message || 'No se pudo completar la tarea.', 'error');
