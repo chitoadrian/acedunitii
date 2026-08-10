@@ -2789,6 +2789,7 @@ function openAttendanceForm(attendanceId = null) {
     openQuickForm({
         title: attendance ? 'Editar asistencia' : 'Registrar asistencia',
         submitLabel: attendance ? 'Actualizar asistencia' : 'Guardar asistencia',
+        closeOnlyAfterSuccess: true,
         fields: [
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: attendance?.subject || '' },
             { name: 'date', label: 'Fecha', type: 'date', value: normalizeDate(attendance?.date || new Date().toISOString()) },
@@ -2816,7 +2817,8 @@ function openAttendanceForm(attendanceId = null) {
                         .update(attendanceData)
                         .eq('id', attendanceId)
                         .eq('user_id', user.id)
-                        .select();
+                        .select()
+                        .single();
 
                     if (error) {
                         console.error("[ATTENDANCE ERROR]", error);
@@ -2824,12 +2826,13 @@ function openAttendanceForm(attendanceId = null) {
                         throw error;
                     }
                     console.log("[ATTENDANCE] guardado correcto", data);
+                    replaceWorkspaceItem('attendance', mapSavedAttendanceRow(data));
                     pushRecentMessage(`Editaste asistencia en ${values.subject}.`);
                 } else {
                     const { data, error } = await getSupabaseClient()
                         .from('attendance')
                         .insert(attendanceData)
-                        .select('id')
+                        .select()
                         .single();
 
                     if (error) {
@@ -2839,23 +2842,27 @@ function openAttendanceForm(attendanceId = null) {
                     }
                     console.log("[ATTENDANCE] guardado correcto", data);
                     savedAttendanceId = data?.id || '';
-                    await updateProfileProgress(values.status === 'Asisti' ? 10 : 4, { bumpStreak: values.status === 'Asisti' });
+                    replaceWorkspaceItem('attendance', mapSavedAttendanceRow(data));
+                    updateProfileProgress(values.status === 'Asisti' ? 10 : 4, { bumpStreak: values.status === 'Asisti' }).catch(error => logSupabaseError('attendance profile progress', error));
                     pushRecentMessage(`Registraste asistencia en ${values.subject}.`);
                 }
 
-                await syncWorkspaceFromSupabase();
-                refreshWorkspaceUI();
-                if (!attendanceId) await refreshActivityAfterSourceMutation(savedAttendanceId, 'attendance_recorded');
+                refreshAttendanceViews();
+                if (!attendanceId) refreshActivityAfterSourceMutation(savedAttendanceId, 'attendance_recorded').catch(error => logSupabaseError('attendance activity refresh', error));
                 notify(attendanceId ? 'Asistencia actualizada.' : 'Asistencia registrada.', 'success');
+                return true;
             } catch (error) {
                 console.error("[ATTENDANCE ERROR]", error);
                 notify(error.message || 'No se pudo guardar la asistencia.', 'error');
+                return false;
             }
         }
     });
 }
 
 async function deleteAttendance(attendanceId) {
+    const deleteKey = `attendance:${attendanceId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const attendance = workspace.attendance.find(item => item.id === attendanceId);
     try {
@@ -2872,11 +2879,13 @@ async function deleteAttendance(attendanceId) {
         }
 
         if (attendance) pushRecentMessage(`Eliminaste asistencia de ${attendance.subject}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeWorkspaceItems('attendance', item => item.id === attendanceId);
+        refreshAttendanceViews();
         notify('Registro de asistencia eliminado.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar la asistencia.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
@@ -3813,6 +3822,7 @@ function openEventForm(eventId = null) {
     openQuickForm({
         title: event ? 'Editar evento' : 'Crear evento',
         submitLabel: event ? 'Actualizar evento' : 'Guardar evento',
+        closeOnlyAfterSuccess: true,
         fields: [
             { name: 'title', label: 'Título del evento', value: event?.title || '', placeholder: 'Ej: Examen final' },
             { name: 'type', label: 'Tipo', type: 'select', options: eventTypeOptions, value: event?.type || 'recordatorio' },
@@ -3855,16 +3865,19 @@ function openEventForm(eventId = null) {
                 console.log("[EVENTS] insertando evento", eventData);
 
                 if (eventId) {
-                    const { error } = await getSupabaseClient()
+                    const { data, error } = await getSupabaseClient()
                         .from('events')
                         .update(eventData)
                         .eq('id', eventId)
-                        .eq('user_id', user.id);
+                        .eq('user_id', user.id)
+                        .select()
+                        .single();
 
                     if (error) {
                         logSupabaseError('events update', error);
                         throw error;
                     }
+                    replaceWorkspaceItem('events', mapSavedEventRow(data));
                     pushRecentMessage(`Editaste el evento ${payload.title}.`);
                 } else {
                     const { data, error } = await getSupabaseClient()
@@ -3878,23 +3891,27 @@ function openEventForm(eventId = null) {
                         throw error;
                     }
                     savedEventId = data?.id || savedEventId;
-                    await updateProfileProgress(20, { bumpStreak: true });
+                    replaceWorkspaceItem('events', mapSavedEventRow(data));
+                    updateProfileProgress(20, { bumpStreak: true }).catch(error => logSupabaseError('event profile progress', error));
                     pushRecentMessage(`Agendaste ${payload.title}.`);
                 }
 
-                await syncWorkspaceFromSupabase();
-                refreshWorkspaceUI();
-                if (!eventId) await refreshActivityAfterSourceMutation(savedEventId, 'event_created');
+                refreshEventViews();
+                if (!eventId) refreshActivityAfterSourceMutation(savedEventId, 'event_created').catch(error => logSupabaseError('event activity refresh', error));
                 notify('Evento guardado correctamente.', 'success');
+                return true;
             } catch (error) {
                 googleCalendarWindow?.close();
                 notify(error.message || 'No se pudo guardar el evento.', 'error');
+                return false;
             }
         }
     });
 }
 
 async function deleteEvent(eventId) {
+    const deleteKey = `event:${eventId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
     try {
@@ -3911,11 +3928,13 @@ async function deleteEvent(eventId) {
         }
 
         if (event) pushRecentMessage(`Eliminaste el evento ${event.title}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeWorkspaceItems('events', item => item.id === eventId);
+        refreshEventViews();
         notify('Evento eliminado.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar el evento.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
@@ -4297,7 +4316,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
                 }
                 savedGrade = data;
                 console.log("[GRADES] guardado correcto", data);
-                await updateProfileProgress(20, { bumpStreak: true });
+                updateProfileProgress(20, { bumpStreak: true }).catch(error => logSupabaseError('grade profile progress', error));
                 pushRecentMessage(`Registraste una calificación en ${payload.subject}.`);
             }
 
@@ -4321,9 +4340,9 @@ function openGradeForm(gradeId = null, defaults = {}) {
                 }
             }
 
-            await syncWorkspaceFromSupabase();
-            refreshWorkspaceUI();
-            if (!gradeId) await refreshActivityAfterSourceMutation(savedGrade?.id, 'grade_recorded');
+            replaceWorkspaceItem('grades', mapSavedGradeRow(savedGrade, gradeItems));
+            refreshGradeViews();
+            if (!gradeId) refreshActivityAfterSourceMutation(savedGrade?.id, 'grade_recorded').catch(error => logSupabaseError('grade activity refresh', error));
             closeModal();
             notify(gradeId ? 'Calificación actualizada.' : 'Calificación registrada.', 'success');
         } catch (error) {
@@ -4343,21 +4362,12 @@ function openGradeForm(gradeId = null, defaults = {}) {
 }
 
 async function deleteGrade(gradeId) {
+    const deleteKey = `grade:${gradeId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const grade = workspace.grades.find(item => item.id === gradeId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { error: itemsError } = await getSupabaseClient()
-            .from('grade_items')
-            .delete()
-            .eq('grade_id', gradeId);
-
-        if (itemsError) {
-            console.error("[GRADES ERROR]", itemsError);
-            logSupabaseError('grade_items delete', itemsError);
-            throw itemsError;
-        }
-
         const { error } = await getSupabaseClient()
             .from('grades')
             .delete()
@@ -4371,12 +4381,14 @@ async function deleteGrade(gradeId) {
         }
 
         if (grade) pushRecentMessage(`Eliminaste una calificación de ${grade.subject}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeWorkspaceItems('grades', item => item.id === gradeId);
+        refreshGradeViews();
         notify('Calificación eliminada.', 'info');
     } catch (error) {
         console.error("[GRADES ERROR]", error);
         notify(error.message || 'No se pudo eliminar la calificación.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
@@ -4579,6 +4591,7 @@ function openResourceForm(resourceId = null) {
     openQuickForm({
         title: resource ? 'Editar PDF simulado' : 'Subir PDF simulado',
         submitLabel: resource ? 'Actualizar recurso' : 'Guardar recurso',
+        closeOnlyAfterSuccess: true,
         fields: [
             { name: 'title', label: 'Título del recurso', value: resource?.title || '', placeholder: 'Ej: Guía de estudio' },
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: resource?.subject || '' },
@@ -4614,6 +4627,8 @@ function openResourceForm(resourceId = null) {
 }
 
 async function deleteResource(resourceId) {
+    const deleteKey = `resource:${resourceId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const resource = workspace.resources.find(item => item.id === resourceId);
     try {
@@ -4630,11 +4645,13 @@ async function deleteResource(resourceId) {
         }
 
         if (resource) pushRecentMessage(`Eliminaste el recurso ${resource.title}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeWorkspaceItems('resources', item => item.id === resourceId);
+        refreshResourceViews();
         notify('Recurso eliminado.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar el recurso.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
@@ -7737,6 +7754,7 @@ function openResourceForm(resourceId = null) {
     openQuickForm({
         title: resource ? 'Editar recurso' : 'Subir PDF',
         submitLabel: resource ? 'Actualizar recurso' : 'Guardar recurso',
+        closeOnlyAfterSuccess: true,
         fields: [
             { name: 'title', label: 'Título del recurso', value: resource?.title || '', placeholder: 'Ej: Guía de estudio' },
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: resource?.subject || '' },
@@ -7786,22 +7804,25 @@ function openResourceForm(resourceId = null) {
                 console.log("[RESOURCES] insertando recurso", resourceData);
 
                 if (resourceId) {
-                    const { error } = await getSupabaseClient()
+                    const { data, error } = await getSupabaseClient()
                         .from('resources')
                         .update(resourceData)
                         .eq('id', resourceId)
-                        .eq('user_id', user.id);
+                        .eq('user_id', user.id)
+                        .select()
+                        .single();
 
                     if (error) {
                         logSupabaseError('resources update', error);
                         throw error;
                     }
+                    replaceWorkspaceItem('resources', mapSavedResourceRow(data));
                     pushRecentMessage(`Editaste el recurso ${payload.title}.`);
                 } else {
                     const { data, error } = await getSupabaseClient()
                         .from('resources')
                         .insert(resourceData)
-                        .select('id')
+                        .select()
                         .single();
 
                     if (error) {
@@ -7809,18 +7830,19 @@ function openResourceForm(resourceId = null) {
                         throw error;
                     }
                     savedResourceId = data?.id || '';
-                    await updateProfileProgress(20, { bumpStreak: true });
+                    replaceWorkspaceItem('resources', mapSavedResourceRow(data));
+                    updateProfileProgress(20, { bumpStreak: true }).catch(error => logSupabaseError('resource profile progress', error));
                     pushRecentMessage(`Subiste el PDF ${payload.title}.`);
                 }
             } catch (error) {
                 notify(error.message || 'No se pudo guardar el recurso en Supabase.', 'error');
-                return;
+                return false;
             }
 
-            await syncWorkspaceFromSupabase();
-            refreshWorkspaceUI();
-            if (!resourceId) await refreshActivityAfterSourceMutation(savedResourceId, 'resource_added');
+            refreshResourceViews();
+            if (!resourceId) refreshActivityAfterSourceMutation(savedResourceId, 'resource_added').catch(error => logSupabaseError('resource activity refresh', error));
             notify(resourceId ? 'Recurso actualizado.' : 'PDF guardado correctamente.', 'success');
+            return true;
         }
     });
 }
@@ -8580,8 +8602,8 @@ function openEvaluationForm(evaluationId = null) {
                 result = await getSupabaseClient().from('evaluations').insert(payload).select().single();
             }
             if (result.error) throw result.error;
-            await syncWorkspaceFromSupabase();
-            refreshWorkspaceUI();
+            replaceWorkspaceItem('evaluations', mapSavedEvaluationRow(result.data));
+            refreshEvaluationViews();
             close();
             notify(evaluation ? 'Evaluación actualizada correctamente.' : 'Evaluación creada. Revisa Calendario para agendarla en Google Calendar.', 'success');
         } catch (error) {
@@ -8680,8 +8702,8 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
                 .maybeSingle();
             if (error) throw error;
             if (!data?.id) throw new Error('No se encontró la evaluación seleccionada.');
-            await syncWorkspaceFromSupabase();
-            refreshWorkspaceUI();
+            removeWorkspaceItems('evaluations', item => item.id === evaluationId);
+            refreshEvaluationViews();
             close(false);
             notify('Evaluación eliminada.', 'info');
         } catch (error) {
@@ -8702,12 +8724,12 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
 async function setEvaluationCalendarState(evaluationId, enabled) {
     try {
         const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient().from('evaluations')
+        const { data, error } = await getSupabaseClient().from('evaluations')
             .update({ show_in_calendar: Boolean(enabled), updated_at: new Date().toISOString() })
-            .eq('id', evaluationId).eq('user_id', user.id);
+            .eq('id', evaluationId).eq('user_id', user.id).select().single();
         if (error) throw error;
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        replaceWorkspaceItem('evaluations', mapSavedEvaluationRow(data));
+        refreshEvaluationViews();
         notify(enabled ? 'Evaluación agregada al Calendario.' : 'Evaluación quitada del Calendario.', 'success');
     } catch (error) {
         logSupabaseError('evaluations calendar toggle', error);
@@ -8740,12 +8762,12 @@ function openEvaluationReminderModal(evaluationId) {
         try {
             const user = await getCurrentSupabaseUser();
             const enabled = modal.querySelector('input[type="checkbox"]').checked;
-            const { error } = await getSupabaseClient().from('evaluations')
+            const { data, error } = await getSupabaseClient().from('evaluations')
                 .update({ reminders_enabled: enabled, updated_at: new Date().toISOString() })
-                .eq('id', evaluationId).eq('user_id', user.id);
+                .eq('id', evaluationId).eq('user_id', user.id).select().single();
             if (error) throw error;
-            await syncWorkspaceFromSupabase();
-            refreshWorkspaceUI();
+            replaceWorkspaceItem('evaluations', mapSavedEvaluationRow(data));
+            refreshEvaluationViews();
             close();
             notify(enabled ? 'Recordatorios por correo activados.' : 'Recordatorios por correo desactivados.', 'success');
         } catch (error) {
@@ -10949,6 +10971,83 @@ async function toggleTask(checkbox) {
     }
 }
 
+function getWorkspaceSubjectName(subjectId, fallback = 'General') {
+    return (workspaceState?.subjects || []).find(subject => subject.id === subjectId)?.name || fallback;
+}
+
+function replaceWorkspaceItem(key, item) {
+    if (!workspaceState || !item?.id) return;
+    const list = workspaceState[key] || [];
+    workspaceState = {
+        ...workspaceState,
+        [key]: list.some(entry => entry.id === item.id)
+            ? list.map(entry => entry.id === item.id ? item : entry)
+            : [...list, item]
+    };
+}
+
+function removeWorkspaceItems(key, predicate) {
+    if (!workspaceState) return;
+    workspaceState = { ...workspaceState, [key]: (workspaceState[key] || []).filter(item => !predicate(item)) };
+}
+
+function mapSavedSubjectRow(row) {
+    return { id: row.id, name: row.name, icon: row.icon || '', color: normalizeSubjectColor(row.color), createdAt: row.created_at || '' };
+}
+
+function mapSavedEventRow(row) {
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id, ''), title: row.title || '', type: row.type || 'evento', date: row.event_date || '', day: row.event_date || '', time: String(row.event_time || '').slice(0, 5), description: row.description || '', createdAt: row.created_at || '' };
+}
+
+function mapSavedEvaluationRow(row) {
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id, 'Materia eliminada'), title: row.title || '', type: row.evaluation_type || 'Examen', date: row.evaluation_date || '', time: String(row.evaluation_time || '').slice(0, 5), topics: Array.isArray(row.topics) ? row.topics.filter(Boolean) : [], description: row.description || '', status: row.status || 'pending', priority: row.priority || 'medium', showInCalendar: row.show_in_calendar !== false, remindersEnabled: row.reminders_enabled === true, createdAt: row.created_at || '', updatedAt: row.updated_at || '' };
+}
+
+function mapSavedAttendanceRow(row) {
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), date: row.date || '', status: row.status || 'Asisti', createdAt: row.created_at || '' };
+}
+
+function mapSavedResourceRow(row) {
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), title: row.title || '', fileName: row.file_name || 'PDF', fileDataUrl: row.file_url || '', fileUrl: row.file_url || '', fileMime: 'application/pdf', description: row.description || '', content: row.description || '', type: 'PDF', tag: row.tag || 'Apunte', uploadedAt: row.created_at || new Date().toISOString(), usedAI: Boolean(row.used_ai || row.usedAI) };
+}
+
+function mapSavedGradeRow(row, items = []) {
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), period: row.period || 'p1', category: row.category || 'partial1', evaluation: row.evaluation || 'CalificaciÃ³n', value: Number(row.final_value || 0), finalValue: Number(row.final_value || 0), date: getFirstGradeItemDate(items), observation: row.observation || '', items, createdAt: row.created_at || '' };
+}
+
+function refreshEventViews() { const workspace = loadWorkspace(); renderCalendarSection(workspace); renderDashboard(workspace); }
+function refreshEvaluationViews() { const workspace = loadWorkspace(); renderEvaluations(workspace); renderCalendarSection(workspace); renderDashboard(workspace); }
+function refreshGradeViews() { const workspace = loadWorkspace(); renderGrades(workspace); renderDashboard(workspace); renderProgress(workspace); }
+function refreshAttendanceViews() { const workspace = loadWorkspace(); renderAttendance(workspace); renderDashboard(workspace); renderProgress(workspace); }
+function refreshResourceViews() { const workspace = loadWorkspace(); renderBackpack(workspace); renderDashboard(workspace); }
+const workspaceDeletesInProgress = new Set();
+function beginWorkspaceDelete(key) { if (workspaceDeletesInProgress.has(key)) return false; workspaceDeletesInProgress.add(key); return true; }
+function finishWorkspaceDelete(key) { workspaceDeletesInProgress.delete(key); }
+
+function removeSubjectFromWorkspace(subjectId) {
+    if (!workspaceState) return;
+    const withoutSubject = item => item.subjectId === subjectId ? { ...item, subjectId: '', subject: 'General' } : item;
+    workspaceState = {
+        ...workspaceState,
+        subjects: (workspaceState.subjects || []).filter(subject => subject.id !== subjectId),
+        tasks: (workspaceState.tasks || []).filter(task => task.subjectId !== subjectId),
+        events: (workspaceState.events || []).map(withoutSubject),
+        evaluations: (workspaceState.evaluations || []).map(item => item.subjectId === subjectId ? { ...item, subjectId: '', subject: 'Materia eliminada' } : item),
+        attendance: (workspaceState.attendance || []).map(withoutSubject),
+        resources: (workspaceState.resources || []).map(withoutSubject),
+        grades: (workspaceState.grades || []).map(withoutSubject),
+        projects: (workspaceState.projects || []).map(withoutSubject),
+        goals: (workspaceState.goals || []).map(withoutSubject)
+    };
+}
+
+function refreshSubjectDependentViews() {
+    const workspace = loadWorkspace();
+    renderDashboard(workspace); renderSubjects(workspace); renderTasks(workspace); renderCalendarSection(workspace);
+    renderEvaluations(workspace); renderGrades(workspace); renderAttendance(workspace); renderBackpack(workspace); renderProgress(workspace);
+    if (typeof renderGoalsProjects === 'function') renderGoalsProjects(workspace);
+}
+
 function openSubjectForm(subjectId = null) {
     const workspace = loadWorkspace();
     const subject = workspace.subjects.find(item => item.id === subjectId);
@@ -11035,6 +11134,8 @@ function openSubjectForm(subjectId = null) {
 }
 
 async function deleteSubject(subjectId) {
+    const deleteKey = `subject:${subjectId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const subject = workspace.subjects.find(item => item.id === subjectId);
     if (!subject) return;
@@ -11072,11 +11173,13 @@ async function deleteSubject(subjectId) {
         saveWorkspaceExtras(extras);
 
         pushRecentMessage(`Eliminaste la materia ${subject.name}.`);
-        await syncWorkspaceFromSupabase();
-        refreshWorkspaceUI();
+        removeSubjectFromWorkspace(subjectId);
+        refreshSubjectDependentViews();
         notify('Materia eliminada junto con sus tareas.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar la materia.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
@@ -11371,6 +11474,8 @@ function openTaskForm(taskId = null) {
 }
 
 async function deleteTask(taskId) {
+    const deleteKey = `task:${taskId}`;
+    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const task = workspace.tasks.find(item => item.id === taskId);
     if (!task) return;
@@ -11397,6 +11502,8 @@ async function deleteTask(taskId) {
         notify('Tarea eliminada.', 'info');
     } catch (error) {
         notify(error.message || 'No se pudo eliminar la tarea.', 'error');
+    } finally {
+        finishWorkspaceDelete(deleteKey);
     }
 }
 
