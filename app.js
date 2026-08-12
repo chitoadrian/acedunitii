@@ -11350,7 +11350,7 @@ function openTaskForm(taskId = null) {
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due), required: false },
             { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se guardará sin hora específica.' },
             { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' },
-            { name: 'remindersEnabled', label: 'Recordatorios', type: 'checkbox', checked: task ? task.remindersEnabled === true : false, help: 'Activar recordatorio para esta tarea' }
+            { name: 'remindersEnabled', label: 'Recordatorios', type: 'checkbox', checked: task ? task.remindersEnabled === true : false, help: 'Activar recordatorio por correo para esta tarea' }
         ],
         onSubmit: async values => {
             let savedRow = null;
