@@ -39072,3 +39072,9 @@ body #dashboard .dashboard-clean-layout > .weekly-progress-card {
     height: 58px;
     padding-inline: 14px;
 }
+
+/* Project type badge contrast in light mode */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #goals-projects-content .gp-type {
+    color: #51439a;
+    background: #e9e4fb;
+}
