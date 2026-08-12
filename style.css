@@ -39060,3 +39060,15 @@ body:is(.light-theme,.light-mode,[data-theme="light"]) #goals-projects-content .
 body #dashboard .dashboard-clean-layout > .weekly-progress-card {
     grid-column: 1 / -1 !important;
 }
+
+/* Landing hero panel info card proportions */
+#landing-page .hero-mini-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#landing-page .hero-mini-card {
+    grid-column: auto !important;
+    min-height: 58px;
+    height: 58px;
+    padding-inline: 14px;
+}
