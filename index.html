@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260813-password-recovery-expired-v1">
+    <link rel="stylesheet" href="style.css?v=20260813-password-recovery-friendly-v1">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -495,6 +495,31 @@
             </div>
         </div>
     </div>
+
+    <!-- PASSWORD RECOVERY RESULT PAGE -->
+    <section id="password-recovery-result-page" class="page password-recovery-result-page" role="status" aria-live="polite" aria-labelledby="password-recovery-result-title">
+        <div class="password-recovery-result-scene" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+        </div>
+        <article class="password-recovery-result-card" data-recovery-result-state="expired">
+            <img src="assets/ac-edunity-logo.png" alt="AC Edunity" class="password-recovery-result-logo">
+            <div class="password-recovery-result-icon" aria-hidden="true">
+                <svg class="password-recovery-result-icon-expired" viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"></path><path d="M9 12V9a3 3 0 0 1 5.8-1"></path><rect x="7" y="12" width="10" height="7" rx="2"></rect></svg>
+                <svg class="password-recovery-result-icon-success" viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>
+            </div>
+            <p class="password-recovery-result-eyebrow">Seguridad de la cuenta</p>
+            <h1 id="password-recovery-result-title">Este enlace ya fue utilizado</h1>
+            <p id="password-recovery-result-message" class="password-recovery-result-message">Por seguridad, los enlaces para cambiar tu contraseña solo pueden utilizarse una vez. Si ya realizaste el cambio, puedes continuar normalmente en AC Edunity.</p>
+            <aside class="password-recovery-result-info" data-recovery-expired-only>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6M12 7h.01"></path></svg>
+                <p>¿No alcanzaste a cambiarla? Puedes solicitar un nuevo enlace desde “¿Olvidaste tu contraseña?”.</p>
+            </aside>
+            <div class="password-recovery-result-actions">
+                <button class="btn-primary password-recovery-result-primary" type="button" data-recovery-result-action="home">Ir a AC Edunity</button>
+                <button class="password-recovery-result-request" type="button" data-recovery-result-action="request" data-recovery-expired-only>Solicitar un nuevo enlace</button>
+            </div>
+        </article>
+    </section>
 
     <!-- MAIN APP -->
     <div id="app-page" class="page">
@@ -1649,7 +1674,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
-    <script src="app.js?v=20260813-password-recovery-expired-v1"></script>
+    <script src="app.js?v=20260813-password-recovery-friendly-v1"></script>
     <script src="goals-projects.js?v=20260810-performance-v2"></script>
 </body>
 </html>

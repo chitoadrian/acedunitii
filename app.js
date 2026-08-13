@@ -362,6 +362,7 @@ function bindAuthForms() {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const logoutBtn = document.getElementById('logoutBtn');
+    const recoveryResultPage = document.getElementById('password-recovery-result-page');
 
     if (loginForm && !loginForm.dataset.supabaseBound) {
         loginForm.dataset.supabaseBound = 'true';
@@ -382,6 +383,14 @@ function bindAuthForms() {
     if (logoutBtn && !logoutBtn.dataset.supabaseBound) {
         logoutBtn.dataset.supabaseBound = 'true';
         logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    if (recoveryResultPage && !recoveryResultPage.dataset.actionsBound) {
+        recoveryResultPage.dataset.actionsBound = 'true';
+        recoveryResultPage.addEventListener('click', event => {
+            const action = event.target.closest('[data-recovery-result-action]')?.dataset.recoveryResultAction;
+            if (action) leavePasswordRecoveryResult(action);
+        });
     }
 }
 
@@ -9292,9 +9301,9 @@ function closePasswordUpdateModal() {
 
 let passwordRecoverySessionPromise = null;
 
-function getAuthCallbackErrorFromUrl() {
-    const searchParams = new URLSearchParams(window.location.search);
-    const rawHash = String(window.location.hash || '').replace(/^#/, '');
+function readAuthCallbackError(search = window.location.search, hash = window.location.hash) {
+    const searchParams = new URLSearchParams(search);
+    const rawHash = String(hash || '').replace(/^#/, '');
     const hashQuery = rawHash.includes('?')
         ? rawHash.slice(rawHash.indexOf('?') + 1)
         : rawHash.replace(/^reset-password[&]?/, '');
@@ -9314,15 +9323,14 @@ function getAuthCallbackErrorFromUrl() {
     };
 }
 
+const passwordRecoveryCallbackErrorAtLoad = readAuthCallbackError();
+
+function getAuthCallbackErrorFromUrl() {
+    return readAuthCallbackError() || passwordRecoveryCallbackErrorAtLoad;
+}
+
 function clearAuthCallbackErrorFromUrl() {
-    const url = new URL(window.location.href);
-    ['error', 'error_code', 'error_description'].forEach(name => url.searchParams.delete(name));
-
-    if (/error(?:_code|_description)?=/.test(url.hash) || url.hash.includes('reset-password')) {
-        url.hash = '';
-    }
-
-    window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+    window.history.replaceState({}, document.title, window.location.pathname || '/');
 }
 
 function handlePasswordRecoveryCallbackError() {
@@ -9331,90 +9339,61 @@ function handlePasswordRecoveryCallbackError() {
     const callbackError = getAuthCallbackErrorFromUrl();
     if (!callbackError) return null;
 
-    const isExpired = callbackError.code === 'otp_expired';
+    const callbackText = `${callbackError.error} ${callbackError.code} ${callbackError.description}`.toLowerCase();
+    const isExpired = callbackError.code === 'otp_expired'
+        || callbackText.includes('token has expired')
+        || callbackText.includes('already been used')
+        || callbackText.includes('already used')
+        || callbackText.includes('cannot be reused')
+        || callbackText.includes('cannot reuse')
+        || callbackText.includes('link is invalid or has expired');
+
+    if (!isExpired) return null;
+
     clearAuthCallbackErrorFromUrl();
     console.warn('[PASSWORD RECOVERY] Callback rechazado:', {
         code: callbackError.code || 'unknown_auth_error',
         source: callbackError.source
     });
 
-    return {
-        isExpired,
-        message: isExpired
-            ? 'El enlace para restablecer tu contraseña ya fue utilizado o ha expirado. Solicita uno nuevo para continuar.'
-            : 'No pudimos validar este enlace. Solicita uno nuevo e inténtalo nuevamente.'
-    };
+    return { isExpired, code: callbackError.code || 'unknown_auth_error' };
 }
 
-function openPasswordRecoveryUnavailableModal(callbackError) {
-    document.querySelector('.quick-modal')?.remove();
+function clearPasswordRecoveryResultUrl() {
+    window.history.replaceState({}, document.title, '/');
+}
 
-    const previouslyFocused = document.activeElement;
-    const modal = document.createElement('div');
-    modal.id = 'password-recovery-unavailable-modal';
-    modal.className = 'quick-modal password-modal password-recovery-unavailable-modal';
-    modal.innerHTML = `
-        <div class="quick-modal-card password-modal-card password-recovery-unavailable-card" role="dialog" aria-modal="true" aria-labelledby="password-recovery-unavailable-title" aria-describedby="password-recovery-unavailable-description">
-            <div class="password-recovery-unavailable-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false">
-                    <path d="M7 10V8a5 5 0 0 1 9.6-2"></path>
-                    <rect x="4" y="10" width="16" height="11" rx="3"></rect>
-                    <path d="M12 14v3"></path>
-                    <path d="m18.5 3.5 2 2"></path>
-                </svg>
-            </div>
-            <h3 id="password-recovery-unavailable-title">Este enlace ya no está disponible</h3>
-            <p id="password-recovery-unavailable-description" class="password-modal-text">${escapeHTML(callbackError.message)}</p>
-            <div class="quick-modal-actions password-modal-actions password-recovery-unavailable-actions">
-                <button class="btn-secondary btn-small" type="button" data-recovery-action="home">Volver al inicio</button>
-                <button class="btn-primary btn-small" type="button" data-recovery-action="request">Solicitar nuevo enlace</button>
-            </div>
-        </div>
-    `;
+function showPasswordRecoveryResult(state = 'expired') {
+    const page = document.getElementById('password-recovery-result-page');
+    const card = page?.querySelector('[data-recovery-result-state]');
+    const title = document.getElementById('password-recovery-result-title');
+    const message = document.getElementById('password-recovery-result-message');
+    if (!page || !card || !title || !message) return;
 
-    const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-    const closeModal = () => {
-        document.removeEventListener('keydown', handleKeydown);
-        modal.remove();
-        if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
-    };
-    const returnHome = () => {
-        closeModal();
-        showLanding();
-    };
-    const requestNewLink = () => {
-        closeModal();
-        openPasswordResetModal();
-    };
-    const handleKeydown = event => {
-        if (event.key === 'Escape') {
-            event.preventDefault();
-            returnHome();
-            return;
-        }
-        if (event.key !== 'Tab') return;
-
-        const focusable = [...modal.querySelectorAll(focusableSelector)];
-        if (!focusable.length) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-            event.preventDefault();
-            last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-        }
-    };
-
-    modal.addEventListener('click', event => {
-        const action = event.target.closest('[data-recovery-action]')?.dataset.recoveryAction;
-        if (action === 'request') requestNewLink();
-        if (action === 'home' || event.target === modal) returnHome();
+    const isSuccess = state === 'success';
+    card.dataset.recoveryResultState = isSuccess ? 'success' : 'expired';
+    title.textContent = isSuccess ? 'Tu contraseña ha sido actualizada' : 'Este enlace ya fue utilizado';
+    message.textContent = isSuccess
+        ? 'Tu nueva contraseña se guardó correctamente. Ya puedes continuar utilizando AC Edunity.'
+        : 'Por seguridad, los enlaces para cambiar tu contraseña solo pueden utilizarse una vez. Si ya realizaste el cambio, puedes continuar normalmente en AC Edunity.';
+    page.querySelectorAll('[data-recovery-expired-only]').forEach(element => {
+        element.hidden = isSuccess;
     });
-    document.addEventListener('keydown', handleKeydown);
-    document.body.appendChild(modal);
-    modal.querySelector('[data-recovery-action="request"]')?.focus();
+
+    clearPasswordRecoveryResultUrl();
+    showPage('password-recovery-result-page');
+    finishBooting();
+    window.requestAnimationFrame(() => page.querySelector('[data-recovery-result-action="home"]')?.focus());
+}
+
+function leavePasswordRecoveryResult(action = 'home') {
+    clearPasswordRecoveryResultUrl();
+    if (action === 'request') {
+        showEmptyLogin();
+        window.requestAnimationFrame(() => openPasswordResetModal());
+        return;
+    }
+    showLanding({ preserveAppView: true });
 }
 
 function getPasswordRecoveryTokensFromUrl() {
@@ -9678,17 +9657,19 @@ async function handleUpdatePassword(newPassword, confirmPassword) {
             return;
         }
 
-        const updateForm = document.querySelector('#password-update-modal form');
-        updateForm?.reset();
-        showToast('Contraseña actualizada correctamente. Ya puedes iniciar sesión.', 'success');
+        document.querySelector('#password-update-modal form')?.reset();
         closePasswordUpdateModal();
-        window.history.replaceState({}, document.title, window.location.pathname);
-        await sb.auth.signOut();
+        clearPasswordRecoveryResultUrl();
+        try {
+            await sb.auth.signOut();
+        } catch (signOutError) {
+            console.warn('[PASSWORD UPDATE] La contraseña se actualizó, pero no se pudo cerrar la sesión temporal:', signOutError?.message || signOutError);
+        }
         currentUser = null;
         profileState = null;
         workspaceState = mergeWorkspaceState();
         clearAppViewSession();
-        showLogin();
+        showPasswordRecoveryResult('success');
     } catch (error) {
         console.error('[PASSWORD UPDATE] Error inesperado:', error?.message || error);
         showToast(getPasswordRecoveryErrorMessage(error), 'error');
@@ -11769,8 +11750,7 @@ async function initializeApp() {
 
         const passwordRecoveryCallbackError = handlePasswordRecoveryCallbackError();
         if (passwordRecoveryCallbackError) {
-            showLanding();
-            openPasswordRecoveryUnavailableModal(passwordRecoveryCallbackError);
+            showPasswordRecoveryResult('expired');
             return;
         }
 
