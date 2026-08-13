@@ -9292,6 +9292,131 @@ function closePasswordUpdateModal() {
 
 let passwordRecoverySessionPromise = null;
 
+function getAuthCallbackErrorFromUrl() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const rawHash = String(window.location.hash || '').replace(/^#/, '');
+    const hashQuery = rawHash.includes('?')
+        ? rawHash.slice(rawHash.indexOf('?') + 1)
+        : rawHash.replace(/^reset-password[&]?/, '');
+    const hashParams = new URLSearchParams(hashQuery);
+    const getParam = name => searchParams.get(name) || hashParams.get(name) || '';
+    const error = String(getParam('error')).trim();
+    const code = String(getParam('error_code')).trim().toLowerCase();
+    const description = String(getParam('error_description')).trim();
+
+    if (!error && !code && !description) return null;
+
+    return {
+        error,
+        code,
+        description,
+        source: searchParams.has('error') || searchParams.has('error_code') ? 'search' : 'hash'
+    };
+}
+
+function clearAuthCallbackErrorFromUrl() {
+    const url = new URL(window.location.href);
+    ['error', 'error_code', 'error_description'].forEach(name => url.searchParams.delete(name));
+
+    if (/error(?:_code|_description)?=/.test(url.hash) || url.hash.includes('reset-password')) {
+        url.hash = '';
+    }
+
+    window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+}
+
+function handlePasswordRecoveryCallbackError() {
+    if (isEmailConfirmationReturn()) return null;
+
+    const callbackError = getAuthCallbackErrorFromUrl();
+    if (!callbackError) return null;
+
+    const isExpired = callbackError.code === 'otp_expired';
+    clearAuthCallbackErrorFromUrl();
+    console.warn('[PASSWORD RECOVERY] Callback rechazado:', {
+        code: callbackError.code || 'unknown_auth_error',
+        source: callbackError.source
+    });
+
+    return {
+        isExpired,
+        message: isExpired
+            ? 'El enlace para restablecer tu contraseña ya fue utilizado o ha expirado. Solicita uno nuevo para continuar.'
+            : 'No pudimos validar este enlace. Solicita uno nuevo e inténtalo nuevamente.'
+    };
+}
+
+function openPasswordRecoveryUnavailableModal(callbackError) {
+    document.querySelector('.quick-modal')?.remove();
+
+    const previouslyFocused = document.activeElement;
+    const modal = document.createElement('div');
+    modal.id = 'password-recovery-unavailable-modal';
+    modal.className = 'quick-modal password-modal password-recovery-unavailable-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card password-modal-card password-recovery-unavailable-card" role="dialog" aria-modal="true" aria-labelledby="password-recovery-unavailable-title" aria-describedby="password-recovery-unavailable-description">
+            <div class="password-recovery-unavailable-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                    <path d="M7 10V8a5 5 0 0 1 9.6-2"></path>
+                    <rect x="4" y="10" width="16" height="11" rx="3"></rect>
+                    <path d="M12 14v3"></path>
+                    <path d="m18.5 3.5 2 2"></path>
+                </svg>
+            </div>
+            <h3 id="password-recovery-unavailable-title">Este enlace ya no está disponible</h3>
+            <p id="password-recovery-unavailable-description" class="password-modal-text">${escapeHTML(callbackError.message)}</p>
+            <div class="quick-modal-actions password-modal-actions password-recovery-unavailable-actions">
+                <button class="btn-secondary btn-small" type="button" data-recovery-action="home">Volver al inicio</button>
+                <button class="btn-primary btn-small" type="button" data-recovery-action="request">Solicitar nuevo enlace</button>
+            </div>
+        </div>
+    `;
+
+    const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const closeModal = () => {
+        document.removeEventListener('keydown', handleKeydown);
+        modal.remove();
+        if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) previouslyFocused.focus();
+    };
+    const returnHome = () => {
+        closeModal();
+        showLanding();
+    };
+    const requestNewLink = () => {
+        closeModal();
+        openPasswordResetModal();
+    };
+    const handleKeydown = event => {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            returnHome();
+            return;
+        }
+        if (event.key !== 'Tab') return;
+
+        const focusable = [...modal.querySelectorAll(focusableSelector)];
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
+
+    modal.addEventListener('click', event => {
+        const action = event.target.closest('[data-recovery-action]')?.dataset.recoveryAction;
+        if (action === 'request') requestNewLink();
+        if (action === 'home' || event.target === modal) returnHome();
+    });
+    document.addEventListener('keydown', handleKeydown);
+    document.body.appendChild(modal);
+    modal.querySelector('[data-recovery-action="request"]')?.focus();
+}
+
 function getPasswordRecoveryTokensFromUrl() {
     const hash = String(window.location.hash || '').replace(/^#/, '');
     const search = String(window.location.search || '').replace(/^\?/, '');
@@ -11640,6 +11765,13 @@ async function initializeApp() {
                 }
             });
             authListenerReady = true;
+        }
+
+        const passwordRecoveryCallbackError = handlePasswordRecoveryCallbackError();
+        if (passwordRecoveryCallbackError) {
+            showLanding();
+            openPasswordRecoveryUnavailableModal(passwordRecoveryCallbackError);
+            return;
         }
 
         const { data: sessionData, error } = await sb.auth.getSession();
