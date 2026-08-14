@@ -42,7 +42,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="style.css?v=20260813-landing-tutorial-video-v1">
+    <link rel="stylesheet" href="style.css?v=20260813-landing-tutorial-layout-v2">
     <link rel="stylesheet" href="settings.css?v=20260729-user-preferences-v4">
     <link rel="stylesheet" href="auth-ui.css?v=20260730-password-toggle-v1">
 </head>
@@ -82,6 +82,7 @@
                 <a href="#features">Funciones</a>
                 <a href="#ai-preview">Tutor IA</a>
                 <a href="#benefits-use">Beneficios</a>
+                <a href="#tutorial-ac-edunity" onclick="event.preventDefault(); document.getElementById('tutorial-ac-edunity').scrollIntoView({ behavior: 'smooth', block: 'start' });">Tutorial</a>
             </div>
             <div class="nav-actions">
                 <button class="btn-secondary" onclick="showLogin()">Inicia sesión</button>
@@ -310,14 +311,14 @@
 
         <section class="landing-tutorial" id="tutorial-ac-edunity" aria-labelledby="landing-tutorial-title">
             <div class="landing-tutorial-container">
-                <header class="landing-tutorial-header reveal">
+                <header class="landing-tutorial-header reveal-left">
                     <span class="section-eyebrow">GUÍA RÁPIDA</span>
                     <h2 id="landing-tutorial-title">¿Primera vez en AC Edunity?</h2>
                     <p class="landing-tutorial-description">Mira este tutorial y aprende paso a paso cómo crear tu cuenta, confirmar tu correo y utilizar las principales herramientas de AC Edunity.</p>
                     <p class="landing-tutorial-note">Todo lo que necesitas para comenzar, explicado de forma sencilla.</p>
                 </header>
 
-                <div class="landing-tutorial-card reveal-scale delay-1">
+                <div class="landing-tutorial-card reveal-right delay-1">
                     <div class="landing-tutorial-video-frame">
                         <video class="landing-tutorial-video" controls playsinline preload="metadata" aria-label="Tutorial de introducción a AC Edunity">
                             <source src="assets/videos/tutorial-ac-edunity.mp4" type="video/mp4">
