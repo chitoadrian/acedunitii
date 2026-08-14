@@ -39946,3 +39946,140 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-
         transform: translate3d(0, 0, 0) scale(1) !important;
     }
 }
+
+/* ==========================================
+   AC EDUNITY — AUTHENTICATED MOBILE DRAWER
+   Phones only
+   ========================================== */
+.mobile-sidebar-backdrop {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    #app-page.page.active {
+        position: relative;
+        display: block;
+        width: 100%;
+        min-width: 0;
+        min-height: 100dvh;
+        overflow-x: clip;
+    }
+
+    #app-page.page.active .sidebar {
+        position: fixed !important;
+        inset: 0 auto 0 0 !important;
+        z-index: 700 !important;
+        width: min(86vw, 370px) !important;
+        min-width: 0 !important;
+        max-width: 370px !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        border-right: 1px solid rgba(148, 163, 184, .18) !important;
+        border-bottom: 0 !important;
+        box-shadow: 22px 0 54px rgba(2, 6, 23, .34) !important;
+        opacity: 0 !important;
+        visibility: hidden;
+        pointer-events: none !important;
+        transform: translate3d(-105%, 0, 0) !important;
+        transition:
+            transform .28s ease,
+            opacity .22s ease,
+            visibility 0s linear .28s !important;
+        will-change: transform;
+    }
+
+    #app-page.page.active .sidebar.open {
+        opacity: 1 !important;
+        visibility: visible;
+        pointer-events: auto !important;
+        transform: translate3d(0, 0, 0) !important;
+        transition-delay: 0s !important;
+    }
+
+    #app-page.page.active .sidebar-nav {
+        width: 100%;
+        min-height: 0 !important;
+        flex-wrap: nowrap !important;
+        align-items: stretch;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    #app-page.page.active .sidebar-nav > .nav-item,
+    #app-page.page.active .google-tools-sidebar {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 auto !important;
+    }
+
+    #app-page.page.active .mobile-sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 690;
+        display: block;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        appearance: none;
+        background: rgba(2, 6, 23, .58);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        transition:
+            opacity .22s ease,
+            visibility 0s linear .22s;
+    }
+
+    #app-page.page.active .sidebar.open + .mobile-sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition-delay: 0s;
+    }
+
+    #app-page.page.active .main-content,
+    #app-page.sidebar-collapsed .main-content {
+        position: relative;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        min-height: 100dvh;
+        margin: 0 !important;
+        padding: 70px 14px 32px !important;
+        overflow-x: clip !important;
+        transform: none !important;
+    }
+
+    #app-page.page.active .section,
+    #app-page.sidebar-collapsed .section {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin-inline: 0 !important;
+        transform: none !important;
+    }
+
+    #app-page.page.active .section > * {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    #app-page.page.active .app-sidebar-control {
+        z-index: 710;
+    }
+
+    body:has(#app-page.page.active .sidebar.open) {
+        height: 100dvh !important;
+        overflow: hidden !important;
+        overscroll-behavior: none;
+    }
+}
