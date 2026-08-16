@@ -10469,6 +10469,78 @@ body.light-theme #tasks .task-meta-grid span {
     margin-inline: auto;
 }
 
+/* Grade bucket mobile details */
+@media (max-width: 767px) {
+    body .quick-modal:has(.grade-bucket-card) {
+        padding: 12px !important;
+        overflow: hidden !important;
+    }
+
+    body .grade-bucket-card {
+        width: calc(100vw - 24px) !important;
+        max-width: calc(100vw - 24px) !important;
+        max-height: 85dvh !important;
+        padding: 20px 16px 0 !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    body .grade-bucket-header {
+        flex: 0 0 auto !important;
+        gap: 14px !important;
+        padding-right: 38px !important;
+    }
+
+    body .grade-bucket-header > div,
+    body .grade-bucket-list,
+    body .grade-bucket-item,
+    body .grade-bucket-item > div,
+    body .grade-bucket-actions {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    body .grade-bucket-header h3,
+    body .grade-bucket-header p,
+    body .grade-bucket-item strong,
+    body .grade-bucket-item span {
+        white-space: normal !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+    }
+
+    body .grade-bucket-list {
+        min-height: 0 !important;
+        padding: 0 3px 16px 0 !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body .grade-bucket-item {
+        align-items: stretch !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    body .grade-bucket-actions {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    body .grade-bucket-actions button,
+    body .grade-bucket-header > button {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 42px !important;
+        margin: 0 !important;
+    }
+}
+
 body #grades .mobile-grade-overview,
 body #grades .mobile-grade-periods {
     display: none !important;
@@ -35032,6 +35104,7 @@ body #grades {
     --grades-partial: #6FA886;
     --grades-exam: #D28B6C;
     --grades-period-two: #8A7AC8;
+    --grades-period-three: #B06F9C;
     --grades-radius: 20px;
     --grades-shadow: 0 12px 30px rgba(8, 13, 22, 0.18);
     width: 100%;
@@ -35054,6 +35127,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #grades {
     --grades-partial: #4E8465;
     --grades-exam: #B26748;
     --grades-period-two: #705EAE;
+    --grades-period-three: #92567E;
     --grades-shadow: 0 10px 26px rgba(31, 41, 55, 0.08);
 }
 
@@ -35213,7 +35287,7 @@ body #grades .period-gradebook-panel {
 body #grades .period-gradebook-table {
     display: table !important;
     width: 100% !important;
-    min-width: 1120px !important;
+    min-width: 1570px !important;
     table-layout: fixed !important;
     border-collapse: separate !important;
     border-spacing: 0 !important;
@@ -35307,12 +35381,20 @@ body #grades .period-gradebook-table .period-group-2 {
     box-shadow: inset 0 3px 0 var(--grades-period-two) !important;
 }
 
+body #grades .period-gradebook-table .period-group-3 {
+    box-shadow: inset 0 3px 0 var(--grades-period-three) !important;
+}
+
 body #grades .period-gradebook-table .period-header-row .period-1 {
     box-shadow: inset 0 3px 0 color-mix(in srgb, var(--grades-period-one) 78%, transparent) !important;
 }
 
 body #grades .period-gradebook-table .period-header-row .period-2 {
     box-shadow: inset 0 3px 0 color-mix(in srgb, var(--grades-period-two) 78%, transparent) !important;
+}
+
+body #grades .period-gradebook-table .period-header-row .period-3 {
+    box-shadow: inset 0 3px 0 color-mix(in srgb, var(--grades-period-three) 78%, transparent) !important;
 }
 
 body #grades .period-gradebook-table .partial-head { color: var(--grades-partial) !important; }

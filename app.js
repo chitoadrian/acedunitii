@@ -4056,7 +4056,8 @@ function formatGradeValue(value) {
 
 const gradePeriods = [
     { value: 'p1', label: 'Periodo 1' },
-    { value: 'p2', label: 'Periodo 2' }
+    { value: 'p2', label: 'Periodo 2' },
+    { value: 'p3', label: 'Periodo 3' }
 ];
 
 const gradeCategories = [
@@ -4083,6 +4084,11 @@ function getGradeCategoryLabel(category) {
 
 function getGradePeriodLabel(period) {
     return gradePeriods.find(item => item.value === period)?.label || 'Periodo 1';
+}
+
+function getGradeEvaluationGroup(period, category) {
+    const categoryLabel = category === 'exam' ? 'Examen' : getGradeCategoryLabel(category);
+    return `${categoryLabel} - ${getGradePeriodLabel(period)}`;
 }
 
 function averageNumbers(values) {
@@ -4126,7 +4132,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
     const selectedPeriod = grade ? getGradePeriod(grade) : (defaults.period || 'p1');
     const selectedCategory = grade ? getGradeCategory(grade) : (defaults.category || 'partial1');
     const selectedSubject = grade?.subject || defaults.subject || '';
-    const suggestedEvaluation = `${getGradeCategoryLabel(selectedCategory)} - ${getGradePeriodLabel(selectedPeriod)}`;
+    const suggestedEvaluation = getGradeEvaluationGroup(selectedPeriod, selectedCategory);
     const subjectOptions = getSubjectOptions(workspace).map(option => {
         const value = typeof option === 'string' ? option : option.value;
         const label = typeof option === 'string' ? option : option.label;
@@ -4161,10 +4167,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
                         <select name="category" required>${categoryOptions}</select>
                     </label>
                 </div>
-                <label>
-                    <span>Grupo de calificación</span>
-                    <input name="evaluation" value="${escapeHTML(grade?.evaluation || suggestedEvaluation)}" placeholder="Ej: Tarea 100% del Parcial 1" required>
-                </label>
+                <input type="hidden" name="evaluation" value="${escapeHTML(suggestedEvaluation)}">
                 <div class="grade-items-builder">
                     <div class="grade-items-head">
                         <strong>Casilleros de actividades</strong>
@@ -4196,6 +4199,10 @@ function openGradeForm(gradeId = null, defaults = {}) {
     const closeModal = () => modal.remove();
     const list = modal.querySelector('.grade-items-list');
     const averageOutput = modal.querySelector('.grade-calculated-average strong');
+    const formElement = modal.querySelector('form');
+    const syncEvaluationGroup = () => {
+        formElement.evaluation.value = getGradeEvaluationGroup(formElement.period.value, formElement.category.value);
+    };
     const rowTemplate = () => {
         const row = document.createElement('div');
         row.className = 'grade-item-row';
@@ -4231,7 +4238,11 @@ function openGradeForm(gradeId = null, defaults = {}) {
         if (event.target.name === 'itemValue') updateAveragePreview();
     });
 
-    modal.querySelector('form').addEventListener('submit', async event => {
+    formElement.addEventListener('change', event => {
+        if (event.target.name === 'period' || event.target.name === 'category') syncEvaluationGroup();
+    });
+
+    formElement.addEventListener('submit', async event => {
         event.preventDefault();
         const form = event.currentTarget;
         const submitButton = form.querySelector('button[type="submit"]');
@@ -4253,11 +4264,13 @@ function openGradeForm(gradeId = null, defaults = {}) {
         const value = gradeItems.reduce((sum, item) => sum + item.value, 0) / gradeItems.length;
         const fresh = loadWorkspace();
         const subject = findSubjectByName(fresh, form.subject.value);
+        const evaluationGroup = getGradeEvaluationGroup(form.period.value, form.category.value);
+        form.evaluation.value = evaluationGroup;
         const payload = {
             subject: form.subject.value,
             period: form.period.value,
             category: form.category.value,
-            evaluation: form.evaluation.value.trim(),
+            evaluation: evaluationGroup,
             value,
             date: gradeItems[0]?.date || '',
             observation: form.observation.value.trim(),
@@ -4581,6 +4594,10 @@ function renderGrades(workspace) {
                         <th class="period-head partial-head period-2" scope="col">Parcial 1</th>
                         <th class="period-head partial-head period-2" scope="col">Parcial 2</th>
                         <th class="period-head exam-head period-2" scope="col">Examen</th>
+                        <th class="period-head period-average-head period-3" scope="col">Periodo 3</th>
+                        <th class="period-head partial-head period-3" scope="col">Parcial 1</th>
+                        <th class="period-head partial-head period-3" scope="col">Parcial 2</th>
+                        <th class="period-head exam-head period-3" scope="col">Examen</th>
                     </tr>
                 </thead>
                 <tbody>
