@@ -4496,7 +4496,11 @@ function renderGrades(workspace) {
 
     const subjectRows = Object.entries(grouped).map(([subject, grades]) => {
         const summary = getSubjectGradeSummary(grades);
-        return { subject, grades, summary, average: summary.average };
+        const mobileItems = grades.flatMap(grade => getGradeItems(grade).map(item => ({
+            activity: item.activity || grade.evaluation || 'Calificación',
+            value: item.value
+        })));
+        return { subject, grades, summary, average: summary.average, mobileItems };
     }).sort((a, b) => a.subject.localeCompare(b.subject));
 
     if (gradeSortMode === 'high') subjectRows.sort((a, b) => (b.average || 0) - (a.average || 0));
@@ -4563,7 +4567,16 @@ function renderGrades(workspace) {
                         <tr class="period-subject-row">
                             <th class="period-subject-cell" scope="row">
                                 <strong>${escapeHTML(row.subject)}</strong>
-                                <small>${row.grades.length} ${row.grades.length === 1 ? 'calificación' : 'calificaciones'}</small>
+                                <small class="period-subject-count">${row.grades.length} ${row.grades.length === 1 ? 'calificación' : 'calificaciones'}</small>
+                                <small class="mobile-grade-count">${row.mobileItems.length} ${row.mobileItems.length === 1 ? 'nota registrada' : 'notas registradas'}</small>
+                                <div class="mobile-grade-details">
+                                    ${row.mobileItems.length ? row.mobileItems.map(item => `
+                                        <div class="mobile-grade-detail-row">
+                                            <span>${escapeHTML(item.activity)}</span>
+                                            <strong>${formatGradeValue(item.value)}</strong>
+                                        </div>
+                                    `).join('') : '<p>Sin notas individuales registradas.</p>'}
+                                </div>
                             </th>
                             <td class="period-average-cell ${row.average === null ? 'empty' : getGradeStatus(row.average).replace(' ', '-')}">
                                 <strong>${row.average === null ? '--' : row.average.toFixed(2)}</strong>

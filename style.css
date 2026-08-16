@@ -10469,6 +10469,11 @@ body.light-theme #tasks .task-meta-grid span {
     margin-inline: auto;
 }
 
+body #grades .period-subject-cell .mobile-grade-count,
+body #grades .mobile-grade-details {
+    display: none !important;
+}
+
 /* Authenticated mobile grades and progress layouts */
 @media (max-width: 767px) {
     /* Calificaciones: replace the ten-column desktop table with subject summaries. */
@@ -10545,6 +10550,72 @@ body.light-theme #tasks .task-meta-grid span {
     #app-page.page.active #grades .period-subject-cell small {
         margin-top: 5px !important;
         font-size: 12px !important;
+    }
+
+    #app-page.page.active #grades .period-subject-count {
+        display: none !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-count {
+        display: block !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-details {
+        display: grid !important;
+        gap: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-top: 15px !important;
+        padding-top: 8px !important;
+        border-top: 1px solid var(--grades-border) !important;
+        color: var(--grades-text) !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-detail-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: baseline !important;
+        gap: 14px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 9px 0 !important;
+        border-bottom: 1px solid color-mix(in srgb, var(--grades-border) 68%, transparent) !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-detail-row:last-child {
+        border-bottom: 0 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-detail-row span {
+        min-width: 0 !important;
+        color: var(--grades-muted) !important;
+        font-size: 12px !important;
+        font-weight: 650 !important;
+        line-height: 1.4 !important;
+        text-align: left !important;
+        white-space: normal !important;
+        word-break: normal !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-detail-row strong {
+        width: auto !important;
+        color: var(--grades-text) !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        line-height: 1.3 !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-details > p {
+        margin: 0 !important;
+        padding: 9px 0 4px !important;
+        color: var(--grades-muted) !important;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
     }
 
     #app-page.page.active #grades .period-average-cell {
