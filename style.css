@@ -10469,6 +10469,221 @@ body.light-theme #tasks .task-meta-grid span {
     margin-inline: auto;
 }
 
+/* Authenticated mobile grades and progress layouts */
+@media (max-width: 767px) {
+    /* Calificaciones: replace the ten-column desktop table with subject summaries. */
+    #app-page.page.active #grades .period-gradebook-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #app-page.page.active #grades .period-gradebook-table,
+    #app-page.page.active #grades .period-gradebook-table tbody {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    #app-page.page.active #grades .period-gradebook-table colgroup,
+    #app-page.page.active #grades .period-gradebook-table thead,
+    #app-page.page.active #grades .period-gradebook-table .grade-table-cell {
+        display: none !important;
+    }
+
+    #app-page.page.active #grades .period-subject-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 15px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin: 0 0 12px !important;
+        padding: 18px !important;
+        overflow: hidden !important;
+        border: 1px solid var(--grades-border) !important;
+        border-radius: 17px !important;
+        background: var(--grades-surface) !important;
+        box-shadow: var(--grades-shadow) !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #grades .period-subject-row:last-child {
+        margin-bottom: 0 !important;
+    }
+
+    #app-page.page.active #grades .period-subject-row:hover > :is(th, td) {
+        background: transparent !important;
+    }
+
+    #app-page.page.active #grades .period-subject-cell,
+    #app-page.page.active #grades .period-average-cell {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        height: auto !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #grades .period-subject-cell strong {
+        font-size: 16px !important;
+        line-height: 1.3 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #app-page.page.active #grades .period-subject-cell small {
+        margin-top: 5px !important;
+        font-size: 12px !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell {
+        display: grid !important;
+        grid-template-columns: auto auto minmax(0, 1fr) !important;
+        align-items: center !important;
+        gap: 9px !important;
+        padding-top: 14px !important;
+        border-top: 1px solid var(--grades-border) !important;
+        text-align: left !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell::before {
+        content: "Promedio";
+        color: var(--grades-muted);
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    #app-page.page.active #grades .period-average-cell strong,
+    #app-page.page.active #grades .period-average-cell span {
+        width: auto !important;
+        margin: 0 !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell strong {
+        font-size: 24px !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell span {
+        justify-self: end !important;
+        font-size: 11px !important;
+        font-weight: 750 !important;
+        text-align: right !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell.excelente span {
+        color: var(--grades-success) !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell.aprobado span {
+        color: var(--grades-accent) !important;
+    }
+
+    #app-page.page.active #grades .period-average-cell:is(.reprobado, .necesita-mejorar) span {
+        color: var(--grades-danger) !important;
+    }
+
+    /* Progreso: turn the horizontal level rail into a centered vertical path. */
+    #app-page.page.active #progress .progress-path,
+    #app-page.page.active #progress .student-path,
+    #app-page.page.active #progress .premium-achievements-grid,
+    #app-page.page.active #progress .progress-stat-grid {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #progress .student-path {
+        grid-template-columns: minmax(0, 1fr) !important;
+        justify-items: center !important;
+        gap: 0 !important;
+        padding: 5px 0 0 !important;
+        overflow: visible !important;
+        overscroll-behavior-inline: auto !important;
+    }
+
+    #app-page.page.active #progress .student-path::before {
+        left: 50% !important;
+        right: auto !important;
+        top: 30px !important;
+        bottom: 48px !important;
+        width: 2px !important;
+        height: auto !important;
+        transform: translateX(-50%) !important;
+    }
+
+    #app-page.page.active #progress .path-step {
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: auto auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        padding: 0 0 30px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    #app-page.page.active #progress .path-step:last-child {
+        padding-bottom: 0 !important;
+    }
+
+    #app-page.page.active #progress .path-step span,
+    #app-page.page.active #progress .path-step small {
+        position: relative !important;
+        z-index: 1 !important;
+    }
+
+    #app-page.page.active #progress .path-step small {
+        padding: 2px 9px !important;
+        border-radius: 999px !important;
+        background: var(--progress-surface) !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
+
+    #app-page.page.active #progress .progress-stat-grid,
+    #app-page.page.active #progress .premium-achievements-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    #app-page.page.active #progress .premium-progress-stat,
+    #app-page.page.active #progress .progress-achievement-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #app-page.page.active #progress .progress-achievement-card p {
+        overflow: visible !important;
+        text-overflow: clip !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #app-page.page.active #progress .progress-achievement-card small {
+        display: block !important;
+        overflow: visible !important;
+        -webkit-line-clamp: unset !important;
+        overflow-wrap: anywhere !important;
+    }
+}
+
 /* Goals, projects and visual project map */
 #goals-projects-content {
     --gp-surface: rgba(22, 28, 55, .82);
