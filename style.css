@@ -10469,8 +10469,8 @@ body.light-theme #tasks .task-meta-grid span {
     margin-inline: auto;
 }
 
-body #grades .period-subject-cell .mobile-grade-count,
-body #grades .mobile-grade-details {
+body #grades .mobile-grade-overview,
+body #grades .mobile-grade-periods {
     display: none !important;
 }
 
@@ -10556,51 +10556,144 @@ body #grades .mobile-grade-details {
         display: none !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-count {
-        display: block !important;
-    }
-
-    #app-page.page.active #grades .mobile-grade-details {
+    #app-page.page.active #grades .mobile-grade-overview {
         display: grid !important;
-        gap: 0 !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: end !important;
+        gap: 14px !important;
         width: 100% !important;
         min-width: 0 !important;
         margin-top: 15px !important;
-        padding-top: 8px !important;
+        padding: 13px 0 !important;
         border-top: 1px solid var(--grades-border) !important;
+        border-bottom: 1px solid var(--grades-border) !important;
         color: var(--grades-text) !important;
         box-sizing: border-box !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-detail-row {
+    #app-page.page.active #grades .mobile-grade-overview > div {
         display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        align-items: baseline !important;
-        gap: 14px !important;
+        gap: 3px !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview > div > span {
+        color: var(--grades-muted) !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview > div > strong {
+        width: auto !important;
+        color: var(--grades-text) !important;
+        font-size: 25px !important;
+        font-weight: 850 !important;
+        line-height: 1.05 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview > small {
+        width: auto !important;
+        margin: 0 !important;
+        font-size: 11px !important;
+        font-weight: 750 !important;
+        line-height: 1.25 !important;
+        text-align: right !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview.excelente > small {
+        color: var(--grades-success) !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview.aprobado > small {
+        color: var(--grades-accent) !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-overview:is(.reprobado, .necesita-mejorar) > small {
+        color: var(--grades-danger) !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-periods {
+        display: grid !important;
+        gap: 13px !important;
         width: 100% !important;
         min-width: 0 !important;
-        padding: 9px 0 !important;
-        border-bottom: 1px solid color-mix(in srgb, var(--grades-border) 68%, transparent) !important;
+        margin-top: 15px !important;
         box-sizing: border-box !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-detail-row:last-child {
-        border-bottom: 0 !important;
+    #app-page.page.active #grades .mobile-grade-period {
+        display: grid !important;
+        gap: 5px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 12px !important;
+        border: 1px solid var(--grades-border) !important;
+        border-radius: 14px !important;
+        background: var(--grades-surface-soft) !important;
+        box-sizing: border-box !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-detail-row span {
+    #app-page.page.active #grades .mobile-grade-period h4 {
+        margin: 0 0 3px !important;
+        color: var(--grades-accent) !important;
+        font-size: 11px !important;
+        font-weight: 850 !important;
+        line-height: 1.25 !important;
+        letter-spacing: .08em !important;
+        text-transform: uppercase !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-categories {
+        display: grid !important;
+        gap: 0 !important;
+        min-width: 0 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-category-row {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: center !important;
+        gap: 14px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 42px !important;
+        margin: 0 !important;
+        padding: 9px 3px !important;
+        border: 0 !important;
+        border-bottom: 1px solid color-mix(in srgb, var(--grades-border) 68%, transparent) !important;
+        border-radius: 0 !important;
+        appearance: none !important;
+        background: transparent !important;
+        color: var(--grades-text) !important;
+        box-shadow: none !important;
+        font: inherit !important;
+        text-align: left !important;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+        transition: color 150ms ease, background-color 150ms ease !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-category-row:hover {
+        background: color-mix(in srgb, var(--grades-accent) 8%, transparent) !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-category-row:focus-visible {
+        outline: 2px solid var(--grades-accent) !important;
+        outline-offset: -2px !important;
+        border-radius: 8px !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-category-row > span {
         min-width: 0 !important;
         color: var(--grades-muted) !important;
         font-size: 12px !important;
-        font-weight: 650 !important;
-        line-height: 1.4 !important;
-        text-align: left !important;
+        font-weight: 680 !important;
+        line-height: 1.35 !important;
         white-space: normal !important;
-        word-break: normal !important;
         overflow-wrap: anywhere !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-detail-row strong {
+    #app-page.page.active #grades .mobile-grade-category-row > strong {
         width: auto !important;
         color: var(--grades-text) !important;
         font-size: 14px !important;
@@ -10610,60 +10703,40 @@ body #grades .mobile-grade-details {
         white-space: nowrap !important;
     }
 
-    #app-page.page.active #grades .mobile-grade-details > p {
-        margin: 0 !important;
-        padding: 9px 0 4px !important;
+    #app-page.page.active #grades .mobile-grade-category-row.empty > strong {
         color: var(--grades-muted) !important;
+        font-weight: 700 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-period-average {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        align-items: center !important;
+        gap: 14px !important;
+        margin-top: 3px !important;
+        padding: 11px 3px 2px !important;
+        border-top: 1px solid var(--grades-border) !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-period-average > span {
+        color: var(--grades-text) !important;
         font-size: 12px !important;
-        line-height: 1.4 !important;
+        font-weight: 780 !important;
+        line-height: 1.35 !important;
+    }
+
+    #app-page.page.active #grades .mobile-grade-period-average > strong {
+        width: auto !important;
+        color: var(--grades-accent) !important;
+        font-size: 16px !important;
+        font-weight: 850 !important;
+        line-height: 1.2 !important;
+        text-align: right !important;
+        white-space: nowrap !important;
     }
 
     #app-page.page.active #grades .period-average-cell {
-        display: grid !important;
-        grid-template-columns: auto auto minmax(0, 1fr) !important;
-        align-items: center !important;
-        gap: 9px !important;
-        padding-top: 14px !important;
-        border-top: 1px solid var(--grades-border) !important;
-        text-align: left !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell::before {
-        content: "Promedio";
-        color: var(--grades-muted);
-        font-size: 11px;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-
-    #app-page.page.active #grades .period-average-cell strong,
-    #app-page.page.active #grades .period-average-cell span {
-        width: auto !important;
-        margin: 0 !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell strong {
-        font-size: 24px !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell span {
-        justify-self: end !important;
-        font-size: 11px !important;
-        font-weight: 750 !important;
-        text-align: right !important;
-        overflow-wrap: anywhere !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell.excelente span {
-        color: var(--grades-success) !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell.aprobado span {
-        color: var(--grades-accent) !important;
-    }
-
-    #app-page.page.active #grades .period-average-cell:is(.reprobado, .necesita-mejorar) span {
-        color: var(--grades-danger) !important;
+        display: none !important;
     }
 
     /* Progreso: turn the horizontal level rail into a centered vertical path. */

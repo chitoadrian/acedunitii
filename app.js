@@ -4496,11 +4496,7 @@ function renderGrades(workspace) {
 
     const subjectRows = Object.entries(grouped).map(([subject, grades]) => {
         const summary = getSubjectGradeSummary(grades);
-        const mobileItems = grades.flatMap(grade => getGradeItems(grade).map(item => ({
-            activity: item.activity || grade.evaluation || 'Calificación',
-            value: item.value
-        })));
-        return { subject, grades, summary, average: summary.average, mobileItems };
+        return { subject, grades, summary, average: summary.average };
     }).sort((a, b) => a.subject.localeCompare(b.subject));
 
     if (gradeSortMode === 'high') subjectRows.sort((a, b) => (b.average || 0) - (a.average || 0));
@@ -4520,6 +4516,31 @@ function renderGrades(workspace) {
                     <span>${category ? (grades.length ? `${grades.length} nota${grades.length === 1 ? '' : 's'}` : 'Agregar') : 'Periodo'}</span>
                 </button>
             </td>
+        `;
+    };
+
+    const renderMobilePeriod = (row, period) => {
+        const categories = ['partial1', 'partial2', 'exam'];
+        return `
+            <section class="mobile-grade-period" aria-label="${escapeHTML(period.label)}">
+                <h4>${escapeHTML(period.label)}</h4>
+                <div class="mobile-grade-categories">
+                    ${categories.map(category => {
+                        const value = period[category];
+                        const label = category === 'exam' ? 'Examen' : getGradeCategoryLabel(category);
+                        return `
+                            <button class="mobile-grade-category-row ${value === null ? 'empty' : ''}" type="button" data-grade-add="true" data-subject="${escapeHTML(row.subject)}" data-period="${escapeHTML(period.value)}" data-category="${escapeHTML(category)}" aria-label="Abrir ${escapeHTML(label)} de ${escapeHTML(period.label)}">
+                                <span>${escapeHTML(label)}</span>
+                                <strong>${value === null ? '--' : formatGradeValue(value)}</strong>
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="mobile-grade-period-average">
+                    <span>Promedio del periodo</span>
+                    <strong>${period.average === null ? '--' : period.average.toFixed(2)}</strong>
+                </div>
+            </section>
         `;
     };
 
@@ -4568,14 +4589,15 @@ function renderGrades(workspace) {
                             <th class="period-subject-cell" scope="row">
                                 <strong>${escapeHTML(row.subject)}</strong>
                                 <small class="period-subject-count">${row.grades.length} ${row.grades.length === 1 ? 'calificación' : 'calificaciones'}</small>
-                                <small class="mobile-grade-count">${row.mobileItems.length} ${row.mobileItems.length === 1 ? 'nota registrada' : 'notas registradas'}</small>
-                                <div class="mobile-grade-details">
-                                    ${row.mobileItems.length ? row.mobileItems.map(item => `
-                                        <div class="mobile-grade-detail-row">
-                                            <span>${escapeHTML(item.activity)}</span>
-                                            <strong>${formatGradeValue(item.value)}</strong>
-                                        </div>
-                                    `).join('') : '<p>Sin notas individuales registradas.</p>'}
+                                <div class="mobile-grade-overview ${row.average === null ? 'empty' : getGradeStatus(row.average).replace(' ', '-')}">
+                                    <div>
+                                        <span>Promedio general</span>
+                                        <strong>${row.average === null ? '--' : row.average.toFixed(2)}</strong>
+                                    </div>
+                                    <small>${row.average === null ? 'Sin datos' : getGradeStatus(row.average)}</small>
+                                </div>
+                                <div class="mobile-grade-periods">
+                                    ${row.summary.periods.map(period => renderMobilePeriod(row, period)).join('')}
                                 </div>
                             </th>
                             <td class="period-average-cell ${row.average === null ? 'empty' : getGradeStatus(row.average).replace(' ', '-')}">
