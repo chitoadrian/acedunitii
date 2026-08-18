@@ -410,6 +410,11 @@ function openQuickForm(config) {
                         <legend>${escapeHTML(field.label)}</legend>
                         ${renderQuickField(field)}
                     </fieldset>
+                ` : field.type === 'notification-options' ? `
+                    <fieldset class="event-notification-field">
+                        <legend>${escapeHTML(field.label)}</legend>
+                        ${renderQuickField(field)}
+                    </fieldset>
                 ` : `
                     <label>
                         <span>${escapeHTML(field.label)}</span>
@@ -561,6 +566,25 @@ function renderQuickField(field) {
         }).join('');
 
         return `<div class="choice-grid">${options}</div>`;
+    }
+
+    if (field.type === 'notification-options') {
+        const options = (field.options || []).map(option => `
+            <label class="event-notification-card">
+                <input
+                    type="checkbox"
+                    name="${escapeHTML(option.name)}"
+                    value="yes"
+                    ${option.checked ? 'checked' : ''}
+                >
+                <span class="event-notification-copy">
+                    <strong>${escapeHTML(option.label)}</strong>
+                    <small>${escapeHTML(option.help)}</small>
+                </span>
+            </label>
+        `).join('');
+
+        return `<div class="event-notification-options">${options}</div>`;
     }
 
     if (field.type === 'checkbox') {
@@ -3828,6 +3852,7 @@ function openGoogleCalendarEvent(eventId) {
 function openEventForm(eventId = null) {
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
+    const formOwnerId = String(currentUser?.id || '');
     openQuickForm({
         title: event ? 'Editar evento' : 'Crear evento',
         submitLabel: event ? 'Actualizar evento' : 'Guardar evento',
@@ -3839,11 +3864,35 @@ function openEventForm(eventId = null) {
             { name: 'date', label: 'Fecha', type: 'date', value: normalizeDate(event?.date) },
             { name: 'time', label: 'Hora', type: 'time', value: event?.time || '08:00' },
             { name: 'description', label: 'Descripción', type: 'textarea', rows: 3, value: event?.description || '', required: false, placeholder: 'Detalle del evento' },
-            { name: 'googleCalendar', label: 'Abrir también en Google Calendar', type: 'checkbox', checked: !eventId, help: 'Se abrirá Google Calendar para guardar el evento y activar notificaciones reales.' }
+            {
+                label: 'Notificaciones',
+                type: 'notification-options',
+                options: [
+                    {
+                        name: 'googleCalendar',
+                        label: 'Activar notificaciones por Google Calendar',
+                        help: 'Se abrirá Google Calendar con los datos del evento para que puedas guardarlo y configurar sus notificaciones.',
+                        checked: false
+                    },
+                    {
+                        name: 'emailReminders',
+                        label: 'Activar notificaciones por correo de AC Edunity',
+                        help: 'Recibirás recordatorios por correo 24 horas y 2 horas antes del evento.',
+                        checked: event?.remindersEnabled === true
+                    }
+                ]
+            }
         ],
         onSubmit: async values => {
+            const saveStartedAt = performance.now();
             const fresh = loadWorkspace();
             const subject = findSubjectByName(fresh, values.subject);
+            const authUserId = String(currentUser?.id || '');
+            if (!authUserId || (formOwnerId && formOwnerId !== authUserId)) {
+                notify('La sesión cambió. Abre nuevamente el formulario.', 'error');
+                return false;
+            }
+
             const payload = {
                 title: values.title.trim(),
                 type: values.type,
@@ -3853,7 +3902,8 @@ function openEventForm(eventId = null) {
                 day: values.date,
                 time: values.time,
                 description: values.description?.trim() || '',
-                googleCalendar: values.googleCalendar === 'yes'
+                googleCalendar: values.googleCalendar === 'yes',
+                emailReminders: values.emailReminders === 'yes'
             };
             let savedEventId = eventId;
             const googleCalendarWindow = payload.googleCalendar
@@ -3861,25 +3911,25 @@ function openEventForm(eventId = null) {
                 : null;
 
             try {
-                const user = await getCurrentSupabaseUser();
                 const eventData = {
-                    user_id: user.id,
+                    user_id: authUserId,
                     subject_id: subject?.id || null,
                     title: payload.title,
                     type: payload.type,
                     event_date: payload.date,
                     event_time: payload.time || null,
-                    description: payload.description
+                    description: payload.description,
+                    reminders_enabled: payload.emailReminders
                 };
-                console.log("[EVENTS] insertando evento", eventData);
+                const sb = getSupabaseClient();
 
                 if (eventId) {
-                    const { data, error } = await getSupabaseClient()
+                    const { data, error } = await sb
                         .from('events')
                         .update(eventData)
                         .eq('id', eventId)
-                        .eq('user_id', user.id)
-                        .select()
+                        .eq('user_id', authUserId)
+                        .select('*')
                         .single();
 
                     if (error) {
@@ -3889,10 +3939,10 @@ function openEventForm(eventId = null) {
                     replaceWorkspaceItem('events', mapSavedEventRow(data));
                     pushRecentMessage(`Editaste el evento ${payload.title}.`);
                 } else {
-                    const { data, error } = await getSupabaseClient()
+                    const { data, error } = await sb
                         .from('events')
                         .insert(eventData)
-                        .select()
+                        .select('*')
                         .single();
 
                     if (error) {
@@ -3907,11 +3957,30 @@ function openEventForm(eventId = null) {
 
                 refreshEventViews();
                 if (!eventId) refreshActivityAfterSourceMutation(savedEventId, 'event_created').catch(error => logSupabaseError('event activity refresh', error));
-                notify('Evento guardado correctamente.', 'success');
+                const durationMs = Math.round(performance.now() - saveStartedAt);
+                console.info('[EVENTS] Guardado local confirmado', {
+                    operation: eventId ? 'update' : 'insert',
+                    durationMs,
+                    googleCalendarRequested: payload.googleCalendar,
+                    googleCalendarOpened: Boolean(googleCalendarWindow),
+                    emailReminders: payload.emailReminders
+                });
+
+                if (payload.googleCalendar && payload.emailReminders && googleCalendarWindow) {
+                    notify('Evento guardado. Google Calendar se abrió y los recordatorios por correo están activados.', 'success');
+                } else if (payload.emailReminders) {
+                    notify('Evento guardado. Recordatorios por correo activados.', 'success');
+                } else if (payload.googleCalendar && googleCalendarWindow) {
+                    notify('Evento guardado. Google Calendar se abrió en otra pestaña.', 'success');
+                } else if (payload.googleCalendar) {
+                    notify('Evento guardado. Habilita ventanas emergentes para abrir Google Calendar.', 'info');
+                } else {
+                    notify('Evento guardado correctamente.', 'success');
+                }
                 return true;
             } catch (error) {
-                googleCalendarWindow?.close();
-                notify(error.message || 'No se pudo guardar el evento.', 'error');
+                logSupabaseError(eventId ? 'events update' : 'events insert', error);
+                notify('No se pudo guardar el evento en AC Edunity.', 'error');
                 return false;
             }
         }
@@ -10174,6 +10243,7 @@ async function syncWorkspaceFromSupabase() {
         day: event.event_date || '',
         time: String(event.event_time || '').slice(0, 5),
         description: event.description || '',
+        remindersEnabled: event.reminders_enabled === true,
         createdAt: event.created_at || ''
     }));
 
@@ -11154,7 +11224,7 @@ function mapSavedSubjectRow(row) {
 }
 
 function mapSavedEventRow(row) {
-    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id, ''), title: row.title || '', type: row.type || 'evento', date: row.event_date || '', day: row.event_date || '', time: String(row.event_time || '').slice(0, 5), description: row.description || '', createdAt: row.created_at || '' };
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id, ''), title: row.title || '', type: row.type || 'evento', date: row.event_date || '', day: row.event_date || '', time: String(row.event_time || '').slice(0, 5), description: row.description || '', remindersEnabled: row.reminders_enabled === true, createdAt: row.created_at || '' };
 }
 
 function mapSavedEvaluationRow(row) {

@@ -10469,6 +10469,126 @@ body.light-theme #tasks .task-meta-grid span {
     margin-inline: auto;
 }
 
+/* Calendar notification channels */
+.quick-modal-card[aria-label="Crear evento"] .event-notification-field,
+.quick-modal-card[aria-label="Editar evento"] .event-notification-field {
+    display: grid;
+    min-width: 0;
+    margin: 2px 0 0;
+    padding: 0;
+    border: 0;
+    gap: 10px;
+}
+
+.quick-modal-card[aria-label="Crear evento"] .event-notification-field legend,
+.quick-modal-card[aria-label="Editar evento"] .event-notification-field legend {
+    margin: 0 0 8px;
+    padding: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.event-notification-options {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+
+.quick-modal-form .event-notification-card {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    padding: 14px 15px;
+    border: 1px solid color-mix(in srgb, var(--color-purple) 24%, var(--bg-tertiary));
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--bg-primary) 88%, var(--color-purple) 12%);
+    color: var(--text-primary);
+    cursor: pointer;
+    text-transform: none;
+    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.quick-modal-form .event-notification-card:hover {
+    border-color: color-mix(in srgb, var(--color-cyan) 52%, var(--bg-tertiary));
+    transform: translateY(-1px);
+}
+
+.quick-modal-form .event-notification-card:has(input:checked) {
+    border-color: color-mix(in srgb, var(--color-purple) 72%, var(--color-cyan));
+    background: color-mix(in srgb, var(--bg-primary) 80%, var(--color-purple) 20%);
+}
+
+.quick-modal-form .event-notification-card:focus-within {
+    outline: 3px solid color-mix(in srgb, var(--color-cyan) 24%, transparent);
+    outline-offset: 2px;
+}
+
+.quick-modal-form .event-notification-card > input[type="checkbox"] {
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    margin: 2px 0 0;
+    padding: 0;
+    border-radius: 6px;
+    accent-color: var(--color-purple);
+    cursor: pointer;
+}
+
+.event-notification-copy {
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+}
+
+.event-notification-copy strong {
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+.event-notification-copy small {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    overflow-wrap: break-word;
+}
+
+body.light-theme .quick-modal-form .event-notification-card,
+body.light-mode .quick-modal-form .event-notification-card,
+body[data-theme="light"] .quick-modal-form .event-notification-card {
+    border-color: #d6d9e6;
+    background: #f4f2fb;
+}
+
+body.light-theme .quick-modal-form .event-notification-card:has(input:checked),
+body.light-mode .quick-modal-form .event-notification-card:has(input:checked),
+body[data-theme="light"] .quick-modal-form .event-notification-card:has(input:checked) {
+    border-color: #8f7fe8;
+    background: #ece9fb;
+}
+
+@media (max-width: 480px) {
+    .quick-modal-form .event-notification-card {
+        grid-template-columns: 20px minmax(0, 1fr);
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .quick-modal-form .event-notification-card > input[type="checkbox"] {
+        width: 19px;
+        min-width: 19px;
+        height: 19px;
+    }
+}
+
 /* Grade bucket mobile details */
 @media (max-width: 767px) {
     body .quick-modal:has(.grade-bucket-card) {
