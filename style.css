@@ -38739,6 +38739,7 @@ body #dashboard .dashboard-next-evaluation {
     height: auto !important;
     min-height: 0 !important;
     align-self: start !important;
+    margin-bottom: 20px !important;
     padding: 17px 20px !important;
 }
 
@@ -38818,6 +38819,7 @@ body #dashboard .dashboard-modules-empty button {
     body #dashboard .dashboard-next-evaluation.is-empty {
         grid-template-columns: minmax(0, 1fr) !important;
         grid-template-areas: "header" "copy" "countdown" "action" !important;
+        margin-bottom: 16px !important;
     }
 
     body #dashboard .dashboard-next-evaluation.is-empty {
