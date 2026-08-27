@@ -40644,3 +40644,36 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-
         overscroll-behavior: none;
     }
 }
+/* Subtask delete confirmation */
+.gp-modal-card.gp-subtask-delete-confirm > footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.gp-modal-card.gp-subtask-delete-confirm > footer .btn-secondary,
+.gp-modal-card.gp-subtask-delete-confirm > footer .btn-danger {
+    min-height: 42px;
+    padding: 10px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.gp-modal-card.gp-subtask-delete-confirm > footer .btn-secondary {
+    min-width: 110px;
+}
+
+.gp-modal-card.gp-subtask-delete-confirm > footer .btn-danger {
+    min-width: 120px;
+}
+
+.gp-modal-card.gp-subtask-delete-confirm > footer .btn-danger:disabled {
+    cursor: not-allowed;
+    opacity: .72;
+}
