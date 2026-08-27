@@ -8331,7 +8331,7 @@ function getProfileAvatarContent(profile) {
     const isImageUrl = /^(https?:\/\/|data:image\/)/i.test(avatarValue);
 
     if ((profile.avatarStyle === 'photo' || profile.avatarStyle === 'custom') && avatarValue && isImageUrl) {
-        return `<img src="${escapeHTML(avatarValue)}" alt="Foto de perfil" loading="lazy">`;
+        return `<img src="${escapeHTML(avatarValue)}" alt="Foto de perfil" width="96" height="96" loading="lazy" decoding="async">`;
     }
     if (profile.avatarStyle === 'custom' && avatarValue) return escapeHTML(avatarValue.slice(0, 4));
     if (profile.avatarStyle === 'rocket') return '🚀';
