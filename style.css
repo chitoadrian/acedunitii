@@ -38296,16 +38296,32 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
 
 
 
-/* Compact Tutor IA layout */
+/* Responsive Tutor IA workspace */
+#ai-assistant.section {
+    width: 100%;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    padding-inline: 0;
+}
+
+#ai-assistant .tutor-chat-card {
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+#ai-assistant .tutor-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
+}
+
 @media (min-width: 769px) {
-    #ai-assistant .tutor-shell { max-width: 960px; gap: 9px; }
+    #ai-assistant .tutor-shell { width: 100%; max-width: none; margin-inline: 0; gap: 9px; }
     #ai-assistant .tutor-hero { min-height: 44px; padding: 0 2px 2px; }
     #ai-assistant .tutor-brand { gap: 9px; }
     #ai-assistant .tutor-header-icon { flex-basis: 34px; width: 34px; height: 34px; border-radius: 11px; }
     #ai-assistant .tutor-header-icon svg { width: 20px; height: 20px; }
     #ai-assistant .tutor-brand h1 { font-size: clamp(1.14rem, 1.65vw, 1.26rem); }
     #ai-assistant .tutor-brand p { margin-top: 2px; font-size: 0.76rem; line-height: 1.32; }
-    #ai-assistant .tutor-chat-card { height: clamp(470px, calc(100dvh - 190px), 600px); padding: 9px; gap: 7px; border-radius: 18px; }
+    #ai-assistant .tutor-chat-card { height: clamp(540px, calc(100dvh - 155px), 900px); padding: 9px; gap: 7px; border-radius: 18px; }
     #ai-assistant .tutor-tabs { gap: 4px; padding-bottom: 2px; }
     #ai-assistant .tutor-tabs button { min-height: 27px; padding: 4px 8px; font-size: 0.73rem; }
     #ai-assistant .tutor-auto-suggestions { gap: 4px; margin-block: 0; }
@@ -38335,11 +38351,8 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-practice-card { grid-template-columns: 25px 1fr; gap: 6px; padding: 7px; border-radius: 10px; }
     #ai-assistant .tutor-practice-card span { width: 25px; height: 25px; border-radius: 7px; }
 }
-@media (min-width: 601px) and (max-width: 1100px) {
-    #ai-assistant .tutor-tabs { flex-wrap: wrap; overflow-x: visible; }
-}
 @media (max-width: 768px) {
-    #ai-assistant .tutor-chat-card { height: min(72dvh, 550px); min-height: 430px; padding: 7px; gap: 6px; }
+    #ai-assistant .tutor-chat-card { height: clamp(500px, calc(100dvh - 170px), 780px); min-height: 430px; padding: 7px; gap: 6px; }
     #ai-assistant .tutor-messages { gap: 7px; }
     #ai-assistant .tutor-message { padding: 8px 9px; font-size: 0.83rem; line-height: 1.48; }
     #ai-assistant .tutor-message p { margin-bottom: 4px; }
@@ -38349,6 +38362,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-auto-suggestions button { min-height: 31px; padding: 5px 8px; }
 }
 @media (max-width: 480px) {
+    #ai-assistant .tutor-chat-card { height: clamp(500px, calc(100dvh - 170px), 680px); }
     #ai-assistant .tutor-tabs button { min-height: 32px; padding-inline: 9px; font-size: 0.78rem; }
     #ai-assistant .tutor-send { min-height: 32px; }
 }
