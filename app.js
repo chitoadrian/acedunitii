@@ -6488,11 +6488,28 @@ async function requestTutorAI(userMessage) {
             }
         }
 
+        const requestStatus = Number(response?.status || error?.status || 0) || null;
+        const upstreamStatus = Number(responseBody?.details?.upstream_status || 0) || null;
+
         console.error("[TUTOR IA]", JSON.stringify({
-            status: response?.status || error?.status || null,
+            status: requestStatus,
             message: error?.message || "Error al conectar con Tutor IA.",
             details: responseBody?.details || responseBody?.error || error?.details || responseBody || null
         }));
+
+        if (requestStatus === 401 || requestStatus === 403) {
+            return {
+                ok: false,
+                answer: "Tu sesión expiró. Inicia sesión nuevamente."
+            };
+        }
+
+        if (requestStatus === 429 || upstreamStatus === 429) {
+            return {
+                ok: false,
+                answer: "El Tutor IA está recibiendo muchas solicitudes. Inténtalo nuevamente en unos segundos."
+            };
+        }
 
         return {
             ok: false,
