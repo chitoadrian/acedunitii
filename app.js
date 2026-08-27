@@ -649,67 +649,72 @@ function legacyInitializeAppLocal() {
     initLandingWheelControl();
 }
 
-function initLandingReveal() {
-    const revealItems = document.querySelectorAll(
+let landingRevealObserver = null;
+
+function getLandingRevealItems() {
+    return document.querySelectorAll(
         '#landing-page .reveal, #landing-page .reveal-left, #landing-page .reveal-right, #landing-page .reveal-scale'
     );
+}
 
+function showLandingRevealItems(revealItems) {
+    revealItems.forEach(item => item.classList.add('active'));
+}
+
+function initLandingReveal() {
+    const revealItems = getLandingRevealItems();
     if (!revealItems.length) return;
-
-    const updateRevealItems = () => {
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 720;
-        revealItems.forEach(item => {
-            const rect = item.getBoundingClientRect();
-            const isVisible = rect.top < viewportHeight * 0.92 && rect.bottom > viewportHeight * -0.08;
-            item.classList.toggle('active', isVisible);
-        });
-    };
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion || !('IntersectionObserver' in window)) {
-        revealItems.forEach(item => item.classList.add('active'));
+        landingRevealObserver?.disconnect();
+        landingRevealObserver = null;
+        showLandingRevealItems(revealItems);
         return;
     }
 
-    const revealObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            entry.target.classList.toggle('active', entry.isIntersecting);
+    try {
+        landingRevealObserver?.disconnect();
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            });
+        }, {
+            threshold: 0.01,
+            rootMargin: '120px 0px 120px 0px'
         });
-    }, {
-        threshold: 0.01,
-        rootMargin: '120px 0px 120px 0px'
-    });
 
-    revealItems.forEach(item => revealObserver.observe(item));
-    updateRevealItems();
-
-    const safeRevealResize = () => window.requestAnimationFrame(updateRevealItems);
-
-    window.addEventListener('resize', safeRevealResize, { passive: true });
-    window.setTimeout(() => {
-        if (document.body.classList.contains('is-landing')) updateRevealItems();
-    }, 700);
-    window.setTimeout(() => {
-        if (document.body.classList.contains('is-landing')) {
-            revealItems.forEach(item => item.classList.add('active'));
-        }
-    }, 1800);
+        landingRevealObserver = observer;
+        revealItems.forEach(item => observer.observe(item));
+    } catch (error) {
+        landingRevealObserver?.disconnect();
+        landingRevealObserver = null;
+        showLandingRevealItems(revealItems);
+        console.warn('[LANDING] Reveal no disponible; contenido mostrado sin animación.', error?.message || error);
+    }
 }
 
 function resetLandingReveal() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const revealItems = getLandingRevealItems();
+    if (!revealItems.length) return;
 
-    const revealItems = document.querySelectorAll(
-        '#landing-page .reveal, #landing-page .reveal-left, #landing-page .reveal-right, #landing-page .reveal-scale'
-    );
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !landingRevealObserver) {
+        showLandingRevealItems(revealItems);
+        return;
+    }
 
     revealItems.forEach(item => item.classList.remove('active'));
+    revealItems.forEach(item => landingRevealObserver.observe(item));
 
     window.requestAnimationFrame(() => {
         revealItems.forEach(item => {
             const rect = item.getBoundingClientRect();
             const visible = rect.top < window.innerHeight * 0.84 && rect.bottom > 0;
-            item.classList.toggle('active', visible);
+            if (!visible) return;
+            item.classList.add('active');
+            landingRevealObserver.unobserve(item);
         });
     });
 }
@@ -1859,7 +1864,7 @@ function generateCalendar() {
                 border-radius: 4px;
                 color: ${textColor};
                 cursor: pointer;
-                transition: all 200ms;
+                transition: transform 200ms ease, background-color 200ms ease, color 200ms ease;
             " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                 ${day}
             </div>
@@ -8582,9 +8587,13 @@ function getEvaluationCountdown(evaluation) {
 }
 
 function updateEvaluationCountdowns() {
+    if (document.hidden || !document.querySelector('#app-page.page.active')) return;
     document.querySelectorAll('[data-evaluation-countdown]').forEach(element => {
+        if (!element.closest('.section.active')) return;
         const evaluation = (workspaceState?.evaluations || []).find(item => item.id === element.dataset.evaluationCountdown);
-        if (evaluation) element.textContent = getEvaluationCountdown(evaluation);
+        if (!evaluation) return;
+        const countdown = getEvaluationCountdown(evaluation);
+        if (element.textContent !== countdown) element.textContent = countdown;
     });
 }
 
@@ -11257,7 +11266,7 @@ function mapSavedResourceRow(row) {
 }
 
 function mapSavedGradeRow(row, items = []) {
-    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), period: row.period || 'p1', category: row.category || 'partial1', evaluation: row.evaluation || 'CalificaciÃ³n', value: Number(row.final_value || 0), finalValue: Number(row.final_value || 0), date: getFirstGradeItemDate(items), observation: row.observation || '', items, createdAt: row.created_at || '' };
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), period: row.period || 'p1', category: row.category || 'partial1', evaluation: row.evaluation || 'Calificación', value: Number(row.final_value || 0), finalValue: Number(row.final_value || 0), date: getFirstGradeItemDate(items), observation: row.observation || '', items, createdAt: row.created_at || '' };
 }
 
 function refreshEventViews() { const workspace = loadWorkspace(); renderCalendarSection(workspace); renderDashboard(workspace); }

@@ -602,11 +602,26 @@ html.performance-mode .animated-bg {
 
 html.performance-mode .card,
 html.performance-mode .stat-card,
+html.performance-mode .landing-nav,
+html.performance-mode .sidebar,
+html.performance-mode .auth-card,
 html.performance-mode #settings .settings-card,
 html.performance-mode .settings-modal-backdrop {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
+}
+
+html.performance-mode .pet-robot,
+html.performance-mode .robot-arm,
+html.performance-mode .robot-shadow,
+html.performance-mode .neon-line,
+html.performance-mode .neon-border-lines > span,
+html.performance-mode #progress .premium-border::before,
+html.performance-mode #progress .progress-xp-bar .xp-fill,
+html.performance-mode #progress .path-step.current span,
+html.performance-mode #profile .profile-xp-fill {
+    animation: none !important;
 }
 
 html.performance-mode *:not(.app-boot-loader *):not(.loading-spinner):not(.loading-indicator) {
