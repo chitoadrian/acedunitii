@@ -25990,6 +25990,7 @@ body.landing-active #landing-page.page,
 body.is-landing #landing-page.page.active,
 body.landing-mode #landing-page.page.active,
 body.landing-active #landing-page.page.active {
+    display: flow-root !important;
     height: auto !important;
     min-height: 100vh !important;
     max-height: none !important;
