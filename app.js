@@ -646,6 +646,7 @@ function legacyInitializeAppLocal() {
     renderSavedCalendarEvents();
     initStudyPet();
     initLandingReveal();
+    initLandingTutorDemo();
     initLandingWheelControl();
 }
 
@@ -717,6 +718,139 @@ function resetLandingReveal() {
             landingRevealObserver.unobserve(item);
         });
     });
+}
+
+const LANDING_TUTOR_DEMO_COPY = Object.freeze({
+    user: 'Necesito repasar funciones cuadráticas.',
+    response: 'Te explico el concepto, te doy un ejemplo y luego practicamos con preguntas.'
+});
+
+let landingTutorDemoController = null;
+
+function shouldReduceLandingTutorMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        || document.documentElement.classList.contains('performance-mode')
+        || document.documentElement.classList.contains('reduce-app-motion');
+}
+
+function initLandingTutorDemo() {
+    landingTutorDemoController?.destroy?.();
+    landingTutorDemoController = null;
+
+    const demo = document.querySelector('#landing-page [data-landing-tutor-demo]');
+    const userText = demo?.querySelector('[data-tutor-demo-user]');
+    const tutorText = demo?.querySelector('[data-tutor-demo-response]');
+    if (!demo || !userText || !tutorText) return;
+
+    let animationFrame = 0;
+    let startedAt = 0;
+    let isVisible = false;
+    let observer = null;
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const setText = (element, text, length) => {
+        const nextText = text.slice(0, Math.max(0, Math.min(text.length, length)));
+        if (element.textContent !== nextText) element.textContent = nextText;
+    };
+
+    const showStaticDemo = () => {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        startedAt = 0;
+        demo.classList.remove('is-demo-enhanced');
+        demo.dataset.demoPhase = 'static';
+        userText.textContent = LANDING_TUTOR_DEMO_COPY.user;
+        tutorText.textContent = LANDING_TUTOR_DEMO_COPY.response;
+    };
+
+    const renderDemoFrame = (timestamp) => {
+        if (!isVisible || document.hidden || shouldReduceLandingTutorMotion()) {
+            showStaticDemo();
+            return;
+        }
+
+        if (!startedAt) startedAt = timestamp;
+        const elapsed = (timestamp - startedAt) % 8150;
+        let phase = 'typing-user';
+        let userLength = LANDING_TUTOR_DEMO_COPY.user.length;
+        let responseLength = 0;
+
+        if (elapsed < 1500) {
+            userLength = Math.floor((elapsed / 1500) * LANDING_TUTOR_DEMO_COPY.user.length);
+        } else if (elapsed < 1950) {
+            phase = 'user-complete';
+        } else if (elapsed < 4950) {
+            phase = 'typing-tutor';
+            responseLength = Math.floor(((elapsed - 1950) / 3000) * LANDING_TUTOR_DEMO_COPY.response.length);
+        } else if (elapsed < 5450) {
+            phase = 'tutor-complete';
+            responseLength = LANDING_TUTOR_DEMO_COPY.response.length;
+        } else if (elapsed < 7650) {
+            phase = 'tools-visible';
+            responseLength = LANDING_TUTOR_DEMO_COPY.response.length;
+        } else {
+            phase = 'resetting';
+            responseLength = LANDING_TUTOR_DEMO_COPY.response.length;
+        }
+
+        demo.dataset.demoPhase = phase;
+        setText(userText, LANDING_TUTOR_DEMO_COPY.user, userLength);
+        setText(tutorText, LANDING_TUTOR_DEMO_COPY.response, responseLength);
+        animationFrame = window.requestAnimationFrame(renderDemoFrame);
+    };
+
+    const startDemo = () => {
+        window.cancelAnimationFrame(animationFrame);
+        animationFrame = 0;
+        startedAt = 0;
+
+        if (!isVisible || document.hidden || shouldReduceLandingTutorMotion()) {
+            showStaticDemo();
+            return;
+        }
+
+        demo.classList.add('is-demo-enhanced');
+        demo.dataset.demoPhase = 'typing-user';
+        userText.textContent = '';
+        tutorText.textContent = '';
+        animationFrame = window.requestAnimationFrame(renderDemoFrame);
+    };
+
+    const handleVisibilityChange = () => {
+        if (document.hidden) showStaticDemo();
+        else if (isVisible) startDemo();
+    };
+    const handleMotionPreference = () => {
+        if (shouldReduceLandingTutorMotion()) showStaticDemo();
+        else if (isVisible) startDemo();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    motionPreference.addEventListener?.('change', handleMotionPreference);
+
+    if ('IntersectionObserver' in window && 'requestAnimationFrame' in window) {
+        observer = new IntersectionObserver(entries => {
+            const entry = entries[0];
+            if (!entry) return;
+            isVisible = entry.isIntersecting;
+            if (isVisible) startDemo();
+            else showStaticDemo();
+        }, { threshold: 0.18 });
+        observer.observe(demo);
+    } else {
+        showStaticDemo();
+    }
+
+    landingTutorDemoController = {
+        syncMotionPreference: handleMotionPreference,
+        destroy() {
+            window.cancelAnimationFrame(animationFrame);
+            observer?.disconnect();
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            motionPreference.removeEventListener?.('change', handleMotionPreference);
+            showStaticDemo();
+        }
+    };
 }
 
 function initLandingWheelControl() {
@@ -11846,6 +11980,7 @@ async function initializeApp() {
     generateCalendar();
     initStudyPet();
     initLandingReveal();
+    initLandingTutorDemo();
     initLandingWheelControl();
 
     const shouldRestoreStudentApp = shouldRestoreAppFromSession();
@@ -12193,6 +12328,7 @@ function applyAppSettings() {
     document.body.classList.toggle('reduce-app-motion', reduceMotion);
     document.documentElement.classList.toggle('performance-mode', appSettings.performanceMode);
     document.body.classList.toggle('performance-mode', appSettings.performanceMode);
+    landingTutorDemoController?.syncMotionPreference?.();
     applyTutorSuggestionPreference();
     applyDashboardModulePreferences();
     syncAppSettingsControls();
