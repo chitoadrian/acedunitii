@@ -33443,10 +33443,6 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page :is(
-    .dashboard-mockup,
-    .hero-dashboard,
-    .mockup-card,
-    .hero-mini-card,
     .benefit-card,
     .about-feature,
     .ai-orbit-card,
@@ -40715,4 +40711,137 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-
     body.light-theme .session-choice-card {
         background-color: #f7f8fa;
     }
+}
+
+/* Landing hero panel refinement */
+#landing-page .dashboard-mockup {
+    isolation: isolate; border-color: rgba(92, 190, 216, .22); border-radius: 20px;
+    background: linear-gradient(150deg, rgba(12, 35, 52, .97), rgba(8, 25, 40, .98) 58%, rgba(28, 27, 62, .94));
+    box-shadow: 0 20px 44px rgba(3, 12, 25, .22), inset 0 1px rgba(167, 224, 239, .05); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+
+#landing-page .dashboard-mockup::before {
+    content: ""; display: block; position: absolute; z-index: 0; inset: -45% -28%; pointer-events: none; opacity: .16;
+    background: radial-gradient(circle, rgba(75, 190, 218, .34), rgba(115, 87, 205, .12) 34%, transparent 66%);
+    transform: translate3d(-8%, 2%, 0); animation: heroPanelAmbient 14s ease-in-out infinite alternate;
+}
+
+#landing-page .dashboard-mockup > * { position: relative; z-index: 1; }
+
+#landing-page .mockup-top {
+    padding: 15px 17px; border-bottom-color: rgba(119, 197, 218, .14); background: rgba(92, 190, 216, .025);
+}
+
+#landing-page .panel-status {
+    background: #68c7d8; box-shadow: 0 0 0 3px rgba(104, 199, 216, .1); animation: heroPanelStatusPulse 3.4s ease-in-out infinite;
+}
+
+#landing-page .mockup-grid { gap: 12px; padding: 15px; }
+
+#landing-page .mockup-card {
+    padding: 14px; border-color: rgba(130, 202, 221, .14); border-radius: 14px;
+    background: linear-gradient(145deg, rgba(21, 50, 68, .72), rgba(11, 32, 48, .78)); box-shadow: inset 0 1px rgba(190, 232, 242, .025);
+    transition: transform 180ms ease-out, border-color 180ms ease-out;
+}
+
+#landing-page .progress-card {
+    min-height: 150px; background: linear-gradient(150deg, rgba(16, 44, 62, .82), rgba(10, 31, 48, .84));
+}
+
+#landing-page .mockup-bars { height: 96px; margin-top: 11px; }
+
+#landing-page .mockup-bars i {
+    min-height: 10px; border-radius: 6px 6px 3px 3px; background: linear-gradient(180deg, #70c9d9, #34849c);
+    box-shadow: 0 0 8px rgba(76, 181, 207, .12); transform-origin: center bottom;
+}
+
+#landing-page .hero-visual.active .mockup-bars i {
+    animation: heroPanelBarGrow 480ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(2) i { animation-delay: 45ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(3) i { animation-delay: 90ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(4) i { animation-delay: 135ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(5) i { animation-delay: 180ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(6) i { animation-delay: 225ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(7) i { animation-delay: 270ms; }
+
+#landing-page .metric-card, #landing-page .tutor-card { min-height: 74px; }
+
+#landing-page .metric-icon {
+    border-color: rgba(104, 199, 216, .22); border-radius: 10px; color: #69c7d7; background: rgba(73, 166, 190, .08);
+}
+
+#landing-page .xp-icon {
+    color: #d8b45f; border-color: rgba(216, 180, 95, .2); background: rgba(216, 180, 95, .07);
+}
+
+#landing-page .hero-mini-card {
+    position: relative; justify-content: flex-start; min-height: 60px; height: 60px; padding: 11px 38px 11px 14px;
+    border-color: rgba(130, 202, 221, .15); border-radius: 13px;
+    background: linear-gradient(145deg, rgba(14, 39, 56, .86), rgba(10, 29, 45, .9)); box-shadow: inset 0 1px rgba(190, 232, 242, .025);
+    transition: transform 180ms ease-out, border-color 180ms ease-out, background-color 180ms ease-out;
+}
+
+#landing-page .hero-mini-card::after {
+    content: "→"; position: absolute; right: 14px; color: rgba(118, 201, 221, .6); font-size: .82rem;
+    transition: transform 180ms ease-out, color 180ms ease-out;
+}
+
+#landing-page .hero-mini-card svg { transition: transform 180ms ease-out; }
+
+@media (hover: hover) and (pointer: fine) {
+    #landing-page .metric-card:hover,
+    #landing-page .tutor-card:hover,
+    #landing-page .hero-mini-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(103, 201, 224, .32);
+    }
+
+    #landing-page .hero-mini-card:hover { transform: translateY(-2px) !important; }
+    #landing-page .hero-mini-card:hover svg { transform: translateX(1px); }
+    #landing-page .hero-mini-card:hover::after { color: #83d0df; transform: translateX(2px); }
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .dashboard-mockup {
+    border-color: rgba(47, 128, 158, .18);
+    background: linear-gradient(150deg, rgba(249, 252, 254, .98), rgba(238, 247, 251, .98) 60%, rgba(244, 241, 253, .96));
+    box-shadow: 0 18px 38px rgba(24, 65, 84, .1), inset 0 1px rgba(255, 255, 255, .9);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .mockup-card,
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .hero-mini-card {
+    border-color: rgba(48, 126, 155, .13) !important;
+    background: linear-gradient(145deg, rgba(255, 255, 255, .9), rgba(239, 247, 251, .86)) !important;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .88) !important;
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .mockup-bars i {
+    background: linear-gradient(180deg, #4daec4, #28758d); box-shadow: 0 0 7px rgba(37, 123, 149, .1);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .hero-mini-card::after { color: rgba(41, 119, 145, .65); }
+
+html.performance-mode #landing-page .dashboard-mockup::before, html.performance-mode #landing-page .panel-status { animation: none !important; }
+
+html.performance-mode #landing-page .dashboard-mockup::before { opacity: .06; }
+html.performance-mode #landing-page .hero-visual.active .mockup-bars i { animation-duration: 160ms; animation-delay: 0ms; }
+
+@keyframes heroPanelBarGrow { from { opacity: .55; transform: scaleY(0); } to { opacity: 1; transform: scaleY(1); } }
+
+@keyframes heroPanelStatusPulse { 0%, 100% { opacity: .68; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+
+@keyframes heroPanelAmbient { from { opacity: .11; transform: translate3d(-8%, 2%, 0); } to { opacity: .18; transform: translate3d(8%, -2%, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    #landing-page .dashboard-mockup::before, #landing-page .panel-status, #landing-page .hero-visual.active .mockup-bars i { animation: none !important; }
+    #landing-page .mockup-bars i { opacity: 1; transform: scaleY(1); }
+}
+
+@media (max-width: 480px) {
+    #landing-page .dashboard-mockup { border-radius: 18px; }
+    #landing-page .mockup-top { padding: 13px 14px; }
+    #landing-page .mockup-card { border-radius: 12px; }
+    #landing-page .metric-card, #landing-page .tutor-card { min-height: 68px; }
+    #landing-page .hero-mini-card { min-height: 56px; height: 56px; }
 }
