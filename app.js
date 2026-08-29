@@ -651,6 +651,7 @@ function legacyInitializeAppLocal() {
 }
 
 let landingRevealObserver = null;
+const LANDING_REVEAL_ENTRY_THRESHOLD = 0.14;
 
 function getLandingRevealItems() {
     return document.querySelectorAll(
@@ -662,12 +663,16 @@ function showLandingRevealItems(revealItems) {
     revealItems.forEach(item => item.classList.add('active'));
 }
 
+function shouldShowLandingRevealsWithoutMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        || document.documentElement.classList.contains('reduce-app-motion');
+}
+
 function initLandingReveal() {
     const revealItems = getLandingRevealItems();
     if (!revealItems.length) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+    if (shouldShowLandingRevealsWithoutMotion() || !('IntersectionObserver' in window)) {
         landingRevealObserver?.disconnect();
         landingRevealObserver = null;
         showLandingRevealItems(revealItems);
@@ -678,13 +683,18 @@ function initLandingReveal() {
         landingRevealObserver?.disconnect();
         const observer = new IntersectionObserver(entries => {
             entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('active');
-                observer.unobserve(entry.target);
+                if (entry.isIntersecting && entry.intersectionRatio >= LANDING_REVEAL_ENTRY_THRESHOLD) {
+                    entry.target.classList.add('active');
+                    return;
+                }
+
+                if (!entry.isIntersecting) {
+                    entry.target.classList.remove('active');
+                }
             });
         }, {
-            threshold: 0.01,
-            rootMargin: '120px 0px 120px 0px'
+            threshold: [0, LANDING_REVEAL_ENTRY_THRESHOLD],
+            rootMargin: '0px'
         });
 
         landingRevealObserver = observer;
@@ -701,8 +711,13 @@ function resetLandingReveal() {
     const revealItems = getLandingRevealItems();
     if (!revealItems.length) return;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !landingRevealObserver) {
+    if (shouldShowLandingRevealsWithoutMotion()) {
         showLandingRevealItems(revealItems);
+        return;
+    }
+
+    if (!landingRevealObserver) {
+        initLandingReveal();
         return;
     }
 
@@ -712,10 +727,11 @@ function resetLandingReveal() {
     window.requestAnimationFrame(() => {
         revealItems.forEach(item => {
             const rect = item.getBoundingClientRect();
-            const visible = rect.top < window.innerHeight * 0.84 && rect.bottom > 0;
+            const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+            const visibleRatio = visibleHeight / Math.max(rect.height, 1);
+            const visible = visibleHeight > 0 && visibleRatio >= LANDING_REVEAL_ENTRY_THRESHOLD;
             if (!visible) return;
             item.classList.add('active');
-            landingRevealObserver.unobserve(item);
         });
     });
 }
