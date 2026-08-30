@@ -41067,3 +41067,66 @@ html.reduce-app-motion #landing-page #benefits-use .benefits-path::after {
         transition: none !important;
     }
 }
+/* Project email reminder validation dialog */
+.gp-reminder-warning {
+    position: fixed;
+    inset: 0;
+    z-index: 10080;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+}
+
+.gp-reminder-warning-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 5, 18, .76);
+    backdrop-filter: blur(5px);
+}
+
+.gp-reminder-warning-card {
+    position: relative;
+    width: min(410px, 100%);
+    box-sizing: border-box;
+    padding: 24px;
+    text-align: center;
+    color: #f3f5ff;
+    background: #171d37;
+    border: 1px solid rgba(143, 163, 255, .24);
+    border-radius: 18px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .44);
+}
+
+.gp-reminder-warning-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-bottom: 12px;
+    color: #f7c96f;
+    background: rgba(247, 201, 111, .12);
+    border: 1px solid rgba(247, 201, 111, .32);
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.gp-reminder-warning-card h3 { margin: 0; font-size: 1.15rem; }
+.gp-reminder-warning-card p { margin: 10px 0 20px; color: #b8c1dc; line-height: 1.55; }
+.gp-reminder-warning-card button { min-width: 130px; }
+.gp-planning-modal input[type="time"] { color-scheme: dark; }
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-reminder-warning-card {
+    color: #1f2937;
+    background: #fafafa;
+    border-color: #d5dae2;
+    box-shadow: 0 24px 70px rgba(31, 41, 55, .2);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-reminder-warning-card p { color: #5c6677; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-planning-modal input[type="time"] { color-scheme: light; }
+
+@media (max-width: 520px) {
+    .gp-reminder-warning { padding: 14px; }
+    .gp-reminder-warning-card { padding: 21px 18px; border-radius: 16px; }
+}
