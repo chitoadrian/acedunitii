@@ -86,7 +86,7 @@ function validateGpReminderSchedule(form,entityType){const d=gpData(form);if(!d.
 function openGoalForm(id=''){const x=loadWorkspace().goals.find(i=>i.id===id);openGpModal(x?'Editar meta':'Nueva meta',`<label class="gp-field gp-field-full"><span>Título</span><input name="title" required placeholder="Escribe el título de la meta" value="${escapeHTML(x?.title||'')}"></label><label class="gp-field gp-field-full"><span>Descripción</span><textarea name="description" placeholder="Escribe una descripción breve">${escapeHTML(x?.description||'')}</textarea></label><div class="gp-form-grid">${gpSubjectSelect(x?.subjectId)}${gpProjectSelect(x?.projectId)}<label class="gp-field"><span>Fecha objetivo</span><input type="date" name="target_date" value="${x?.targetDate||''}"></label>${gpPrioritySelect(x?.priority||'medium')}${gpStatusSelect('goal',x?.status||'pending')}<label class="gp-field"><span>Progreso</span><span class="gp-percentage-field"><input type="number" min="0" max="100" name="progress" value="${x?.progress??0}"><b aria-hidden="true">%</b></span></label></div><label class="gp-check"><input type="checkbox" name="show" ${x?.showInCalendar?'checked':''}> Mostrar en Calendario</label>`,e=>saveGoal(e,id),false,'gp-planning-modal');}
 function openProjectForm(id=''){const x=loadWorkspace().projects.find(i=>i.id===id);openGpModal(x?'Editar proyecto':'Nuevo proyecto',`<label class="gp-field gp-field-full"><span>Nombre del proyecto</span><input name="title" required placeholder="Escribe el nombre del proyecto" value="${escapeHTML(x?.title||'')}"></label><label class="gp-field gp-field-full"><span>Descripción</span><textarea name="description" placeholder="Escribe una descripción breve">${escapeHTML(x?.description||'')}</textarea></label><div class="gp-form-grid">${gpSubjectSelect(x?.subjectId)}<label class="gp-field"><span>Inicio</span><input type="date" name="start_date" value="${x?.startDate||''}"></label><label class="gp-field"><span>Fecha límite</span><input type="date" name="due_date" value="${x?.dueDate||''}"></label>${gpPrioritySelect(x?.priority||'medium')}${gpStatusSelect('project',x?.status||'pending')}</div><label class="gp-check"><input type="checkbox" name="show" ${x?.showInCalendar?'checked':''}> Mostrar fecha límite en Calendario</label>`,e=>saveProject(e,id),false,'gp-planning-modal');}
 function openStageForm(projectId,id=''){const ws=loadWorkspace(),x=ws.projectStages.find(i=>i.id===id),items=id?ws.projectSubtasks.filter(item=>item.stageId===id):[],derivedStatus=x?getProjectStageStatus(x,items):'pending';openGpModal(x?'Editar etapa':'Nueva etapa',`<label class="gp-field gp-field-full"><span>Título</span><input name="title" required value="${escapeHTML(x?.title||'')}"></label><label class="gp-field gp-field-full"><span>Descripción</span><textarea name="description">${escapeHTML(x?.description||'')}</textarea></label><div class="gp-form-grid"><label class="gp-field"><span>Fecha límite</span><input type="date" name="due_date" value="${x?.dueDate||''}"></label><label class="gp-field"><span>Hora límite</span><input type="time" name="due_time" value="${x?.dueTime||''}"></label>${items.length?`<label class="gp-field"><span>Estado</span><input type="hidden" name="status" value="${derivedStatus}"><span class="gp-derived-status">${gpLabel(derivedStatus)} · calculado por subtareas</span></label>`:gpStageStatusSelect(x?.status||'pending')}</div><label class="gp-check"><input type="checkbox" name="show" ${x?.showInCalendar?'checked':''}> Mostrar en Calendario</label><label class="gp-check"><input type="checkbox" name="reminders" ${x?.remindersEnabled?'checked':''}> Activar recordatorio por correo de AC Edunity</label>`,e=>saveStage(e,projectId,id),false,'gp-planning-modal');}
-function openSubtaskForm(projectId,stageId,id=''){const x=loadWorkspace().projectSubtasks.find(i=>i.id===id);openGpModal(x?'Editar subtarea':'Nueva subtarea',`<label class="gp-field gp-field-full"><span>Título</span><input name="title" required value="${escapeHTML(x?.title||'')}"></label><label class="gp-field gp-field-full"><span>Descripción</span><textarea name="description">${escapeHTML(x?.description||'')}</textarea></label><div class="gp-form-grid"><label class="gp-field"><span>Fecha límite</span><input type="date" name="due_date" value="${x?.dueDate||''}"></label><label class="gp-field"><span>Hora límite</span><input type="time" name="due_time" value="${x?.dueTime||''}"></label>${gpPrioritySelect(x?.priority||'medium')}${gpSubtaskStatusSelect(x?.status||'pending')}</div><label class="gp-check"><input type="checkbox" name="reminders" ${x?.remindersEnabled?'checked':''}> Activar recordatorio por correo de AC Edunity</label>${x?.taskId?'<p>Vinculada al módulo Tareas.</p>':'<label class="gp-check"><input type="checkbox" name="add_task"> Agregar también a Tareas</label>'}`,e=>saveSubtask(e,projectId,stageId,id),false,'gp-planning-modal');}
+function openSubtaskForm(projectId,stageId,id=''){const x=loadWorkspace().projectSubtasks.find(i=>i.id===id);openGpModal(x?'Editar subtarea':'Nueva subtarea',`<label class="gp-field gp-field-full"><span>Título</span><input name="title" required value="${escapeHTML(x?.title||'')}"></label><label class="gp-field gp-field-full"><span>Descripción</span><textarea name="description">${escapeHTML(x?.description||'')}</textarea></label><div class="gp-form-grid"><label class="gp-field"><span>Fecha límite</span><input type="date" name="due_date" value="${x?.dueDate||''}"></label><label class="gp-field"><span>Hora límite</span><input type="time" name="due_time" value="${x?.dueTime||''}"></label>${gpPrioritySelect(x?.priority||'medium')}${gpSubtaskStatusSelect(x?.status||'pending')}</div><label class="gp-check"><input type="checkbox" name="reminders" ${x?.remindersEnabled?'checked':''}> Activar recordatorio por correo de AC Edunity</label><label class="gp-check"><input type="checkbox" name="add_task" ${x?.taskId?'checked':''}> Agregar también a Tareas</label>`,e=>saveSubtask(e,projectId,stageId,id),false,'gp-planning-modal');}
 function gpData(form){return Object.fromEntries(new FormData(form).entries());}
 function mergeGpSavedRow(table,row){if(!row||!workspaceState)return;const config={projects:['projects',value=>mapProjectRow(value,new Map((workspaceState.subjects||[]).map(subject=>[subject.id,subject.name])))],goals:['goals',value=>mapGoalRow(value,new Map((workspaceState.subjects||[]).map(subject=>[subject.id,subject.name])))],project_stages:['projectStages',mapProjectStageRow],project_subtasks:['projectSubtasks',mapProjectSubtaskRow]}[table];if(!config)return;const[key,mapper]=config,list=workspaceState[key]||[],mapped=mapper(row),index=list.findIndex(item=>item.id===mapped.id);workspaceState={...workspaceState,[key]:index<0?[...list,mapped]:list.map(item=>item.id===mapped.id?mapped:item)};}
 function patchGpWorkspaceItem(key,id,changes){if(!workspaceState||!id)return;workspaceState={...workspaceState,[key]:(workspaceState[key]||[]).map(item=>item.id===id?{...item,...changes}:item)};}
@@ -98,7 +98,74 @@ async function saveGoal(e,id){e.preventDefault();const d=gpData(e.currentTarget)
 async function saveProject(e,id){e.preventDefault();const d=gpData(e.currentTarget);if(d.start_date&&d.due_date&&d.start_date>d.due_date){notify('La fecha límite no puede ser anterior al inicio.','error');return;}await gpSave('projects',id,{title:d.title.trim(),description:d.description.trim()||null,subject_id:d.subject_id||null,start_date:d.start_date||null,due_date:d.due_date||null,priority:d.priority,status:d.status,show_in_calendar:Boolean(d.show&&d.due_date)},id?'Proyecto actualizado.':'Proyecto creado correctamente.');}
 async function persistDerivedStageStatus(stageId){const ws=loadWorkspace(),stage=ws.projectStages.find(item=>item.id===stageId),items=ws.projectSubtasks.filter(item=>item.stageId===stageId);if(!stage||!items.length)return true;const status=getProjectStageStatus(stage,items);if(stage.status===status)return true;const{data,error}=await getSupabaseClient().from('project_stages').update({status,updated_at:new Date().toISOString()}).eq('id',stageId).eq('user_id',currentUser.id).select().single();if(error){logSupabaseError('project stage derived status',error);return false;}mergeGpSavedRow('project_stages',data);refreshGpDependentUI();return true;}
 async function saveStage(e,projectId,id){e.preventDefault();const form=e.currentTarget;if(!validateGpReminderSchedule(form,'stage'))return;const d=gpData(form),ws=loadWorkspace(),stage=ws.projectStages.find(x=>x.id===id),items=id?ws.projectSubtasks.filter(item=>item.stageId===id):[],position=id?stage.position:ws.projectStages.filter(x=>x.projectId===projectId).length,status=items.length?getProjectStageStatus(stage,items):d.status;await gpSave('project_stages',id,{project_id:projectId,title:d.title.trim(),description:d.description.trim()||null,due_date:d.due_date||null,due_time:d.due_time||null,reminders_enabled:Boolean(d.reminders),status,position,show_in_calendar:Boolean(d.show&&d.due_date)},id?'Etapa actualizada.':'Etapa agregada.');}
-async function saveSubtask(e,projectId,stageId,id){e.preventDefault();const form=e.currentTarget;if(!validateGpReminderSchedule(form,'subtask'))return;const d=gpData(form),ws=loadWorkspace(),old=ws.projectSubtasks.find(x=>x.id===id),project=ws.projects.find(x=>x.id===projectId);let taskId=old?.taskId||null,createdTask=false;if(!taskId&&d.add_task){const{data,error}=await getSupabaseClient().from('tasks').insert({user_id:currentUser.id,subject_id:project?.subjectId||null,title:d.title.trim(),description:d.description.trim()||null,due_date:d.due_date||null,priority:d.priority,status:d.status==='completed'?'completed':'pending'}).select().single();if(error){notify('No se pudo crear la tarea vinculada.','error');return;}taskId=data.id;createdTask=true;}const position=id?old.position:ws.projectSubtasks.filter(x=>x.stageId===stageId).length;const saved=await gpSave('project_subtasks',id,{project_id:projectId,stage_id:stageId,task_id:taskId,title:d.title.trim(),description:d.description.trim()||null,due_date:d.due_date||null,due_time:d.due_time||null,reminders_enabled:Boolean(d.reminders),priority:d.priority,status:d.status,position},id?'Subtarea actualizada.':'Subtarea creada.');if(!saved&&createdTask){await getSupabaseClient().from('tasks').delete().eq('id',taskId).eq('user_id',currentUser.id);return;}if(saved){await persistDerivedStageStatus(stageId);if(taskId&&d.status==='completed'){const{data,error}=await getSupabaseClient().from('tasks').update({status:'completed',updated_at:new Date().toISOString()}).eq('id',taskId).eq('user_id',currentUser.id).select().single();if(error)logSupabaseError('linked task completion',error);else{commitTaskStatusToWorkspace(data.id,normalizeTaskStatus(data.status));refreshTaskDependentUI();}}}}
+function getGpLinkedTaskPayload(data,project,includeReminderDefault=false){const payload={user_id:currentUser.id,subject_id:project?.subjectId||null,title:data.title.trim(),description:data.description.trim()||null,due_date:data.due_date||null,due_time:data.due_time||null,priority:normalizeTaskPriority(data.priority),status:normalizeTaskStatus(data.status)};if(includeReminderDefault)payload.reminders_enabled=false;return payload;}
+function getGpSubtaskRollbackPayload(item){return{project_id:item.projectId,stage_id:item.stageId,task_id:item.taskId||null,title:item.title,description:item.description||null,due_date:item.dueDate||null,due_time:item.dueTime||null,reminders_enabled:item.remindersEnabled===true,priority:item.priority,status:item.status,position:item.position};}
+async function rollbackGpSubtaskLinkChange(sb,item){if(!item?.id)return false;const{data,error}=await sb.from('project_subtasks').update({...getGpSubtaskRollbackPayload(item),updated_at:new Date().toISOString()}).eq('id',item.id).eq('user_id',currentUser.id).select().single();if(error){logSupabaseError('project subtask link rollback',error);return false;}mergeGpSavedRow('project_subtasks',data);refreshGpDependentUI();return true;}
+async function removeCreatedGpLinkedTask(sb,taskId){if(!taskId)return true;const{error}=await sb.from('tasks').delete().eq('id',taskId).eq('user_id',currentUser.id);if(error){logSupabaseError('orphan linked task cleanup',error);return false;}return true;}
+async function saveSubtask(e,projectId,stageId,id){
+    e.preventDefault();
+    const form=e.currentTarget;
+    if(!validateGpReminderSchedule(form,'subtask')||goalsProjectsSaving)return;
+
+    const data=gpData(form),workspace=loadWorkspace(),old=workspace.projectSubtasks.find(item=>item.id===id),project=workspace.projects.find(item=>item.id===projectId),subjectName=workspace.subjects.find(item=>item.id===project?.subjectId)?.name||project?.subject||'General',wantsTask=Boolean(data.add_task),oldTaskId=old?.taskId||null,position=id?old.position:workspace.projectSubtasks.filter(item=>item.stageId===stageId).length,sb=getSupabaseClient();
+    let targetTaskId=wantsTask?oldTaskId:null;
+    let createdTask=null;
+    let taskWorkspaceChanged=false;
+    goalsProjectsSaving=true;
+
+    try{
+        if(wantsTask&&!oldTaskId){
+            const{data:task,error}=await sb.from('tasks').insert(getGpLinkedTaskPayload(data,project,true)).select('*').single();
+            if(error)throw new Error(`No se pudo crear la tarea vinculada: ${error.message}`);
+            createdTask=task;
+            targetTaskId=task.id;
+        }
+
+        const subtaskPayload={project_id:projectId,stage_id:stageId,task_id:targetTaskId,title:data.title.trim(),description:data.description.trim()||null,due_date:data.due_date||null,due_time:data.due_time||null,reminders_enabled:Boolean(data.reminders),priority:data.priority,status:data.status,position};
+        const query=id?sb.from('project_subtasks').update({...subtaskPayload,updated_at:new Date().toISOString()}).eq('id',id).eq('user_id',currentUser.id):sb.from('project_subtasks').insert({...subtaskPayload,user_id:currentUser.id});
+        const{data:savedSubtask,error:subtaskError}=await query.select('*').single();
+        if(subtaskError){
+            const cleaned=!createdTask||await removeCreatedGpLinkedTask(sb,createdTask.id);
+            throw new Error(cleaned?`No se pudo guardar la subtarea: ${subtaskError.message}`:`No se pudo guardar la subtarea ni eliminar la tarea temporal creada: ${subtaskError.message}`);
+        }
+        mergeGpSavedRow('project_subtasks',savedSubtask);
+
+        if(wantsTask){
+            let savedTask=createdTask;
+            if(oldTaskId){
+                const taskPayload=getGpLinkedTaskPayload(data,project,false);
+                delete taskPayload.user_id;
+                const{data:updatedTask,error:taskError}=await sb.from('tasks').update({...taskPayload,updated_at:new Date().toISOString()}).eq('id',oldTaskId).eq('user_id',currentUser.id).select('*').single();
+                if(taskError){
+                    const rolledBack=await rollbackGpSubtaskLinkChange(sb,old);
+                    throw new Error(rolledBack?`No se pudo actualizar la tarea vinculada: ${taskError.message}`:`No se pudo actualizar la tarea vinculada ni restaurar la subtarea: ${taskError.message}`);
+                }
+                savedTask=updatedTask;
+            }
+            commitSavedTaskToWorkspace(savedTask,subjectName);
+            taskWorkspaceChanged=true;
+        }else if(oldTaskId){
+            const{error:deleteError}=await sb.from('tasks').delete().eq('id',oldTaskId).eq('user_id',currentUser.id).select('id').single();
+            if(deleteError){
+                const rolledBack=await rollbackGpSubtaskLinkChange(sb,old);
+                throw new Error(rolledBack?`No se pudo desvincular la tarea: ${deleteError.message}`:`No se pudo eliminar la tarea vinculada ni restaurar la relación: ${deleteError.message}`);
+            }
+            removeTaskFromWorkspace(oldTaskId);
+            taskWorkspaceChanged=true;
+        }
+
+        await persistDerivedStageStatus(stageId);
+        refreshGpDependentUI();
+        if(taskWorkspaceChanged)refreshTaskDependentUI();
+        closeGpModal();
+        notify(id?'Subtarea actualizada.':'Subtarea creada.','success');
+    }catch(error){
+        logSupabaseError('project subtask task link save',error);
+        notify(error.message||'No se pudo guardar la subtarea.','error');
+    }finally{
+        goalsProjectsSaving=false;
+    }
+}
 async function toggleGpComplete(type,id){const key=type==='goal'?'goals':'projects',x=loadWorkspace()[key].find(i=>i.id===id);if(!x)return;await gpSave(type==='goal'?'goals':'projects',id,type==='goal'?{status:x.status==='completed'?'in_progress':'completed',progress:x.status==='completed'?Math.min(x.progress,99):100}:{status:x.status==='completed'?'in_progress':'completed'},`${type==='goal'?'Meta':'Proyecto'} actualizado.`);}
 async function toggleGpCalendar(type,id){const key=type==='goal'?'goals':'projects',x=loadWorkspace()[key].find(i=>i.id===id),date=type==='goal'?x?.targetDate:x?.dueDate;if(!date){notify('Añade una fecha antes de mostrarlo en Calendario.','error');return;}await gpSave(type==='goal'?'goals':'projects',id,{show_in_calendar:!x.showInCalendar},'Calendario actualizado.');}
 function toggleProjectSubtaskDescription(id){expandedProjectSubtasks.has(id)?expandedProjectSubtasks.delete(id):expandedProjectSubtasks.add(id);renderGoalsProjects(loadWorkspace());}
@@ -124,9 +191,10 @@ async function toggleProjectSubtask(id){
             if(stageError){logSupabaseError('project stage derived status',stageError);secondaryError=true;}else mergeGpSavedRow('project_stages',savedStage);
         }
 
-        if(x.taskId&&status==='completed'){
-            const{data:savedTask,error:taskError}=await sb.from('tasks').update({status:'completed',updated_at:new Date().toISOString()}).eq('id',x.taskId).eq('user_id',currentUser.id).select().single();
-            if(taskError){logSupabaseError('linked task completion',taskError);secondaryError=true;}else{commitTaskStatusToWorkspace(savedTask.id,normalizeTaskStatus(savedTask.status));refreshTaskDependentUI();}
+        if(x.taskId){
+            const taskStatus=normalizeTaskStatus(status);
+            const{data:savedTask,error:taskError}=await sb.from('tasks').update({status:taskStatus,updated_at:new Date().toISOString()}).eq('id',x.taskId).eq('user_id',currentUser.id).select().single();
+            if(taskError){logSupabaseError('linked task status',taskError);secondaryError=true;}else{commitTaskStatusToWorkspace(savedTask.id,normalizeTaskStatus(savedTask.status));refreshTaskDependentUI();}
         }
 
         if(secondaryError)notify('Subtarea actualizada, pero una dependencia no pudo sincronizarse.','info');
