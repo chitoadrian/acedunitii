@@ -8,7 +8,7 @@ const MAX_ATTEMPTS = 3;
 const CLAIM_TIMEOUT_MS = 15 * 60 * 1000;
 const REQUEST_TIMEOUT_MS = 12_000;
 
-type EntityType = "stage" | "subtask";
+type EntityType = "project" | "stage" | "subtask";
 type ReminderType = "due_24h" | "due_2h";
 type Candidate = {
   entityType: EntityType;
@@ -90,6 +90,9 @@ function priorityLabel(priority: string) {
 }
 
 function emailSubject(entityType: EntityType, reminderType: ReminderType) {
+  if (entityType === "project") {
+    return reminderType === "due_2h" ? "Tu proyecto vence pronto — AC Edunity" : "Tu proyecto vence mañana — AC Edunity";
+  }
   if (entityType === "subtask") {
     return reminderType === "due_2h" ? "Tu subtarea vence pronto — AC Edunity" : "Tu subtarea vence mañana — AC Edunity";
   }
@@ -97,7 +100,7 @@ function emailSubject(entityType: EntityType, reminderType: ReminderType) {
 }
 
 function emailHeading(entityType: EntityType, reminderType: ReminderType) {
-  const entity = entityType === "subtask" ? "subtarea" : "etapa";
+  const entity = entityType === "project" ? "proyecto" : entityType === "subtask" ? "subtarea" : "etapa";
   return `Tu ${entity} vence ${reminderType === "due_2h" ? "pronto" : "mañana"}`;
 }
 
@@ -122,19 +125,21 @@ function emailHtml(
   const due = formatDue(dueAt);
   const greeting = firstName ? `Hola, ${escapeHtml(firstName)}.` : "Hola.";
   const details = [
-    detailRow("Proyecto", projectName),
+    candidate.entityType !== "project" ? detailRow("Proyecto", projectName) : "",
+    candidate.entityType === "project" ? detailRow("Materia", stageName) : "",
     candidate.entityType === "subtask" ? detailRow("Etapa", stageName) : "",
-    candidate.entityType === "subtask" ? detailRow("Prioridad", priorityLabel(candidate.priority)) : "",
-    candidate.entityType === "stage" ? detailRow("Progreso", stageProgress) : "",
+    candidate.entityType !== "stage" ? detailRow("Prioridad", priorityLabel(candidate.priority)) : "",
+    candidate.entityType !== "subtask" ? detailRow("Progreso", stageProgress) : "",
     detailRow("Fecha límite", due.date),
     detailRow("Hora límite", due.time),
     detailRow("Tiempo restante", remainingLabel(reminderType), true),
   ].join("");
   const description = clean(candidate.description, 800);
 
+  const entityLabel = candidate.entityType === "project" ? "el proyecto" : candidate.entityType === "subtask" ? "la subtarea" : "la etapa";
   return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>@media(max-width:620px){.shell{width:100%!important}.body{padding:26px 20px!important}.button{display:block!important}.detail td{display:block!important;text-align:left!important;padding:4px 0!important}.detail td+td{padding-bottom:10px!important}}</style></head>
-<body style="margin:0;background:#eef2f8;font-family:Arial,Helvetica,sans-serif;color:#24314d"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef2f8"><tr><td align="center" style="padding:28px 12px"><table role="presentation" class="shell" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 36px rgba(31,45,88,.13)"><tr><td style="padding:32px;background:linear-gradient(135deg,#6554d9,#486fea 58%,#43b9e8);color:#fff"><div style="font-size:13px;font-weight:700;letter-spacing:1.4px">AC EDUNITY</div><h1 style="margin:10px 0 0;font-size:28px;line-height:35px">${escapeHtml(emailHeading(candidate.entityType, reminderType))}</h1></td></tr><tr><td class="body" style="padding:34px 40px 38px"><p style="margin:0 0 18px;font-size:16px;line-height:25px;color:#55627b">${greeting} Este es tu recordatorio académico.</p><div style="padding:22px;border:1px solid #dfe5f2;border-radius:16px;background:#f8f9fd"><div style="font-size:20px;font-weight:800;color:#273452">${escapeHtml(candidate.title)}</div><table role="presentation" class="detail" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px">${details}</table>${description ? `<p style="margin:18px 0 0;line-height:23px;color:#55627b"><b>Descripción:</b> ${escapeHtml(description)}</p>` : ""}</div><table role="presentation" align="center" cellspacing="0" cellpadding="0" style="margin:26px auto 16px"><tr><td bgcolor="#6554d9" style="border-radius:12px"><a class="button" href="${APP_URL}" style="display:inline-block;padding:14px 28px;color:#fff;text-decoration:none;font-weight:700">Ver mi proyecto</a></td></tr></table><p style="margin:0;text-align:center;font-size:13px;line-height:20px;color:#7a8497">Puedes administrar este recordatorio al editar ${candidate.entityType === "subtask" ? "la subtarea" : "la etapa"} en AC Edunity.</p></td></tr><tr><td align="center" style="padding:22px;background:#172341;color:#dce6fb;font-size:13px">AC Edunity · Gestión educativa inteligente · <a href="${APP_URL}" style="color:#7ed7f5">edunity.me</a></td></tr></table></td></tr></table></body></html>`;
+<body style="margin:0;background:#eef2f8;font-family:Arial,Helvetica,sans-serif;color:#24314d"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef2f8"><tr><td align="center" style="padding:28px 12px"><table role="presentation" class="shell" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 12px 36px rgba(31,45,88,.13)"><tr><td style="padding:32px;background:linear-gradient(135deg,#6554d9,#486fea 58%,#43b9e8);color:#fff"><div style="font-size:13px;font-weight:700;letter-spacing:1.4px">AC EDUNITY</div><h1 style="margin:10px 0 0;font-size:28px;line-height:35px">${escapeHtml(emailHeading(candidate.entityType, reminderType))}</h1></td></tr><tr><td class="body" style="padding:34px 40px 38px"><p style="margin:0 0 18px;font-size:16px;line-height:25px;color:#55627b">${greeting} Este es tu recordatorio académico.</p><div style="padding:22px;border:1px solid #dfe5f2;border-radius:16px;background:#f8f9fd"><div style="font-size:20px;font-weight:800;color:#273452">${escapeHtml(candidate.title)}</div><table role="presentation" class="detail" width="100%" cellspacing="0" cellpadding="0" style="margin-top:18px">${details}</table>${description ? `<p style="margin:18px 0 0;line-height:23px;color:#55627b"><b>Descripción:</b> ${escapeHtml(description)}</p>` : ""}</div><table role="presentation" align="center" cellspacing="0" cellpadding="0" style="margin:26px auto 16px"><tr><td bgcolor="#6554d9" style="border-radius:12px"><a class="button" href="${APP_URL}" style="display:inline-block;padding:14px 28px;color:#fff;text-decoration:none;font-weight:700">Ver mi proyecto</a></td></tr></table><p style="margin:0;text-align:center;font-size:13px;line-height:20px;color:#7a8497">Puedes administrar este recordatorio al editar ${entityLabel} en AC Edunity.</p></td></tr><tr><td align="center" style="padding:22px;background:#172341;color:#dce6fb;font-size:13px">AC Edunity · Gestión educativa inteligente · <a href="${APP_URL}" style="color:#7ed7f5">edunity.me</a></td></tr></table></td></tr></table></body></html>`;
 }
 
 function emailText(
@@ -150,11 +155,12 @@ function emailText(
   return [
     firstName ? `Hola, ${firstName}.` : "Hola.",
     `${emailHeading(candidate.entityType, reminderType)}.`,
-    `${candidate.entityType === "subtask" ? "Subtarea" : "Etapa"}: ${candidate.title}`,
-    projectName ? `Proyecto: ${projectName}` : "",
+    `${candidate.entityType === "project" ? "Proyecto" : candidate.entityType === "subtask" ? "Subtarea" : "Etapa"}: ${candidate.title}`,
+    candidate.entityType !== "project" && projectName ? `Proyecto: ${projectName}` : "",
+    candidate.entityType === "project" && stageName ? `Materia: ${stageName}` : "",
     candidate.entityType === "subtask" && stageName ? `Etapa: ${stageName}` : "",
-    candidate.entityType === "subtask" ? `Prioridad: ${priorityLabel(candidate.priority)}` : "",
-    candidate.entityType === "stage" && stageProgress ? `Progreso: ${stageProgress}` : "",
+    candidate.entityType !== "stage" ? `Prioridad: ${priorityLabel(candidate.priority)}` : "",
+    candidate.entityType !== "subtask" && stageProgress ? `Progreso: ${stageProgress}` : "",
     `Fecha límite: ${due.date}`,
     `Hora límite: ${due.time}`,
     `Tiempo restante: ${remainingLabel(reminderType)}`,
@@ -276,7 +282,15 @@ Deno.serve(async (request) => {
   const fromDate = localDateKey(new Date(now.getTime() - 60 * 60 * 1000));
   const throughDate = localDateKey(new Date(now.getTime() + 25 * 60 * 60 * 1000));
 
-  const [stageResult, subtaskResult] = await Promise.all([
+  const [projectResult, stageResult, subtaskResult] = await Promise.all([
+    admin.from("projects")
+      .select("id,user_id,subject_id,title,description,due_date,due_time,priority,status,reminders_enabled")
+      .eq("reminders_enabled", true)
+      .not("due_date", "is", null)
+      .not("due_time", "is", null)
+      .neq("status", "completed")
+      .gte("due_date", fromDate)
+      .lte("due_date", throughDate),
     admin.from("project_stages")
       .select("id,user_id,project_id,title,description,due_date,due_time,status,reminders_enabled")
       .eq("reminders_enabled", true)
@@ -295,13 +309,26 @@ Deno.serve(async (request) => {
       .lte("due_date", throughDate),
   ]);
 
-  if (stageResult.error || subtaskResult.error) {
-    const message = clean(stageResult.error?.message || subtaskResult.error?.message || "candidate_query_failed", 500);
+  if (projectResult.error || stageResult.error || subtaskResult.error) {
+    const message = clean(projectResult.error?.message || stageResult.error?.message || subtaskResult.error?.message || "candidate_query_failed", 500);
     console.error("[project-reminders] Error consultando candidatos", message);
     return json({ ok: false, error: "No se pudieron consultar los recordatorios" }, 500);
   }
 
   const candidates: Candidate[] = [
+    ...(projectResult.data || []).map((row) => ({
+      entityType: "project" as const,
+      id: row.id,
+      userId: row.user_id,
+      projectId: row.id,
+      stageId: null,
+      title: clean(row.title, 220),
+      description: clean(row.description, 800),
+      dueDate: clean(row.due_date, 10),
+      dueTime: clean(row.due_time, 8),
+      priority: clean(row.priority, 30),
+      status: clean(row.status, 30),
+    })),
     ...(stageResult.data || []).map((row) => ({
       entityType: "stage" as const,
       id: row.id,
@@ -335,15 +362,16 @@ Deno.serve(async (request) => {
   const userIds = [...new Set(candidates.map((item) => item.userId))];
   const projectIds = [...new Set(candidates.map((item) => item.projectId))];
   const stageIds = [...new Set(candidates.map((item) => item.stageId).filter(Boolean))] as string[];
-  const [preferencesResult, profilesResult, projectsResult, stagesResult, stageSubtasksResult] = await Promise.all([
+  const [preferencesResult, profilesResult, projectsResult, subjectsResult, stagesResult, stageSubtasksResult] = await Promise.all([
     admin.from("user_preferences").select("user_id,reminders_enabled").in("user_id", userIds),
     admin.from("profiles").select("id,full_name").in("id", userIds),
-    admin.from("projects").select("id,title").in("id", projectIds),
+    admin.from("projects").select("id,title,subject_id").in("id", projectIds),
+    admin.from("subjects").select("id,name").in("user_id", userIds),
     stageIds.length ? admin.from("project_stages").select("id,title").in("id", stageIds) : Promise.resolve({ data: [], error: null }),
-    stageIds.length ? admin.from("project_subtasks").select("stage_id,status").in("stage_id", stageIds) : Promise.resolve({ data: [], error: null }),
+    projectIds.length ? admin.from("project_subtasks").select("project_id,stage_id,status").in("project_id", projectIds) : Promise.resolve({ data: [], error: null }),
   ]);
 
-  const metadataError = preferencesResult.error || profilesResult.error || projectsResult.error || stagesResult.error || stageSubtasksResult.error;
+  const metadataError = preferencesResult.error || profilesResult.error || projectsResult.error || subjectsResult.error || stagesResult.error || stageSubtasksResult.error;
   if (metadataError) {
     console.error("[project-reminders] Error consultando metadatos", clean(metadataError.message, 500));
     return json({ ok: false, error: "No se pudieron consultar las preferencias" }, 500);
@@ -351,14 +379,20 @@ Deno.serve(async (request) => {
 
   const preferenceMap = new Map((preferencesResult.data || []).map((row) => [row.user_id, row.reminders_enabled === true]));
   const profileMap = new Map((profilesResult.data || []).map((row) => [row.id, clean(row.full_name, 180).split(/\s+/)[0] || ""]));
-  const projectMap = new Map((projectsResult.data || []).map((row) => [row.id, clean(row.title, 220)]));
+  const projectMap = new Map((projectsResult.data || []).map((row) => [row.id, { title: clean(row.title, 220), subjectId: clean(row.subject_id, 80) }]));
+  const subjectMap = new Map((subjectsResult.data || []).map((row) => [row.id, clean(row.name, 180)]));
   const stageMap = new Map((stagesResult.data || []).map((row) => [row.id, clean(row.title, 220)]));
   const stageCounts = new Map<string, { total: number; completed: number }>();
+  const projectCounts = new Map<string, { total: number; completed: number }>();
   for (const row of stageSubtasksResult.data || []) {
     const count = stageCounts.get(row.stage_id) || { total: 0, completed: 0 };
     count.total += 1;
     if (row.status === "completed") count.completed += 1;
     stageCounts.set(row.stage_id, count);
+    const projectCount = projectCounts.get(row.project_id) || { total: 0, completed: 0 };
+    projectCount.total += 1;
+    if (row.status === "completed") projectCount.completed += 1;
+    projectCounts.set(row.project_id, projectCount);
   }
 
   const authUsers = new Map<string, Awaited<ReturnType<typeof admin.auth.admin.getUserById>>>();
@@ -398,9 +432,12 @@ Deno.serve(async (request) => {
         continue;
       }
 
-      const projectName = projectMap.get(candidate.projectId) || "Proyecto";
-      const stageName = candidate.stageId ? stageMap.get(candidate.stageId) || "" : "";
-      const count = candidate.stageId ? stageCounts.get(candidate.stageId) : null;
+      const projectInfo = projectMap.get(candidate.projectId);
+      const projectName = projectInfo?.title || "Proyecto";
+      const stageName = candidate.entityType === "project"
+        ? subjectMap.get(projectInfo?.subjectId || "") || "Sin materia"
+        : candidate.stageId ? stageMap.get(candidate.stageId) || "" : "";
+      const count = candidate.entityType === "project" ? projectCounts.get(candidate.projectId) : candidate.stageId ? stageCounts.get(candidate.stageId) : null;
       const stageProgress = count?.total ? `${count.completed} de ${count.total} subtareas completadas` : "Sin subtareas registradas";
 
       try {

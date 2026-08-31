@@ -3973,6 +3973,7 @@ function getGoogleCalendarUrl(event) {
         details,
         trp: 'true'
     });
+    if (!event.allDay) params.set('ctz', event.timeZone || 'America/Guayaquil');
     return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
@@ -3996,6 +3997,22 @@ function openGoogleCalendarForEvent(event) {
     }
     notify('Google Calendar se abrio con el evento listo para guardar.', 'info');
     return calendarWindow;
+}
+
+function openAgendaItemInGoogleCalendar(item) {
+    if (!item?.date) {
+        notify('Este elemento no tiene una fecha válida para Google Calendar.', 'error');
+        return null;
+    }
+    return openGoogleCalendarForEvent({
+        title: item.title,
+        date: item.date,
+        time: item.time || '',
+        allDay: item.allDay === true || !item.time,
+        calendarDetails: item.calendarDetails || item.description || 'Elemento académico gestionado desde AC Edunity.',
+        type: item.calendarType || item.kind || 'Elemento académico',
+        timeZone: 'America/Guayaquil'
+    });
 }
 
 function openGoogleCalendarEvent(eventId) {
@@ -4214,7 +4231,7 @@ function renderCalendarSection(workspace) {
                                     ${event.kind === 'evaluation'
                                         ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Google Calendar</button>`
                                         : event.kind !== 'event'
-                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>`
+                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button><button class="btn-secondary btn-small google-calendar-btn" data-google-planning="${escapeHTML(event.id)}">Agregar a Google Calendar</button>`
                                             : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
@@ -4230,6 +4247,10 @@ function renderCalendarSection(workspace) {
     container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
     container.querySelectorAll('[data-google-evaluation]').forEach(button => button.addEventListener('click', () => openGoogleCalendarForEvaluation(button.dataset.googleEvaluation)));
+    container.querySelectorAll('[data-google-planning]').forEach(button => button.addEventListener('click', () => {
+        const item = planningEvents.find(event => event.id === button.dataset.googlePlanning);
+        if (item) openAgendaItemInGoogleCalendar(item);
+    }));
     container.querySelectorAll('[data-calendar-planning]').forEach(button => button.addEventListener('click', () => {
         navigateTo('goals-projects');
         const projectId = button.dataset.calendarPlanning;
