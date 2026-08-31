@@ -110,7 +110,6 @@ async function saveSubtask(e,projectId,stageId,id){
     const data=gpData(form),workspace=loadWorkspace(),old=workspace.projectSubtasks.find(item=>item.id===id),project=workspace.projects.find(item=>item.id===projectId),subjectName=workspace.subjects.find(item=>item.id===project?.subjectId)?.name||project?.subject||'General',wantsTask=Boolean(data.add_task),oldTaskId=old?.taskId||null,position=id?old.position:workspace.projectSubtasks.filter(item=>item.stageId===stageId).length,sb=getSupabaseClient();
     let targetTaskId=wantsTask?oldTaskId:null;
     let createdTask=null;
-    let taskWorkspaceChanged=false;
     goalsProjectsSaving=true;
 
     try{
@@ -143,7 +142,7 @@ async function saveSubtask(e,projectId,stageId,id){
                 savedTask=updatedTask;
             }
             commitSavedTaskToWorkspace(savedTask,subjectName);
-            taskWorkspaceChanged=true;
+            refreshTaskDependentUI();
         }else if(oldTaskId){
             const{error:deleteError}=await sb.from('tasks').delete().eq('id',oldTaskId).eq('user_id',currentUser.id).select('id').single();
             if(deleteError){
@@ -151,12 +150,11 @@ async function saveSubtask(e,projectId,stageId,id){
                 throw new Error(rolledBack?`No se pudo desvincular la tarea: ${deleteError.message}`:`No se pudo eliminar la tarea vinculada ni restaurar la relación: ${deleteError.message}`);
             }
             removeTaskFromWorkspace(oldTaskId);
-            taskWorkspaceChanged=true;
+            refreshTaskDependentUI();
         }
 
         await persistDerivedStageStatus(stageId);
         refreshGpDependentUI();
-        if(taskWorkspaceChanged)refreshTaskDependentUI();
         closeGpModal();
         notify(id?'Subtarea actualizada.':'Subtarea creada.','success');
     }catch(error){
