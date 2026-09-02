@@ -76,12 +76,12 @@ function formatDue(date: Date) {
       month: "long",
       year: "numeric",
     }).format(date),
-    time: new Intl.DateTimeFormat("es-EC", {
+    time: new Intl.DateTimeFormat("en-US", {
       timeZone: TIME_ZONE,
-      hour: "2-digit",
+      hour: "numeric",
       minute: "2-digit",
-      hour12: false,
-    }).format(date),
+      hour12: true,
+    }).format(date).replace(/\u202f/g, " "),
   };
 }
 

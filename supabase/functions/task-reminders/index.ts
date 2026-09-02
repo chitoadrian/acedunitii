@@ -79,9 +79,9 @@ function formatDue(dueAt: Date) {
   const date = new Intl.DateTimeFormat("es-EC", {
     timeZone: PROJECT_TIME_ZONE, weekday: "long", day: "numeric", month: "long", year: "numeric",
   }).format(dueAt);
-  const time = new Intl.DateTimeFormat("es-EC", {
-    timeZone: PROJECT_TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false,
-  }).format(dueAt);
+  const time = new Intl.DateTimeFormat("en-US", {
+    timeZone: PROJECT_TIME_ZONE, hour: "numeric", minute: "2-digit", hour12: true,
+  }).format(dueAt).replace(/\u202f/g, " ");
   return { date, time };
 }
 

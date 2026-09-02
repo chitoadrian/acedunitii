@@ -394,6 +394,102 @@ function bindAuthForms() {
     }
 }
 
+let time12FieldSequence = 0;
+
+function renderTime12Field(field = {}) {
+    const fieldName = String(field.name || 'time');
+    const fieldLabel = String(field.label || 'Hora');
+    const converted = ACEdunityTime.convert24HourTo12(field.value || '');
+    const fieldId = `time12-${fieldName.replace(/[^a-zA-Z0-9_-]/g, '-')}-${++time12FieldSequence}`;
+    const required = field.required === false ? '' : 'required';
+    return `
+        <div class="time12-control" data-time12-control data-time12-required="${field.required === false ? 'false' : 'true'}">
+            <input type="hidden" name="${escapeHTML(fieldName)}" value="${escapeHTML(ACEdunityTime.normalize24HourTime(field.value || ''))}" data-time12-value>
+            <input
+                id="${escapeHTML(fieldId)}"
+                class="time12-clock"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="12:00"
+                pattern="(?:0?[1-9]|1[0-2]):[0-5][0-9]"
+                maxlength="5"
+                value="${escapeHTML(converted.clock)}"
+                aria-label="${escapeHTML(fieldLabel)} en formato de 12 horas"
+                data-time12-clock
+                ${required}
+            >
+            <select class="time12-period" aria-label="Seleccionar AM o PM para ${escapeHTML(fieldLabel.toLowerCase())}" data-time12-period>
+                <option value="AM" ${converted.period === 'AM' ? 'selected' : ''}>AM</option>
+                <option value="PM" ${converted.period === 'PM' ? 'selected' : ''}>PM</option>
+            </select>
+        </div>
+    `;
+}
+
+function syncTime12Control(control, reportValidity = false) {
+    const hidden = control?.querySelector('[data-time12-value]');
+    const clock = control?.querySelector('[data-time12-clock]');
+    const period = control?.querySelector('[data-time12-period]');
+    if (!hidden || !clock || !period) return true;
+
+    const clockValue = String(clock.value || '').trim();
+    const required = control.dataset.time12Required !== 'false';
+    if (!clockValue) {
+        hidden.value = '';
+        clock.setCustomValidity(required ? 'Selecciona una hora.' : '');
+        control.classList.toggle('is-invalid', required);
+        if (reportValidity && required) {
+            clock.reportValidity();
+            clock.focus();
+        }
+        return !required;
+    }
+
+    const normalized = ACEdunityTime.convert12HourTo24(clockValue, period.value);
+    if (!normalized) {
+        hidden.value = '';
+        clock.setCustomValidity('Usa una hora válida entre 1:00 y 12:59 y selecciona AM o PM.');
+        control.classList.add('is-invalid');
+        if (reportValidity) {
+            clock.reportValidity();
+            clock.focus();
+        }
+        return false;
+    }
+
+    hidden.value = normalized;
+    clock.setCustomValidity('');
+    control.classList.remove('is-invalid');
+    return true;
+}
+
+function initializeTime12Controls(root = document) {
+    root.querySelectorAll('[data-time12-control]').forEach(control => {
+        if (control.dataset.time12Bound === 'true') return;
+        control.dataset.time12Bound = 'true';
+        const clock = control.querySelector('[data-time12-clock]');
+        const period = control.querySelector('[data-time12-period]');
+        clock?.addEventListener('input', () => syncTime12Control(control));
+        clock?.addEventListener('blur', () => {
+            if (!syncTime12Control(control)) return;
+            const hidden = control.querySelector('[data-time12-value]');
+            const display = ACEdunityTime.convert24HourTo12(hidden?.value || '');
+            if (clock.value.trim()) clock.value = display.clock;
+        });
+        period?.addEventListener('change', () => syncTime12Control(control));
+        syncTime12Control(control);
+    });
+}
+
+function syncTime12Controls(root, reportValidity = false) {
+    const controls = [...root.querySelectorAll('[data-time12-control]')];
+    for (const control of controls) {
+        if (!syncTime12Control(control, reportValidity)) return false;
+    }
+    return true;
+}
+
 function openQuickForm(config) {
     const existingModal = document.querySelector('.quick-modal');
     if (existingModal) existingModal.remove();
@@ -415,6 +511,12 @@ function openQuickForm(config) {
                         <legend>${escapeHTML(field.label)}</legend>
                         ${renderQuickField(field)}
                     </fieldset>
+                ` : field.type === 'time12' ? `
+                    <div class="quick-time12-field">
+                        <span class="quick-time12-label">${escapeHTML(field.label)}</span>
+                        ${renderTime12Field(field)}
+                        ${field.help ? `<small>${escapeHTML(field.help)}</small>` : ''}
+                    </div>
                 ` : `
                     <label>
                         <span>${escapeHTML(field.label)}</span>
@@ -458,6 +560,7 @@ function openQuickForm(config) {
         event.preventDefault();
         const form = event.currentTarget;
         if (form.dataset.submitting === 'true') return;
+        if (!syncTime12Controls(form, true)) return;
 
         const formData = new FormData(form);
         const values = Object.fromEntries(formData.entries());
@@ -493,11 +596,14 @@ function openQuickForm(config) {
     });
 
     document.body.appendChild(modal);
+    initializeTime12Controls(modal);
     const firstInput = modal.querySelector('input, textarea, select');
     if (firstInput) firstInput.focus();
 }
 
 function renderQuickField(field) {
+    if (field.type === 'time12') return renderTime12Field(field);
+
     if (field.type === 'textarea') {
         return `
             <textarea
@@ -1934,7 +2040,7 @@ function renderCalendarEvent(event) {
         </div>
         <div class="event-content">
             <h4>${escapeHTML(event.title)}</h4>
-            <p>${escapeHTML(event.time)}</p>
+            <p>${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p>
             <span class="event-badge">${escapeHTML(event.type)}</span>
         </div>
     `;
@@ -2709,7 +2815,7 @@ function renderCalendarSection(workspace) {
                 ${workspace.events.length ? workspace.events.map(event => `
                     <div class="event-item event-custom">
                         <div class="event-date"><span class="day">${escapeHTML(event.day)}</span><span class="month">AC</span></div>
-                        <div class="event-content"><h4>${escapeHTML(event.title)}</h4><p>${escapeHTML(event.time)}</p><span class="event-badge">${escapeHTML(event.type)}</span></div>
+                        <div class="event-content"><h4>${escapeHTML(event.title)}</h4><p>${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p><span class="event-badge">${escapeHTML(event.type)}</span></div>
                     </div>
                 `).join('') : emptyStateHTML('No tienes eventos programados.', 'Agendar evento', 'addCalendarEventUI()')}
             </div>
@@ -3750,7 +3856,7 @@ function openTaskForm(taskId = null) {
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: task?.subject || '' },
             { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea' },
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due) },
-            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se usarán las 18:00 (America/Guayaquil).' },
+            { name: 'dueTime', label: 'Hora límite', type: 'time12', value: task?.dueTime || '', required: false, help: 'Selecciona la hora y especifica AM o PM.' },
             { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' }
         ],
         onSubmit: values => {
@@ -4034,7 +4140,7 @@ function openEventForm(eventId = null) {
             { name: 'type', label: 'Tipo', type: 'select', options: eventTypeOptions, value: event?.type || 'recordatorio' },
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(workspace), value: event?.subject || 'General' },
             { name: 'date', label: 'Fecha', type: 'date', value: normalizeDate(event?.date) },
-            { name: 'time', label: 'Hora', type: 'time', value: event?.time || '08:00' },
+            { name: 'time', label: 'Hora', type: 'time12', value: event?.time || '08:00' },
             { name: 'description', label: 'Descripción', type: 'textarea', rows: 3, value: event?.description || '', required: false, placeholder: 'Detalle del evento' },
             {
                 label: 'Notificaciones',
@@ -4224,7 +4330,7 @@ function renderCalendarSection(workspace) {
                             <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML(eventMonth)}</span></div>
                             <div class="event-content">
                                 <h4>${escapeHTML(event.title)}</h4>
-                                <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(event.time || 'Sin hora')}</p>
+                                <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p>
                                 <span class="event-badge">${escapeHTML(event.calendarType || event.type)}</span>
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions">
@@ -7492,7 +7598,7 @@ function renderDashboard(workspace) {
             ${nextEvaluation ? `
                 <div class="dashboard-next-evaluation-copy">
                     <h3>${escapeHTML(nextEvaluation.title)}</h3>
-                    <p>${escapeHTML(nextEvaluation.type || 'Evaluación')} · ${escapeHTML(formatEvaluationCompactDate(nextEvaluation.date))}${nextEvaluation.time ? ` · ${escapeHTML(String(nextEvaluation.time).slice(0, 5))}` : ''}</p>
+                    <p>${escapeHTML(nextEvaluation.type || 'Evaluación')} · ${escapeHTML(formatEvaluationCompactDate(nextEvaluation.date))}${nextEvaluation.time ? ` · ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(nextEvaluation.time))}` : ''}</p>
                 </div>
                 <div class="dashboard-next-evaluation-countdown">
                     <span>⏱ Faltan</span>
@@ -8849,7 +8955,7 @@ function openEvaluationForm(evaluationId = null) {
                     <label><span>Materia</span><select name="subjectId" required><option value="">Selecciona una materia</option>${evaluationSubjectOptionsHTML(workspace, evaluation?.subjectId || '')}</select></label>
                     <label><span>Tipo de evaluación</span><select name="type">${evaluationTypeOptions.map(type => `<option value="${escapeHTML(type)}" ${type === (evaluation?.type || 'Examen') ? 'selected' : ''}>${escapeHTML(type)}</option>`).join('')}</select></label>
                     <label><span>Fecha</span><input name="date" type="date" value="${escapeHTML(evaluation?.date || '')}" required></label>
-                    <label><span>Hora <small>(opcional)</small></span><input name="time" type="time" value="${escapeHTML(evaluation?.time || '')}"></label>
+                    <div class="evaluation-time12-field"><span>Hora <small>(opcional)</small></span>${renderTime12Field({ name: 'time', label: 'Hora de la evaluación', value: evaluation?.time || '', required: false })}</div>
                     <label><span>Estado</span><select name="status">${evaluationStatusOptions.map(option => `<option value="${option.value}" ${option.value === (evaluation?.status || 'pending') ? 'selected' : ''}>${option.label}</option>`).join('')}</select></label>
                     <label><span>Prioridad</span><select name="priority">${evaluationPriorityOptions.map(option => `<option value="${option.value}" ${option.value === (evaluation?.priority || 'medium') ? 'selected' : ''}>${option.label}</option>`).join('')}</select></label>
                 </div>
@@ -8894,6 +9000,7 @@ function openEvaluationForm(evaluationId = null) {
         event.preventDefault();
         if (evaluationSubmitInProgress) return;
         const form = event.currentTarget;
+        if (!syncTime12Controls(form, true)) return;
         const values = new FormData(form);
         const title = String(values.get('title') || '').trim();
         const subjectId = String(values.get('subjectId') || '');
@@ -8942,6 +9049,7 @@ function openEvaluationForm(evaluationId = null) {
         }
     });
     document.body.appendChild(modal);
+    initializeTime12Controls(modal);
     modal.querySelector('[name="title"]')?.focus();
 }
 
@@ -8958,7 +9066,7 @@ function openEvaluationDetail(evaluationId) {
             <button class="quick-modal-close" type="button" aria-label="Cerrar">×</button>
             <span class="evaluations-kicker">${escapeHTML(subject?.name || evaluation.subject)}</span>
             <h3 id="evaluation-detail-title">${escapeHTML(evaluation.title)}</h3>
-            <div class="evaluation-detail-meta"><span>${escapeHTML(evaluation.type)}</span><span>${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(evaluation.time)}` : ''}</span><span>${escapeHTML(getEvaluationCountdown(evaluation))}</span></div>
+            <div class="evaluation-detail-meta"><span>${escapeHTML(evaluation.type)}</span><span>${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(evaluation.time))}` : ''}</span><span>${escapeHTML(getEvaluationCountdown(evaluation))}</span></div>
             <div class="evaluation-detail-status"><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
             ${evaluation.description ? `<section><h4>Descripción / notas</h4><p>${escapeHTML(evaluation.description)}</p></section>` : ''}
             <section><h4>Temas</h4>${evaluation.topics.length ? `<div class="evaluation-topic-list">${evaluation.topics.map(topic => `<span>${escapeHTML(topic)}</span>`).join('')}</div>` : '<p class="evaluation-muted">Sin temas registrados.</p>'}</section>
@@ -9200,7 +9308,7 @@ function renderEvaluations(workspace) {
                 return `<article class="evaluation-card" style="${getAcademicCardStyle(subject?.color || 'Morado')}" data-evaluation-id="${escapeHTML(evaluation.id)}">
                     <div class="evaluation-card-top"><span class="evaluation-subject">${escapeHTML(subject?.name || evaluation.subject)}</span><div class="evaluation-menu-wrap"><button class="evaluation-menu-button" type="button" aria-label="Opciones de ${escapeHTML(evaluation.title)}" aria-haspopup="menu" aria-expanded="false" data-evaluation-menu-button="${escapeHTML(evaluation.id)}">⋯</button><div class="evaluation-menu" role="menu"><button role="menuitem" type="button" data-evaluation-view="${escapeHTML(evaluation.id)}">Ver detalles</button><button role="menuitem" type="button" data-evaluation-edit="${escapeHTML(evaluation.id)}">Editar</button><button role="menuitem" type="button" data-evaluation-calendar="${escapeHTML(evaluation.id)}" data-calendar-enabled="${evaluation.showInCalendar}">${evaluation.showInCalendar ? 'Quitar del Calendario' : 'Agendar en Calendario'}</button><button role="menuitem" type="button" data-evaluation-reminder="${escapeHTML(evaluation.id)}">Recordatorio por correo${evaluation.remindersEnabled ? ' · Activado' : ''}</button><button class="is-danger" role="menuitem" type="button" data-evaluation-delete="${escapeHTML(evaluation.id)}">Eliminar</button></div></div></div>
                     <h3>${escapeHTML(evaluation.title)}</h3>
-                    <p class="evaluation-card-schedule">${escapeHTML(evaluation.type)} · ${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(evaluation.time)}` : ''}</p>
+                    <p class="evaluation-card-schedule">${escapeHTML(evaluation.type)} · ${escapeHTML(formatEvaluationDate(evaluation.date))}${evaluation.time ? ` · ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(evaluation.time))}` : ''}</p>
                     <div class="evaluation-countdown-wrap"><span>⏱ Faltan</span><strong class="evaluation-countdown" data-evaluation-countdown="${escapeHTML(evaluation.id)}">${escapeHTML(getEvaluationCountdown(evaluation))}</strong></div>
                     <div class="evaluation-card-meta"><span>${evaluation.topics.length} ${evaluation.topics.length === 1 ? 'tema' : 'temas'}</span><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
                     ${isFuture ? `<button class="evaluation-tutor-button" type="button" data-evaluation-tutor="${escapeHTML(evaluation.id)}">Preparar con Tutor IA</button>` : ''}
@@ -11773,7 +11881,7 @@ function openTaskForm(taskId = null) {
             { name: 'subject', label: 'Materia', type: 'select', options: getSubjectOptions(initialWorkspace), value: task?.subject || 'General' },
             { name: 'description', label: 'Descripción', type: 'textarea', value: task?.description || '', placeholder: 'Detalles de la tarea', required: false },
             { name: 'due', label: 'Fecha límite', type: 'date', value: normalizeDate(task?.due), required: false },
-            { name: 'dueTime', label: 'Hora límite', type: 'time', value: task?.dueTime || '', required: false, help: 'Si no eliges una hora, se guardará sin hora específica.' },
+            { name: 'dueTime', label: 'Hora límite', type: 'time12', value: task?.dueTime || '', required: false, help: 'Selecciona la hora y especifica AM o PM.' },
             { name: 'priority', label: 'Prioridad', type: 'select', options: taskPriorityOptions, value: task?.priority || 'media' },
             { name: 'remindersEnabled', label: 'Recordatorios', type: 'checkbox', checked: task ? task.remindersEnabled === true : false, help: 'Activar recordatorio por correo para esta tarea' }
         ],

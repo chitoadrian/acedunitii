@@ -77,9 +77,9 @@ function formatDue(date: Date) {
     date: new Intl.DateTimeFormat("es-EC", {
       timeZone: TIME_ZONE, weekday: "long", day: "numeric", month: "long", year: "numeric",
     }).format(date),
-    time: new Intl.DateTimeFormat("es-EC", {
-      timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hour12: false,
-    }).format(date),
+    time: new Intl.DateTimeFormat("en-US", {
+      timeZone: TIME_ZONE, hour: "numeric", minute: "2-digit", hour12: true,
+    }).format(date).replace(/\u202f/g, " "),
   };
 }
 

@@ -41114,8 +41114,6 @@ html.reduce-app-motion #landing-page #benefits-use .benefits-path::after {
 .gp-reminder-warning-card h3 { margin: 0; font-size: 1.15rem; }
 .gp-reminder-warning-card p { margin: 10px 0 20px; color: #b8c1dc; line-height: 1.55; }
 .gp-reminder-warning-card button { min-width: 130px; }
-.gp-planning-modal input[type="time"] { color-scheme: dark; }
-
 body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-reminder-warning-card {
     color: #1f2937;
     background: #fafafa;
@@ -41124,9 +41122,120 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-reminder-warning-ca
 }
 
 body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-reminder-warning-card p { color: #5c6677; }
-body:is(.light-theme, .light-mode, [data-theme="light"]) .gp-planning-modal input[type="time"] { color-scheme: light; }
-
 @media (max-width: 520px) {
     .gp-reminder-warning { padding: 14px; }
     .gp-reminder-warning-card { padding: 21px 18px; border-radius: 16px; }
+}
+
+/* 12-hour time controls */
+.quick-time12-field,
+.evaluation-time12-field {
+    min-width: 0;
+    display: grid;
+    gap: 8px;
+    color: var(--text-secondary, #a7b0c2);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.quick-time12-label,
+.evaluation-time12-field > span {
+    line-height: 1.25;
+}
+
+.quick-time12-field > small {
+    color: var(--text-secondary, #a7b0c2);
+    font-size: .74rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.time12-control {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(78px, 92px);
+    align-items: stretch;
+    gap: 8px;
+}
+
+.time12-control > input[type="hidden"] {
+    display: none !important;
+}
+
+.time12-control .time12-clock,
+.time12-control .time12-period {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.time12-control .time12-clock {
+    font-variant-numeric: tabular-nums;
+}
+
+.time12-control .time12-period {
+    cursor: pointer;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: .035em;
+}
+
+.time12-control.is-invalid .time12-clock {
+    border-color: #e96f7f !important;
+    box-shadow: 0 0 0 3px rgba(233, 111, 127, .15) !important;
+}
+
+body .quick-modal-card[aria-label="Crear tarea"] .quick-time12-field,
+body .quick-modal-card[aria-label="Editar tarea"] .quick-time12-field,
+body .quick-modal-card[aria-label="Crear evento"] .quick-time12-field,
+body .quick-modal-card[aria-label="Editar evento"] .quick-time12-field {
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+body .quick-modal-card[aria-label="Crear tarea"] .quick-time12-field,
+body .quick-modal-card[aria-label="Editar tarea"] .quick-time12-field {
+    color: var(--task-modal-muted) !important;
+    font-size: .78rem !important;
+    font-weight: 650 !important;
+}
+
+body .quick-modal-card[aria-label="Crear evento"] .quick-time12-field,
+body .quick-modal-card[aria-label="Editar evento"] .quick-time12-field {
+    color: #9ba8bb !important;
+    font-size: .72rem !important;
+    font-weight: 750 !important;
+    letter-spacing: .035em !important;
+}
+
+.evaluation-time12-field {
+    color: var(--text-secondary, #a7b0c2);
+    text-transform: uppercase;
+}
+
+.gp-planning-modal .time12-control .time12-period {
+    min-height: 46px;
+    padding: 11px 10px;
+    color: var(--gp-text);
+    background: color-mix(in srgb, var(--gp-surface-soft) 88%, transparent);
+    border: 1px solid var(--gp-border);
+    border-radius: 12px;
+    outline: none;
+}
+
+.gp-planning-modal .time12-control .time12-period:focus-visible {
+    border-color: var(--gp-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gp-accent) 18%, transparent);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Crear evento"] .quick-time12-field,
+body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-label="Editar evento"] .quick-time12-field {
+    color: #526174 !important;
+}
+
+@media (max-width: 520px) {
+    .time12-control {
+        grid-template-columns: minmax(0, 1fr) 82px;
+        gap: 7px;
+    }
 }
