@@ -3920,27 +3920,28 @@ function completeTask(taskId) {
 }
 
 function getTaskGoogleCalendarUrl(task) {
-    // Futuro backend: este enlace puede reemplazarse por Google Calendar API con OAuth del usuario.
     const date = normalizeDate(task.due) || normalizeDate(new Date().toISOString());
-    const start = toGoogleCalendarDate(date, '08:00');
-    const end = toGoogleCalendarDate(date, '09:00');
     const details = [
         task.description || 'Tarea académica creada en AC Edunity.',
         `Materia: ${task.subject || 'General'}`,
         `Prioridad: ${getTaskPriorityLabel(task.priority || 'media')}`
     ].join('\n');
 
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(task.title)}&dates=${start}/${end}&details=${encodeURIComponent(details)}&sf=true&output=xml`;
+    return getGoogleCalendarUrl({ title: task.title, date, time: task.dueTime || '08:00', calendarDetails: details });
 }
 
 function openTaskInGoogleCalendar(taskId) {
     const workspace = loadWorkspace();
     const task = workspace.tasks.find(item => item.id === taskId);
     if (!task) return;
-    const opened = window.open(getTaskGoogleCalendarUrl(task), '_blank', 'noopener,noreferrer');
+    const opened = window.open(getTaskGoogleCalendarUrl(task), '_blank');
     if (!opened) {
         notify('Permite ventanas emergentes para abrir Google Calendar.', 'info');
+        return null;
     }
+    try { opened.opener = null; } catch (_) { /* Browser isolation may prevent access. */ }
+    ACGoogleCalendarManual.markOpened('task', taskId);
+    return opened;
 }
 
 function renderTasks(workspace) {
@@ -4025,7 +4026,7 @@ function renderTasks(workspace) {
                         <div class="task-card-actions ${actionLayoutClass}">
                             <button class="btn-secondary btn-small" data-task-edit="${escapeHTML(task.id)}">Editar</button>
                             ${task.status !== 'completed' ? `<button class="btn-primary btn-small" data-task-complete="${escapeHTML(task.id)}">Completar</button>` : ''}
-                            <button class="btn-secondary btn-small" data-task-calendar="${escapeHTML(task.id)}">Google Calendar</button>
+                            ${ACGoogleCalendarManual.render('task', task.id)}
                             <button class="btn-danger btn-small" data-task-delete="${escapeHTML(task.id)}">Eliminar</button>
                         </div>
                     </article>
@@ -4038,7 +4039,6 @@ function renderTasks(workspace) {
     list.querySelectorAll('[data-task-edit]').forEach(button => button.addEventListener('click', () => openTaskForm(button.dataset.taskEdit)));
     list.querySelectorAll('[data-task-delete]').forEach(button => button.addEventListener('click', () => deleteTask(button.dataset.taskDelete)));
     list.querySelectorAll('[data-task-complete]').forEach(button => button.addEventListener('click', () => completeTask(button.dataset.taskComplete)));
-    list.querySelectorAll('[data-task-calendar]').forEach(button => button.addEventListener('click', () => openTaskInGoogleCalendar(button.dataset.taskCalendar)));
 }
 
 function addCalendarEventUI() {
@@ -4066,7 +4066,10 @@ function getNextCalendarDate(date) {
 
 function getGoogleCalendarUrl(event) {
     const start = event.allDay ? event.date.replaceAll('-', '') : toGoogleCalendarDate(event.date, event.time || '08:00');
-    const end = event.allDay ? getNextCalendarDate(event.date) : toGoogleCalendarDate(event.date, addMinutesToTime(event.time || '08:00', 60));
+    // UTC arithmetic is only a calendar clock; the URL still uses local time and ctz.
+    const endClock = event.allDay ? null : new Date(`${event.date}T${(event.time || '08:00').slice(0, 5)}:00Z`);
+    if (endClock) endClock.setUTCHours(endClock.getUTCHours() + 1);
+    const end = event.allDay ? getNextCalendarDate(event.date) : endClock.toISOString().slice(0, 19).replaceAll('-', '').replaceAll(':', '');
     const details = event.calendarDetails || [
         event.description || 'Evento creado desde AC Edunity.',
         event.subject ? `Materia: ${event.subject}.` : '',
@@ -4110,7 +4113,7 @@ function openAgendaItemInGoogleCalendar(item) {
         notify('Este elemento no tiene una fecha válida para Google Calendar.', 'error');
         return null;
     }
-    return openGoogleCalendarForEvent({
+    const opened = openGoogleCalendarForEvent({
         title: item.title,
         date: item.date,
         time: item.time || '',
@@ -4119,13 +4122,17 @@ function openAgendaItemInGoogleCalendar(item) {
         type: item.calendarType || item.kind || 'Elemento académico',
         timeZone: 'America/Guayaquil'
     });
+    if (opened) ACGoogleCalendarManual.markOpened(item.kind, item.entityId);
+    return opened;
 }
 
 function openGoogleCalendarEvent(eventId) {
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
     if (!event) return;
-    openGoogleCalendarForEvent(event);
+    const opened = openGoogleCalendarForEvent(event);
+    if (opened) ACGoogleCalendarManual.markOpened('event', eventId);
+    return opened;
 }
 function openEventForm(eventId = null) {
     const workspace = loadWorkspace();
@@ -4233,6 +4240,7 @@ function openEventForm(eventId = null) {
                     pushRecentMessage(`Agendaste ${payload.title}.`);
                 }
 
+                if (googleCalendarWindow && currentUser?.id === authUserId) ACGoogleCalendarManual.markOpened('event', savedEventId);
                 refreshEventViews();
                 if (!eventId) refreshActivityAfterSourceMutation(savedEventId, 'event_created').catch(error => logSupabaseError('event activity refresh', error));
                 const durationMs = Math.round(performance.now() - saveStartedAt);
@@ -4335,10 +4343,10 @@ function renderCalendarSection(workspace) {
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button><button class="btn-secondary btn-small google-calendar-btn" data-google-evaluation="${escapeHTML(event.id)}">Google Calendar</button>`
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.render('evaluation', event.id)}`
                                         : event.kind !== 'event'
-                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button><button class="btn-secondary btn-small google-calendar-btn" data-google-planning="${escapeHTML(event.id)}">Agregar a Google Calendar</button>`
-                                            : `<button class="btn-secondary btn-small google-calendar-btn" data-google-event="${escapeHTML(event.id)}">Google Calendar</button><button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
+                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
+                                            : `${ACGoogleCalendarManual.render('event', event.id)}<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
                                 </div>
                             </div>
                         </div>
@@ -4348,15 +4356,9 @@ function renderCalendarSection(workspace) {
         </div>
     `;
     generateCalendar();
-    container.querySelectorAll('[data-google-event]').forEach(button => button.addEventListener('click', () => openGoogleCalendarEvent(button.dataset.googleEvent)));
     container.querySelectorAll('[data-event-edit]').forEach(button => button.addEventListener('click', () => openEventForm(button.dataset.eventEdit)));
     container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
-    container.querySelectorAll('[data-google-evaluation]').forEach(button => button.addEventListener('click', () => openGoogleCalendarForEvaluation(button.dataset.googleEvaluation)));
-    container.querySelectorAll('[data-google-planning]').forEach(button => button.addEventListener('click', () => {
-        const item = planningEvents.find(event => event.id === button.dataset.googlePlanning);
-        if (item) openAgendaItemInGoogleCalendar(item);
-    }));
     container.querySelectorAll('[data-calendar-planning]').forEach(button => button.addEventListener('click', () => {
         navigateTo('goals-projects');
         const projectId = button.dataset.calendarPlanning;
@@ -9070,11 +9072,10 @@ function openEvaluationDetail(evaluationId) {
             <div class="evaluation-detail-status"><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
             ${evaluation.description ? `<section><h4>Descripción / notas</h4><p>${escapeHTML(evaluation.description)}</p></section>` : ''}
             <section><h4>Temas</h4>${evaluation.topics.length ? `<div class="evaluation-topic-list">${evaluation.topics.map(topic => `<span>${escapeHTML(topic)}</span>`).join('')}</div>` : '<p class="evaluation-muted">Sin temas registrados.</p>'}</section>
-            <div class="quick-modal-actions"><button class="btn-secondary btn-small" type="button" data-detail-google>Google Calendar</button><button class="btn-secondary btn-small" type="button" data-detail-tutor>Preparar con Tutor IA</button><button class="btn-primary btn-small" type="button" data-detail-edit>Editar</button></div>
+            <div class="quick-modal-actions">${ACGoogleCalendarManual.render('evaluation', evaluation.id)}<button class="btn-secondary btn-small" type="button" data-detail-tutor>Preparar con Tutor IA</button><button class="btn-primary btn-small" type="button" data-detail-edit>Editar</button></div>
         </article>`;
     modal.addEventListener('click', event => {
         if (event.target === modal || event.target.closest('.quick-modal-close')) modal.remove();
-        if (event.target.closest('[data-detail-google]')) openGoogleCalendarForEvaluation(evaluation.id);
         if (event.target.closest('[data-detail-tutor]')) prepareEvaluationWithTutor(evaluation.id);
         if (event.target.closest('[data-detail-edit]')) {
             modal.remove();
@@ -9250,7 +9251,7 @@ function openGoogleCalendarForEvaluation(evaluationId) {
         evaluation.topics.length ? `Temas:\n${evaluation.topics.map(topic => `- ${topic}`).join('\n')}` : '',
         evaluation.description ? `Notas:\n${evaluation.description}` : ''
     ].filter(Boolean).join('\n\n');
-    openGoogleCalendarForEvent({
+    const opened = openGoogleCalendarForEvent({
         title: evaluation.title,
         date: evaluation.date,
         time: evaluation.time || '',
@@ -9259,6 +9260,8 @@ function openGoogleCalendarForEvaluation(evaluationId) {
         type: evaluation.type,
         calendarDetails: details
     });
+    if (opened) ACGoogleCalendarManual.markOpened('evaluation', evaluationId);
+    return opened;
 }
 
 function prepareEvaluationWithTutor(evaluationId) {
@@ -10256,6 +10259,7 @@ function normalizeTaskStatus(status) {
 }
 
 function mergeWorkspaceState(remoteState = {}) {
+    if (!currentUser?.id) ACGoogleCalendarManual.reset();
     const extras = loadWorkspaceExtras();
     const taskMeta = extras.taskMeta || {};
     const tasks = (remoteState.tasks || []).map(task => ({

@@ -41239,3 +41239,93 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
         gap: 7px;
     }
 }
+
+/* Google Calendar manual confirmation */
+.gcal-manual-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    flex: 0 1 auto;
+    grid-column: 1 / -1;
+}
+
+.gcal-manual-controls > button,
+.gcal-manual-opened,
+.gcal-manual-success {
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.gcal-manual-opened,
+.gcal-manual-success {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #46506b);
+    border-radius: 10px;
+    font-size: .8rem;
+    font-weight: 600;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.gcal-manual-opened {
+    color: var(--text-secondary, #bdc7df);
+    background: rgba(127, 145, 183, .09);
+}
+
+.gcal-manual-success {
+    color: #91e3bc;
+    background: rgba(45, 164, 109, .12);
+    border-color: rgba(82, 192, 139, .35);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) .gcal-manual-success {
+    color: #176442;
+    background: #eaf7ef;
+    border-color: #b8dcc8;
+}
+
+.gcal-manual-controls > small {
+    flex-basis: 100%;
+    color: var(--text-secondary, #a7b0c2);
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+.gcal-manual-controls > button:focus-visible {
+    outline: 2px solid #8b91ff;
+    outline-offset: 3px;
+}
+
+.gcal-manual-controls > button:disabled {
+    cursor: wait;
+    opacity: .65;
+}
+
+body #tasks .task-card-modern .task-card-actions .gcal-manual-controls {
+    order: 1;
+}
+
+body #tasks .task-card-modern .task-card-actions .gcal-manual-controls > button {
+    width: auto !important;
+    height: auto !important;
+    padding: 8px 11px !important;
+}
+
+body #calendar .event-item.event-custom .card-actions .gcal-manual-controls > .btn-primary {
+    background: #6558d8 !important;
+    color: #fff !important;
+    border: 1px solid transparent !important;
+}
+
+body #calendar .event-item.event-custom .card-actions .gcal-manual-controls > .btn-primary:hover {
+    background: #584bbc !important;
+}

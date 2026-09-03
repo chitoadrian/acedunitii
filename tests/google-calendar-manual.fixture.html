@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Google Calendar — controles de prueba aislados</title>
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body { margin: 0; padding: 16px; }
+        .fixture { max-width: 1100px; margin: auto; }
+        .fixture > p { margin: 12px 0; }
+        .fixture-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,300px),1fr)); gap: 18px; }
+        .fixture-card { min-width: 0; padding: 18px; border: 1px solid var(--border-color,#46506b); border-radius: 16px; background: var(--bg-secondary,#171d30); }
+        .fixture-card h2 { margin: 0 0 16px; font-size: 1.1rem; }
+        .fixture-card h3 { margin: 16px 0 8px; font-size: .8rem; }
+    </style>
+</head>
+<body>
+    <main class="fixture">
+        <h1>Controles de Google Calendar</h1>
+        <p>Prueba aislada: datos ficticios y backend en memoria. No modifica cuentas ni registros reales.</p>
+        <button type="button" id="theme" class="btn-secondary">Cambiar tema</button>
+        <p id="notice" role="status"></p>
+        <div class="fixture-grid" id="cards"></div>
+        <h2>Controles dentro de los contenedores existentes</h2>
+        <section id="tasks"><div class="task-board task-list-modern" id="task-context"></div></section>
+        <section id="calendar"><div class="events-list" id="calendar-context"></div></section>
+    </main>
+    <script>
+        const currentUser = { id: '00000000-0000-4000-8000-000000000001' };
+        const rows = new Map();
+        const kinds = ['task','event','evaluation','project','goal','stage'];
+        const labels = ['Tarea','Evento','Evaluación','Proyecto','Meta','Etapa'];
+        const key = row => `${row.entity_type}:${row.entity_id}`;
+        function getSupabaseClient() {
+            return { from() {
+                let operation = 'read', data, filters = {};
+                const q = {
+                    select() { return q; }, order() { return q; }, range() { return q; }, single() { return q; },
+                    eq(k,v) { filters[k] = v; return q; },
+                    upsert(value) { operation = 'save'; data = value; return q; },
+                    delete() { operation = 'delete'; return q; },
+                    then(resolve) {
+                        if (operation === 'save') {
+                            data = {...data, confirmed_at: new Date().toISOString()}; rows.set(key(data),data);
+                            return Promise.resolve({data}).then(resolve);
+                        }
+                        const found = [...rows.values()].filter(row => Object.entries(filters).every(([k,v]) => row[k] === v));
+                        if (operation === 'delete') found.forEach(row => rows.delete(key(row)));
+                        return Promise.resolve({data: found}).then(resolve);
+                    }
+                }; return q;
+            }};
+        }
+        function notify(message) { document.getElementById('notice').textContent = message; }
+        function openFixture(type,id) {
+            const params = new URLSearchParams({action:'TEMPLATE',text:`PRUEBA CONTROL MANUAL ${type}`,dates:'20260910T120000/20260910T130000',ctz:'America/Guayaquil'});
+            const opened = window.open(`https://calendar.google.com/calendar/render?${params}`, '_blank');
+            if (opened) { opened.opener = null; ACGoogleCalendarManual.markOpened(type,id); }
+        }
+        function openTaskInGoogleCalendar(id) { openFixture('task',id); }
+        function openGoogleCalendarEvent(id) { openFixture('event',id); }
+        function openGoogleCalendarForEvaluation(id) { openFixture('evaluation',id); }
+        function openAgendaItemInGoogleCalendar(item) { openFixture(item.kind,item.entityId); }
+        function loadWorkspace() { return {}; }
+        function getGoalsProjectsCalendarItems() { return kinds.flatMap(kind => [1,2,3].map(n => ({kind,entityId: makeId(kinds.indexOf(kind),n)}))); }
+        function makeId(i,n) { return `00000000-0000-4000-8000-${String(i*10+n).padStart(12,'0')}`; }
+        document.getElementById('theme').onclick = () => {
+            document.body.classList.toggle('light-theme');
+            document.body.dataset.theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
+        };
+    </script>
+    <script src="../google-calendar-manual.js"></script>
+    <script>
+        (async () => {
+            await ACGoogleCalendarManual.load();
+            for (let i=0;i<kinds.length;i++) {
+                ACGoogleCalendarManual.markOpened(kinds[i],makeId(i,2));
+                ACGoogleCalendarManual.markOpened(kinds[i],makeId(i,3));
+                await ACGoogleCalendarManual.confirm(kinds[i],makeId(i,3));
+            }
+            document.getElementById('cards').innerHTML = kinds.map((kind,i) => `
+                <section class="fixture-card" aria-label="${labels[i]}">
+                    <h2>${labels[i]}</h2>
+                    ${[1,2,3].map(n => `<h3>${['Inicial','Abierto','Confirmado'][n-1]}</h3>${ACGoogleCalendarManual.render(kind,makeId(i,n))}`).join('')}
+                </section>`).join('');
+            document.getElementById('task-context').innerHTML = [1,2,3].map(n => `
+                <article class="task-item task-card-modern"><h3>Tarea de prueba ${n}</h3>
+                <div class="task-card-actions has-complete"><button class="btn-secondary btn-small">Editar</button><button class="btn-primary btn-small">Completar</button>
+                ${ACGoogleCalendarManual.render('task',makeId(0,n))}<button class="btn-danger btn-small">Eliminar</button></div></article>`).join('');
+            document.getElementById('calendar-context').innerHTML = kinds.slice(1).map((kind,i) => `
+                <article class="event-item event-custom ${kind === 'evaluation' ? 'event-evaluation' : ''}"><div class="event-content"><h4>${labels[i+1]}</h4>
+                <div class="card-actions"><button class="btn-secondary btn-small">Ver detalle</button>${ACGoogleCalendarManual.render(kind,makeId(i+1,2))}</div>
+                <div class="card-actions">${ACGoogleCalendarManual.render(kind,makeId(i+1,3))}</div></div></article>`).join('');
+        })();
+    </script>
+</body>
+</html>
