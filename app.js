@@ -4027,7 +4027,7 @@ function renderTasks(workspace) {
                             <button class="btn-secondary btn-small" data-task-edit="${escapeHTML(task.id)}">Editar</button>
                             ${task.status !== 'completed' ? `<button class="btn-primary btn-small" data-task-complete="${escapeHTML(task.id)}">Completar</button>` : ''}
                             ${ACGoogleCalendarManual.render('task', task.id)}
-                            ${ACGoogleCalendarManual.renderDelete('task', task.id)}
+                            <button class="btn-danger btn-small" data-task-delete="${escapeHTML(task.id)}">Eliminar</button>
                         </div>
                     </article>
                 `;
@@ -4037,6 +4037,7 @@ function renderTasks(workspace) {
 
     list.querySelectorAll('[data-task-filter]').forEach(button => button.addEventListener('click', () => filterTasks(button.dataset.taskFilter, button)));
     list.querySelectorAll('[data-task-edit]').forEach(button => button.addEventListener('click', () => openTaskForm(button.dataset.taskEdit)));
+    list.querySelectorAll('[data-task-delete]').forEach(button => button.addEventListener('click', () => deleteTask(button.dataset.taskDelete)));
     list.querySelectorAll('[data-task-complete]').forEach(button => button.addEventListener('click', () => completeTask(button.dataset.taskComplete)));
 }
 
@@ -4347,10 +4348,10 @@ function renderCalendarSection(workspace) {
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
                                 <div class="card-actions gcal-card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.renderDelete('evaluation', event.id)}${ACGoogleCalendarManual.render('evaluation', event.id)}`
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.renderCalendarRemove('evaluation', event.id)}${ACGoogleCalendarManual.render('evaluation', event.id)}`
                                         : event.kind !== 'event'
-                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.renderDelete(event.kind, event.entityId)}${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
-                                            : `<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>${ACGoogleCalendarManual.renderDelete('event', event.id)}${ACGoogleCalendarManual.render('event', event.id)}`}
+                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.renderCalendarRemove(event.kind, event.entityId)}${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
+                                            : `<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>${ACGoogleCalendarManual.renderCalendarRemove('event', event.id)}${ACGoogleCalendarManual.render('event', event.id)}<button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar evento</button>`}
                                 </div>
                             </div>
                         </div>
@@ -4361,6 +4362,7 @@ function renderCalendarSection(workspace) {
     `;
     generateCalendar();
     container.querySelectorAll('[data-event-edit]').forEach(button => button.addEventListener('click', () => openEventForm(button.dataset.eventEdit)));
+    container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
     container.querySelectorAll('[data-calendar-planning]').forEach(button => button.addEventListener('click', () => {
         navigateTo('goals-projects');
@@ -9102,7 +9104,7 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
             <button class="quick-modal-close" type="button" data-cancel-evaluation-delete aria-label="Cerrar">×</button>
             <span class="evaluations-kicker">Evaluaciones</span>
             <h3 id="evaluation-delete-title">¿Eliminar esta evaluación?</h3>
-            <p id="evaluation-delete-description">${ACGoogleCalendarManual.deleteDescription('evaluation')}</p>
+            <p id="evaluation-delete-description">Esta acción no se puede deshacer.</p>
             <strong class="evaluation-delete-name">${escapeHTML(evaluation.title)}</strong>
             <div class="evaluation-delete-actions">
                 <button class="btn-secondary btn-small" type="button" data-cancel-evaluation-delete>No, cancelar</button>

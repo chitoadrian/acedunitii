@@ -8,8 +8,19 @@
     const labels = { task: 'Tarea', event: 'Evento', evaluation: 'Evaluación', project: 'Proyecto', goal: 'Meta', stage: 'Etapa' };
     const entityLabel = type => labels[type] || 'Elemento';
     const savedLabel = type => `${entityLabel(type)} ${['task', 'evaluation', 'goal', 'stage'].includes(type) ? 'guardada' : 'guardado'} en el calendario`;
-    const deleteTitle = type => `¿Eliminar ${['task', 'evaluation', 'goal', 'stage'].includes(type) ? 'esta' : 'este'} ${entityLabel(type).toLowerCase()}?`;
-    const deleteDescription = type => `Se eliminará de AC Edunity. Si también ${['task', 'evaluation', 'goal', 'stage'].includes(type) ? 'la' : 'lo'} guardaste en Google Calendar, deberás eliminar su copia allí manualmente.${type === 'project' ? ' También se eliminarán sus etapas y subtareas; las metas y tareas vinculadas se conservarán.' : type === 'stage' ? ' También se eliminarán sus subtareas.' : ''}`;
+    const agendaTypes = new Set(['evaluation', 'project', 'goal', 'stage']);
+    const removalTitle = type => agendaTypes.has(type)
+        ? `¿Quitar ${['evaluation', 'goal', 'stage'].includes(type) ? 'esta' : 'este'} ${entityLabel(type).toLowerCase()} del calendario?`
+        : '¿Quitar la confirmación de Google Calendar?';
+    function removalDescription(type, confirmed) {
+        const location = type === 'evaluation' ? 'Evaluaciones' : 'Metas y Proyectos';
+        const feminine = ['evaluation', 'goal', 'stage'].includes(type);
+        const base = agendaTypes.has(type)
+            ? `Se quitará únicamente de tu Agenda de AC Edunity. ${feminine ? 'La' : 'El'} ${entityLabel(type).toLowerCase()} seguirá existiendo en ${location}.`
+            : type === 'event' ? 'El evento seguirá visible en Calendario. Solo se quitará su confirmación de Google Calendar.'
+            : 'La tarea seguirá intacta en Tareas. Las tareas no se muestran en Agenda; solo se quitará su confirmación de Google Calendar.';
+        return base + (confirmed ? ' También se quitará la confirmación de AC Edunity. Si guardaste una copia en Google Calendar, puedes abrir Google Calendar para eliminarla allí.' : '');
+    }
 
     function createController({ getUserId, getClient, onChange = () => {}, onError = () => {} }) {
         let owner = '', generation = 0, loaded = false, loading = null, loadFailed = false;
@@ -103,7 +114,28 @@
             if (!key) return;
             deleted.add(key); confirmed.delete(key); opened.delete(key); onChange();
         }
-        return { state, load, reset, markOpened, forget, confirm: (type, id) => mutate(type, id, false),
+        async function removeFromCalendar(type, id) {
+            const user = scope(), key = keyFor(type, id), version = generation;
+            if (!user || !key || deleted.has(key) || pending.has(key)) return false;
+            pending.add(key); onChange();
+            try {
+                if (!await load() || scope() !== user || generation !== version) return false;
+                const { data, error } = await getClient().rpc('remove_from_academic_calendar', {
+                    p_entity_type: type, p_entity_id: id
+                });
+                if (error) throw error;
+                if (scope() !== user || generation !== version || deleted.has(key)) return false;
+                if (!data?.row || data.row.id !== id) throw new Error('missing_calendar_entity');
+                confirmed.delete(key); opened.delete(key);
+                return data;
+            } catch (error) {
+                if (scope() === user && generation === version) onError('calendar-remove', error);
+                return false;
+            } finally {
+                if (scope() === user && generation === version) { pending.delete(key); onChange(); }
+            }
+        }
+        return { state, load, reset, markOpened, forget, removeFromCalendar, confirm: (type, id) => mutate(type, id, false),
             remove: (type, id) => mutate(type, id, true) };
     }
     root.createGoogleCalendarManualController = createController;
@@ -145,23 +177,19 @@
     });
     root.ACGoogleCalendarManual = {
         ...controller,
-        deleteTitle, deleteDescription,
         afterDelete(type, id) {
             const confirmed = controller.state(type, id).confirmed;
             controller.forget(type, id);
             return confirmed ? 'Elemento eliminado de AC Edunity. Recuerda eliminar también la copia guardada en Google Calendar.' : 'Elemento eliminado de AC Edunity.';
         },
-        renderDelete(type, id) {
+        renderCalendarRemove(type, id) {
             if (!types.has(type) || !uuid.test(id || '')) return '';
-            return `<button type="button" class="btn-danger btn-small gcal-entity-delete" data-gcal-delete="${type}" data-gcal-id="${id}" aria-label="Eliminar" title="Eliminar"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg></button>`;
+            return `<button type="button" class="btn-secondary btn-small gcal-entity-delete" data-gcal-calendar-remove="${type}" data-gcal-id="${id}" aria-label="Quitar del calendario" title="Quitar del calendario"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/></svg></button>`;
         },
-        requestDelete(type, id, trigger) {
+        requestCalendarRemoval(type, id, trigger) {
             if (!controller.state(type, id).valid || controller.state(type, id).busy) return;
-            if (type === 'evaluation') return deleteEvaluation(id, trigger);
-            if (['project', 'goal', 'stage'].includes(type)) return openGpDelete(type, id, trigger);
-            if (type === 'task' || type === 'event') return confirmDeletion(type, id, () => type === 'task' ? deleteTask(id) : deleteEvent(id), trigger);
+            return confirmCalendarRemoval(type, id, trigger);
         },
-        confirmDeletion,
         render(type, id) {
             if (!types.has(type) || !uuid.test(id || '')) return '';
             const s = controller.state(type, id);
@@ -169,14 +197,25 @@
             return `<div class="gcal-manual-controls" data-gcal-manual data-gcal-type="${type}" data-gcal-id="${id}" tabindex="-1" aria-live="polite">${content(type, id)}</div>`;
         }
     };
-    function confirmDeletion(type, id, action, trigger = document.activeElement) {
+    async function removeFromAcademicCalendar(type, id) {
+        const result = await controller.removeFromCalendar(type, id);
+        if (!result) return false;
+        if (result.hidden) {
+            if (type === 'evaluation') replaceWorkspaceItem('evaluations', mapSavedEvaluationRow(result.row));
+            else mergeGpSavedRow({project:'projects',goal:'goals',stage:'project_stages'}[type], result.row);
+        }
+        renderCalendarSection(loadWorkspace());
+        return result;
+    }
+    root.removeFromAcademicCalendar = removeFromAcademicCalendar;
+    function confirmCalendarRemoval(type, id, trigger = document.activeElement) {
         if (!controller.state(type, id).valid || document.querySelector('.gcal-delete-modal')) return;
         const owner = currentUser.id;
         const modal = document.createElement('div');
         modal.className = 'quick-modal gcal-delete-modal';
-        modal.innerHTML = `<div class="quick-modal-card evaluation-delete-card" role="dialog" aria-modal="true" aria-labelledby="gcal-delete-title" aria-describedby="gcal-delete-copy"><h3 id="gcal-delete-title">${deleteTitle(type)}</h3><p id="gcal-delete-copy">${deleteDescription(type)}</p><div class="evaluation-delete-actions"><button type="button" class="btn-secondary btn-small" data-cancel>Cancelar</button><button type="button" class="btn-danger btn-small" data-confirm>Eliminar</button></div></div>`;
+        modal.innerHTML = `<div class="quick-modal-card evaluation-delete-card" role="dialog" aria-modal="true" aria-labelledby="gcal-delete-title" aria-describedby="gcal-delete-copy"><h3 id="gcal-delete-title">${removalTitle(type)}</h3><p id="gcal-delete-copy">${removalDescription(type, controller.state(type,id).confirmed)}</p><div class="evaluation-delete-actions"><button type="button" class="btn-secondary btn-small" data-cancel>Cancelar</button><button type="button" class="btn-primary btn-small" data-confirm>Quitar del calendario</button></div></div>`;
         const cancel = modal.querySelector('[data-cancel]'), submit = modal.querySelector('[data-confirm]');
-        let busy = false;
+        let busy = false, completed = false;
         const close = () => { modal.remove(); document.removeEventListener('keydown', keydown); if (trigger?.isConnected) trigger.focus(); };
         const keydown = event => {
             if (event.key === 'Escape' && !busy) { event.preventDefault(); close(); }
@@ -186,17 +225,28 @@
         modal.onclick = event => { if (event.target === modal && !busy) close(); };
         submit.onclick = async () => {
             if (busy) return;
+            if (completed) { window.open('https://calendar.google.com/calendar/', '_blank', 'noopener,noreferrer'); return; }
             if (currentUser?.id !== owner) { close(); return; }
-            busy = true; cancel.disabled = true; submit.disabled = true; submit.textContent = 'Eliminando…';
-            try { if (await action() !== false) { close(); return; } }
-            catch (_) { notify('No se pudo eliminar. Inténtalo nuevamente.', 'error'); }
-            busy = false; cancel.disabled = false; submit.disabled = false; submit.textContent = 'Eliminar'; submit.focus();
+            busy = true; cancel.disabled = true; submit.disabled = true; submit.textContent = 'Quitando…';
+            try {
+                const result = await removeFromAcademicCalendar(type, id);
+                if (result) {
+                    const message = result.hidden ? 'Se quitó de la Agenda de AC Edunity.' : 'Se quitó la confirmación. El registro original permanece intacto.';
+                    notify(message, 'success');
+                    if (!result.had_confirmation) { close(); return; }
+                    completed = true; busy = false; cancel.disabled = false; submit.disabled = false;
+                    modal.querySelector('h3').textContent = message;
+                    modal.querySelector('p').textContent = 'Tu copia en Google Calendar no se eliminó automáticamente.';
+                    cancel.textContent = 'Entendido'; submit.textContent = 'Abrir Google Calendar'; cancel.focus(); return;
+                }
+            } catch (_) { notify('No se pudo quitar del calendario. Inténtalo nuevamente.', 'error'); }
+            busy = false; cancel.disabled = false; submit.disabled = false; submit.textContent = 'Quitar del calendario'; submit.focus();
         };
         document.body.appendChild(modal); document.addEventListener('keydown', keydown); cancel.focus();
     }
     document.addEventListener('click', async event => {
-        const trash = event.target.closest('[data-gcal-delete]');
-        if (trash) { root.ACGoogleCalendarManual.requestDelete(trash.dataset.gcalDelete, trash.dataset.gcalId, trash); return; }
+        const trash = event.target.closest('[data-gcal-calendar-remove]');
+        if (trash) { root.ACGoogleCalendarManual.requestCalendarRemoval(trash.dataset.gcalCalendarRemove, trash.dataset.gcalId, trash); return; }
         const button = event.target.closest('[data-gcal-action]');
         const host = button?.closest('[data-gcal-manual]');
         if (!host || button.disabled) return;

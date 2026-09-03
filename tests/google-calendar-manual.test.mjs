@@ -14,15 +14,29 @@ test('one grammatical label per entity, no old two-control state', () => {
     const ui = readFileSync(new URL('../google-calendar-manual.js', import.meta.url), 'utf8');
     assert.doesNotMatch(ui, /Abierto en Google Calendar|Ya lo guardé|>Desmarcar<|<small>Confirmado manualmente/);
     assert.match(ui, /aria-label="Quitar confirmación"/);
-    assert.match(ui, /aria-label="Eliminar" title="Eliminar"><svg/);
+    assert.match(ui, /aria-label="Quitar del calendario" title="Quitar del calendario"><svg/);
+    assert.doesNotMatch(ui, /\b(?:deleteTask|deleteEvent|deleteEvaluation|deleteGpRecord|openGpDelete|confirmDeletion|requestDelete)\s*\(/);
 });
 function backend() {
-    const rows = new Map(), calls = [];
+    const rows = new Map(), calls = [], entities = new Map();
     let failure = false, pause = null;
     return {
-        rows, calls,
+        rows, calls, entities,
         fail(value) { failure = value; },
         pause(value) { pause = value; },
+        async rpc(name, args) {
+            calls.push({op:'rpc',name,args});
+            assert.equal(name,'remove_from_academic_calendar');
+            if (pause) await pause;
+            if (failure) return {error:{code:'TEST_FAILURE'}};
+            const key=`${args.p_entity_type}:${args.p_entity_id}`, original=entities.get(key);
+            if (!original) return {error:{code:'42501'}};
+            const hidden=['evaluation','project','goal','stage'].includes(args.p_entity_type);
+            const row=hidden?{...original,show_in_calendar:false}:original;
+            entities.set(key,row);
+            const linkKey=`${user}:${key}`, had_confirmation=rows.delete(linkKey);
+            return {data:{row,hidden,had_confirmation}};
+        },
         from(table) {
             assert.equal(table, 'google_calendar_manual_links');
             let op = 'select', payload, filters = {}, range = [0, 999];
@@ -77,6 +91,28 @@ for (const kind of kinds) test(`${kind}: explicit confirmation, persistence and 
     assert.equal(reloaded.state(kind, id).confirmed, false);
     assert.equal(db.rows.size, 0);
     assert.deepEqual(db.calls.at(-1).filters, { user_id: user, entity_type: kind, entity_id: id });
+});
+
+for (const kind of kinds) test(`${kind}: calendar removal preserves academic entity and clears only its confirmation`, async () => {
+    const db=backend(), c=create({getUserId:()=>user,getClient:()=>db});
+    const original={id,user_id:user,title:'PRUEBA NO BORRAR',due_time:'12:00',reminders_enabled:true,show_in_calendar:true};
+    db.entities.set(`${kind}:${id}`,original);
+    await c.load(); c.markOpened(kind,id); await c.confirm(kind,id);
+    db.fail(true); assert.equal(await c.removeFromCalendar(kind,id),false);
+    assert.deepEqual(db.entities.get(`${kind}:${id}`),original); assert.equal(c.state(kind,id).confirmed,true);
+    db.fail(false);
+    const results=await Promise.all([c.removeFromCalendar(kind,id),c.removeFromCalendar(kind,id)]);
+    assert.equal(results[1],false,'double click locked');
+    const hides=['evaluation','project','goal','stage'].includes(kind);
+    assert.equal(results[0].hidden,hides); assert.equal(results[0].had_confirmation,true);
+    assert.equal(db.entities.size,1,'original count unchanged');
+    assert.deepEqual(db.entities.get(`${kind}:${id}`),hides?{...original,show_in_calendar:false}:original);
+    assert.equal(db.rows.size,0); assert.equal(c.state(kind,id).valid,true,'can be restored, not tombstoned');
+    const reload=create({getUserId:()=>user,getClient:()=>db}); await reload.load();
+    assert.equal(reload.state(kind,id).confirmed,false);
+    assert.equal(db.entities.get(`${kind}:${id}`).show_in_calendar,!hides,'visibility survives reload');
+    db.entities.set(`${kind}:${id}`,original); c.markOpened(kind,id);
+    assert.equal(await c.confirm(kind,id),true,'can re-enable and confirm again');
 });
 
 test('batch loading, account isolation and unauthenticated actions', async () => {

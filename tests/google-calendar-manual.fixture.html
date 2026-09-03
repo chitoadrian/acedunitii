@@ -28,12 +28,19 @@
     </main>
     <script>
         const currentUser = { id: '00000000-0000-4000-8000-000000000001' };
-        const rows = new Map();
+        const rows = new Map(), entities = new Map();
         const kinds = ['task','event','evaluation','project','goal','stage'];
         const labels = ['Tarea','Evento','Evaluación','Proyecto','Meta','Etapa'];
         const key = row => `${row.entity_type}:${row.entity_id}`;
         function getSupabaseClient() {
-            return { from() {
+            return { async rpc(name,args) {
+                if(name!=='remove_from_academic_calendar')throw new Error('Unexpected RPC');
+                const k=`${args.p_entity_type}:${args.p_entity_id}`, old=entities.get(k);
+                const hidden=['evaluation','project','goal','stage'].includes(args.p_entity_type);
+                const row=hidden?{...old,show_in_calendar:false}:old;
+                entities.set(k,row);
+                return {data:{row,hidden,had_confirmation:rows.delete(k)}};
+            }, from() {
                 let operation = 'read', data, filters = {};
                 const q = {
                     select() { return q; }, order() { return q; }, range() { return q; }, single() { return q; },
@@ -62,19 +69,19 @@
         function openGoogleCalendarEvent(id) { openFixture('event',id); }
         function openGoogleCalendarForEvaluation(id) { openFixture('evaluation',id); }
         function openAgendaItemInGoogleCalendar(item) { openFixture(item.kind,item.entityId); }
-        function loadWorkspace() { return {}; }
+        function loadWorkspace() { return {entities}; }
         function getGoalsProjectsCalendarItems() { return kinds.flatMap(kind => [1,2,3].map(n => ({kind,entityId: makeId(kinds.indexOf(kind),n)}))); }
         function makeId(i,n) { return `00000000-0000-4000-8000-${String(i*10+n).padStart(12,'0')}`; }
-        async function deleteFixture(type,id) {
-            rows.delete(`${type}:${id}`);
-            notify(ACGoogleCalendarManual.afterDelete(type,id));
-            document.querySelectorAll(`[data-fixture-type="${type}"][data-fixture-id="${id}"]`).forEach(e=>e.remove());
-            return true;
+        function mergeGpSavedRow() {}
+        function mapSavedEvaluationRow(row) {return row;}
+        function replaceWorkspaceItem() {}
+        function renderCalendarSection() {
+            document.querySelectorAll('#calendar [data-fixture-type]').forEach(card=>{
+                const entity=entities.get(`${card.dataset.fixtureType}:${card.dataset.fixtureId}`);
+                if(entity?.show_in_calendar===false)card.remove();
+            });
+            document.getElementById('notice').textContent=`Entidades académicas conservadas: ${entities.size}`;
         }
-        function deleteTask(id) { return deleteFixture('task',id); }
-        function deleteEvent(id) { return deleteFixture('event',id); }
-        function deleteEvaluation(id,trigger) { return ACGoogleCalendarManual.confirmDeletion('evaluation',id,()=>deleteFixture('evaluation',id),trigger); }
-        function openGpDelete(type,id,trigger) { return ACGoogleCalendarManual.confirmDeletion(type,id,()=>deleteFixture(type,id),trigger); }
         document.getElementById('theme').onclick = () => {
             document.body.classList.toggle('light-theme');
             document.body.dataset.theme = document.body.classList.contains('light-theme') ? 'light' : 'dark';
@@ -85,6 +92,7 @@
         (async () => {
             await ACGoogleCalendarManual.load();
             for (let i=0;i<kinds.length;i++) {
+                for(const n of [1,2,3])entities.set(`${kinds[i]}:${makeId(i,n)}`,{id:makeId(i,n),title:`${labels[i]} ${n}`,show_in_calendar:true});
                 ACGoogleCalendarManual.markOpened(kinds[i],makeId(i,2));
                 ACGoogleCalendarManual.markOpened(kinds[i],makeId(i,3));
                 await ACGoogleCalendarManual.confirm(kinds[i],makeId(i,3));
@@ -97,10 +105,10 @@
             document.getElementById('task-context').innerHTML = [1,2,3].map(n => `
                 <article class="task-item task-card-modern" data-fixture-type="task" data-fixture-id="${makeId(0,n)}"><h3>Tarea de prueba ${n}</h3>
                 <div class="task-card-actions has-complete"><button class="btn-secondary btn-small">Editar</button><button class="btn-primary btn-small">Completar</button>
-                ${ACGoogleCalendarManual.render('task',makeId(0,n))}${ACGoogleCalendarManual.renderDelete('task',makeId(0,n))}</div></article>`).join('');
+                ${ACGoogleCalendarManual.render('task',makeId(0,n))}${ACGoogleCalendarManual.renderCalendarRemove('task',makeId(0,n))}</div></article>`).join('');
             document.getElementById('calendar-context').innerHTML = kinds.slice(1).flatMap((kind,i) => [1,2,3].map(n=>`
                 <article class="event-item event-custom ${kind === 'evaluation' ? 'event-evaluation' : ''}" data-fixture-type="${kind}" data-fixture-id="${makeId(i+1,n)}"><div class="event-content"><h4>${labels[i+1]} ${n}</h4>
-                <div class="card-actions gcal-card-actions"><button class="btn-secondary btn-small">${['project','goal','stage'].includes(kind)?'Ver en Metas y Proyectos':'Ver detalle'}</button>${ACGoogleCalendarManual.renderDelete(kind,makeId(i+1,n))}${ACGoogleCalendarManual.render(kind,makeId(i+1,n))}</div></div></article>`)).join('');
+                <div class="card-actions gcal-card-actions"><button class="btn-secondary btn-small">${['project','goal','stage'].includes(kind)?'Ver en Metas y Proyectos':'Ver detalle'}</button>${ACGoogleCalendarManual.renderCalendarRemove(kind,makeId(i+1,n))}${ACGoogleCalendarManual.render(kind,makeId(i+1,n))}${kind==='event'?'<button class="btn-danger btn-small">Eliminar evento</button>':''}</div></div></article>`)).join('');
         })();
     </script>
 </body>
