@@ -4027,7 +4027,7 @@ function renderTasks(workspace) {
                             <button class="btn-secondary btn-small" data-task-edit="${escapeHTML(task.id)}">Editar</button>
                             ${task.status !== 'completed' ? `<button class="btn-primary btn-small" data-task-complete="${escapeHTML(task.id)}">Completar</button>` : ''}
                             ${ACGoogleCalendarManual.render('task', task.id)}
-                            <button class="btn-danger btn-small" data-task-delete="${escapeHTML(task.id)}">Eliminar</button>
+                            ${ACGoogleCalendarManual.renderDelete('task', task.id)}
                         </div>
                     </article>
                 `;
@@ -4037,7 +4037,6 @@ function renderTasks(workspace) {
 
     list.querySelectorAll('[data-task-filter]').forEach(button => button.addEventListener('click', () => filterTasks(button.dataset.taskFilter, button)));
     list.querySelectorAll('[data-task-edit]').forEach(button => button.addEventListener('click', () => openTaskForm(button.dataset.taskEdit)));
-    list.querySelectorAll('[data-task-delete]').forEach(button => button.addEventListener('click', () => deleteTask(button.dataset.taskDelete)));
     list.querySelectorAll('[data-task-complete]').forEach(button => button.addEventListener('click', () => completeTask(button.dataset.taskComplete)));
 }
 
@@ -4275,28 +4274,33 @@ function openEventForm(eventId = null) {
 
 async function deleteEvent(eventId) {
     const deleteKey = `event:${eventId}`;
-    if (!beginWorkspaceDelete(deleteKey)) return;
+    if (!beginWorkspaceDelete(deleteKey)) return false;
     const workspace = loadWorkspace();
     const event = workspace.events.find(item => item.id === eventId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient()
+        const { data, error } = await getSupabaseClient()
             .from('events')
             .delete()
             .eq('id', eventId)
-            .eq('user_id', user.id);
+            .eq('user_id', user.id).select('id').maybeSingle();
 
         if (error) {
             logSupabaseError('events delete', error);
             throw error;
         }
 
+        if (!data?.id) throw new Error('No se encontró el evento seleccionado.');
+        if (currentUser?.id !== user.id) return true;
+        const deleteMessage = ACGoogleCalendarManual.afterDelete('event', eventId);
         if (event) pushRecentMessage(`Eliminaste el evento ${event.title}.`);
         removeWorkspaceItems('events', item => item.id === eventId);
         refreshEventViews();
-        notify('Evento eliminado.', 'info');
+        notify(deleteMessage, 'info');
+        return true;
     } catch (error) {
         notify(error.message || 'No se pudo eliminar el evento.', 'error');
+        return false;
     } finally {
         finishWorkspaceDelete(deleteKey);
     }
@@ -4341,12 +4345,12 @@ function renderCalendarSection(workspace) {
                                 <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p>
                                 <span class="event-badge">${escapeHTML(event.calendarType || event.type)}</span>
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
-                                <div class="card-actions">
+                                <div class="card-actions gcal-card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.render('evaluation', event.id)}`
+                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.renderDelete('evaluation', event.id)}${ACGoogleCalendarManual.render('evaluation', event.id)}`
                                         : event.kind !== 'event'
-                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
-                                            : `${ACGoogleCalendarManual.render('event', event.id)}<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button><button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar</button>`}
+                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.renderDelete(event.kind, event.entityId)}${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
+                                            : `<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>${ACGoogleCalendarManual.renderDelete('event', event.id)}${ACGoogleCalendarManual.render('event', event.id)}`}
                                 </div>
                             </div>
                         </div>
@@ -4357,7 +4361,6 @@ function renderCalendarSection(workspace) {
     `;
     generateCalendar();
     container.querySelectorAll('[data-event-edit]').forEach(button => button.addEventListener('click', () => openEventForm(button.dataset.eventEdit)));
-    container.querySelectorAll('[data-event-delete]').forEach(button => button.addEventListener('click', () => deleteEvent(button.dataset.eventDelete)));
     container.querySelectorAll('[data-calendar-evaluation]').forEach(button => button.addEventListener('click', () => openEvaluationDetail(button.dataset.calendarEvaluation)));
     container.querySelectorAll('[data-calendar-planning]').forEach(button => button.addEventListener('click', () => {
         navigateTo('goals-projects');
@@ -9099,7 +9102,7 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
             <button class="quick-modal-close" type="button" data-cancel-evaluation-delete aria-label="Cerrar">×</button>
             <span class="evaluations-kicker">Evaluaciones</span>
             <h3 id="evaluation-delete-title">¿Eliminar esta evaluación?</h3>
-            <p id="evaluation-delete-description">Esta acción no se puede deshacer.</p>
+            <p id="evaluation-delete-description">${ACGoogleCalendarManual.deleteDescription('evaluation')}</p>
             <strong class="evaluation-delete-name">${escapeHTML(evaluation.title)}</strong>
             <div class="evaluation-delete-actions">
                 <button class="btn-secondary btn-small" type="button" data-cancel-evaluation-delete>No, cancelar</button>
@@ -9138,10 +9141,12 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
                 .maybeSingle();
             if (error) throw error;
             if (!data?.id) throw new Error('No se encontró la evaluación seleccionada.');
+            if (currentUser?.id !== user.id) { close(false); return; }
+            const deleteMessage = ACGoogleCalendarManual.afterDelete('evaluation', evaluationId);
             removeWorkspaceItems('evaluations', item => item.id === evaluationId);
             refreshEvaluationViews();
             close(false);
-            notify('Evaluación eliminada.', 'info');
+            notify(deleteMessage, 'info');
         } catch (error) {
             logSupabaseError('evaluations delete', error);
             notify(error.message || 'No se pudo eliminar la evaluación.', 'error');
@@ -12011,24 +12016,28 @@ function openTaskForm(taskId = null) {
 }
 
 async function deleteTask(taskId) {
+    const userId = currentUser?.id;
+    if (!userId) return false;
     const deleteKey = `task:${taskId}`;
-    if (!beginWorkspaceDelete(deleteKey)) return;
     const workspace = loadWorkspace();
     const task = workspace.tasks.find(item => item.id === taskId);
-    if (!task) return;
+    if (!task || !beginWorkspaceDelete(deleteKey)) return false;
 
     try {
-        const { error } = await getSupabaseClient()
+        const { data, error } = await getSupabaseClient()
             .from('tasks')
             .delete()
             .eq('id', taskId)
-            .eq('user_id', currentUser.id);
+            .eq('user_id', userId).select('id').maybeSingle();
 
         if (error) {
             logSupabaseError('tasks delete', error);
             throw error;
         }
 
+        if (!data?.id) throw new Error('No se encontró la tarea seleccionada.');
+        if (currentUser?.id !== userId) return true;
+        const deleteMessage = ACGoogleCalendarManual.afterDelete('task', taskId);
         const extras = loadWorkspaceExtras();
         delete extras.taskMeta?.[taskId];
         saveWorkspaceExtras(extras);
@@ -12036,9 +12045,11 @@ async function deleteTask(taskId) {
         pushRecentMessage(`Eliminaste la tarea ${task.title}.`);
         removeTaskFromWorkspace(taskId);
         refreshTaskDependentUI();
-        notify('Tarea eliminada.', 'info');
+        notify(deleteMessage, 'info');
+        return true;
     } catch (error) {
         notify(error.message || 'No se pudo eliminar la tarea.', 'error');
+        return false;
     } finally {
         finishWorkspaceDelete(deleteKey);
     }

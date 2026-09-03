@@ -41242,8 +41242,8 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
 
 /* Google Calendar manual confirmation */
 .gcal-manual-controls {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 8px;
     min-width: 0;
@@ -41251,10 +41251,10 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
     max-width: 100%;
     flex: 0 1 auto;
     grid-column: 1 / -1;
+    box-sizing: border-box;
 }
 
 .gcal-manual-controls > button,
-.gcal-manual-opened,
 .gcal-manual-success {
     max-width: 100%;
     min-width: 0;
@@ -41262,7 +41262,6 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
     overflow-wrap: anywhere;
 }
 
-.gcal-manual-opened,
 .gcal-manual-success {
     display: inline-flex;
     align-items: center;
@@ -41274,11 +41273,6 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .quick-modal-card[aria-
     font-weight: 600;
     line-height: 1.4;
     box-sizing: border-box;
-}
-
-.gcal-manual-opened {
-    color: var(--text-secondary, #bdc7df);
-    background: rgba(127, 145, 183, .09);
 }
 
 .gcal-manual-success {
@@ -41294,7 +41288,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .gcal-manual-success {
 }
 
 .gcal-manual-controls > small {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     color: var(--text-secondary, #a7b0c2);
     font-size: .72rem;
     line-height: 1.5;
@@ -41329,3 +41323,73 @@ body #calendar .event-item.event-custom .card-actions .gcal-manual-controls > .b
 body #calendar .event-item.event-custom .card-actions .gcal-manual-controls > .btn-primary:hover {
     background: #584bbc !important;
 }
+
+.gcal-manual-controls > :only-child { grid-column: 1 / -1; }
+
+body #calendar .event-item.event-custom .card-actions.gcal-card-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 40px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    min-width: 0;
+}
+
+body #calendar .event-item.event-custom .card-actions.gcal-card-actions > button,
+body #calendar .event-item.event-custom .card-actions.gcal-card-actions .gcal-manual-controls > .btn-small {
+    height: auto !important;
+    min-height: 40px !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box;
+}
+
+body #calendar .event-item.event-custom .card-actions.gcal-card-actions > .gcal-entity-delete,
+body #tasks .task-card-modern .task-card-actions > .gcal-entity-delete {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 !important;
+    justify-self: end;
+}
+
+.gcal-entity-delete svg,
+.gcal-entity-delete svg path {
+    fill: none !important;
+    stroke: currentColor !important;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.gcal-entity-delete svg { display: block; width: 19px; height: 19px; }
+
+body #calendar .event-item.event-custom .card-actions .gcal-manual-controls > .gcal-manual-remove,
+body #tasks .task-card-modern .task-card-actions .gcal-manual-controls > .gcal-manual-remove,
+.gcal-manual-controls > .gcal-manual-remove {
+    width: 32px !important;
+    max-width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: var(--text-secondary, #a7b0c2) !important;
+    box-shadow: none !important;
+    font: inherit;
+    font-size: 20px !important;
+    cursor: pointer;
+}
+.gcal-manual-controls > .gcal-manual-remove:hover { opacity: .75; }
+body .gcal-delete-modal { align-items: center !important; }
+body .gcal-delete-modal .evaluation-delete-card {
+    max-width: min(440px, calc(100vw - 32px));
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 32px) !important;
+    align-self: center;
+}
+.gcal-delete-modal p { color: var(--text-secondary, #a7b0c2); line-height: 1.6; }

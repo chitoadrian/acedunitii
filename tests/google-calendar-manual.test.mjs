@@ -8,6 +8,14 @@ const create = globalThis.createGoogleCalendarManualController;
 const id = 'b2f158ae-a768-4d8f-9767-b20ae3ef48f1';
 const user = '00000000-0000-4000-8000-000000000001';
 const kinds = ['task', 'event', 'evaluation', 'project', 'goal', 'stage'];
+test('one grammatical label per entity, no old two-control state', () => {
+    const expected = ['Tarea guardada','Evento guardado','Evaluación guardada','Proyecto guardado','Meta guardada','Etapa guardada'];
+    kinds.forEach((kind,i) => assert.equal(globalThis.getGoogleCalendarSavedLabel(kind), `${expected[i]} en el calendario`));
+    const ui = readFileSync(new URL('../google-calendar-manual.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(ui, /Abierto en Google Calendar|Ya lo guardé|>Desmarcar<|<small>Confirmado manualmente/);
+    assert.match(ui, /aria-label="Quitar confirmación"/);
+    assert.match(ui, /aria-label="Eliminar" title="Eliminar"><svg/);
+});
 function backend() {
     const rows = new Map(), calls = [];
     let failure = false, pause = null;
@@ -126,6 +134,19 @@ test('a temporarily unavailable client can retry without getting stuck', async (
     assert.equal(c.state('task', id).loadFailed, false);
 });
 
+test('deletion prevents late confirmation responses from restoring local state', async () => {
+    const db = backend(); let release;
+    const c = create({ getUserId: () => user, getClient: () => db });
+    await c.load(); c.markOpened('stage',id);
+    db.pause(new Promise(resolve => {release=resolve;}));
+    const write=c.confirm('stage',id);
+    await new Promise(resolve=>setImmediate(resolve));
+    c.forget('stage',id); release();
+    assert.equal(await write,false);
+    assert.equal(c.state('stage',id).valid,false);
+    assert.equal(c.state('stage',id).confirmed,false);
+});
+
 const source = readFileSync(new URL('../app.js', import.meta.url), 'utf8');
 const taskStart = source.indexOf('function getTaskGoogleCalendarUrl');
 const taskSource = source.slice(taskStart, source.indexOf('function renderTasks', taskStart));
@@ -164,4 +185,55 @@ test('blocked window never marks opened; all four opening paths share controller
     handle = {}; actions.forEach(action => action());
     assert.deepEqual(opened.map(([kind]) => kind), ['task', 'event', 'evaluation', 'project']);
     assert.equal(handle.opener, null);
+});
+
+test('existing delete flows target exact owner/id and update only local dependents', async () => {
+    const gp=readFileSync(new URL('../goals-projects.js',import.meta.url),'utf8');
+    for (const kind of ['task','event','project','goal','stage']) {
+        const calls=[],forgotten=[],removed=[]; let fail=false;
+        const ctx=vm.createContext({currentUser:{id:user},goalsProjectsSaving:false,activeProjectId:'',
+            document:{querySelector:()=>null},beginWorkspaceDelete:()=>true,finishWorkspaceDelete:()=>{},
+            loadWorkspace:()=>({tasks:[{id,title:'Test'}],events:[{id,title:'Test'}],projectStages:[{id:'child',projectId:id}],projectSubtasks:[]}),
+            getCurrentSupabaseUser:async()=>({id:user}),
+            getSupabaseClient:()=>({from(table){const filters={}; const q={delete:()=>q,eq(k,v){filters[k]=v;return q;},select:()=>q,
+                maybeSingle:async()=>{calls.push({table,filters});return fail?{error:new Error('test failure')}:{data:{id}};}};return q;}}),
+            ACGoogleCalendarManual:{afterDelete:(type,value)=>{forgotten.push([type,value]);return 'Eliminado';},forget:(...args)=>forgotten.push(args)},
+            removeTaskFromWorkspace:value=>removed.push(value),removeWorkspaceItems:()=>removed.push(id),removeGpRecordFromWorkspace:()=>removed.push(id),
+            refreshTaskDependentUI:()=>{},refreshEventViews:()=>{},refreshGpDependentUI:()=>{},persistDerivedStageStatus:async()=>{},closeGpModal:()=>{},
+            loadWorkspaceExtras:()=>({}),saveWorkspaceExtras:()=>{},pushRecentMessage:()=>{},notify:()=>{},logSupabaseError:()=>{}});
+        const name=kind==='task'?'deleteTask':kind==='event'?'deleteEvent':'deleteGpRecord';
+        const code=kind==='task'?source.slice(source.lastIndexOf('async function deleteTask'),source.lastIndexOf('async function completeTask')):
+            kind==='event'?source.slice(source.indexOf('async function deleteEvent'),source.indexOf('function renderCalendarSection',source.indexOf('async function deleteEvent'))):
+            gp.slice(gp.indexOf('async function deleteGpRecord'),gp.indexOf('function toggleProjectMapStage'));
+        vm.runInContext(code,ctx);
+        const invoke=()=>name==='deleteGpRecord'?ctx[name](kind,id):ctx[name](id);
+        fail=true; assert.equal(await invoke(),false); assert.equal(removed.length,0); assert.equal(forgotten.length,0);
+        fail=false; assert.equal(await invoke(),true);
+        assert.deepEqual(calls.at(-1).filters,{id,user_id:user});
+        assert.deepEqual(forgotten[0],[kind,id]); assert.equal(removed.length,1);
+        assert.doesNotMatch(code,/syncWorkspaceFromSupabase|refreshWorkspaceUI/);
+    }
+});
+
+test('existing evaluation dialog cancels safely and cleans confirmation only after successful deletion', async () => {
+    const calls=[], removed=[], forgotten=[]; let fail=false, closed=false;
+    const cancel={focus(){}}, confirm={focus(){},addEventListener(_event,callback){this.click=callback;}};
+    const modal={querySelector:selector=>selector.includes('data-confirm')?confirm:cancel,
+        remove(){closed=true;},addEventListener(_event,callback){this.click=callback;}};
+    const ctx=vm.createContext({currentUser:{id:user},
+        document:{querySelector:()=>null,createElement:()=>modal,addEventListener(){},removeEventListener(){},body:{appendChild(){}}},
+        loadWorkspace:()=>({evaluations:[{id,title:'Test'}]}),closeEvaluationMenus(){},escapeHTML:value=>value,
+        getCurrentSupabaseUser:async()=>({id:user}),
+        getSupabaseClient:()=>({from(table){const filters={}; const q={delete:()=>q,eq(k,v){filters[k]=v;return q;},select:()=>q,
+            maybeSingle:async()=>{calls.push({table,filters});return fail?{error:new Error('test failure')}:{data:{id}};}};return q;}}),
+        ACGoogleCalendarManual:{deleteDescription:()=> 'Manual Google copy',afterDelete:(...args)=>{forgotten.push(args);return 'Eliminado';}},
+        removeWorkspaceItems:(...args)=>removed.push(args),refreshEvaluationViews(){},notify(){},logSupabaseError(){}});
+    vm.runInContext(source.slice(source.indexOf('function deleteEvaluation('),source.indexOf('async function setEvaluationCalendarState')),ctx);
+    ctx.deleteEvaluation(id); modal.click({target:{closest:()=>true}});
+    assert.equal(closed,true); assert.equal(calls.length,0);
+    closed=false; ctx.deleteEvaluation(id); fail=true; await confirm.click();
+    assert.equal(closed,false); assert.equal(removed.length,0); assert.equal(forgotten.length,0);
+    fail=false; await confirm.click();
+    assert.equal(closed,true); assert.deepEqual(calls.at(-1),{table:'evaluations',filters:{id,user_id:user}});
+    assert.deepEqual(forgotten,[['evaluation',id]]); assert.equal(removed.length,1);
 });
