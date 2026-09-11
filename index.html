@@ -40,6 +40,11 @@
         #register-page {
             visibility: hidden;
         }
+
+        body.app-booting #study-pet,
+        body:not(.is-landing) #study-pet {
+            display: none !important;
+        }
     </style>
 
     <link rel="stylesheet" href="style.css?v=20260911-evaluation-accent-border-fix-v1">
