@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Academic notification center fixture</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body { margin: 0; min-height: 100vh; }
+        #app-page { display: block !important; min-height: 100vh; }
+        .main-content { min-height: 100vh; padding: 72px 24px 32px; }
+        #dashboard { display: block !important; }
+        .fixture-controls { display: flex; gap: 8px; margin: 0 0 20px; }
+        .fixture-controls button { padding: 8px 12px; }
+    </style>
+</head>
+<body class="is-dashboard">
+    <div id="app-page" class="page active">
+        <button class="app-sidebar-control" type="button" aria-label="Sidebar"><span></span></button>
+        <main class="main-content">
+            <div class="fixture-controls">
+                <button type="button" id="fixture-theme">Cambiar tema</button>
+                <button type="button" id="fixture-settings">Configuración</button>
+                <button type="button" id="fixture-dashboard">Dashboard</button>
+                <button type="button" id="fixture-empty">Todo al día</button>
+            </div>
+            <section id="dashboard" class="section active">
+                <div class="dashboard-hero dashboard-student-hero">
+                    <div class="dashboard-hero-copy">
+                        <span class="dashboard-eyebrow">Panel académico</span>
+                        <h1>Hola, Estudiante</h1>
+                        <p>Fixture visual del centro de avisos.</p>
+                        <div class="quick-actions-bar dashboard-hero-actions">
+                            <button type="button">+ Nueva materia</button><button type="button">+ Nueva tarea</button>
+                            <button type="button">+ Nuevo evento</button><button type="button">+ Nueva evaluación</button>
+                            <button type="button">+ Subir apunte</button><button class="dashboard-tutor-action" type="button">Tutor IA</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="../time-utils.js"></script>
+    <script>
+        window.fixtureStateWrites = [];
+        window.currentSection = 'dashboard';
+        window.getSupabaseClient = () => ({
+            from: () => ({
+                select: () => ({ eq: async () => ({ data: [], error: null }) }),
+                upsert: async payload => { fixtureStateWrites.push(payload); return { error: null }; }
+            })
+        });
+        window.notify = () => {};
+        window.navigateTo = section => {
+            window.currentSection = section;
+            document.body.dataset.fixtureSection = section;
+            window.ACAcademicNotifications.updateVisibility(section);
+        };
+        window.loadWorkspace = () => ({
+            tasks: [
+                { id: 'task-1', title: 'Entregar ensayo', due: '2026-09-10', dueTime: '12:00', status: 'pending' },
+                { id: 'task-2', title: 'Terminar presentación', due: '2026-09-09', dueTime: '08:00', status: 'pending' }
+            ],
+            evaluations: [{ id: 'eval-1', title: 'Examen de química', date: '2026-09-10', time: '10:00', status: 'pending' }],
+            projects: [{ id: 'project-1', title: 'Proyecto de industria', dueDate: '2026-09-08', dueTime: '14:00', status: 'in_progress' }],
+            projectStages: [{ id: 'stage-1', projectId: 'project-1', title: 'Investigación', dueDate: '2026-09-09', dueTime: '16:00', status: 'in_progress' }],
+            projectSubtasks: [{ id: 'subtask-1', projectId: 'project-1', stageId: 'stage-1', title: 'Marco teórico', dueDate: '2026-09-10', dueTime: '09:30', status: 'pending' }],
+            events: [{ id: 'event-1', title: 'Clase magistral', date: '2026-09-10', time: '08:00' }]
+        });
+    </script>
+    <script src="../academic-notifications.js"></script>
+    <script>
+        ACAcademicNotifications.start({ userId: 'fixture-user', workspace: loadWorkspace() });
+        document.getElementById('fixture-theme').addEventListener('click', () => document.body.classList.toggle('light-theme'));
+        document.getElementById('fixture-settings').addEventListener('click', () => navigateTo('settings'));
+        document.getElementById('fixture-dashboard').addEventListener('click', () => navigateTo('dashboard'));
+        document.getElementById('fixture-empty').addEventListener('click', () => ACAcademicNotifications.refresh({}));
+        document.querySelector('.dashboard-tutor-action').addEventListener('click', () => navigateTo('ai-assistant'));
+    </script>
+</body>
+</html>

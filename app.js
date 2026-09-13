@@ -1242,6 +1242,7 @@ function navigateTo(sectionId, evt) {
 
     currentSection = sectionId;
     rememberAppView(sectionId);
+    window.ACAcademicNotifications?.updateVisibility(sectionId);
 
     // Scroll al top en mobile
     if (isTabletOrSmaller) {
@@ -7574,15 +7575,11 @@ function renderDashboard(workspace) {
                     <button type="button" onclick="navigateTo('calendar')">+ Nuevo evento</button>
                     <button type="button" onclick="navigateTo('evaluations')">+ Nueva evaluación</button>
                     <button type="button" onclick="navigateTo('backpack')">+ Subir apunte</button>
+                    <button class="dashboard-tutor-action" type="button" data-dashboard-module="tutor" onclick="navigateTo('ai-assistant')">
+                        ${appIconHTML('bot', 'dashboard-quick-action-icon')}
+                        Tutor IA
+                    </button>
                 </div>
-            </div>
-            <div class="dashboard-hero-widget" data-dashboard-module="tutor">
-                ${appIconHTML('bot', 'hero-widget-icon stat-icon stat-icon-assistant dashboard-icon')}
-                <div>
-                    <strong>Tutor IA</strong>
-                    <p>Pregunta, resume apuntes o prepara un examen.</p>
-                </div>
-                <button class="btn-primary btn-small" type="button" onclick="navigateTo('ai-assistant')">Abrir Tutor</button>
             </div>
         </div>
 
@@ -9618,6 +9615,7 @@ function clearAuthenticatedClientState() {
     resetAuthForms();
     document.body.classList.remove('is-dashboard', 'student-active');
     document.documentElement.classList.remove('is-dashboard');
+    window.ACAcademicNotifications?.stop();
 }
 
 function isConfirmedAuthUser(user) {
@@ -10716,6 +10714,7 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
     await syncWorkspaceFromSupabase();
+    await window.ACAcademicNotifications?.start({ userId: user.id, workspace: loadWorkspace() });
     dashboardAuthorizedUserId = user.id;
     updateDashboardGreeting();
 }
@@ -11559,8 +11558,8 @@ function mapSavedGradeRow(row, items = []) {
     return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), period: row.period || 'p1', category: row.category || 'partial1', evaluation: row.evaluation || 'Calificación', value: Number(row.final_value || 0), finalValue: Number(row.final_value || 0), date: getFirstGradeItemDate(items), observation: row.observation || '', items, createdAt: row.created_at || '' };
 }
 
-function refreshEventViews() { const workspace = loadWorkspace(); renderCalendarSection(workspace); renderDashboard(workspace); }
-function refreshEvaluationViews() { const workspace = loadWorkspace(); renderEvaluations(workspace); renderCalendarSection(workspace); renderDashboard(workspace); }
+function refreshEventViews() { const workspace = loadWorkspace(); renderCalendarSection(workspace); renderDashboard(workspace); window.ACAcademicNotifications?.refresh(workspace); }
+function refreshEvaluationViews() { const workspace = loadWorkspace(); renderEvaluations(workspace); renderCalendarSection(workspace); renderDashboard(workspace); window.ACAcademicNotifications?.refresh(workspace); }
 function refreshGradeViews() { const workspace = loadWorkspace(); renderGrades(workspace); renderDashboard(workspace); renderProgress(workspace); }
 function refreshAttendanceViews() { const workspace = loadWorkspace(); renderAttendance(workspace); renderDashboard(workspace); renderProgress(workspace); }
 function refreshResourceViews() { const workspace = loadWorkspace(); renderBackpack(workspace); renderDashboard(workspace); }
@@ -11876,6 +11875,7 @@ function refreshTaskDependentUI() {
     renderSubjects(workspace);
     renderTasks(workspace);
     renderProgress(workspace);
+    window.ACAcademicNotifications?.refresh(workspace);
 }
 
 function openTaskForm(taskId = null) {
@@ -12100,6 +12100,7 @@ function refreshWorkspaceUI() {
     renderEvaluations(workspace);
     renderGoalsProjects(workspace);
     updateGradeSubjectOptions(workspace);
+    window.ACAcademicNotifications?.refresh(workspace);
 }
 
 async function initializeApp() {
