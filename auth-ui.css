@@ -289,8 +289,16 @@
 #login-page .auth-input-shell input::placeholder { color:#7f89a7 !important; opacity:1 !important; }
 #login-page .auth-form-options { display:flex; align-items:center; justify-content:space-between; gap:18px; min-height:27px !important; }
 #login-page .remember-option { display:inline-flex; align-items:center; gap:9px; color:#e6e9f5; font-size:14px !important; cursor:pointer; }
-#login-page .remember-option input { appearance:none; width:21px !important; height:21px !important; margin:0; border:1px solid rgba(132,150,193,.65); border-radius:6px; background:rgba(7,14,35,.64); }
-#login-page .remember-option input:checked { border-color:#6b73ff; background:linear-gradient(135deg,#2ea8ff,#8953ff); }
+#login-page .remember-option input { appearance:none; -webkit-appearance:none; width:21px !important; height:21px !important; margin:0; border:1px solid rgba(132,150,193,.65); border-radius:6px; background:rgba(7,14,35,.64); box-sizing:border-box; }
+#login-page .remember-option input:checked {
+    border-color:#6b73ff;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.25 8.25 6.5 11.5 12.75 4.75' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg,#2ea8ff,#8953ff);
+    background-position:center,center;
+    background-repeat:no-repeat,no-repeat;
+    background-size:14px 14px,100% 100%;
+}
 #login-page .forgot-password-link { width:auto !important; margin:0 !important; padding:3px 0 !important; border:0 !important; color:#4d9fff !important; background:transparent !important; box-shadow:none !important; font-size:14px !important; }
 #login-page #login-form > .btn-primary {
     display:flex !important;
@@ -1888,7 +1896,12 @@ body.light-theme #login-page .remember-option input {
 }
 body.light-theme #login-page .remember-option input:checked {
     border-color: #4f46e5 !important;
-    background: linear-gradient(135deg, #2589e9, #7145e8) !important;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.25 8.25 6.5 11.5 12.75 4.75' fill='none' stroke='%23fff' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+        linear-gradient(135deg, #2589e9, #7145e8) !important;
+    background-position: center, center !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-size: 14px 14px, 100% 100% !important;
 }
 body.light-theme #login-page .remember-option input:focus-visible {
     outline: 3px solid rgba(37, 99, 235, .24) !important;
@@ -2116,4 +2129,45 @@ body.light-theme #register-page .password-toggle:hover,
 body.light-theme .password-modal .password-toggle:hover {
     color: var(--auth-link, #2563eb);
     background: rgba(37, 99, 235, .09);
+}
+
+/* Keep the login password control outside Chrome's autofill painting area. */
+#login-page .auth-password-shell {
+    padding-right: 54px;
+    box-sizing: border-box;
+    isolation: isolate;
+}
+
+#login-page .auth-password-shell > input {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+    padding-right: 14px !important;
+}
+
+#login-page .auth-password-shell > .password-toggle {
+    z-index: 5;
+}
+
+#login-page .auth-password-shell > input:-webkit-autofill,
+#login-page .auth-password-shell > input:-webkit-autofill:hover,
+#login-page .auth-password-shell > input:-webkit-autofill:focus,
+#login-page .auth-password-shell > input:autofill {
+    -webkit-text-fill-color: #f7f8ff !important;
+    caret-color: #f7f8ff;
+    -webkit-box-shadow: 0 0 0 1000px #07102a inset !important;
+    box-shadow: 0 0 0 1000px #07102a inset !important;
+    transition: background-color 9999s ease-out 0s;
+}
+
+body.light-theme #login-page .auth-password-shell > input:-webkit-autofill,
+body.light-theme #login-page .auth-password-shell > input:-webkit-autofill:hover,
+body.light-theme #login-page .auth-password-shell > input:-webkit-autofill:focus,
+body.light-theme #login-page .auth-password-shell > input:autofill {
+    -webkit-text-fill-color: var(--auth-input-text) !important;
+    caret-color: #4338ca;
+    -webkit-box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
+    box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
 }
