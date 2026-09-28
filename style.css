@@ -9106,7 +9106,8 @@ body.light-theme .theme-toggle::before {
     gap: 9px;
     overflow-x: hidden;
     overflow-y: auto;
-    overscroll-behavior: contain;
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: rgba(112, 170, 220, 0.58) rgba(8, 20, 43, 0.3);
@@ -38325,8 +38326,8 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-auto-suggestions button { font-size: 0.72rem; }
     #ai-assistant .tutor-auto-suggestions button { min-height: 26px; padding: 4px 8px; }
     #ai-assistant .tutor-messages { padding: 4px 4px 7px 1px; gap: 6px; }
-    #ai-assistant .tutor-message { max-width: min(84%, 740px); padding: 8px 10px; border-radius: 13px; font-size: 0.79rem; line-height: 1.42; }
-    #ai-assistant .tutor-user { max-width: min(74%, 600px); }
+    #ai-assistant .tutor-message { max-width: min(88%, 860px); padding: 8px 10px; border-radius: 13px; font-size: 0.79rem; line-height: 1.42; }
+    #ai-assistant .tutor-user { max-width: min(78%, 680px); }
     #ai-assistant .tutor-message-title { margin-bottom: 3px; font-size: 0.69rem; }
     #ai-assistant .tutor-message p { margin-bottom: 4px; }
     #ai-assistant .tutor-message h3,
@@ -38346,6 +38347,12 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #attendance .attendance
     #ai-assistant .tutor-practice-grid { gap: 6px; margin-top: 6px; }
     #ai-assistant .tutor-practice-card { grid-template-columns: 25px 1fr; gap: 6px; padding: 7px; border-radius: 10px; }
     #ai-assistant .tutor-practice-card span { width: 25px; height: 25px; border-radius: 7px; }
+}
+@media (min-width: 1024px) {
+    #ai-assistant.section {
+        width: calc(100% + 8px);
+        margin-inline: -4px !important;
+    }
 }
 @media (max-width: 768px) {
     #ai-assistant .tutor-chat-card { height: clamp(500px, calc(100dvh - 170px), 780px); min-height: 430px; padding: 7px; gap: 6px; }
