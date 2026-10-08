@@ -93,12 +93,14 @@ button {
 
 #landing-page {
   width: 100%;
+  max-width: 100%;
   background:
     radial-gradient(circle at top left, rgba(124, 58, 237, 0.22), transparent 26%),
     radial-gradient(circle at top right, rgba(34, 211, 238, 0.18), transparent 30%),
     linear-gradient(180deg, rgba(7, 12, 18, 0.96) 0%, rgba(10, 17, 25, 1) 100%);
   color: var(--text-primary);
   position: relative;
+  overflow: visible;
 }
 
 body.light-theme #landing-page {
@@ -227,18 +229,35 @@ body.light-theme .landing-nav {
 .theme-toggle {
   width: 42px;
   height: 42px;
+  min-width: 42px;
   border-radius: 50%;
   border: 1px solid var(--lp-border);
   background: rgba(255, 255, 255, 0.03);
   display: grid;
   place-items: center;
   font-size: 1.1rem;
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle span {
+  display: block;
+  line-height: 1;
+  font-size: 1.05rem;
+  transform: translateY(-1px);
+}
+
+body.light-theme .theme-toggle {
+  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(15, 23, 42, 0.04);
 }
 
 .hero {
-  width: min(1160px, calc(100% - 32px));
+  width: min(1350px, calc(100% - 36px));
   margin: 0 auto;
-  padding: 72px 0 54px;
+  padding: 64px 20px 58px;
 }
 
 .hero-content {
@@ -4372,8 +4391,8 @@ body.light-theme .auth-card {
 /* Mascota flotante de AC Edunity */
 .study-pet {
     position: fixed;
-    right: 26px;
-    bottom: 24px;
+    right: 18px;
+    bottom: 18px;
     z-index: 500;
     display: grid;
     grid-template-columns: minmax(190px, 260px) 92px;
@@ -25092,19 +25111,66 @@ body.light-theme .study-ai-card {
 #landing-page .benefits-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 18px !important;
+    align-items: stretch !important;
 }
 
 #landing-page .benefit-card {
-    min-height: 0 !important;
+    min-height: 250px !important;
+    height: auto !important;
     padding: 24px !important;
     border-radius: 26px !important;
     display: flex !important;
     flex-direction: column !important;
+    justify-content: flex-start !important;
     gap: 14px !important;
     background:
         linear-gradient(145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.035)),
         rgba(22, 26, 39, 0.88) !important;
     border: 1px solid rgba(255, 255, 255, 0.09) !important;
+}
+
+#landing-page .landing-nav {
+    align-items: center !important;
+    gap: 18px !important;
+}
+
+#landing-page .nav-actions {
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+#landing-page .theme-toggle {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 12px !important;
+    display: grid !important;
+    place-items: center !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10) !important;
+    box-shadow: none !important;
+}
+
+#landing-page .theme-toggle span {
+    display: block;
+    line-height: 1;
+    transform: translateY(-1px);
+}
+
+#landing-page .hero {
+    padding-top: 64px !important;
+    padding-bottom: 58px !important;
+}
+
+#landing-page .hero-content {
+    align-items: center !important;
+    gap: clamp(42px, 5vw, 68px) !important;
+}
+
+#landing-page .hero-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 #landing-page .benefit-card::after {
@@ -25186,8 +25252,21 @@ body.light-theme .study-ai-card {
 
 .study-pet {
     right: 18px !important;
-    bottom: 24px !important;
+    bottom: 18px !important;
     z-index: 30 !important;
+    pointer-events: none !important;
+    transform: none !important;
+}
+
+#landing-page .study-pet {
+    right: 18px !important;
+    bottom: 18px !important;
+    z-index: 40 !important;
+    pointer-events: none !important;
+}
+
+#landing-page .pet-robot {
+    pointer-events: auto !important;
 }
 
 .pet-bubble {
