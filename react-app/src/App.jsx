@@ -182,12 +182,16 @@ function App() {
   const [isSubmittingRegister, setIsSubmittingRegister] = useState(false)
 
   useEffect(() => {
+    const isLanding = currentPage === 'landing'
+    const isAuth = currentPage === 'login' || currentPage === 'register'
+
     document.body.classList.toggle('light-theme', theme === 'light')
-    document.body.classList.toggle('landing-mode', true)
-    document.body.classList.toggle('is-landing', true)
-    document.body.classList.toggle('landing-active', true)
+    document.body.classList.toggle('landing-mode', isLanding)
+    document.body.classList.toggle('is-landing', isLanding)
+    document.body.classList.toggle('landing-active', isLanding)
+    document.body.classList.toggle('auth-mode', isAuth)
     window.localStorage.setItem('theme', theme)
-  }, [theme])
+  }, [theme, currentPage])
 
   useEffect(() => {
     const revealItems = document.querySelectorAll(
@@ -410,7 +414,8 @@ function App() {
 
   return (
     <>
-      <div id="landing-page" className={`page ${currentPage === 'landing' ? 'active' : ''}`}>
+      {currentPage === 'landing' && (
+        <div id="landing-page" className="page active">
         <nav className="landing-nav reveal">
           <div className="nav-logo">
             <img src="/assets/ac-edunity-logo.png" alt="Logo AC Edunity" className="brand-logo" />
@@ -822,9 +827,11 @@ function App() {
         <footer className="landing-footer reveal">
           <p>&copy; 2026 AC Edunity. Proyecto de Grado - Gestión Educativa Inteligente Personalizada</p>
         </footer>
-      </div>
+        </div>
+      )}
 
-      <div id="login-page" className={`page ${currentPage === 'login' ? 'active' : ''}`}>
+      {currentPage === 'login' && (
+        <div id="login-page" className="page active">
         <div className="auth-container">
           <div className="auth-bg-scene" aria-hidden="true">
             <span className="auth-star star-a"></span>
@@ -925,9 +932,11 @@ function App() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
-      <div id="register-page" className={`page ${currentPage === 'register' ? 'active' : ''}`}>
+      {currentPage === 'register' && (
+        <div id="register-page" className="page active">
         <div className="auth-container">
           <div className="auth-bg-scene" aria-hidden="true">
             <span className="auth-star star-a"></span>
@@ -1024,7 +1033,8 @@ function App() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </>
   )
 }
