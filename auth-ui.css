@@ -1411,11 +1411,11 @@
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(1500px, calc(100vw - 64px)) !important;
-        max-width: 1500px !important;
+        width: min(1320px, calc(100vw - 64px)) !important;
+        max-width: 1320px !important;
         min-height: calc(100vh - 48px) !important;
-        grid-template-columns: minmax(0, 48fr) minmax(0, 52fr) !important;
-        gap: clamp(50px, 4vw, 70px) !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: clamp(38px, 3vw, 50px) !important;
         align-items: center !important;
         justify-self: stretch !important;
         padding: 0 !important;
@@ -1460,21 +1460,22 @@
 
     #login-page .auth-card,
     #register-page .auth-card {
-        width: 100% !important;
-        max-width: 580px !important;
+        box-sizing: border-box !important;
+        width: min(100%, 530px) !important;
+        max-width: 530px !important;
         max-height: none !important;
         align-self: center !important;
-        justify-self: stretch !important;
+        justify-self: center !important;
         margin-inline: auto !important;
         overflow: hidden !important;
     }
 
     #login-page .auth-card {
-        padding: 34px 48px 36px !important;
+        padding: 34px 40px 36px !important;
     }
 
     #register-page .auth-card {
-        padding: 26px 48px 28px !important;
+        padding: 26px 40px 28px !important;
     }
 
     #login-page .auth-brand-logo,
@@ -1571,17 +1572,19 @@
     #login-page .auth-layout,
     #register-page .auth-layout {
         width: calc(100vw - 48px) !important;
-        max-width: 100% !important;
-        grid-template-columns: minmax(250px, 40fr) minmax(430px, 60fr) !important;
-        gap: 48px !important;
+        max-width: 1320px !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: clamp(38px, 4vw, 48px) !important;
     }
 
     #login-page .auth-card,
     #register-page .auth-card {
-        width: 100% !important;
-        max-width: 580px !important;
-        padding-left: 32px !important;
-        padding-right: 32px !important;
+        box-sizing: border-box !important;
+        width: min(100%, 530px) !important;
+        max-width: 530px !important;
+        justify-self: center !important;
+        padding-left: 40px !important;
+        padding-right: 40px !important;
     }
 
     #login-page .login-intro-copy h1,
@@ -2207,7 +2210,7 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     filter: blur(20px) saturate(125%) !important;
     mix-blend-mode: screen !important;
     transform-origin: center !important;
-    animation: authGalaxyNebulaDrift 34s ease-in-out infinite alternate !important;
+    animation: authGalaxyNebulaDrift 14s ease-in-out infinite alternate !important;
     will-change: transform !important;
 }
 
@@ -2229,9 +2232,49 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     background-position: 12px 24px, 74px 18px, 31px 96px !important;
     filter: none !important;
     mix-blend-mode: normal !important;
-    animation: authGalaxyStarfieldDrift 52s linear infinite !important;
+    animation: authGalaxyStarfieldDrift 8s ease-in-out infinite alternate !important;
     will-change: transform !important;
 }
+
+#login-page .auth-star,
+#register-page .auth-star {
+    color: #65d9ff !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+}
+
+#login-page .auth-star::before,
+#register-page .auth-star::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 12px currentColor;
+    animation: authGalaxyStarTwinkleDrift 7.2s ease-in-out infinite;
+    will-change: transform, opacity;
+}
+
+#login-page .star-b,
+#login-page .star-e,
+#register-page .star-b,
+#register-page .star-e { color: #a45bff !important; }
+
+#login-page .star-a::before,
+#register-page .star-a::before { animation-duration: 6.2s; animation-delay: -.8s; }
+#login-page .star-b::before,
+#register-page .star-b::before { animation-duration: 8.4s; animation-delay: -3.1s; }
+#login-page .star-c::before,
+#register-page .star-c::before { animation-duration: 7.6s; animation-delay: -1.9s; }
+#login-page .star-d::before,
+#register-page .star-d::before { animation-duration: 8.8s; animation-delay: -4.2s; }
+#login-page .star-e::before,
+#register-page .star-e::before { animation-duration: 6.8s; animation-delay: -2.5s; }
+#login-page .star-f::before,
+#register-page .star-f::before { animation-duration: 8.1s; animation-delay: -5.1s; }
 
 @keyframes authGalaxyNebulaDrift {
     0% {
@@ -2246,8 +2289,20 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
 }
 
 @keyframes authGalaxyStarfieldDrift {
-    from { transform: translate3d(0, 0, 0); }
-    to { transform: translate3d(-74px, 52px, 0); }
+    from {
+        transform: translate3d(0, 0, 0);
+        background-position: 12px 24px, 74px 18px, 31px 96px;
+    }
+    to {
+        transform: translate3d(-22px, 14px, 0);
+        background-position: -18px 46px, 49px 36px, 9px 112px;
+    }
+}
+
+@keyframes authGalaxyStarTwinkleDrift {
+    0%, 100% { opacity: .36; transform: translate3d(0, 0, 0) scale(.78); }
+    38% { opacity: 1; transform: translate3d(5px, -4px, 0) scale(1.28); }
+    68% { opacity: .58; transform: translate3d(9px, 3px, 0) scale(.94); }
 }
 
 body.light-theme #login-page .auth-bg-scene::before,
@@ -2260,6 +2315,18 @@ body.light-theme #register-page .auth-bg-scene::before {
 body.light-theme #login-page .auth-bg-scene::after,
 body.light-theme #register-page .auth-bg-scene::after {
     opacity: .4 !important;
+}
+
+body.light-theme #login-page .auth-star,
+body.light-theme #register-page .auth-star {
+    color: #397be8 !important;
+}
+
+body.light-theme #login-page .star-b,
+body.light-theme #login-page .star-e,
+body.light-theme #register-page .star-b,
+body.light-theme #register-page .star-e {
+    color: #7c3aed !important;
 }
 
 @media (max-width: 560px) {
@@ -2294,7 +2361,9 @@ body.light-theme #register-page .auth-bg-scene::after {
     #login-page .auth-bg-scene::after,
     #register-page .auth-bg-scene::after,
     #login-page .auth-star,
-    #register-page .auth-star {
+    #register-page .auth-star,
+    #login-page .auth-star::before,
+    #register-page .auth-star::before {
         animation: none !important;
     }
 }
