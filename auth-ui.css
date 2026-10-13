@@ -1411,13 +1411,14 @@
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(1320px, calc(100vw - 64px)) !important;
-        max-width: 1320px !important;
+        width: min(1080px, calc(100vw - 48px)) !important;
+        max-width: 1080px !important;
         min-height: calc(100vh - 48px) !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: clamp(38px, 3vw, 50px) !important;
+        gap: clamp(24px, 1.5vw, 32px) !important;
         align-items: center !important;
         justify-self: stretch !important;
+        margin-inline: auto !important;
         padding: 0 !important;
     }
 
@@ -1425,12 +1426,16 @@
     #register-page .auth-study-visual {
         min-height: 390px !important;
         align-items: center !important;
+        justify-content: center !important;
     }
 
     #login-page .auth-visual-inner,
     #register-page .auth-visual-inner {
+        width: 100% !important;
+        max-width: 430px !important;
         height: 390px !important;
         justify-content: space-between !important;
+        margin-inline: auto !important;
     }
 
     #login-page .login-intro-brand,
@@ -1461,31 +1466,32 @@
     #login-page .auth-card,
     #register-page .auth-card {
         box-sizing: border-box !important;
-        width: min(100%, 530px) !important;
-        max-width: 530px !important;
+        width: min(100%, 470px) !important;
+        max-width: 470px !important;
         max-height: none !important;
         align-self: center !important;
         justify-self: center !important;
         margin-inline: auto !important;
+        border-radius: 26px !important;
         overflow: hidden !important;
     }
 
     #login-page .auth-card {
-        padding: 34px 40px 36px !important;
+        padding: 26px 32px 28px !important;
     }
 
     #register-page .auth-card {
-        padding: 26px 40px 28px !important;
+        padding: 22px 32px 24px !important;
     }
 
     #login-page .auth-brand-logo,
     #register-page .auth-brand-logo {
-        width: 66px !important;
-        height: 66px !important;
-        min-width: 66px !important;
-        min-height: 66px !important;
-        max-width: 66px !important;
-        max-height: 66px !important;
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
+        max-width: 60px !important;
+        max-height: 60px !important;
     }
 
     #login-page .auth-brand,
@@ -1495,7 +1501,7 @@
 
     #login-page .auth-card h2,
     #register-page .auth-card h2 {
-        font-size: 36px !important;
+        font-size: 34px !important;
         line-height: 1.1 !important;
     }
 
@@ -1508,16 +1514,16 @@
     }
 
     #login-page .auth-subtitle {
-        margin-bottom: 21px !important;
+        margin-bottom: 18px !important;
         font-size: 14px !important;
     }
 
     #login-page #login-form {
-        gap: 15px !important;
+        gap: 13px !important;
     }
 
     #register-page #register-form {
-        gap: 8px !important;
+        gap: 7px !important;
     }
 
     #login-page .form-group,
@@ -1548,13 +1554,13 @@
 
     #login-page #login-form > .btn-primary,
     #register-page #register-form > .btn-primary {
-        min-height: 52px !important;
+        min-height: 50px !important;
         font-size: 15px !important;
     }
 
     #login-page .auth-link,
     #register-page .auth-link {
-        margin-top: 20px !important;
+        margin-top: 16px !important;
         font-size: 14px !important;
     }
 
@@ -1572,19 +1578,19 @@
     #login-page .auth-layout,
     #register-page .auth-layout {
         width: calc(100vw - 48px) !important;
-        max-width: 1320px !important;
+        max-width: 1080px !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: clamp(38px, 4vw, 48px) !important;
+        gap: clamp(24px, 3vw, 32px) !important;
     }
 
     #login-page .auth-card,
     #register-page .auth-card {
         box-sizing: border-box !important;
-        width: min(100%, 530px) !important;
-        max-width: 530px !important;
+        width: min(100%, 470px) !important;
+        max-width: 470px !important;
         justify-self: center !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
+        padding-left: 32px !important;
+        padding-right: 32px !important;
     }
 
     #login-page .login-intro-copy h1,
@@ -2187,183 +2193,8 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
 }
 
-/* Auth galaxy background — visual only. */
+/* Keep authentication backgrounds static and free of decorative star layers. */
 #login-page .auth-bg-scene,
 #register-page .auth-bg-scene {
-    contain: paint;
-}
-
-#login-page .auth-bg-scene::before,
-#register-page .auth-bg-scene::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: -22% !important;
-    width: auto !important;
-    height: auto !important;
-    border-radius: 0 !important;
-    pointer-events: none !important;
-    opacity: .78 !important;
-    background:
-        radial-gradient(ellipse at 18% 32%, rgba(38, 157, 255, .4) 0%, rgba(38, 157, 255, .13) 24%, transparent 52%),
-        radial-gradient(ellipse at 77% 24%, rgba(129, 74, 255, .38) 0%, rgba(129, 74, 255, .12) 26%, transparent 54%),
-        radial-gradient(ellipse at 56% 82%, rgba(197, 48, 255, .26) 0%, rgba(83, 71, 228, .1) 30%, transparent 58%) !important;
-    filter: blur(20px) saturate(125%) !important;
-    mix-blend-mode: screen !important;
-    transform-origin: center !important;
-    animation: authGalaxyNebulaDrift 14s ease-in-out infinite alternate !important;
-    will-change: transform !important;
-}
-
-#login-page .auth-bg-scene::after,
-#register-page .auth-bg-scene::after {
-    content: "" !important;
-    position: absolute !important;
-    inset: -18% !important;
-    width: auto !important;
-    height: auto !important;
-    border-radius: 0 !important;
-    pointer-events: none !important;
-    opacity: .64 !important;
-    background-image:
-        radial-gradient(circle, rgba(137, 213, 255, .95) 0 1.1px, transparent 1.8px),
-        radial-gradient(circle, rgba(167, 124, 255, .9) 0 1.3px, transparent 2px),
-        radial-gradient(circle, rgba(255, 255, 255, .78) 0 .9px, transparent 1.5px) !important;
-    background-size: 138px 138px, 211px 211px, 297px 297px !important;
-    background-position: 12px 24px, 74px 18px, 31px 96px !important;
-    filter: none !important;
-    mix-blend-mode: normal !important;
-    animation: authGalaxyStarfieldDrift 8s ease-in-out infinite alternate !important;
-    will-change: transform !important;
-}
-
-#login-page .auth-star,
-#register-page .auth-star {
-    color: #65d9ff !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-}
-
-#login-page .auth-star::before,
-#register-page .auth-star::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: currentColor;
-    box-shadow: 0 0 12px currentColor;
-    animation: authGalaxyStarTwinkleDrift 7.2s ease-in-out infinite;
-    will-change: transform, opacity;
-}
-
-#login-page .star-b,
-#login-page .star-e,
-#register-page .star-b,
-#register-page .star-e { color: #a45bff !important; }
-
-#login-page .star-a::before,
-#register-page .star-a::before { animation-duration: 6.2s; animation-delay: -.8s; }
-#login-page .star-b::before,
-#register-page .star-b::before { animation-duration: 8.4s; animation-delay: -3.1s; }
-#login-page .star-c::before,
-#register-page .star-c::before { animation-duration: 7.6s; animation-delay: -1.9s; }
-#login-page .star-d::before,
-#register-page .star-d::before { animation-duration: 8.8s; animation-delay: -4.2s; }
-#login-page .star-e::before,
-#register-page .star-e::before { animation-duration: 6.8s; animation-delay: -2.5s; }
-#login-page .star-f::before,
-#register-page .star-f::before { animation-duration: 8.1s; animation-delay: -5.1s; }
-
-@keyframes authGalaxyNebulaDrift {
-    0% {
-        transform: translate3d(-3%, 2%, 0) scale(1.02) rotate(-1deg);
-    }
-    50% {
-        transform: translate3d(2%, -2%, 0) scale(1.08) rotate(1deg);
-    }
-    100% {
-        transform: translate3d(4%, 1%, 0) scale(1.04) rotate(0deg);
-    }
-}
-
-@keyframes authGalaxyStarfieldDrift {
-    from {
-        transform: translate3d(0, 0, 0);
-        background-position: 12px 24px, 74px 18px, 31px 96px;
-    }
-    to {
-        transform: translate3d(-22px, 14px, 0);
-        background-position: -18px 46px, 49px 36px, 9px 112px;
-    }
-}
-
-@keyframes authGalaxyStarTwinkleDrift {
-    0%, 100% { opacity: .36; transform: translate3d(0, 0, 0) scale(.78); }
-    38% { opacity: 1; transform: translate3d(5px, -4px, 0) scale(1.28); }
-    68% { opacity: .58; transform: translate3d(9px, 3px, 0) scale(.94); }
-}
-
-body.light-theme #login-page .auth-bg-scene::before,
-body.light-theme #register-page .auth-bg-scene::before {
-    opacity: .34 !important;
-    filter: blur(26px) saturate(110%) !important;
-    mix-blend-mode: multiply !important;
-}
-
-body.light-theme #login-page .auth-bg-scene::after,
-body.light-theme #register-page .auth-bg-scene::after {
-    opacity: .4 !important;
-}
-
-body.light-theme #login-page .auth-star,
-body.light-theme #register-page .auth-star {
-    color: #397be8 !important;
-}
-
-body.light-theme #login-page .star-b,
-body.light-theme #login-page .star-e,
-body.light-theme #register-page .star-b,
-body.light-theme #register-page .star-e {
-    color: #7c3aed !important;
-}
-
-@media (max-width: 560px) {
-    #login-page .auth-bg-scene::before,
-    #register-page .auth-bg-scene::before {
-        inset: -12% !important;
-        opacity: .42 !important;
-        filter: blur(28px) saturate(108%) !important;
-        animation-duration: 36s !important;
-    }
-
-    #login-page .auth-bg-scene::after,
-    #register-page .auth-bg-scene::after {
-        opacity: .32 !important;
-        animation-duration: 58s !important;
-    }
-
-    body.light-theme #login-page .auth-bg-scene::before,
-    body.light-theme #register-page .auth-bg-scene::before {
-        opacity: .17 !important;
-    }
-
-    body.light-theme #login-page .auth-bg-scene::after,
-    body.light-theme #register-page .auth-bg-scene::after {
-        opacity: .2 !important;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    #login-page .auth-bg-scene::before,
-    #register-page .auth-bg-scene::before,
-    #login-page .auth-bg-scene::after,
-    #register-page .auth-bg-scene::after,
-    #login-page .auth-star,
-    #register-page .auth-star,
-    #login-page .auth-star::before,
-    #register-page .auth-star::before {
-        animation: none !important;
-    }
+    display: none !important;
 }
