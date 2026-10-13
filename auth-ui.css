@@ -1411,11 +1411,11 @@
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(1800px, calc(100vw - 64px)) !important;
-        max-width: 1800px !important;
+        width: min(1500px, calc(100vw - 64px)) !important;
+        max-width: 1500px !important;
         min-height: calc(100vh - 48px) !important;
-        grid-template-columns: minmax(0, 42fr) minmax(0, 58fr) !important;
-        gap: clamp(56px, 4.5vw, 88px) !important;
+        grid-template-columns: minmax(0, 48fr) minmax(0, 52fr) !important;
+        gap: clamp(50px, 4vw, 70px) !important;
         align-items: center !important;
         justify-self: stretch !important;
         padding: 0 !important;
@@ -1461,7 +1461,7 @@
     #login-page .auth-card,
     #register-page .auth-card {
         width: 100% !important;
-        max-width: clamp(660px, 49vw, 720px) !important;
+        max-width: 580px !important;
         max-height: none !important;
         align-self: center !important;
         justify-self: stretch !important;
@@ -1579,7 +1579,7 @@
     #login-page .auth-card,
     #register-page .auth-card {
         width: 100% !important;
-        max-width: 600px !important;
+        max-width: 580px !important;
         padding-left: 32px !important;
         padding-right: 32px !important;
     }
@@ -2199,15 +2199,15 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     height: auto !important;
     border-radius: 0 !important;
     pointer-events: none !important;
-    opacity: .62 !important;
+    opacity: .78 !important;
     background:
-        radial-gradient(ellipse at 18% 32%, rgba(38, 157, 255, .28) 0%, rgba(38, 157, 255, .09) 22%, transparent 50%),
-        radial-gradient(ellipse at 77% 24%, rgba(129, 74, 255, .28) 0%, rgba(129, 74, 255, .08) 24%, transparent 51%),
-        radial-gradient(ellipse at 56% 82%, rgba(197, 48, 255, .18) 0%, rgba(83, 71, 228, .07) 28%, transparent 56%) !important;
-    filter: blur(24px) saturate(118%) !important;
+        radial-gradient(ellipse at 18% 32%, rgba(38, 157, 255, .4) 0%, rgba(38, 157, 255, .13) 24%, transparent 52%),
+        radial-gradient(ellipse at 77% 24%, rgba(129, 74, 255, .38) 0%, rgba(129, 74, 255, .12) 26%, transparent 54%),
+        radial-gradient(ellipse at 56% 82%, rgba(197, 48, 255, .26) 0%, rgba(83, 71, 228, .1) 30%, transparent 58%) !important;
+    filter: blur(20px) saturate(125%) !important;
     mix-blend-mode: screen !important;
     transform-origin: center !important;
-    animation: authGalaxyNebulaDrift 28s ease-in-out infinite alternate !important;
+    animation: authGalaxyNebulaDrift 34s ease-in-out infinite alternate !important;
     will-change: transform !important;
 }
 
@@ -2220,16 +2220,16 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     height: auto !important;
     border-radius: 0 !important;
     pointer-events: none !important;
-    opacity: .46 !important;
+    opacity: .64 !important;
     background-image:
-        radial-gradient(circle, rgba(137, 213, 255, .9) 0 1px, transparent 1.6px),
-        radial-gradient(circle, rgba(167, 124, 255, .8) 0 1.2px, transparent 1.9px),
-        radial-gradient(circle, rgba(255, 255, 255, .65) 0 .8px, transparent 1.4px) !important;
+        radial-gradient(circle, rgba(137, 213, 255, .95) 0 1.1px, transparent 1.8px),
+        radial-gradient(circle, rgba(167, 124, 255, .9) 0 1.3px, transparent 2px),
+        radial-gradient(circle, rgba(255, 255, 255, .78) 0 .9px, transparent 1.5px) !important;
     background-size: 138px 138px, 211px 211px, 297px 297px !important;
     background-position: 12px 24px, 74px 18px, 31px 96px !important;
     filter: none !important;
     mix-blend-mode: normal !important;
-    animation: authGalaxyStarfieldDrift 46s linear infinite !important;
+    animation: authGalaxyStarfieldDrift 52s linear infinite !important;
     will-change: transform !important;
 }
 
@@ -2252,14 +2252,14 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
 
 body.light-theme #login-page .auth-bg-scene::before,
 body.light-theme #register-page .auth-bg-scene::before {
-    opacity: .24 !important;
-    filter: blur(30px) saturate(105%) !important;
+    opacity: .34 !important;
+    filter: blur(26px) saturate(110%) !important;
     mix-blend-mode: multiply !important;
 }
 
 body.light-theme #login-page .auth-bg-scene::after,
 body.light-theme #register-page .auth-bg-scene::after {
-    opacity: .26 !important;
+    opacity: .4 !important;
 }
 
 @media (max-width: 560px) {
