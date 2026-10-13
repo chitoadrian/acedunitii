@@ -1414,8 +1414,8 @@
         width: min(1800px, calc(100vw - 64px)) !important;
         max-width: 1800px !important;
         min-height: calc(100vh - 48px) !important;
-        grid-template-columns: minmax(0, 44fr) minmax(0, 56fr) !important;
-        gap: clamp(72px, 5.5vw, 112px) !important;
+        grid-template-columns: minmax(0, 42fr) minmax(0, 58fr) !important;
+        gap: clamp(56px, 4.5vw, 88px) !important;
         align-items: center !important;
         justify-self: stretch !important;
         padding: 0 !important;
@@ -1461,7 +1461,7 @@
     #login-page .auth-card,
     #register-page .auth-card {
         width: 100% !important;
-        max-width: 660px !important;
+        max-width: clamp(660px, 49vw, 720px) !important;
         max-height: none !important;
         align-self: center !important;
         justify-self: stretch !important;
@@ -1579,7 +1579,7 @@
     #login-page .auth-card,
     #register-page .auth-card {
         width: 100% !important;
-        max-width: 560px !important;
+        max-width: 600px !important;
         padding-left: 32px !important;
         padding-right: 32px !important;
     }
@@ -2182,4 +2182,119 @@ body.light-theme #login-page .auth-password-shell > input:autofill {
     caret-color: #4338ca;
     -webkit-box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
     box-shadow: 0 0 0 1000px var(--auth-input-bg) inset !important;
+}
+
+/* Auth galaxy background — visual only. */
+#login-page .auth-bg-scene,
+#register-page .auth-bg-scene {
+    contain: paint;
+}
+
+#login-page .auth-bg-scene::before,
+#register-page .auth-bg-scene::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: -22% !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    pointer-events: none !important;
+    opacity: .62 !important;
+    background:
+        radial-gradient(ellipse at 18% 32%, rgba(38, 157, 255, .28) 0%, rgba(38, 157, 255, .09) 22%, transparent 50%),
+        radial-gradient(ellipse at 77% 24%, rgba(129, 74, 255, .28) 0%, rgba(129, 74, 255, .08) 24%, transparent 51%),
+        radial-gradient(ellipse at 56% 82%, rgba(197, 48, 255, .18) 0%, rgba(83, 71, 228, .07) 28%, transparent 56%) !important;
+    filter: blur(24px) saturate(118%) !important;
+    mix-blend-mode: screen !important;
+    transform-origin: center !important;
+    animation: authGalaxyNebulaDrift 28s ease-in-out infinite alternate !important;
+    will-change: transform !important;
+}
+
+#login-page .auth-bg-scene::after,
+#register-page .auth-bg-scene::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: -18% !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    pointer-events: none !important;
+    opacity: .46 !important;
+    background-image:
+        radial-gradient(circle, rgba(137, 213, 255, .9) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(167, 124, 255, .8) 0 1.2px, transparent 1.9px),
+        radial-gradient(circle, rgba(255, 255, 255, .65) 0 .8px, transparent 1.4px) !important;
+    background-size: 138px 138px, 211px 211px, 297px 297px !important;
+    background-position: 12px 24px, 74px 18px, 31px 96px !important;
+    filter: none !important;
+    mix-blend-mode: normal !important;
+    animation: authGalaxyStarfieldDrift 46s linear infinite !important;
+    will-change: transform !important;
+}
+
+@keyframes authGalaxyNebulaDrift {
+    0% {
+        transform: translate3d(-3%, 2%, 0) scale(1.02) rotate(-1deg);
+    }
+    50% {
+        transform: translate3d(2%, -2%, 0) scale(1.08) rotate(1deg);
+    }
+    100% {
+        transform: translate3d(4%, 1%, 0) scale(1.04) rotate(0deg);
+    }
+}
+
+@keyframes authGalaxyStarfieldDrift {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-74px, 52px, 0); }
+}
+
+body.light-theme #login-page .auth-bg-scene::before,
+body.light-theme #register-page .auth-bg-scene::before {
+    opacity: .24 !important;
+    filter: blur(30px) saturate(105%) !important;
+    mix-blend-mode: multiply !important;
+}
+
+body.light-theme #login-page .auth-bg-scene::after,
+body.light-theme #register-page .auth-bg-scene::after {
+    opacity: .26 !important;
+}
+
+@media (max-width: 560px) {
+    #login-page .auth-bg-scene::before,
+    #register-page .auth-bg-scene::before {
+        inset: -12% !important;
+        opacity: .42 !important;
+        filter: blur(28px) saturate(108%) !important;
+        animation-duration: 36s !important;
+    }
+
+    #login-page .auth-bg-scene::after,
+    #register-page .auth-bg-scene::after {
+        opacity: .32 !important;
+        animation-duration: 58s !important;
+    }
+
+    body.light-theme #login-page .auth-bg-scene::before,
+    body.light-theme #register-page .auth-bg-scene::before {
+        opacity: .17 !important;
+    }
+
+    body.light-theme #login-page .auth-bg-scene::after,
+    body.light-theme #register-page .auth-bg-scene::after {
+        opacity: .2 !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #login-page .auth-bg-scene::before,
+    #register-page .auth-bg-scene::before,
+    #login-page .auth-bg-scene::after,
+    #register-page .auth-bg-scene::after,
+    #login-page .auth-star,
+    #register-page .auth-star {
+        animation: none !important;
+    }
 }
