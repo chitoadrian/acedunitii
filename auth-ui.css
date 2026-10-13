@@ -1406,17 +1406,19 @@
 @media (min-width: 881px) {
     #login-page .auth-container,
     #register-page .auth-container {
-        padding: 30px 42px !important;
+        padding: 24px 32px !important;
     }
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(1740px, calc(100% - 84px)) !important;
-        max-width: 1740px !important;
-        min-height: calc(100vh - 60px) !important;
-        grid-template-columns: minmax(0, 42fr) minmax(0, 58fr) !important;
-        gap: clamp(124px, 9vw, 180px) !important;
+        width: min(1800px, calc(100vw - 64px)) !important;
+        max-width: 1800px !important;
+        min-height: calc(100vh - 48px) !important;
+        grid-template-columns: minmax(0, 44fr) minmax(0, 56fr) !important;
+        gap: clamp(72px, 5.5vw, 112px) !important;
         align-items: center !important;
+        justify-self: stretch !important;
+        padding: 0 !important;
     }
 
     #login-page .auth-study-visual,
@@ -1458,20 +1460,21 @@
 
     #login-page .auth-card,
     #register-page .auth-card {
-        width: min(100%, 560px) !important;
-        max-width: 560px !important;
+        width: 100% !important;
+        max-width: 660px !important;
         max-height: none !important;
         align-self: center !important;
-        justify-self: center !important;
+        justify-self: stretch !important;
+        margin-inline: auto !important;
         overflow: hidden !important;
     }
 
     #login-page .auth-card {
-        padding: 30px 42px 32px !important;
+        padding: 34px 48px 36px !important;
     }
 
     #register-page .auth-card {
-        padding: 22px 42px 24px !important;
+        padding: 26px 48px 28px !important;
     }
 
     #login-page .auth-brand-logo,
@@ -1562,19 +1565,21 @@
 @media (max-width: 1180px) and (min-width: 881px) {
     #login-page .auth-container,
     #register-page .auth-container {
-        padding: 22px 28px !important;
+        padding: 22px 24px !important;
     }
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(100%, calc(100% - 28px)) !important;
+        width: calc(100vw - 48px) !important;
+        max-width: 100% !important;
         grid-template-columns: minmax(250px, 40fr) minmax(430px, 60fr) !important;
-        gap: 64px !important;
+        gap: 48px !important;
     }
 
     #login-page .auth-card,
     #register-page .auth-card {
-        width: min(100%, 520px) !important;
+        width: 100% !important;
+        max-width: 560px !important;
         padding-left: 32px !important;
         padding-right: 32px !important;
     }
@@ -1595,11 +1600,13 @@
 
     #login-page .auth-layout,
     #register-page .auth-layout {
-        width: min(560px, 100%) !important;
+        width: min(560px, calc(100vw - 36px)) !important;
+        max-width: 560px !important;
         min-height: auto !important;
         grid-template-columns: 1fr !important;
         gap: 22px !important;
         align-items: center !important;
+        padding: 0 !important;
     }
 
     #login-page .auth-study-visual {
@@ -1634,7 +1641,7 @@
 
     #login-page .auth-card,
     #register-page .auth-card {
-        width: min(100%, 520px) !important;
+        width: 100% !important;
         max-width: 520px !important;
         max-height: none !important;
         overflow: hidden !important;
@@ -1657,6 +1664,11 @@
 
     #login-page .auth-layout {
         gap: 16px !important;
+    }
+
+    #login-page .auth-layout,
+    #register-page .auth-layout {
+        width: calc(100vw - 24px) !important;
     }
 
     #login-page .auth-card,
