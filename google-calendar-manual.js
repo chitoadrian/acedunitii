@@ -168,7 +168,12 @@
     }
     const controller = createController({
         getUserId: () => typeof currentUser !== 'undefined' ? currentUser?.id : '',
-        getClient: () => getSupabaseClient(),
+        getClient: () => ({
+            from: name => academicTable(name),
+            rpc: (name, args) => getSupabaseClient().rpc(name, {
+                ...args, p_academic_year_id: academicYearManager.selected()?.id
+            })
+        }),
         onChange: refresh,
         onError: (operation, error) => {
             console.warn('[Google Calendar manual]', { operation, code: error?.code || 'unavailable' });

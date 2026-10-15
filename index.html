@@ -94,6 +94,7 @@
     <link rel="stylesheet" href="style.css?v=20260928-tutor-scroll-width-fix-v1">
     <link rel="stylesheet" href="settings.css?v=20260827-global-ui-performance-v2">
     <link rel="stylesheet" href="auth-ui.css?v=20261013-auth-compact-clean-v4">
+    <link rel="stylesheet" href="academic-years.css?v=20261015-academic-years-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <script id="theme-preload">
@@ -732,6 +733,14 @@
             <button class="app-sidebar-control" type="button" onclick="toggleSidebarCollapse()" title="Cerrar barra lateral" aria-label="Cerrar barra lateral">
                 <span></span>
             </button>
+            <div class="academic-year-toolbar">
+                <label for="academic-year-select">Año lectivo</label>
+                <div class="academic-year-control">
+                    <span aria-hidden="true">▦</span>
+                    <select id="academic-year-select" aria-label="Seleccionar año lectivo" disabled></select>
+                </div>
+                <span id="academic-year-status" role="status" aria-live="polite"></span>
+            </div>
 
             <!-- DASHBOARD SECTION -->
             <section id="dashboard" class="section active">
@@ -1739,9 +1748,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="time-utils.js?v=20260902-am-pm-time-consistency-v1"></script>
-    <script src="google-calendar-manual.js?v=20260903-calendar-remove-only-v3"></script>
-    <script src="app.js?v=20260911-academic-notification-center-v1"></script>
-    <script src="goals-projects.js?v=20260911-academic-notification-center-v1"></script>
-    <script src="academic-notifications.js?v=20260911-academic-notification-center-v1"></script>
+    <script src="google-calendar-manual.js?v=20261015-academic-years-v1"></script>
+    <script src="academic-years.js?v=20261015-academic-years-v1"></script>
+    <script src="app.js?v=20261015-academic-years-v1"></script>
+    <script src="goals-projects.js?v=20261015-academic-years-v1"></script>
+    <script src="academic-notifications.js?v=20261015-academic-years-v1"></script>
 </body>
 </html>

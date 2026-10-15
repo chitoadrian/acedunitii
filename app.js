@@ -2145,7 +2145,7 @@ function downloadResource(filename) {
 // ============================================
 
 function getWorkspaceKey() {
-    return `acStudyWorkspace:${currentUser?.email || 'guest'}`;
+    return `acStudyWorkspace:${currentUser?.id || 'guest'}:${academicYearManager.selected()?.id || 'unresolved'}`;
 }
 
 const gradebookResetVersion = 'period-gradebook-v1';
@@ -2486,10 +2486,11 @@ function waitForActivityRefresh(delay) {
 
 async function refreshActivityChart({ confirmMutation = false } = {}) {
     const safeUserId = String(currentUser?.id || '');
+    const academicScope = academicYearManager.scope();
     const requestId = ++weeklyActivityRequestId;
     renderWeeklyActivityState([], 'loading');
 
-    if (!safeUserId) {
+    if (!safeUserId || !academicScope.yearId) {
         renderWeeklyActivityState([], 'ready');
         return [];
     }
@@ -2497,7 +2498,8 @@ async function refreshActivityChart({ confirmMutation = false } = {}) {
     let latestRows = [];
 
     try {
-        const { data, error } = await getSupabaseClient().rpc('get_five_day_activity');
+        const { data, error } = await getSupabaseClient().rpc('get_five_day_activity', { p_academic_year_id: academicScope.yearId });
+        if (!academicYearManager.matches(academicScope)) return [];
         if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
         if (error) throw error;
         latestRows = data;
@@ -2505,6 +2507,7 @@ async function refreshActivityChart({ confirmMutation = false } = {}) {
         renderWeeklyActivityState(latestRows, 'ready');
         return normalizeFiveDayActivityRows(latestRows);
     } catch (error) {
+        if (!academicYearManager.matches(academicScope)) return [];
         if (requestId !== weeklyActivityRequestId || String(currentUser?.id || '') !== safeUserId) return [];
         console.error('No se pudo cargar el progreso de cinco días.', {
             code: error?.code || null,
@@ -2538,8 +2541,7 @@ async function waitForAcademicActivityEvent(sourceId, activityType, attempts = 4
 
     for (let attempt = 0; attempt < attempts; attempt += 1) {
         if (String(currentUser?.id || '') !== safeUserId) return false;
-        const { data, error } = await getSupabaseClient()
-            .from('user_activity_events')
+        const { data, error } = await academicTable('user_activity_events')
             .select('id')
             .eq('user_id', safeUserId)
             .eq('source_id', safeSourceId)
@@ -3107,8 +3109,7 @@ function openAttendanceForm(attendanceId = null) {
                 console.log("[ATTENDANCE] guardando asistencia", attendanceData);
 
                 if (attendanceId) {
-                    const { data, error } = await getSupabaseClient()
-                        .from('attendance')
+                    const { data, error } = await academicTable('attendance')
                         .update(attendanceData)
                         .eq('id', attendanceId)
                         .eq('user_id', user.id)
@@ -3124,8 +3125,7 @@ function openAttendanceForm(attendanceId = null) {
                     replaceWorkspaceItem('attendance', mapSavedAttendanceRow(data));
                     pushRecentMessage(`Editaste asistencia en ${values.subject}.`);
                 } else {
-                    const { data, error } = await getSupabaseClient()
-                        .from('attendance')
+                    const { data, error } = await academicTable('attendance')
                         .insert(attendanceData)
                         .select()
                         .single();
@@ -3162,8 +3162,7 @@ async function deleteAttendance(attendanceId) {
     const attendance = workspace.attendance.find(item => item.id === attendanceId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient()
-            .from('attendance')
+        const { error } = await academicTable('attendance')
             .delete()
             .eq('id', attendanceId)
             .eq('user_id', user.id);
@@ -4210,8 +4209,7 @@ function openEventForm(eventId = null) {
                 const sb = getSupabaseClient();
 
                 if (eventId) {
-                    const { data, error } = await sb
-                        .from('events')
+                    const { data, error } = await academicTable('events')
                         .update(eventData)
                         .eq('id', eventId)
                         .eq('user_id', authUserId)
@@ -4225,8 +4223,7 @@ function openEventForm(eventId = null) {
                     replaceWorkspaceItem('events', mapSavedEventRow(data));
                     pushRecentMessage(`Editaste el evento ${payload.title}.`);
                 } else {
-                    const { data, error } = await sb
-                        .from('events')
+                    const { data, error } = await academicTable('events')
                         .insert(eventData)
                         .select('*')
                         .single();
@@ -4281,8 +4278,7 @@ async function deleteEvent(eventId) {
     const event = workspace.events.find(item => item.id === eventId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { data, error } = await getSupabaseClient()
-            .from('events')
+        const { data, error } = await academicTable('events')
             .delete()
             .eq('id', eventId)
             .eq('user_id', user.id).select('id').maybeSingle();
@@ -4656,8 +4652,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
 
             let savedGrade = null;
             if (gradeId) {
-                const { data, error } = await getSupabaseClient()
-                    .from('grades')
+                const { data, error } = await academicTable('grades')
                     .update(gradePayload)
                     .eq('id', gradeId)
                     .eq('user_id', user.id)
@@ -4672,8 +4667,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
                 savedGrade = data;
                 console.log("[GRADES] guardado correcto", data);
 
-                const { error: deleteItemsError } = await getSupabaseClient()
-                    .from('grade_items')
+                const { error: deleteItemsError } = await academicTable('grade_items')
                     .delete()
                     .eq('grade_id', gradeId);
 
@@ -4684,8 +4678,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
                 }
                 pushRecentMessage(`Editaste una calificación de ${payload.subject}.`);
             } else {
-                const { data, error } = await getSupabaseClient()
-                    .from('grades')
+                const { data, error } = await academicTable('grades')
                     .insert(gradePayload)
                     .select()
                     .single();
@@ -4710,8 +4703,7 @@ function openGradeForm(gradeId = null, defaults = {}) {
             console.log("[GRADE_ITEMS] guardando nota individual", gradeItemPayload);
 
             if (gradeItemPayload.length) {
-                const { error: itemsError } = await getSupabaseClient()
-                    .from('grade_items')
+                const { error: itemsError } = await academicTable('grade_items')
                     .insert(gradeItemPayload);
 
                 if (itemsError) {
@@ -4749,8 +4741,7 @@ async function deleteGrade(gradeId) {
     const grade = workspace.grades.find(item => item.id === gradeId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient()
-            .from('grades')
+        const { error } = await academicTable('grades')
             .delete()
             .eq('id', gradeId)
             .eq('user_id', user.id);
@@ -5053,8 +5044,7 @@ async function deleteResource(resourceId) {
     const resource = workspace.resources.find(item => item.id === resourceId);
     try {
         const user = await getCurrentSupabaseUser();
-        const { error } = await getSupabaseClient()
-            .from('resources')
+        const { error } = await academicTable('resources')
             .delete()
             .eq('id', resourceId)
             .eq('user_id', user.id);
@@ -8237,8 +8227,7 @@ function openResourceForm(resourceId = null) {
                 console.log("[RESOURCES] insertando recurso", resourceData);
 
                 if (resourceId) {
-                    const { data, error } = await getSupabaseClient()
-                        .from('resources')
+                    const { data, error } = await academicTable('resources')
                         .update(resourceData)
                         .eq('id', resourceId)
                         .eq('user_id', user.id)
@@ -8252,8 +8241,7 @@ function openResourceForm(resourceId = null) {
                     replaceWorkspaceItem('resources', mapSavedResourceRow(data));
                     pushRecentMessage(`Editaste el recurso ${payload.title}.`);
                 } else {
-                    const { data, error } = await getSupabaseClient()
-                        .from('resources')
+                    const { data, error } = await academicTable('resources')
                         .insert(resourceData)
                         .select()
                         .single();
@@ -9035,9 +9023,9 @@ function openEvaluationForm(evaluationId = null) {
             };
             let result;
             if (evaluation) {
-                result = await getSupabaseClient().from('evaluations').update(payload).eq('id', evaluation.id).eq('user_id', user.id).select().single();
+                result = await academicTable('evaluations').update(payload).eq('id', evaluation.id).eq('user_id', user.id).select().single();
             } else {
-                result = await getSupabaseClient().from('evaluations').insert(payload).select().single();
+                result = await academicTable('evaluations').insert(payload).select().single();
             }
             if (result.error) throw result.error;
             replaceWorkspaceItem('evaluations', mapSavedEvaluationRow(result.data));
@@ -9131,8 +9119,7 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
         confirmButton.textContent = 'Eliminando…';
         try {
             const user = await getCurrentSupabaseUser();
-            const { data, error } = await getSupabaseClient()
-                .from('evaluations')
+            const { data, error } = await academicTable('evaluations')
                 .delete()
                 .eq('id', evaluationId)
                 .eq('user_id', user.id)
@@ -9164,7 +9151,7 @@ function deleteEvaluation(evaluationId, triggerElement = null) {
 async function setEvaluationCalendarState(evaluationId, enabled) {
     try {
         const user = await getCurrentSupabaseUser();
-        const { data, error } = await getSupabaseClient().from('evaluations')
+        const { data, error } = await academicTable('evaluations')
             .update({ show_in_calendar: Boolean(enabled), updated_at: new Date().toISOString() })
             .eq('id', evaluationId).eq('user_id', user.id).select().single();
         if (error) throw error;
@@ -9202,7 +9189,7 @@ function openEvaluationReminderModal(evaluationId) {
         try {
             const user = await getCurrentSupabaseUser();
             const enabled = modal.querySelector('input[type="checkbox"]').checked;
-            const { data, error } = await getSupabaseClient().from('evaluations')
+            const { data, error } = await academicTable('evaluations')
                 .update({ reminders_enabled: enabled, updated_at: new Date().toISOString() })
                 .eq('id', evaluationId).eq('user_id', user.id).select().single();
             if (error) throw error;
@@ -9437,6 +9424,113 @@ let logoutInProgress = false;
 let accountSwitchInProgress = false;
 let dashboardAuthorizedUserId = '';
 let authOperationGeneration = 0;
+const academicYearManager = ACAcademicYears.createManager({ onChange: renderAcademicYearSelector });
+let academicYearRolloverTimer = null;
+
+function academicTable(name) {
+    return academicYearManager.table(name, getSupabaseClient());
+}
+
+function renderAcademicYearSelector() {
+    const select = document.getElementById('academic-year-select');
+    if (!select) return;
+    const state = academicYearManager.state;
+    document.querySelector('#app-page .main-content')?.setAttribute('aria-busy', String(state.switching));
+    document.querySelectorAll('#app-page .section').forEach(section => { section.inert = state.switching; });
+    const signature = state.years.map(year => `${year.id}:${year.label}:${year.id === state.currentId}`).join('|');
+    if (select.dataset.years !== signature) {
+        select.innerHTML = state.years.map(year => `<option value="${escapeHTML(year.id)}">${escapeHTML(year.label)}${year.id === state.currentId ? ' · Año actual' : ' · Historial'}</option>`).join('');
+        select.dataset.years = signature;
+    }
+    select.value = state.selectedId;
+    select.disabled = !state.selectedId || state.switching || state.pending > 0;
+    document.getElementById('academic-year-status').textContent = state.switching ? 'Cargando año lectivo…' : '';
+}
+
+async function ensureAcademicYearForUser(userId) {
+    if (!userId || userId !== currentUser?.id) throw new Error('La cuenta no coincide con el espacio académico.');
+    const year = await academicYearManager.start(getSupabaseClient(), userId);
+    window.clearTimeout(academicYearRolloverTimer);
+    scheduleAcademicYearRollover();
+    return year;
+}
+
+function resetAcademicYearSession() {
+    window.clearTimeout(academicYearRolloverTimer);
+    academicYearManager.reset();
+    clearWeeklyActivityState();
+}
+
+function clearAcademicYearViews() {
+    clearWeeklyActivityState();
+    window.ACAcademicNotifications?.stop();
+    ACGoogleCalendarManual.reset();
+    activeProjectId = '';
+    activeProjectTab = 'summary';
+    collapsedProjectStages.clear();
+    expandedProjectSubtasks.clear();
+    subjectFilterText = '';
+    backpackFilterText = '';
+    backpackSubjectFilter = 'all';
+    evaluationSubjectFilter = 'all';
+    currentTaskFilter = 'all';
+    settingsReminderKey = '';
+    workspaceState = getEmptyWorkspace();
+    refreshWorkspaceUI();
+}
+
+async function selectAcademicYear(id) {
+    if (document.querySelector('.quick-modal, .gp-modal, .password-modal') || goalsProjectsSaving || projectMapDownloading || tutorRequestInProgress) {
+        renderAcademicYearSelector();
+        notify('Cierra el formulario actual antes de cambiar de año lectivo.', 'info');
+        return;
+    }
+    const previous = workspaceState;
+    const owner = currentUser?.id;
+    try {
+        await academicYearManager.select(id, async () => {
+            clearAcademicYearViews();
+            await syncWorkspaceFromSupabase();
+            await window.ACAcademicNotifications?.start({ userId: owner, workspace: loadWorkspace() });
+            refreshWorkspaceUI();
+        });
+        await runSmartReminders({ force: true });
+    } catch (error) {
+        if (owner === currentUser?.id) {
+            workspaceState = previous;
+            await window.ACAcademicNotifications?.start({ userId: owner, workspace: loadWorkspace() });
+            refreshWorkspaceUI();
+            notify(error.message || 'No se pudo cambiar el año lectivo.', 'error');
+        }
+    } finally { renderAcademicYearSelector(); }
+}
+
+function scheduleAcademicYearRollover() {
+    // A single daily check and visibility event, never a data polling loop.
+    const now = new Date();
+    const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Guayaquil', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+    const nextMidnight = new Date(`${localDate}T00:00:00-05:00`).getTime() + 86400000;
+    academicYearRolloverTimer = window.setTimeout(checkAcademicYearRollover, Math.max(1000, nextMidnight - now.getTime() + 100));
+}
+
+async function checkAcademicYearRollover() {
+    window.clearTimeout(academicYearRolloverTimer);
+    if (!currentUser?.id || !academicYearManager.selected()) return;
+    const state = academicYearManager.state;
+    const cycle = ACAcademicYears.getCurrentAcademicYear().startYear;
+    if (state.years.some(year => year.start_year === cycle)) { scheduleAcademicYearRollover(); return; }
+    if (state.pending || state.switching || document.querySelector('.quick-modal, .gp-modal') || tutorRequestInProgress) {
+        academicYearRolloverTimer = window.setTimeout(checkAcademicYearRollover, 60000);
+        return;
+    }
+    try {
+        await ensureAcademicYearForUser(currentUser.id);
+        clearAcademicYearViews();
+        await syncWorkspaceFromSupabase();
+        await window.ACAcademicNotifications?.start({ userId: currentUser.id, workspace: loadWorkspace() });
+        refreshWorkspaceUI();
+    } catch (error) { notify('No se pudo abrir el nuevo año lectivo. Intenta de nuevo.', 'error'); scheduleAcademicYearRollover(); }
+}
 const AUTH_PERSISTENCE_MODE_KEY = 'ac_auth_persistence_mode';
 const APP_INSIDE_SESSION_KEY = 'ac_inside_student_app';
 const APP_CURRENT_VIEW_SESSION_KEY = 'ac_current_student_view';
@@ -9606,6 +9700,7 @@ function clearAuthenticatedClientState() {
     closeSessionChoice();
     setTutorAuthenticatedUser(null);
     switchAppSettingsUser(null);
+    resetAcademicYearSession();
     currentUser = null;
     profileState = null;
     workspaceState = mergeWorkspaceState();
@@ -10117,7 +10212,7 @@ function isPasswordRecoveryUrl() {
 }
 
 function getWorkspaceExtrasKey() {
-    return `acEdunityExtras:${currentUser?.id || currentUser?.email || 'guest'}`;
+    return `acEdunityExtras:${currentUser?.id || 'guest'}:${academicYearManager.selected()?.id || 'unresolved'}`;
 }
 
 function getWorkspaceClone(data) {
@@ -10147,7 +10242,11 @@ function getEmptyWorkspace() {
 
 function loadWorkspaceExtras() {
     try {
-        const raw = localStorage.getItem(getWorkspaceExtrasKey());
+        let raw = localStorage.getItem(getWorkspaceExtrasKey());
+        const legacyRaw = currentUser?.id ? localStorage.getItem(`acEdunityExtras:${currentUser.id}`) : null;
+        // Only the baseline may read legacy academic extras; other cycles receive global profile extras alone.
+        if (!raw && academicYearManager.selected()?.start_year === 2026) raw = legacyRaw;
+        const globalProfile = legacyRaw ? JSON.parse(legacyRaw).profileExtras || {} : {};
         if (!raw) return {
             events: [],
             grades: [],
@@ -10155,7 +10254,7 @@ function loadWorkspaceExtras() {
             resources: [],
             recent: [],
             taskMeta: {},
-            profileExtras: {},
+            profileExtras: globalProfile,
             tutorHistory: []
         };
         const parsed = JSON.parse(raw);
@@ -10166,7 +10265,7 @@ function loadWorkspaceExtras() {
             resources: Array.isArray(parsed.resources) ? parsed.resources : [],
             recent: Array.isArray(parsed.recent) ? parsed.recent : [],
             taskMeta: parsed.taskMeta && typeof parsed.taskMeta === 'object' ? parsed.taskMeta : {},
-            profileExtras: parsed.profileExtras && typeof parsed.profileExtras === 'object' ? parsed.profileExtras : {},
+            profileExtras: parsed.profileExtras && typeof parsed.profileExtras === 'object' ? parsed.profileExtras : globalProfile,
             tutorHistory: Array.isArray(parsed.tutorHistory) ? parsed.tutorHistory : []
         };
     } catch (error) {
@@ -10186,6 +10285,11 @@ function loadWorkspaceExtras() {
 
 function saveWorkspaceExtras(extras) {
     localStorage.setItem(getWorkspaceExtrasKey(), JSON.stringify(extras));
+    if (currentUser?.id) {
+        const key = `acEdunityExtras:${currentUser.id}`;
+        const previous = JSON.parse(localStorage.getItem(key) || '{}');
+        localStorage.setItem(key, JSON.stringify({ ...previous, profileExtras: extras.profileExtras || previous.profileExtras || {} }));
+    }
 }
 
 function extractTaskMeta(tasks = []) {
@@ -10264,7 +10368,10 @@ function normalizeTaskStatus(status) {
 }
 
 function mergeWorkspaceState(remoteState = {}) {
-    if (!currentUser?.id) ACGoogleCalendarManual.reset();
+    if (!currentUser?.id) {
+        ACGoogleCalendarManual.reset();
+        resetAcademicYearSession();
+    }
     const extras = loadWorkspaceExtras();
     const taskMeta = extras.taskMeta || {};
     const tasks = (remoteState.tasks || []).map(task => ({
@@ -10331,8 +10438,8 @@ function saveWorkspace(workspace) {
             emailReminder: !!nextExtras.taskMeta[task.id]?.emailReminder,
             email: nextExtras.taskMeta[task.id]?.email || task.email || ''
         })),
-        xp: profileState?.xp || 0,
-        streak: profileState?.streak || 0
+        xp: academicYearManager.selected()?.xp || 0,
+        streak: academicYearManager.selected()?.streak || 0
     });
 }
 
@@ -10446,20 +10553,22 @@ async function syncWorkspaceFromSupabase() {
         return workspaceState;
     }
 
+    const scope = academicYearManager.scope();
+    if (!scope.yearId) throw new Error('No hay un año lectivo seleccionado.');
     const sb = getSupabaseClient();
     const [profileRes, subjectsRes, tasksRes, eventsRes, evaluationsRes, attendanceRes, resourcesRes, gradesRes, projectsRes, goalsRes, stagesRes, subtasksRes] = await Promise.all([
         sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
-        sb.from('subjects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
-        sb.from('tasks').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true }),
-        sb.from('evaluations').select('*').eq('user_id', currentUser.id).order('evaluation_date', { ascending: true }),
-        sb.from('attendance').select('*').eq('user_id', currentUser.id).order('date', { ascending: false }),
-        sb.from('resources').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('projects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('goals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
-        sb.from('project_stages').select('*').eq('user_id', currentUser.id).order('position', { ascending: true }),
-        sb.from('project_subtasks').select('*').eq('user_id', currentUser.id).order('position', { ascending: true })
+        academicTable('subjects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
+        academicTable('tasks').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        academicTable('events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true }),
+        academicTable('evaluations').select('*').eq('user_id', currentUser.id).order('evaluation_date', { ascending: true }),
+        academicTable('attendance').select('*').eq('user_id', currentUser.id).order('date', { ascending: false }),
+        academicTable('resources').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        academicTable('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        academicTable('projects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        academicTable('goals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        academicTable('project_stages').select('*').eq('user_id', currentUser.id).order('position', { ascending: true }),
+        academicTable('project_subtasks').select('*').eq('user_id', currentUser.id).order('position', { ascending: true })
     ]);
 
     if (profileRes.error) {
@@ -10501,6 +10610,7 @@ async function syncWorkspaceFromSupabase() {
         }
     }
 
+    if (!academicYearManager.matches(scope)) throw new Error('El año lectivo cambió durante la carga.');
     profileState = profileRes.data || {
         id: currentUser.id,
         full_name: currentUser.name,
@@ -10614,8 +10724,7 @@ async function syncWorkspaceFromSupabase() {
     const gradeIds = gradeRows.map(grade => grade.id).filter(Boolean);
     let gradeItemsRows = [];
     if (gradeIds.length) {
-        const gradeItemsRes = await sb
-            .from('grade_items')
+        const gradeItemsRes = await academicTable('grade_items')
             .select('*')
             .in('grade_id', gradeIds)
             .order('item_date', { ascending: true });
@@ -10656,6 +10765,7 @@ async function syncWorkspaceFromSupabase() {
         };
     });
 
+    if (!academicYearManager.matches(scope)) throw new Error('El año lectivo cambió durante la carga.');
     return mergeWorkspaceState({
         subjects,
         tasks,
@@ -10668,8 +10778,8 @@ async function syncWorkspaceFromSupabase() {
         attendance,
         resources,
         grades,
-        xp: Number(profileState.xp || 0),
-        streak: Number(profileState.streak || 0)
+        xp: Number(academicYearManager.selected()?.xp || 0),
+        streak: Number(academicYearManager.selected()?.streak || 0)
     });
 }
 
@@ -10709,6 +10819,7 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
 
     const profile = await ensureProfileRow(user, fallbackName);
     currentUser = getPublicUserFromAuth(user, profile);
+    await ensureAcademicYearForUser(user.id);
     await switchAppSettingsUser(user);
     console.log('[Supabase] Usuario autenticado validado', { userId: user.id });
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -10720,30 +10831,16 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
 }
 
 async function updateProfileProgress(deltaXp, { bumpStreak = false } = {}) {
-    if (!currentUser?.id || !profileState) return;
-
-    const nextXp = Math.max(0, Number(profileState.xp || 0) + Number(deltaXp || 0));
-    const nextStreak = bumpStreak ? Math.max(1, Number(profileState.streak || 0)) : Number(profileState.streak || 0);
-    const nextLevel = getLevel(nextXp);
-
-    profileState = {
-        ...profileState,
-        xp: nextXp,
-        streak: nextStreak,
-        level: nextLevel
-    };
-
-    if (workspaceState) {
-        workspaceState.xp = nextXp;
-        workspaceState.streak = nextStreak;
-    }
-
-    const { error } = await getSupabaseClient()
-        .from('profiles')
-        .update({ xp: nextXp, streak: nextStreak, level: nextLevel })
-        .eq('id', currentUser.id);
-
+    const scope = academicYearManager.scope();
+    if (!currentUser?.id || !scope.yearId) return;
+    const { data, error } = await getSupabaseClient().rpc('increment_academic_year_progress', {
+        p_year_id: scope.yearId, p_delta: Number(deltaXp || 0), p_bump_streak: bumpStreak
+    });
     if (error) throw error;
+    const progress = Array.isArray(data) ? data[0] : data;
+    if (!academicYearManager.matches(scope) || !progress) return;
+    academicYearManager.updateProgress(progress);
+    if (workspaceState) { workspaceState.xp = progress.xp; workspaceState.streak = progress.streak; }
 }
 
 function pushRecentMessage(text) {
@@ -11489,8 +11586,7 @@ async function toggleTask(checkbox) {
         commitTaskStatusToWorkspace(taskId, nextStatus);
         refreshTaskDependentUI();
 
-        const { error } = await getSupabaseClient()
-            .from('tasks')
+        const { error } = await academicTable('tasks')
             .update({ status: nextStatus })
             .eq('id', taskId)
             .eq('user_id', currentUser.id);
@@ -11631,8 +11727,7 @@ function openSubjectForm(subjectId = null) {
                 };
 
                 if (subjectId) {
-                    const { data, error } = await sb
-                        .from('subjects')
+                    const { data, error } = await academicTable('subjects')
                         .update(payload)
                         .eq('id', subjectId)
                         .eq('user_id', currentUser.id);
@@ -11649,8 +11744,7 @@ function openSubjectForm(subjectId = null) {
                     });
                     pushRecentMessage(`Editaste la materia ${name}.`);
                 } else {
-                    const { data, error } = await sb
-                        .from('subjects')
+                    const { data, error } = await academicTable('subjects')
                         .insert(payload);
 
                     if (error) {
@@ -11688,8 +11782,7 @@ async function deleteSubject(subjectId) {
         const subjectTasks = workspace.tasks.filter(task => task.subjectId === subjectId);
 
         if (subjectTasks.length) {
-            const { error: taskError } = await sb
-                .from('tasks')
+            const { error: taskError } = await academicTable('tasks')
                 .delete()
                 .eq('user_id', currentUser.id)
                 .eq('subject_id', subjectId);
@@ -11700,8 +11793,7 @@ async function deleteSubject(subjectId) {
             }
         }
 
-        const { error } = await sb
-            .from('subjects')
+        const { error } = await academicTable('subjects')
             .delete()
             .eq('id', subjectId)
             .eq('user_id', currentUser.id);
@@ -11961,8 +12053,7 @@ function openTaskForm(taskId = null) {
                         return false;
                     }
 
-                    const { data, error } = await sb
-                        .from('tasks')
+                    const { data, error } = await academicTable('tasks')
                         .update(payload)
                         .eq('id', taskId)
                         .eq('user_id', authUser.id)
@@ -11973,8 +12064,7 @@ function openTaskForm(taskId = null) {
                     savedRow = data;
                     pushRecentMessage(`Editaste la tarea ${title}.`);
                 } else {
-                    const { data, error } = await sb
-                        .from('tasks')
+                    const { data, error } = await academicTable('tasks')
                         .insert(payload)
                         .select('*')
                         .single();
@@ -12026,8 +12116,7 @@ async function deleteTask(taskId) {
     if (!task || !beginWorkspaceDelete(deleteKey)) return false;
 
     try {
-        const { data, error } = await getSupabaseClient()
-            .from('tasks')
+        const { data, error } = await academicTable('tasks')
             .delete()
             .eq('id', taskId)
             .eq('user_id', userId).select('id').maybeSingle();
@@ -12064,8 +12153,7 @@ async function completeTask(taskId) {
     if (task.status === 'completed') return;
 
     try {
-        const { error } = await getSupabaseClient()
-            .from('tasks')
+        const { error } = await academicTable('tasks')
             .update({ status: 'completed' })
             .eq('id', taskId)
             .eq('user_id', currentUser.id);
@@ -12104,6 +12192,10 @@ function refreshWorkspaceUI() {
 }
 
 async function initializeApp() {
+    document.getElementById('academic-year-select')?.addEventListener('change', event => selectAcademicYear(event.target.value));
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') void checkAcademicYearRollover();
+    });
     document.documentElement.classList.add('is-landing', 'landing-mode');
     document.documentElement.classList.remove('is-dashboard');
     document.body.classList.add('is-landing', 'landing-mode', 'landing-active');
@@ -12629,15 +12721,14 @@ function getReminderCandidates(workspace) {
 }
 
 async function runSmartReminders({ force = false } = {}) {
-    if (!appSettings?.notifications || !currentUser?.id) return;
-    const reminderKey = `${currentUser.id}:unread`;
+    if (!appSettings?.notifications || !currentUser?.id || !academicYearManager.selected()) return;
+    const reminderKey = `${currentUser.id}:${academicYearManager.selected().id}:unread`;
     if (!force && settingsReminderKey === reminderKey) return;
     settingsReminderKey = reminderKey;
 
     try {
         const sb = getSupabaseClient();
-        const { data, error } = await sb
-            .from('internal_notifications')
+        const { data, error } = await academicTable('internal_notifications')
             .select('id,title,message,notification_type,created_at')
             .eq('user_id', currentUser.id)
             .is('read_at', null)
@@ -12653,8 +12744,7 @@ async function runSmartReminders({ force = false } = {}) {
         ));
 
         const ids = data.map(item => item.id);
-        const { error: readError } = await sb
-            .from('internal_notifications')
+        const { error: readError } = await academicTable('internal_notifications')
             .update({ read_at: new Date().toISOString() })
             .in('id', ids)
             .eq('user_id', currentUser.id);

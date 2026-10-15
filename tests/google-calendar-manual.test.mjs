@@ -241,6 +241,7 @@ test('existing delete flows target exact owner/id and update only local dependen
         const code=kind==='task'?source.slice(source.lastIndexOf('async function deleteTask'),source.lastIndexOf('async function completeTask')):
             kind==='event'?source.slice(source.indexOf('async function deleteEvent'),source.indexOf('function renderCalendarSection',source.indexOf('async function deleteEvent'))):
             gp.slice(gp.indexOf('async function deleteGpRecord'),gp.indexOf('function toggleProjectMapStage'));
+        ctx.academicTable = table => ctx.getSupabaseClient().from(table);
         vm.runInContext(code,ctx);
         const invoke=()=>name==='deleteGpRecord'?ctx[name](kind,id):ctx[name](id);
         fail=true; assert.equal(await invoke(),false); assert.equal(removed.length,0); assert.equal(forgotten.length,0);
@@ -264,6 +265,7 @@ test('existing evaluation dialog cancels safely and cleans confirmation only aft
             maybeSingle:async()=>{calls.push({table,filters});return fail?{error:new Error('test failure')}:{data:{id}};}};return q;}}),
         ACGoogleCalendarManual:{deleteDescription:()=> 'Manual Google copy',afterDelete:(...args)=>{forgotten.push(args);return 'Eliminado';}},
         removeWorkspaceItems:(...args)=>removed.push(args),refreshEvaluationViews(){},notify(){},logSupabaseError(){}});
+    ctx.academicTable = table => ctx.getSupabaseClient().from(table);
     vm.runInContext(source.slice(source.indexOf('function deleteEvaluation('),source.indexOf('async function setEvaluationCalendarState')),ctx);
     ctx.deleteEvaluation(id); modal.click({target:{closest:()=>true}});
     assert.equal(closed,true); assert.equal(calls.length,0);

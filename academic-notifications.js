@@ -308,8 +308,7 @@
         const generation = ++stateLoadGeneration;
         stateRows = [];
         if (!ownerId || typeof root.getSupabaseClient !== 'function') return;
-        const { data, error } = await root.getSupabaseClient()
-            .from('academic_notification_states')
+        const { data, error } = await root.academicTable('academic_notification_states')
             .select('notification_key,read_at,dismissed_at,created_at,updated_at')
             .eq('user_id', ownerId);
         if (generation !== stateLoadGeneration || !ownerId) return;
@@ -335,8 +334,7 @@
             };
         });
         try {
-            const { error } = await root.getSupabaseClient()
-                .from('academic_notification_states')
+            const { error } = await root.academicTable('academic_notification_states')
                 .upsert(payload, { onConflict: 'user_id,notification_key' });
             if (error) throw error;
             return true;
