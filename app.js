@@ -9443,6 +9443,7 @@ function renderAcademicYearSelector() {
         select.dataset.years = signature;
     }
     select.value = state.selectedId;
+    document.getElementById('academic-year-label').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Año lectivo';
     select.disabled = !state.selectedId || state.switching || state.pending > 0;
     document.getElementById('academic-year-status').textContent = state.switching ? 'Cargando año lectivo…' : '';
 }

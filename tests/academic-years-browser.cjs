@@ -97,8 +97,11 @@ const userId = '10000000-0000-4000-8000-000000000001';
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica') === false, 'new cycle must start empty');
         const years = await page.evaluate(() => academicYearManager.state.years);
         const old = years.find(y => y.start_year === 2026), current = years.find(y => y.start_year === 2027);
+        assert.equal(await page.locator('#academic-year-label').innerText(), current.label);
+        assert.ok((await page.locator('#academic-year-select option:checked').innerText()).includes('Año actual'));
         await page.selectOption('#academic-year-select', old.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
+        assert.equal(await page.locator('#academic-year-label').innerText(), old.label, 'closed control shows only the selected year');
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica'));
         await boot();
         assert.equal(await page.inputValue('#academic-year-select'), old.id, 'reload preserves explicit historical selection');
@@ -115,31 +118,62 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.waitForFunction(() => loadWorkspace().tasks.some(t => t.title === 'PRUEBA TAREA AÑO LECTIVO'));
         const persisted = (await db.query("select academic_year_id from public.tasks where title='PRUEBA TAREA AÑO LECTIVO'")).rows;
         assert.equal(persisted[0].academic_year_id, current.id);
+        // The original native select remains operable by keyboard, including year changes.
+        const firstYear = await page.locator('#academic-year-select option').first().getAttribute('value');
+        const lastYear = await page.locator('#academic-year-select option').last().getAttribute('value');
+        await page.locator('#academic-year-select').press('Home');
+        await page.waitForFunction(id => academicYearManager.state.selectedId === id && !academicYearManager.state.switching, firstYear);
+        await page.locator('#academic-year-select').press('End');
+        await page.waitForFunction(id => academicYearManager.state.selectedId === id && !academicYearManager.state.switching, lastYear);
+        await page.selectOption('#academic-year-select', current.id);
+        await page.waitForFunction(() => !academicYearManager.state.switching);
         const sections = ['dashboard','subjects','tasks','calendar','evaluations','grades','attendance','goals-projects','progress','backpack','profile','settings','ai-assistant'];
         const outputDir = process.env.TEST_SCREENSHOT_DIR;
         if (outputDir) fs.mkdirSync(outputDir, { recursive: true });
-        for (const [width, height] of [[1440,900],[1024,768],[768,1024],[430,932],[390,844],[360,800]]) {
+        for (const [width, height] of [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[430,932],[390,844],[360,800]]) {
             await page.setViewportSize({ width, height });
             for (const theme of ['dark','light']) {
                 await page.evaluate(theme => document.body.classList.toggle('light-theme', theme === 'light'), theme);
                 for (const section of sections) {
                     await page.evaluate(section => navigateTo(section), section);
-                    const measure = await page.locator('#academic-year-select').evaluate(select => {
-                        const r = select.getBoundingClientRect();
-                        return { width: r.width, left: r.left, right: r.right, viewport: innerWidth, overflow: document.documentElement.scrollWidth > innerWidth };
+                    const measure = await page.locator('.academic-year-control').evaluate(control => {
+                        const r = control.getBoundingClientRect();
+                        const bell = document.querySelector('.academic-notification-center')?.getBoundingClientRect();
+                        const sidebar = document.querySelector('.app-sidebar-control').getBoundingClientRect();
+                        const label = document.getElementById('academic-year-label');
+                        const overlaps = other => other && other.width > 0 && r.left < other.right && r.right > other.left && r.top < other.bottom && r.bottom > other.top;
+                        return { width: r.width, left: r.left, right: r.right, top: r.top, viewport: innerWidth,
+                            overflow: document.documentElement.scrollWidth > innerWidth, overlap: Boolean(overlaps(bell) || overlaps(sidebar)),
+                            clipped: label.scrollWidth > label.clientWidth, label: label.textContent };
                     });
                     assert.ok(measure.width > 0 && measure.left >= 0 && measure.right <= width, JSON.stringify({width,theme,section,measure}));
+                    assert.equal(measure.width, width <= 768 ? 150 : 156);
+                    assert.equal(measure.top, width <= 768 ? 14 : 18);
+                    assert.equal(measure.overlap, false, 'year selector must not overlap header controls');
+                    assert.equal(measure.clipped, false, 'year range must fit without truncation');
+                    assert.equal(measure.label, current.label);
                     // Existing wide module content is checked separately from the new toolbar.
                     if (section === 'subjects' || section === 'dashboard') assert.equal(measure.overflow, false, `${width}/${theme}/${section}`);
                 }
-                if (outputDir && [1440,390].includes(width)) {
+                if (outputDir && [1440,768,390,360].includes(width)) {
                     await page.evaluate(() => navigateTo('dashboard'));
                     await page.waitForTimeout(1500);
                     await page.screenshot({ path: path.join(outputDir, `academic-years-${theme}-${width}.png`) });
+                    await page.locator('#academic-year-select').click();
+                    await page.screenshot({ path: path.join(outputDir, `academic-years-menu-${theme}-${width}.png`) });
+                    await page.keyboard.press('Escape');
                 }
             }
         }
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page.evaluate(() => toggleSidebarCollapse());
+        const rightWithCollapsedSidebar = await page.locator('.academic-year-control').evaluate(el => el.getBoundingClientRect().right);
+        assert.equal(rightWithCollapsedSidebar, 1440 - 130, 'selector remains right-aligned when sidebar is collapsed');
+        await page.locator('#academic-year-select').focus();
+        assert.equal(await page.locator('.academic-year-control').evaluate(el => getComputedStyle(el).outlineStyle), 'solid');
+        await page.evaluate(() => showLanding());
+        assert.equal(await page.locator('.academic-year-control').isVisible(), false, 'selector is not shown on public pages');
         assert.deepEqual(errors, []);
-        console.log('PASS: real forms + local PostgreSQL, selector/year switching, historical reload, isolated task persistence, 13 sections, 6 viewport sizes, dark/light, no new console errors.');
+        console.log('PASS: real forms + local PostgreSQL, native keyboard/year switching, short label, historical reload, isolated task persistence, 13 sections, 8 viewport sizes, dark/light, compact right alignment, no header overlap, no new console errors.');
     } finally { if (browser) await browser.close(); await db.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

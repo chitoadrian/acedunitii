@@ -2,44 +2,83 @@
 #app-page .academic-year-toolbar {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 8px 12px;
+    justify-content: flex-end;
+    min-height: 42px;
     min-width: 0;
-    margin: 0 68px 24px 42px;
+    margin: 0 0 24px;
     color: var(--text-primary, #edf0ff);
 }
-#app-page .academic-year-toolbar > label { font-size: 13px; opacity: .75; }
+#app-page .academic-year-toolbar > label,
+#app-page #academic-year-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
 #app-page .academic-year-control {
+    position: fixed;
+    top: 18px;
+    right: 130px;
+    z-index: 424;
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: 0;
-    max-width: 100%;
-    padding: 0 12px;
+    box-sizing: border-box;
+    width: 156px;
+    height: 42px;
+    padding: 0 11px;
     border: 1px solid rgba(139, 126, 238, .35);
     border-radius: 12px;
-    background: rgba(110, 91, 206, .1);
+    background: rgba(35, 34, 54, .94);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+    transition: border-color .18s ease, background-color .18s ease;
 }
-#app-page #academic-year-select {
-    width: auto;
+#app-page .academic-year-control:hover { border-color: rgba(139, 126, 238, .65); }
+#app-page .academic-year-control:focus-within { outline: 2px solid #8b77ff; outline-offset: 3px; }
+#app-page .academic-year-control:has(select:disabled) { opacity: .65; }
+#app-page #academic-year-label {
+    flex: 1;
     min-width: 0;
-    max-width: 100%;
-    min-height: 42px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+#app-page .academic-year-chevron {
+    width: 6px;
+    height: 6px;
+    margin: -3px 2px 0 0;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+}
+/* Keep the native menu, keyboard support and existing change handler. */
+#app-page #academic-year-select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    margin: 0;
     border: 0;
-    background: transparent;
-    color: inherit;
+    border-radius: inherit;
+    opacity: 0;
     font: inherit;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
 }
-#app-page #academic-year-select option { color: #17213d; background: #fff; }
-#app-page #academic-year-select:focus-visible { outline: 2px solid #8b77ff; outline-offset: 3px; }
-#app-page #academic-year-select:disabled { opacity: .65; cursor: wait; }
-#app-page #academic-year-status { font-size: 12px; }
+#app-page #academic-year-select option { color: #edf0ff; background: #232236; }
+#app-page #academic-year-select:disabled { cursor: wait; }
 body.light-theme #app-page .academic-year-toolbar { color: #293657; }
+body.light-theme #app-page .academic-year-control { background: rgba(255, 255, 255, .97); }
+body.light-theme #app-page #academic-year-select option { color: #293657; background: #fff; }
+@media (max-width: 768px) {
+    #app-page .academic-year-control { top: 14px; right: 118px; width: 150px; height: 40px; padding-inline: 9px; }
+}
 @media (max-width: 767px) {
-    #app-page .academic-year-toolbar { margin: 0 48px 18px 0; gap: 6px; }
-    #app-page .academic-year-toolbar > label { flex-basis: 100%; }
-    #app-page .academic-year-control { padding-inline: 8px; }
-    #app-page #academic-year-select { min-height: 42px; font-size: 13px; }
+    #app-page .academic-year-toolbar { min-height: 0; margin: 0; }
 }
