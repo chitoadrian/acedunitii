@@ -17,18 +17,20 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await db.query("insert into public.subjects(user_id,name) values($1,'Materia histórica')", [userId]);
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015130622_add_academic_year_management.sql'), 'utf8'));
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015132831_optimize_academic_year_indexes.sql'), 'utf8'));
+        await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015141942_annual_academic_reports.sql'), 'utf8'));
         // Only this disposable DB simulates 2027; production clock/data are untouched.
         await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2027 $$");
         await db.query("select set_config('request.jwt.claim.sub',$1,false)", [userId]);
         await db.exec('set role authenticated');
         const quoted = name => { if (!/^[a-z_]+$/.test(name)) throw new Error('invalid identifier'); return `"${name}"`; };
-        let queue = Promise.resolve();
+        let queue = Promise.resolve(), reportInvocations = 0;
         async function execute(request) {
             const job = queue.then(async () => {
                 try {
                     if (request.rpc) {
                         if (request.rpc === 'ensure_academic_year_for_user') return { data: (await db.query('select public.ensure_academic_year_for_user() v')).rows[0].v, error: null };
                         if (request.rpc === 'get_five_day_activity') return { data: (await db.query('select * from public.get_five_day_activity($1)', [request.args.p_academic_year_id])).rows, error: null };
+                        if (request.rpc === 'get_academic_year_report') { reportInvocations++; return { data: (await db.query('select public.get_academic_year_report($1) v', [request.args.p_academic_year_id])).rows[0].v, error: null }; }
                         if (request.rpc === 'increment_academic_year_progress') return { data: (await db.query('select * from public.increment_academic_year_progress($1,$2,$3)', [request.args.p_year_id, request.args.p_delta, request.args.p_bump_streak])).rows[0], error: null };
                         throw new Error(`Unsupported test RPC: ${request.rpc}`);
                     }
@@ -61,6 +63,8 @@ const userId = '10000000-0000-4000-8000-000000000001';
         browser = await chromium.launch({ headless: true, executablePath: process.env.TEST_BROWSER });
         const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
         const errors = []; page.on('pageerror', error => errors.push(error.message));
+        const libraryRequests = [];
+        page.on('request', request => { if (request.url().includes('/assets/vendor/jspdf')) libraryRequests.push(request.url()); });
         page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
         await page.exposeFunction('academicTestQuery', execute);
         const boot = async () => {
@@ -102,11 +106,19 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.selectOption('#academic-year-select', old.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
         assert.equal(await page.locator('#academic-year-label').innerText(), old.label, 'closed control shows only the selected year');
+        assert.equal(await page.locator('#academic-year-state').innerText(), 'Año histórico · Solo consulta');
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica'));
         await boot();
         assert.equal(await page.inputValue('#academic-year-select'), old.id, 'reload preserves explicit historical selection');
         await page.selectOption('#academic-year-select', current.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
+        assert.equal(await page.locator('#academic-year-state').innerText(), 'Año actual');
+        const futureError = await page.evaluate(async () => {
+            try { await academicYearManager.select('future-year', async () => {}); } catch (error) { return error.message; }
+        });
+        assert.ok(futureError.includes('1 de abril de 2028'));
+        await page.evaluate(() => selectAcademicYear('future-year'));
+        assert.ok((await page.locator('#app-toast').innerText()).includes('No puedes cambiar al próximo año lectivo todavía.'));
         // Create through the application's real form handlers and persist in local PostgreSQL.
         await page.evaluate(() => openSubjectForm());
         await page.locator('.quick-modal input[name="name"]').fill('PRUEBA AÑO LECTIVO');
@@ -140,11 +152,13 @@ const userId = '10000000-0000-4000-8000-000000000001';
                         const r = control.getBoundingClientRect();
                         const bell = document.querySelector('.academic-notification-center')?.getBoundingClientRect();
                         const sidebar = document.querySelector('.app-sidebar-control').getBoundingClientRect();
+                        const report = document.getElementById('academic-year-report').getBoundingClientRect();
                         const label = document.getElementById('academic-year-label');
                         const overlaps = other => other && other.width > 0 && r.left < other.right && r.right > other.left && r.top < other.bottom && r.bottom > other.top;
                         return { width: r.width, left: r.left, right: r.right, top: r.top, viewport: innerWidth,
                             overflow: document.documentElement.scrollWidth > innerWidth, overlap: Boolean(overlaps(bell) || overlaps(sidebar)),
-                            clipped: label.scrollWidth > label.clientWidth, label: label.textContent };
+                            clipped: label.scrollWidth > label.clientWidth, label: label.textContent,
+                            reportFits: report.left >= 0 && report.right < r.left && report.top === r.top };
                     });
                     assert.ok(measure.width > 0 && measure.left >= 0 && measure.right <= width, JSON.stringify({width,theme,section,measure}));
                     assert.equal(measure.width, width <= 768 ? 150 : 156);
@@ -152,6 +166,7 @@ const userId = '10000000-0000-4000-8000-000000000001';
                     assert.equal(measure.overlap, false, 'year selector must not overlap header controls');
                     assert.equal(measure.clipped, false, 'year range must fit without truncation');
                     assert.equal(measure.label, current.label);
+                    assert.equal(measure.reportFits, true, 'report action fits next to selector without overlap');
                     // Existing wide module content is checked separately from the new toolbar.
                     if (section === 'subjects' || section === 'dashboard') assert.equal(measure.overflow, false, `${width}/${theme}/${section}`);
                 }
@@ -171,9 +186,34 @@ const userId = '10000000-0000-4000-8000-000000000001';
         assert.equal(rightWithCollapsedSidebar, 1440 - 130, 'selector remains right-aligned when sidebar is collapsed');
         await page.locator('#academic-year-select').focus();
         assert.equal(await page.locator('.academic-year-control').evaluate(el => getComputedStyle(el).outlineStyle), 'solid');
+        // Actual download, from the real button and the real read-only report RPC.
+        const pdfDir = process.env.TEST_PDF_DIR;
+        assert.equal(libraryRequests.length, 0, 'PDF libraries must not load before the user asks for a report');
+        if (pdfDir) {
+            fs.mkdirSync(pdfDir, { recursive: true });
+            await db.query("insert into public.tasks(user_id,academic_year_id,title,due_date,due_time) select $1,$2,'ACTUAL 2027 Tarea extensa '||n||' - Investigación y actividades académicas con un título largo para comprobar el ajuste del contenido',date '2027-05-15',time '12:00' from generate_series(1,180) n", [userId,current.id]);
+            for (const [year, theme] of [[current,'dark'],[old,'light']]) {
+                await page.selectOption('#academic-year-select', year.id);
+                await page.waitForFunction(() => !academicYearManager.state.switching);
+                await page.evaluate(theme => document.body.classList.toggle('light-theme', theme === 'light'), theme);
+                await page.setViewportSize({ width: 390, height: 844 });
+                if (outputDir) await page.screenshot({ path: path.join(outputDir, `academic-report-${theme}-${year.start_year}.png`) });
+                const downloadPromise = page.waitForEvent('download');
+                await page.locator('#academic-year-report').click();
+                const download = await downloadPromise;
+                assert.equal(download.suggestedFilename(), `Reporte de Prueba local - ${year.start_year}-${year.end_year}.pdf`);
+                await download.saveAs(path.join(pdfDir, download.suggestedFilename()));
+                await page.waitForFunction(() => !academicReportGenerating);
+                assert.equal(await page.locator('#academic-year-report').isEnabled(), true);
+            }
+            await boot();
+            assert.equal(await page.inputValue('#academic-year-select'), old.id, 'report generation does not change the selected historical year');
+            assert.equal(reportInvocations, 2, 'one read-only snapshot per requested report');
+            assert.equal(libraryRequests.length, 2, 'PDF libraries load once each, on demand');
+        }
         await page.evaluate(() => showLanding());
         assert.equal(await page.locator('.academic-year-control').isVisible(), false, 'selector is not shown on public pages');
         assert.deepEqual(errors, []);
-        console.log('PASS: real forms + local PostgreSQL, native keyboard/year switching, short label, historical reload, isolated task persistence, 13 sections, 8 viewport sizes, dark/light, compact right alignment, no header overlap, no new console errors.');
+        console.log('PASS: real forms + local PostgreSQL, future/history states, native keyboard/year switching, historical reload, 13 sections, 8 viewport sizes, dark/light, report button fits; PDF downloads when TEST_PDF_DIR is set; no new console errors.');
     } finally { if (browser) await browser.close(); await db.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

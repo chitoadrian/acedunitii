@@ -9424,6 +9424,7 @@ let logoutInProgress = false;
 let accountSwitchInProgress = false;
 let dashboardAuthorizedUserId = '';
 let authOperationGeneration = 0;
+let academicReportGenerating = false;
 const academicYearManager = ACAcademicYears.createManager({ onChange: renderAcademicYearSelector });
 let academicYearRolloverTimer = null;
 
@@ -9444,8 +9445,55 @@ function renderAcademicYearSelector() {
     }
     select.value = state.selectedId;
     document.getElementById('academic-year-label').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Año lectivo';
-    select.disabled = !state.selectedId || state.switching || state.pending > 0;
+    select.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
+    const yearState = document.getElementById('academic-year-state');
+    yearState.textContent = state.historical ? 'Año histórico · Solo consulta' : 'Año actual';
+    yearState.hidden = !state.selectedId;
+    const reportButton = document.getElementById('academic-year-report');
+    reportButton.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
+    reportButton.setAttribute('aria-busy', String(academicReportGenerating));
+    reportButton.querySelector('span').textContent = academicReportGenerating ? 'Generando…' : 'Generar reporte';
     document.getElementById('academic-year-status').textContent = state.switching ? 'Cargando año lectivo…' : '';
+}
+
+async function getAcademicYearReportData(academicYearId) {
+    const scope = academicYearManager.scope();
+    const sb = getSupabaseClient();
+    const { data: auth, error: authError } = await sb.auth.getUser();
+    if (authError || !auth?.user?.id || auth.user.id !== scope.userId || auth.user.id !== currentUser?.id) {
+        throw new Error('Inicia sesión para generar el reporte.');
+    }
+    if (academicYearId !== scope.yearId) throw new Error('Selecciona el año lectivo que quieres consultar.');
+    const { data, error } = await sb.rpc('get_academic_year_report', { p_academic_year_id: academicYearId });
+    if (error) throw error;
+    if (!academicYearManager.matches(scope) || currentUser?.id !== scope.userId) throw new Error('La cuenta o el año lectivo cambió durante la generación.');
+    if (data?.year?.user_id !== scope.userId || data?.year?.id !== academicYearId) throw new Error('No se pudo verificar el propietario del reporte.');
+    const raw = { ...data, student_name: data.student_name || auth.user.user_metadata?.full_name || currentUser.name };
+    return ACAcademicReports.normalize(raw, {
+        gradeSummary: getSubjectGradeSummary, averageGrade: getAverageGrade, gradeItems: getGradeItems,
+        attendance: getAttendanceStats, projectStats: getProjectStats, taskStatus: normalizeTaskStatus,
+        taskVisualStatus: getTaskVisualStatus, priority: getTaskPriorityLabel, level: getLevel,
+        dateTime: (date, time) => {
+            if (!date) return 'Sin fecha';
+            const day = new Intl.DateTimeFormat('es-EC', { timeZone: 'America/Guayaquil', day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(`${date}T12:00:00-05:00`));
+            return `${day}${time ? ` · ${ACEdunityTime.formatTime24ForDisplay(time)}` : ''}`;
+        }
+    });
+}
+
+async function generateAcademicYearReport() {
+    if (academicReportGenerating || !academicYearManager.selected() || academicYearManager.state.switching) return;
+    const owner = currentUser?.id, yearId = academicYearManager.state.selectedId;
+    academicReportGenerating = true; renderAcademicYearSelector();
+    try {
+        const report = await getAcademicYearReportData(yearId);
+        const pdf = await ACAcademicReports.createDocument(report);
+        if (owner !== currentUser?.id) throw new Error('La sesión cambió. Vuelve a generar el reporte.');
+        await pdf.save(report.filename, { returnPromise: true });
+        notify('Reporte académico descargado correctamente.', 'success');
+    } catch (error) {
+        if (owner === currentUser?.id) notify(error.message || 'No se pudo generar el reporte. Inténtalo de nuevo.', 'error');
+    } finally { academicReportGenerating = false; renderAcademicYearSelector(); }
 }
 
 async function ensureAcademicYearForUser(userId) {
@@ -10833,7 +10881,7 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
 
 async function updateProfileProgress(deltaXp, { bumpStreak = false } = {}) {
     const scope = academicYearManager.scope();
-    if (!currentUser?.id || !scope.yearId) return;
+    if (!currentUser?.id || !scope.yearId || academicYearManager.state.historical) return;
     const { data, error } = await getSupabaseClient().rpc('increment_academic_year_progress', {
         p_year_id: scope.yearId, p_delta: Number(deltaXp || 0), p_bump_streak: bumpStreak
     });

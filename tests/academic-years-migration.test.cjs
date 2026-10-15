@@ -27,6 +27,7 @@ const q = (db, sql, args = []) => db.query(sql, args).then(r => r.rows);
         for (const t of tracked) before[t] = await q(db, `select to_jsonb(t) row from public.${t} t order by to_jsonb(t)::text`);
         await db.exec(migration);
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015132831_optimize_academic_year_indexes.sql'), 'utf8'));
+        await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015141942_annual_academic_reports.sql'), 'utf8'));
         for (const t of tracked) {
             const after = await q(db, `select to_jsonb(t)-'academic_year_id' row from public.${t} t order by (to_jsonb(t)-'academic_year_id')::text`);
             assert.deepEqual(after, before[t], `${t}: backfill changed existing data`);
@@ -38,9 +39,17 @@ const q = (db, sql, args = []) => db.query(sql, args).then(r => r.rows);
         const asUser = async id => { await db.exec('reset role'); await q(db, "select set_config('request.jwt.claim.sub',$1,false)", [id]); await db.exec('set role authenticated'); };
         await asUser(users[0]);
         const [first] = await q(db, 'select public.ensure_academic_year_for_user() state');
+        await assert.rejects(q(db, 'insert into public.user_academic_years(user_id,start_year) values($1,2027)', [users[0]]));
+        await assert.rejects(q(db, 'update public.user_academic_year_preferences set last_current_start_year=2027 where user_id=$1', [users[0]]));
+        const snapshot = await q(db, 'select to_jsonb(t) row from public.tasks t');
+        const [firstReport] = await q(db, 'select public.get_academic_year_report($1) data', [first.state.selected_id]);
+        assert.equal(firstReport.data.tasks.length, 1);
+        assert.equal(firstReport.data.evaluations.length, 0);
+        assert.deepEqual(await q(db, 'select to_jsonb(t) row from public.tasks t'), snapshot, 'report is strictly read-only');
         await q(db, 'select public.ensure_academic_year_for_user()');
         assert.equal((await q(db, 'select count(*)::int n from public.user_academic_years'))[0].n, 1, 'idempotent and RLS isolated');
         await asUser(users[1]);
+        await assert.rejects(q(db, 'select public.get_academic_year_report($1)', [first.state.selected_id]), /no está disponible/);
         assert.equal((await q(db, 'select count(*)::int n from public.tasks'))[0].n, 0);
         await assert.rejects(q(db, 'insert into public.subjects(user_id,name,academic_year_id) values($1,$2,$3)', [users[1], 'Forbidden', first.state.selected_id]));
         await db.exec('reset role');
@@ -88,11 +97,31 @@ const q = (db, sql, args = []) => db.query(sql, args).then(r => r.rows);
         const [reloaded] = await q(db, 'select public.ensure_academic_year_for_user() state');
         assert.equal(reloaded.state.selected_id, first.state.selected_id, 'historical selection survives reload within the same cycle');
         assert.equal((await q(db, 'select final_value from public.grades where academic_year_id=$1', [first.state.selected_id]))[0].final_value, '9.5');
+        for (const sql of ['update public.tasks set title=title where id=$1', 'delete from public.tasks where id=$1']) {
+            await assert.rejects(q(db, sql, [task.id]), /Año histórico/);
+        }
+        await assert.rejects(q(db, 'insert into public.subjects(user_id,name,academic_year_id) values($1,$2,$3)', [users[0],'Historical write',first.state.selected_id]), /Año histórico/);
+        const [oldReport] = await q(db, 'select public.get_academic_year_report($1) data', [first.state.selected_id]);
+        const [newReport] = await q(db, 'select public.get_academic_year_report($1) data', [next.state.selected_id]);
+        assert.equal(oldReport.data.tasks.length, 1);
+        assert.equal(newReport.data.tasks.length, 1);
+        assert.notEqual(oldReport.data.tasks[0].id,newReport.data.tasks[0].id);
+        for (const report of [oldReport.data,newReport.data]) {
+            for (const table of ['subjects','tasks','grades','grade_items','projects','project_stages','project_subtasks']) {
+                assert.ok(report[table].every(row => row.academic_year_id===report.year.id));
+            }
+        }
+        await db.exec('reset role');
+        await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2029 $$");
+        await asUser(users[0]);
+        await assert.rejects(q(db, 'insert into public.user_academic_years(user_id,start_year) values($1,2029)', [users[0]]), /secuencialmente/);
+        const [sequential] = await q(db, 'select public.ensure_academic_year_for_user() state');
+        assert.deepEqual(sequential.state.years.map(year=>year.start_year),[2029,2028,2027,2026]);
         const [activity] = await q(db, 'select academic_year_id from public.user_activity_events where source_id=$1', [newTask.id]);
         assert.equal(activity.academic_year_id, next.state.selected_id, 'activity inherits source, not selected preference');
         assert.equal((await q(db, 'select count(*)::int n from public.get_five_day_activity($1)', [next.state.selected_id]))[0].n, 5);
         await db.exec('reset role');
         assert.deepEqual(await q(db, 'select to_jsonb(t) row from public.task_reminder_deliveries t order by to_jsonb(t)::text'), before.task_reminder_deliveries, 'reminder idempotency ledger unchanged');
-        console.log('PASS: backfill, 2 accounts/RLS, idempotency, April rollover, historical reload, grades, relation isolation, child inheritance, activity, reminders.');
+        console.log('PASS: backfill preserved, 2 accounts/RLS, future/skip rejection, sequential rollover, read-only history/report, cross-year and cross-user report isolation, relation integrity, reminders unchanged.');
     } finally { await db.close(); }
 })().catch(error => { console.error(error.message, error.code || '', error.where || ''); process.exitCode = 1; });

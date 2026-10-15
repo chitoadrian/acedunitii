@@ -94,7 +94,7 @@
     <link rel="stylesheet" href="style.css?v=20260928-tutor-scroll-width-fix-v1">
     <link rel="stylesheet" href="settings.css?v=20260827-global-ui-performance-v2">
     <link rel="stylesheet" href="auth-ui.css?v=20261013-auth-compact-clean-v4">
-    <link rel="stylesheet" href="academic-years.css?v=20261015-year-selector-compact-v2">
+    <link rel="stylesheet" href="academic-years.css?v=20261015-annual-academic-reports-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <script id="theme-preload">
@@ -735,12 +735,17 @@
             </button>
             <div class="academic-year-toolbar">
                 <label for="academic-year-select">Año lectivo</label>
+                <button id="academic-year-report" class="academic-year-report" type="button" onclick="generateAcademicYearReport()" aria-label="Generar reporte del año lectivo seleccionado" title="Generar reporte del año lectivo seleccionado" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></svg>
+                    <span>Generar reporte</span>
+                </button>
                 <div class="academic-year-control" title="Cambiar año lectivo">
                     <span aria-hidden="true">▦</span>
                     <span id="academic-year-label" aria-hidden="true">Año lectivo</span>
                     <span class="academic-year-chevron" aria-hidden="true"></span>
                     <select id="academic-year-select" aria-label="Seleccionar año lectivo" disabled></select>
                 </div>
+                <span id="academic-year-state" class="academic-year-state" role="status" hidden></span>
                 <span id="academic-year-status" role="status" aria-live="polite"></span>
             </div>
 
@@ -1751,8 +1756,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="time-utils.js?v=20260902-am-pm-time-consistency-v1"></script>
     <script src="google-calendar-manual.js?v=20261015-academic-years-v1"></script>
-    <script src="academic-years.js?v=20261015-academic-years-v1"></script>
-    <script src="app.js?v=20261015-year-selector-compact-v2"></script>
+    <script src="academic-years.js?v=20261015-annual-academic-reports-v1"></script>
+    <script src="academic-reports.js?v=20261015-annual-academic-reports-v1"></script>
+    <script src="app.js?v=20261015-annual-academic-reports-v1"></script>
     <script src="goals-projects.js?v=20261015-academic-years-v1"></script>
     <script src="academic-notifications.js?v=20261015-academic-years-v1"></script>
 </body>

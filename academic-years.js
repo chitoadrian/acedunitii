@@ -20,12 +20,13 @@
     function createManager({ onChange = () => {} } = {}) {
         let client = null, ownerId = '', years = [], selectedId = '', currentId = '', generation = 0;
         let pending = 0, switching = false;
+        let currentStartYear = 0;
         const scope = () => ({ userId: ownerId, yearId: selectedId, generation });
         const matches = value => Boolean(value && value.userId === ownerId && value.yearId === selectedId && value.generation === generation);
         const selected = () => years.find(year => year.id === selectedId) || null;
         function reset() {
             generation++; ownerId = ''; years = []; selectedId = ''; currentId = ''; client = null;
-            pending = 0; switching = false; onChange();
+            pending = 0; switching = false; currentStartYear = 0; onChange();
         }
         async function start(sb, userId) {
             reset(); client = sb; ownerId = String(userId || '');
@@ -33,14 +34,17 @@
             const { data, error } = await client.rpc('ensure_academic_year_for_user');
             if (version !== generation || ownerId !== userId) throw new Error('La cuenta cambió durante la carga.');
             if (error) throw error;
-            years = (data?.years || []).filter(year => year.user_id === ownerId).sort((a, b) => b.start_year - a.start_year);
+            const serverCurrent = (data?.years || []).find(year => year.id === data?.current_id && year.user_id === ownerId);
+            currentStartYear = Number(data?.current_start_year || serverCurrent?.start_year);
+            years = (data?.years || []).filter(year => year.user_id === ownerId && year.start_year <= currentStartYear).sort((a, b) => b.start_year - a.start_year);
             currentId = data?.current_id || ''; selectedId = data?.selected_id || '';
             if (!selected() || !years.some(year => year.id === currentId)) throw new Error('No se pudo resolver el año lectivo.');
             onChange(); return selected();
         }
         async function select(id, load) {
             if (id === selectedId) return;
-            if (!ownerId || !years.some(year => year.id === id) || pending || switching) throw new Error('Espera a que termine la operación actual.');
+            if (!ownerId || pending || switching) throw new Error('Espera a que termine la operación actual.');
+            if (!years.some(year => year.id === id)) throw new Error(`No puedes cambiar al próximo año lectivo todavía. El año ${currentStartYear + 1} - ${currentStartYear + 2} estará disponible a partir del 1 de abril de ${currentStartYear + 1}.`);
             const previousId = selectedId, version = generation, userId = ownerId;
             switching = true; onChange();
             try {
@@ -99,12 +103,17 @@
                 };
                 return Array.isArray(values) ? values.map(stamp) : stamp(values);
             };
+            const writable = () => {
+                if (selectedId !== currentId && !['academic_notification_states', 'google_calendar_manual_links', 'internal_notifications', 'recent_activity', 'user_activity_events'].includes(name)) {
+                    throw new Error('Año histórico: solo puedes consultar sus datos.');
+                }
+            };
             return {
                 select: (...args) => filter(sb.from(name).select(...args)),
-                insert: (values, options) => guard(sb.from(name).insert(payload(values), options), captured),
-                upsert: (values, options) => guard(sb.from(name).upsert(payload(values), options), captured),
-                update: (values, options) => filter(sb.from(name).update(payload(values, false), options)),
-                delete: options => filter(sb.from(name).delete(options))
+                insert: (values, options) => { writable(); return guard(sb.from(name).insert(payload(values), options), captured); },
+                upsert: (values, options) => { writable(); return guard(sb.from(name).upsert(payload(values), options), captured); },
+                update: (values, options) => { writable(); return filter(sb.from(name).update(payload(values, false), options)); },
+                delete: options => { writable(); return filter(sb.from(name).delete(options)); }
             };
         }
         function updateProgress(row) {
@@ -112,7 +121,7 @@
             years = years.map(year => year.id === row.id ? row : year); onChange();
         }
         return { start, select, reset, table, scope, matches, selected, updateProgress,
-            get state() { return { ownerId, years: years.slice(), selectedId, currentId, pending, switching }; } };
+            get state() { return { ownerId, years: years.slice(), selectedId, currentId, currentStartYear, historical: Boolean(selectedId && selectedId !== currentId), pending, switching }; } };
     }
 
     root.ACAcademicYears = { getCurrentAcademicYear, createManager, TABLES };

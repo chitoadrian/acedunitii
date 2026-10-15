@@ -33,12 +33,13 @@ function fixture(owner = 'account-a') {
 
 test('Every academic table filters the server by cycle and owner; all mutations carry the cycle', async () => {
     const f = fixture(), manager = createManager(); await manager.start(f.client, f.owner);
+    await manager.select('year-2027', async () => {});
     for (const name of TABLES) {
         await manager.table(name).select('*');
-        assert.deepEqual(f.calls.at(-1).filters.find(x => x[0] === 'academic_year_id'), ['academic_year_id', 'year-2026']);
+        assert.deepEqual(f.calls.at(-1).filters.find(x => x[0] === 'academic_year_id'), ['academic_year_id', 'year-2027']);
         if (name !== 'grade_items') assert.ok(f.calls.at(-1).filters.some(x => x[0] === 'user_id' && x[1] === f.owner));
         await manager.table(name).insert({ title: 'Test' });
-        assert.equal(f.calls.at(-1).payload.academic_year_id, 'year-2026');
+        assert.equal(f.calls.at(-1).payload.academic_year_id, 'year-2027');
         await manager.table(name).update({ title: 'Updated' }).eq('id', 'item');
         assert.ok(f.calls.at(-1).filters.some(x => x[0] === 'academic_year_id'));
         await manager.table(name).delete().eq('id', 'item');
@@ -47,6 +48,19 @@ test('Every academic table filters the server by cycle and owner; all mutations 
     assert.throws(() => manager.table('profiles'));
     assert.throws(() => manager.table('tasks').insert({ academic_year_id: 'wrong' }));
     assert.throws(() => manager.table('tasks').insert({ user_id: 'someone-else' }));
+});
+
+test('Future selection performs no write; history is readable but academic mutations are blocked', async () => {
+    const f = fixture(), manager = createManager(); await manager.start(f.client, f.owner);
+    const before = f.calls.length;
+    await assert.rejects(manager.select('year-2028', async () => {}), /1 de abril de 2028/);
+    assert.equal(f.calls.length, before);
+    assert.equal(manager.state.historical, true);
+    await manager.table('tasks').select();
+    for (const method of ['insert','upsert','update','delete']) assert.throws(() => manager.table('tasks')[method]({ title: 'Forbidden' }), /Año histórico/);
+    await manager.select('year-2027', async () => {});
+    assert.equal(manager.state.historical, false);
+    await manager.table('tasks').insert({ title: 'Allowed' });
 });
 
 test('Switching persists selection, invalidates stale builders, restores on failure, and isolates account changes', async () => {

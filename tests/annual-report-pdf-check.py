@@ -1,0 +1,55 @@
+"""Inspect the two disposable PDFs downloaded by academic-years-browser.cjs.
+Usage: python tests/annual-report-pdf-check.py <TEST_PDF_DIR>
+Render separately with pdftoppm; contact sheets help review every rendered page.
+"""
+import re
+import sys
+from pathlib import Path
+import pdfplumber
+from pypdf import PdfReader
+from PIL import Image, ImageOps, ImageDraw
+
+directory = Path(sys.argv[1]).resolve()
+reports = {}
+for cycle in ("2026-2027", "2027-2028"):
+    filename = directory / f"Reporte de Prueba local - {cycle}.pdf"
+    reader = PdfReader(filename)
+    content = " ".join(" ".join(page.extract_text().split()) for page in reader.pages)
+    assert "Prueba local" in content
+    assert "Generado por AC Edunity" in content
+    assert "No se registraron datos en esta sección durante este año lectivo." in content
+    for i, page in enumerate(reader.pages, 1):
+        assert abs(float(page.mediabox.width) - 595.28) < 1
+        assert abs(float(page.mediabox.height) - 841.89) < 1
+        assert f"Página {i} de {len(reader.pages)}" in " ".join(page.extract_text().split())
+    with pdfplumber.open(filename) as pdf:
+        for page in pdf.pages:
+            outside = [char for char in page.chars if char["text"].strip() and
+                       (char["x0"] < 0 or char["x1"] > page.width + 0.5 or
+                        char["top"] < 0 or char["bottom"] > page.height + 0.5)]
+            assert not outside, f"Text outside page: {filename.name}, page {page.page_number}"
+    reports[cycle] = content
+    print(f"PASS PDF {cycle}: {len(reader.pages)} A4 pages; correct name, headers/footer, no text outside page.")
+assert "Materia histórica" in reports["2026-2027"]
+assert "Materia histórica" not in reports["2027-2028"]
+assert "ACTUAL 2027" not in reports["2026-2027"]
+assert "PRUEBA AÑO LECTIVO" not in reports["2026-2027"]
+assert "PRUEBA AÑO LECTIVO" in reports["2027-2028"]
+for n in range(1, 181):
+    assert f"Tarea extensa {n} - Investigación" in reports["2027-2028"], f"Missing task {n}"
+assert "12:00 PM" in reports["2027-2028"]
+print("PASS: all 180 long task titles retained; no cross-year data; AM/PM preserved.")
+
+for prefix in ("actual", "historico"):
+    pages = sorted(directory.glob(f"{prefix}-*.png"))
+    for start in range(0, len(pages), 6):
+        batch = pages[start:start + 6]
+        sheet = Image.new("RGB", (1200, 1160), "#d9ddea")
+        draw = ImageDraw.Draw(sheet)
+        for index, page in enumerate(batch):
+            image = Image.open(page).convert("RGB")
+            image.thumbnail((380, 540))
+            x, y = (index % 3) * 400 + 10, (index // 3) * 580 + 20
+            sheet.paste(image, (x, y))
+            draw.text((x, y + 545), page.stem, fill="black")
+        sheet.save(directory / f"review-{prefix}-{start // 6 + 1}.png")
