@@ -9446,13 +9446,11 @@ function renderAcademicYearSelector() {
     select.value = state.selectedId;
     document.getElementById('academic-year-label').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Año lectivo';
     select.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
-    const yearState = document.getElementById('academic-year-state');
-    yearState.textContent = state.historical ? 'Año histórico · Solo consulta' : 'Año actual';
-    yearState.hidden = !state.selectedId;
+    document.getElementById('academic-report-year').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Sin año seleccionado';
     const reportButton = document.getElementById('academic-year-report');
     reportButton.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
     reportButton.setAttribute('aria-busy', String(academicReportGenerating));
-    reportButton.querySelector('span').textContent = academicReportGenerating ? 'Generando…' : 'Generar reporte';
+    reportButton.querySelector('span').textContent = academicReportGenerating ? 'Generando reporte…' : 'Generar reporte';
     document.getElementById('academic-year-status').textContent = state.switching ? 'Cargando año lectivo…' : '';
 }
 

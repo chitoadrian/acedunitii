@@ -23,14 +23,14 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await db.query("select set_config('request.jwt.claim.sub',$1,false)", [userId]);
         await db.exec('set role authenticated');
         const quoted = name => { if (!/^[a-z_]+$/.test(name)) throw new Error('invalid identifier'); return `"${name}"`; };
-        let queue = Promise.resolve(), reportInvocations = 0;
+        let queue = Promise.resolve(), reportInvocations = 0, reportGate = null;
         async function execute(request) {
             const job = queue.then(async () => {
                 try {
                     if (request.rpc) {
                         if (request.rpc === 'ensure_academic_year_for_user') return { data: (await db.query('select public.ensure_academic_year_for_user() v')).rows[0].v, error: null };
                         if (request.rpc === 'get_five_day_activity') return { data: (await db.query('select * from public.get_five_day_activity($1)', [request.args.p_academic_year_id])).rows, error: null };
-                        if (request.rpc === 'get_academic_year_report') { reportInvocations++; return { data: (await db.query('select public.get_academic_year_report($1) v', [request.args.p_academic_year_id])).rows[0].v, error: null }; }
+                        if (request.rpc === 'get_academic_year_report') { reportInvocations++; if (reportGate) await reportGate; return { data: (await db.query('select public.get_academic_year_report($1) v', [request.args.p_academic_year_id])).rows[0].v, error: null }; }
                         if (request.rpc === 'increment_academic_year_progress') return { data: (await db.query('select * from public.increment_academic_year_progress($1,$2,$3)', [request.args.p_year_id, request.args.p_delta, request.args.p_bump_streak])).rows[0], error: null };
                         throw new Error(`Unsupported test RPC: ${request.rpc}`);
                     }
@@ -106,13 +106,18 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.selectOption('#academic-year-select', old.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
         assert.equal(await page.locator('#academic-year-label').innerText(), old.label, 'closed control shows only the selected year');
-        assert.equal(await page.locator('#academic-year-state').innerText(), 'Año histórico · Solo consulta');
+        assert.equal(await page.locator('#academic-year-state').count(), 0, 'no visible state badge under the selector');
+        assert.equal(await page.evaluate(() => academicYearManager.state.historical), true, 'historical state is retained internally');
+        assert.equal(await page.locator('#academic-report-year').textContent(), old.label);
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica'));
         await boot();
         assert.equal(await page.inputValue('#academic-year-select'), old.id, 'reload preserves explicit historical selection');
         await page.selectOption('#academic-year-select', current.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
-        assert.equal(await page.locator('#academic-year-state').innerText(), 'Año actual');
+        assert.equal(await page.evaluate(() => academicYearManager.state.historical), false);
+        assert.equal(await page.locator('#academic-report-year').textContent(), current.label);
+        assert.equal(await page.locator('.academic-year-toolbar #academic-year-report').count(), 0);
+        assert.equal(await page.locator('#settings #academic-year-report').count(), 1, 'the original report control is only in settings');
         const futureError = await page.evaluate(async () => {
             try { await academicYearManager.select('future-year', async () => {}); } catch (error) { return error.message; }
         });
@@ -152,13 +157,11 @@ const userId = '10000000-0000-4000-8000-000000000001';
                         const r = control.getBoundingClientRect();
                         const bell = document.querySelector('.academic-notification-center')?.getBoundingClientRect();
                         const sidebar = document.querySelector('.app-sidebar-control').getBoundingClientRect();
-                        const report = document.getElementById('academic-year-report').getBoundingClientRect();
                         const label = document.getElementById('academic-year-label');
                         const overlaps = other => other && other.width > 0 && r.left < other.right && r.right > other.left && r.top < other.bottom && r.bottom > other.top;
                         return { width: r.width, left: r.left, right: r.right, top: r.top, viewport: innerWidth,
                             overflow: document.documentElement.scrollWidth > innerWidth, overlap: Boolean(overlaps(bell) || overlaps(sidebar)),
-                            clipped: label.scrollWidth > label.clientWidth, label: label.textContent,
-                            reportFits: report.left >= 0 && report.right < r.left && report.top === r.top };
+                            clipped: label.scrollWidth > label.clientWidth, label: label.textContent };
                     });
                     assert.ok(measure.width > 0 && measure.left >= 0 && measure.right <= width, JSON.stringify({width,theme,section,measure}));
                     assert.equal(measure.width, width <= 768 ? 150 : 156);
@@ -166,7 +169,28 @@ const userId = '10000000-0000-4000-8000-000000000001';
                     assert.equal(measure.overlap, false, 'year selector must not overlap header controls');
                     assert.equal(measure.clipped, false, 'year range must fit without truncation');
                     assert.equal(measure.label, current.label);
-                    assert.equal(measure.reportFits, true, 'report action fits next to selector without overlap');
+                    assert.equal(await page.locator('#academic-year-report').isVisible(), section === 'settings');
+                    if (section === 'settings') {
+                        const card = page.locator('.settings-card--report');
+                        await card.scrollIntoViewIfNeeded();
+                        await page.waitForTimeout(300);
+                        const layout = await card.evaluate(el => {
+                            const r = el.getBoundingClientRect(), button = el.querySelector('button').getBoundingClientRect();
+                            const peer = document.querySelector('.settings-card--tutor');
+                            return { left: r.left, right: r.right, width: r.width, peerWidth: peer.getBoundingClientRect().width,
+                                overflow: document.documentElement.scrollWidth > innerWidth || el.scrollWidth > el.clientWidth,
+                                buttonFits: button.left >= r.left && button.right <= r.right && button.bottom <= r.bottom,
+                                position: getComputedStyle(el.querySelector('button')).position,
+                                radius: getComputedStyle(el).borderRadius, peerRadius: getComputedStyle(peer).borderRadius };
+                        });
+                        assert.ok(layout.left >= 0 && layout.right <= width, JSON.stringify({width,theme,layout}));
+                        assert.equal(layout.overflow, false, `${width}/${theme}/settings overflow`);
+                        assert.equal(layout.buttonFits, true);
+                        assert.notEqual(layout.position, 'fixed');
+                        assert.ok(Math.abs(layout.width - layout.peerWidth) < 1, 'report uses the existing grid slot');
+                        assert.equal(layout.radius, layout.peerRadius);
+                        if (outputDir) await page.screenshot({ path: path.join(outputDir, `settings-report-${theme}-${width}.png`) });
+                    }
                     // Existing wide module content is checked separately from the new toolbar.
                     if (section === 'subjects' || section === 'dashboard') assert.equal(measure.overflow, false, `${width}/${theme}/${section}`);
                 }
@@ -197,14 +221,30 @@ const userId = '10000000-0000-4000-8000-000000000001';
                 await page.waitForFunction(() => !academicYearManager.state.switching);
                 await page.evaluate(theme => document.body.classList.toggle('light-theme', theme === 'light'), theme);
                 await page.setViewportSize({ width: 390, height: 844 });
+                await page.evaluate(() => navigateTo('settings'));
+                await page.locator('.settings-card--report').scrollIntoViewIfNeeded();
+                await page.waitForTimeout(300);
+                assert.equal(await page.locator('#academic-report-year').textContent(), year.label);
                 if (outputDir) await page.screenshot({ path: path.join(outputDir, `academic-report-${theme}-${year.start_year}.png`) });
                 const downloadPromise = page.waitForEvent('download');
-                await page.locator('#academic-year-report').click();
+                const beforeReport = reportInvocations;
+                let releaseReport;
+                reportGate = new Promise(resolve => { releaseReport = resolve; });
+                try {
+                    await page.locator('#academic-year-report').click();
+                    await page.waitForFunction(() => academicReportGenerating);
+                    assert.equal(await page.locator('#academic-year-report').isDisabled(), true);
+                    assert.equal(await page.locator('#academic-year-report').getAttribute('aria-busy'), 'true');
+                    assert.equal(await page.locator('#academic-year-report').innerText(), 'Generando reporte…');
+                    assert.equal(await page.locator('#academic-year-select').isDisabled(), true);
+                    await page.evaluate(() => generateAcademicYearReport()); // A second request must not start another download.
+                } finally { releaseReport(); reportGate = null; }
                 const download = await downloadPromise;
                 assert.equal(download.suggestedFilename(), `Reporte de Prueba local - ${year.start_year}-${year.end_year}.pdf`);
                 await download.saveAs(path.join(pdfDir, download.suggestedFilename()));
                 await page.waitForFunction(() => !academicReportGenerating);
                 assert.equal(await page.locator('#academic-year-report').isEnabled(), true);
+                assert.equal(reportInvocations, beforeReport + 1, 'double click must not duplicate the read or PDF');
             }
             await boot();
             assert.equal(await page.inputValue('#academic-year-select'), old.id, 'report generation does not change the selected historical year');
@@ -214,6 +254,6 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.evaluate(() => showLanding());
         assert.equal(await page.locator('.academic-year-control').isVisible(), false, 'selector is not shown on public pages');
         assert.deepEqual(errors, []);
-        console.log('PASS: real forms + local PostgreSQL, future/history states, native keyboard/year switching, historical reload, 13 sections, 8 viewport sizes, dark/light, report button fits; PDF downloads when TEST_PDF_DIR is set; no new console errors.');
+        console.log('PASS: real forms + local PostgreSQL, future/history states, native keyboard/year switching, historical reload, 13 sections, 8 viewport sizes, dark/light, no header badge/report button, settings card fits; current/historical PDF downloads when TEST_PDF_DIR is set; no new console errors.');
     } finally { if (browser) await browser.close(); await db.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

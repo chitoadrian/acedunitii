@@ -17,17 +17,28 @@ for cycle in ("2026-2027", "2027-2028"):
     content = " ".join(" ".join(page.extract_text().split()) for page in reader.pages)
     assert "Prueba local" in content
     assert "Generado por AC Edunity" in content
+    assert "REPORTE ACADÉMICO" in reader.pages[0].extract_text()
     assert "No se registraron datos en esta sección durante este año lectivo." in content
+    for section in ("Resumen general", "Materias del año", "Resumen de tareas", "Evaluaciones", "Calificaciones",
+                    "Asistencia", "Metas", "Proyectos", "Calendario y eventos", "Mochila y recursos", "Progreso del año"):
+        assert section in content, f"Missing section: {section}"
     for i, page in enumerate(reader.pages, 1):
         assert abs(float(page.mediabox.width) - 595.28) < 1
         assert abs(float(page.mediabox.height) - 841.89) < 1
         assert f"Página {i} de {len(reader.pages)}" in " ".join(page.extract_text().split())
     with pdfplumber.open(filename) as pdf:
         for page in pdf.pages:
+            assert "Reporte académico de Prueba local" in page.extract_text()
+            assert len(page.chars) > 150, f"Unexpected blank page: {page.page_number}"
+            # No large colored rectangles; white paper and small table headers only.
+            assert not [r for r in page.rects if r["height"] > 50 and r["width"] > 100 and
+                        r.get("non_stroking_color") not in (1, (1, 1, 1), [1, 1, 1])], f"Dark block on page {page.page_number}"
             outside = [char for char in page.chars if char["text"].strip() and
                        (char["x0"] < 0 or char["x1"] > page.width + 0.5 or
                         char["top"] < 0 or char["bottom"] > page.height + 0.5)]
             assert not outside, f"Text outside page: {filename.name}, page {page.page_number}"
+            assert all(char["x0"] >= 50 and char["x1"] <= page.width - 50 for char in page.chars if char["text"].strip()), \
+                f"Text outside side margins: {filename.name}, page {page.page_number}"
     reports[cycle] = content
     print(f"PASS PDF {cycle}: {len(reader.pages)} A4 pages; correct name, headers/footer, no text outside page.")
 assert "Materia histórica" in reports["2026-2027"]
@@ -42,6 +53,15 @@ print("PASS: all 180 long task titles retained; no cross-year data; AM/PM preser
 
 for prefix in ("actual", "historico"):
     pages = sorted(directory.glob(f"{prefix}-*.png"))
+    assert pages, "Render the latest PDFs before inspecting them"
+    for page in pages:
+        image = Image.open(page).convert("RGB")
+        # Paper around every page and the old dark cover area is now pure white.
+        for x, y in ((5, 5), (image.width - 6, 5), (5, image.height - 6), (image.width - 6, image.height - 6)):
+            assert min(image.getpixel((x, y))) >= 250, f"Non-white paper: {page.name}"
+        if page == pages[0]:
+            for x in (image.width // 5, image.width * 4 // 5):
+                assert min(image.getpixel((x, image.height // 10))) >= 250, f"Old dark cover: {page.name}"
     for start in range(0, len(pages), 6):
         batch = pages[start:start + 6]
         sheet = Image.new("RGB", (1200, 1160), "#d9ddea")

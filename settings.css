@@ -184,6 +184,27 @@
     cursor: pointer;
 }
 
+/* Annual report: reuse the settings card and button, without a header action. */
+#settings .settings-card--report {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 12px;
+}
+#settings .academic-report-year {
+    display: block;
+    margin-top: 10px;
+    color: var(--settings-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+#settings #academic-year-report {
+    grid-column: 2;
+    justify-self: start;
+    max-width: 100%;
+    transition: border-color .18s ease, filter .18s ease;
+}
+#settings #academic-year-report:hover:not(:disabled) { border-color: #8e82e4; filter: brightness(1.08); }
+#settings #academic-year-report:disabled { opacity: .6; cursor: wait; }
+
 #settings .settings-options-panel,
 #settings .settings-about-panel {
     grid-column: 1 / -1;

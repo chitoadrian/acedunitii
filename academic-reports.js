@@ -145,29 +145,40 @@
         doc.setProperties({ title: `Reporte académico ${report.year.label}`, author: 'AC Edunity', subject: 'Resumen anual del estudiante', creator: 'AC Edunity' });
         const navy = [26, 36, 65], purple = [104, 74, 194], blue = [41, 108, 201], muted = [93, 105, 125];
         const generated = new Intl.DateTimeFormat('es-EC', { timeZone: 'America/Guayaquil', dateStyle: 'long', timeStyle: 'short', hour12: true }).format(new Date(report.generatedAt));
-        doc.setFillColor(...navy); doc.rect(0, 0, 210, 83, 'F');
+        // Explicit white paper on the cover and on pages added by AutoTable, in either app theme.
+        const whitePaper = () => {
+            doc.saveGraphicsState(); doc.setFillColor(255, 255, 255); doc.rect(0, 0, 210, 297, 'F'); doc.restoreGraphicsState();
+        };
+        whitePaper(); doc.internal.events.subscribe('addPage', whitePaper);
         doc.saveGraphicsState();
-        doc.circle(30, 32, 12, null); doc.clip(); doc.discardPath();
-        doc.addImage(logo, 'PNG', 18, 20, 24, 24, undefined, 'FAST');
+        doc.circle(105, 46, 14, null); doc.clip(); doc.discardPath();
+        doc.addImage(logo, 'PNG', 91, 32, 28, 28, undefined, 'FAST');
         doc.restoreGraphicsState();
-        doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text('AC EDUNITY', 49, 31);
-        doc.setFontSize(28); doc.text('Reporte académico', 18, 65);
-        doc.setTextColor(...purple); doc.setFontSize(10); doc.text('ESTUDIANTE', 18, 107);
-        doc.setTextColor(...navy); doc.setFontSize(21);
+        doc.setTextColor(...blue); doc.setFont('helvetica', 'bold'); doc.setFontSize(12); doc.text('AC EDUNITY', 105, 76, { align: 'center' });
+        doc.setTextColor(...navy); doc.setFontSize(28); doc.text('REPORTE ACADÉMICO', 105, 99, { align: 'center' });
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(13); doc.setTextColor(...muted);
+        doc.text(`Año lectivo ${report.year.label}`, 105, 113, { align: 'center' });
+        doc.setDrawColor(217, 222, 237); doc.setLineWidth(.3); doc.line(18, 130, 192, 130);
+        doc.setTextColor(...purple); doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.text('ESTUDIANTE', 18, 151);
+        doc.setTextColor(...navy); doc.setFontSize(19);
         const nameLines = doc.splitTextToSize(report.studentName, 174);
-        doc.text(nameLines, 18, 121);
-        let y = 121 + nameLines.length * 8 + 15;
-        doc.setFontSize(16); doc.text(`Año lectivo ${report.year.label}`, 18, y);
+        doc.text(nameLines, 18, 163);
+        let y = 163 + nameLines.length * 8 + 14;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...purple); doc.text('FECHA DE GENERACIÓN', 18, y);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(11); doc.setTextColor(...muted);
-        doc.text(doc.splitTextToSize(`Fecha de generación: ${generated}`, 174), 18, y + 15);
-        doc.setDrawColor(217, 222, 237); doc.line(18, 248, 192, 248);
-        doc.setTextColor(...blue); doc.setFontSize(12); doc.text('Generado por AC Edunity', 18, 260);
-        doc.setTextColor(...muted); doc.setFontSize(9); doc.text('Gestión educativa inteligente y personalizada · edunity.me', 18, 268);
+        doc.text(doc.splitTextToSize(generated, 174), 18, y + 9);
+        doc.setTextColor(...blue); doc.setFontSize(10); doc.text('Generado por AC Edunity', 105, 251, { align: 'center' });
+        doc.setTextColor(...muted); doc.setFontSize(9); doc.text('Gestión educativa inteligente y personalizada · edunity.me', 105, 260, { align: 'center' });
         doc.addPage(); y = 31;
         function section(title, headers, body, note) {
             doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
             const noteLines = note ? doc.splitTextToSize(note, 174) : [];
-            if (y + 33 + noteLines.length * 4.2 > 273) { doc.addPage(); y = 31; }
+            // Keep short tables together; long tables reserve the title, note, header and first row.
+            doc.setFontSize(8.7);
+            const previewRows = body.length ? (body.length <= 8 ? body : body.slice(0, 1)) : [[EMPTY]];
+            const rowsHeight = previewRows.reduce((height, row) => height + 5.2 + 3.6 * Math.max(...row.map(cell =>
+                doc.splitTextToSize(text(cell), 174 / (body.length ? headers.length : 1) - 5.2).length)), 0);
+            if (y + 8 + (noteLines.length ? noteLines.length * 4.2 + 5 : 0) + 10 + rowsHeight > 273) { doc.addPage(); y = 31; }
             doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(...purple); doc.text(title, 18, y);
             y += 8;
             if (note) {
@@ -179,8 +190,8 @@
                 head: [headers], body: body.length ? body : [[{ content: EMPTY, colSpan: headers.length, styles: { fontStyle: 'italic', textColor: muted } }]],
                 theme: 'grid', showHead: 'everyPage', rowPageBreak: 'avoid',
                 styles: { font: 'helvetica', fontSize: 8.7, cellPadding: 2.6, textColor: navy, lineColor: [225, 230, 241], lineWidth: .15, overflow: 'linebreak' },
-                headStyles: { fillColor: navy, textColor: [255,255,255], fontStyle: 'bold', fontSize: 8.8 },
-                alternateRowStyles: { fillColor: [247,248,253] }
+                headStyles: { fillColor: [236,239,247], textColor: navy, fontStyle: 'bold', fontSize: 8.8 },
+                bodyStyles: { fillColor: [255,255,255] }, alternateRowStyles: { fillColor: [249,250,252] }
             });
             y = doc.lastAutoTable.finalY + 14;
         }
@@ -190,12 +201,13 @@
         for (let page = 1; page <= total; page++) {
             doc.setPage(page);
             if (page > 1) {
-                doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...navy); doc.text('AC EDUNITY · REPORTE ACADÉMICO', 18, 15);
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...navy); doc.text('AC EDUNITY', 18, 15);
                 doc.setFont('helvetica', 'normal'); doc.setTextColor(...muted); doc.text(report.year.label, 192, 15, { align: 'right' });
+                doc.setDrawColor(217,222,237); doc.setLineWidth(.2); doc.line(18, 20, 192, 20);
             }
             doc.setDrawColor(225,230,241); doc.line(18, 279, 192, 279);
             doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...muted);
-            doc.text(`Año ${report.year.label} · Generado por AC Edunity`, 18, 285);
+            doc.text(doc.splitTextToSize(`Reporte académico de ${report.studentName}`, 135), 18, 285);
             doc.text(`Página ${page} de ${total}`, 192, 285, { align: 'right' });
         }
         return doc;
