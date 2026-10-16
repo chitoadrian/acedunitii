@@ -108,3 +108,14 @@ test('Presentation hides redundant history columns, preserves deleted states and
         section.body.forEach(cells=>assert.equal(cells.length,section.headers.length));
     }
 });
+test('Task layout keeps date and AM/PM time together on separate lines without changing source data',()=>{
+    for(const record of ['Conservada','Eliminada posteriormente']){
+        const section={title:'Tareas del año',kind:'tasks',headers:[],body:[['Trabajo','Matemática','30 sept 2026 · 12:00 PM','Completada',record,'Alta']]};
+        const before=JSON.stringify(section),shown=reports.presentSection(section);
+        assert.equal(shown.body[0][2],'30 sept 2026\n12:00 PM');
+        assert.equal(shown.body[0][3],'Completada');
+        assert.equal(shown.widths.reduce((a,b)=>a+b),174);
+        assert.equal(shown.body[0].length,shown.headers.length);
+        assert.equal(JSON.stringify(section),before);
+    }
+});

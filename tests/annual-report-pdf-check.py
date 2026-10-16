@@ -37,6 +37,9 @@ for cycle in ("2026-2027", "2027-2028"):
         assert abs(float(page.mediabox.width) - 595.28) < 1
         assert abs(float(page.mediabox.height) - 841.89) < 1
         assert f"Página {i} de {len(reader.pages)}" in " ".join(page.extract_text().split())
+        if "PROGRESO DEL ESTUDIANTE" in page.extract_text():
+            metrics_row = ("XP del año", "Nivel alcanzado", "Días activos") if "XP del año" in page.extract_text() else ("Actividades registradas", "Racha", "Tareas completadas")
+            assert all(label in page.extract_text() for label in metrics_row), "Progress heading must stay with a complete metric row"
     with pdfplumber.open(filename) as pdf:
         for page in pdf.pages:
             assert "Reporte académico de Prueba local" in page.extract_text()
@@ -54,6 +57,9 @@ for cycle in ("2026-2027", "2027-2028"):
             assert not outside, f"Text outside page: {filename.name}, page {page.page_number}"
             assert all(char["x0"] >= 50 and char["x1"] <= page.width - 50 for char in page.chars if char["text"].strip()), \
                 f"Text outside side margins: {filename.name}, page {page.page_number}"
+            for shape in page.curves:
+                if shape['height'] > 10 and shape['width'] > 30:
+                    assert shape['top'] >= 0 and shape['bottom'] <= 774, f"Card crosses page/footer boundary: page {page.page_number}"
     reports[cycle] = content
     print(f"PASS PDF {cycle}: {len(reader.pages)} A4 pages; correct name, headers/footer, no text outside page.")
 assert "Materia histórica" in reports["2026-2027"]
