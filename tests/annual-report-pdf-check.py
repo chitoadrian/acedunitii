@@ -3,6 +3,7 @@ Usage: python tests/annual-report-pdf-check.py <TEST_PDF_DIR>
 Render separately with pdftoppm; contact sheets help review every rendered page.
 """
 import re
+import json
 import sys
 from pathlib import Path
 import pdfplumber
@@ -18,9 +19,11 @@ for cycle in ("2026-2027", "2027-2028"):
     assert "Prueba local" in content
     assert "Generado por AC Edunity" in content
     assert "REPORTE ACADÉMICO" in reader.pages[0].extract_text()
-    assert "No se registraron datos en esta sección durante este año lectivo." in content
-    for section in ("Resumen general", "Materias del año", "Resumen de tareas", "Evaluaciones", "Calificaciones",
-                    "Asistencia", "Metas", "Proyectos", "Calendario y eventos", "Mochila y recursos", "Progreso del año"):
+    if cycle == "2026-2027":
+        assert "No se registraron datos en esta sección durante este año lectivo." in content
+    assert "RESUMEN DEL AÑO LECTIVO" in reader.pages[1].extract_text()
+    for section in ("Balance del año", "Balance académico", "Materias del año", "Tareas del año", "Evaluaciones", "Rendimiento académico",
+                    "Asistencia", "Metas", "Proyectos", "Etapas y subtareas", "Calendario y eventos", "Mochila y recursos", "Progreso del año", "FIN DEL REPORTE"):
         assert section in content, f"Missing section: {section}"
     for i, page in enumerate(reader.pages, 1):
         assert abs(float(page.mediabox.width) - 595.28) < 1
@@ -31,8 +34,12 @@ for cycle in ("2026-2027", "2027-2028"):
             assert "Reporte académico de Prueba local" in page.extract_text()
             assert len(page.chars) > 150, f"Unexpected blank page: {page.page_number}"
             # No large colored rectangles; white paper and small table headers only.
+            def light(color):
+                if isinstance(color, (int, float)):
+                    return color >= .85
+                return color is None or sum(color) / len(color) >= .85
             assert not [r for r in page.rects if r["height"] > 50 and r["width"] > 100 and
-                        r.get("non_stroking_color") not in (1, (1, 1, 1), [1, 1, 1])], f"Dark block on page {page.page_number}"
+                        not light(r.get("non_stroking_color"))], f"Dark block on page {page.page_number}"
             outside = [char for char in page.chars if char["text"].strip() and
                        (char["x0"] < 0 or char["x1"] > page.width + 0.5 or
                         char["top"] < 0 or char["bottom"] > page.height + 0.5)]
@@ -48,7 +55,19 @@ assert "PRUEBA AÑO LECTIVO" not in reports["2026-2027"]
 assert "PRUEBA AÑO LECTIVO" in reports["2027-2028"]
 for n in range(1, 181):
     assert f"Tarea extensa {n} - Investigación" in reports["2027-2028"], f"Missing task {n}"
+    assert len(re.findall(rf"Tarea extensa {n} - Investigación", reports["2027-2028"])) == 1, f"Duplicated task {n}"
 assert "12:00 PM" in reports["2027-2028"]
+assert "private.example" not in reports["2027-2028"]
+assert "ANTERIOR AL HISTORIAL" not in reports["2026-2027"], "A missing title must never be fabricated from activity"
+assert "Evidencia anterior sin snapshot" in reports["2026-2027"]
+assert "8.10" in reports["2027-2028"]
+assert "100%" in reports["2027-2028"]
+assert "Eliminada posteriormente" in reports["2027-2028"]
+assert "Completada" in reports["2027-2028"]
+metrics = json.loads((directory / "metrics-2027.json").read_text())
+assert metrics["history"]["tasks"] == {"total": 181, "retained": 171, "deleted": 10}
+assert metrics["taskCounts"]["completed"] == 60
+assert sum(metrics["taskCounts"].values()) == 181
 print("PASS: all 180 long task titles retained; no cross-year data; AM/PM preserved.")
 
 for prefix in ("actual", "historico"):

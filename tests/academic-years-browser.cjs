@@ -18,6 +18,11 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015130622_add_academic_year_management.sql'), 'utf8'));
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015132831_optimize_academic_year_indexes.sql'), 'utf8'));
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015141942_annual_academic_reports.sql'), 'utf8'));
+        // Older activity is evidence, not a fabricated full record.
+        const legacy=await db.query("insert into public.tasks(user_id,title) values($1,'ANTERIOR AL HISTORIAL') returning id",[userId]);
+        await db.query('delete from public.tasks where id=$1',[legacy.rows[0].id]);
+        await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015161306_academic_record_history.sql'), 'utf8'));
+        await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015161909_optimize_academic_history_fk.sql'), 'utf8'));
         // Only this disposable DB simulates 2027; production clock/data are untouched.
         await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2027 $$");
         await db.query("select set_config('request.jwt.claim.sub',$1,false)", [userId]);
@@ -147,7 +152,8 @@ const userId = '10000000-0000-4000-8000-000000000001';
         const sections = ['dashboard','subjects','tasks','calendar','evaluations','grades','attendance','goals-projects','progress','backpack','profile','settings','ai-assistant'];
         const outputDir = process.env.TEST_SCREENSHOT_DIR;
         if (outputDir) fs.mkdirSync(outputDir, { recursive: true });
-        for (const [width, height] of [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[430,932],[390,844],[360,800]]) {
+        const viewports=process.env.TEST_PDF_ONLY ? [] : [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[430,932],[390,844],[360,800]];
+        for (const [width, height] of viewports) {
             await page.setViewportSize({ width, height });
             for (const theme of ['dark','light']) {
                 await page.evaluate(theme => document.body.classList.toggle('light-theme', theme === 'light'), theme);
@@ -215,7 +221,31 @@ const userId = '10000000-0000-4000-8000-000000000001';
         assert.equal(libraryRequests.length, 0, 'PDF libraries must not load before the user asks for a report');
         if (pdfDir) {
             fs.mkdirSync(pdfDir, { recursive: true });
-            await db.query("insert into public.tasks(user_id,academic_year_id,title,due_date,due_time) select $1,$2,'ACTUAL 2027 Tarea extensa '||n||' - Investigación y actividades académicas con un título largo para comprobar el ajuste del contenido',date '2027-05-15',time '12:00' from generate_series(1,180) n", [userId,current.id]);
+            const reportSubject=(await db.query("select id from public.subjects where name='PRUEBA AÑO LECTIVO' and user_id=$1",[userId])).rows[0].id;
+            for(const [category,value,remove] of [['partial1',8,false],['partial2',10,false],['exam',6,false],['exam',2,true]]){
+                const grade=(await db.query("insert into public.grades(user_id,academic_year_id,subject_id,category,final_value) values($1,$2,$3,$4,$5) returning id",[userId,current.id,reportSubject,category,value])).rows[0];
+                await db.query("insert into public.grade_items(grade_id,activity,value) values($1,'ACTUAL 2027 Nota de prueba',$2)",[grade.id,value]);
+                if(remove)await db.query('delete from public.grades where id=$1',[grade.id]);
+            }
+            for(const status of ['Asisti','Falta','Atraso','Justificado']){
+                const row=(await db.query("insert into public.attendance(user_id,academic_year_id,subject_id,date,status) values($1,$2,$3,'2027-05-15',$4) returning id",[userId,current.id,reportSubject,status])).rows[0];
+                if(status==='Falta')await db.query('delete from public.attendance where id=$1',[row.id]);
+            }
+            for(const remove of [false,true]){
+                const project=(await db.query("insert into public.projects(user_id,academic_year_id,title) values($1,$2,$3) returning id",[userId,current.id,remove?'ACTUAL 2027 Proyecto eliminado':'ACTUAL 2027 Proyecto conservado'])).rows[0];
+                const stage=(await db.query("insert into public.project_stages(user_id,project_id,title) values($1,$2,'Etapa de prueba') returning id",[userId,project.id])).rows[0];
+                await db.query("insert into public.project_subtasks(user_id,project_id,stage_id,title,status) values($1,$2,$3,'Subtarea terminada','completed')",[userId,project.id,stage.id]);
+                if(!remove)await db.query("insert into public.project_subtasks(user_id,project_id,stage_id,title) values($1,$2,$3,'Subtarea pendiente')",[userId,project.id,stage.id]);
+                const goal=(await db.query("insert into public.goals(user_id,academic_year_id,title,progress,status) values($1,$2,$3,$4,$5) returning id",[userId,current.id,remove?'ACTUAL 2027 Meta eliminada':'ACTUAL 2027 Meta conservada',remove?100:80,remove?'completed':'in_progress'])).rows[0];
+                const resource=(await db.query("insert into public.resources(user_id,academic_year_id,title,file_name,file_url) values($1,$2,$3,'material.pdf','https://private.example/secret') returning id",[userId,current.id,remove?'ACTUAL 2027 Recurso eliminado':'ACTUAL 2027 Recurso conservado'])).rows[0];
+                const evaluation=(await db.query("insert into public.evaluations(user_id,academic_year_id,subject_id,title,evaluation_date,status) values($1,$2,$3,$4,'2027-05-15',$5) returning id",[userId,current.id,reportSubject,remove?'ACTUAL 2027 Evaluación eliminada':'ACTUAL 2027 Evaluación conservada',remove?'completed':'pending'])).rows[0];
+                const event=(await db.query("insert into public.events(user_id,academic_year_id,title,event_date) values($1,$2,$3,'2027-05-15') returning id",[userId,current.id,remove?'ACTUAL 2027 Evento eliminado':'ACTUAL 2027 Evento conservado'])).rows[0];
+                if(remove)for(const [table,row] of [['projects',project],['goals',goal],['resources',resource],['evaluations',evaluation],['events',event]])await db.query(`delete from public.${table} where id=$1`,[row.id]);
+            }
+            const stress=await db.query("insert into public.tasks(user_id,academic_year_id,title,due_date,due_time,status) select $1,$2,'ACTUAL 2027 Tarea extensa '||n||' - Investigación y actividades académicas con un título largo para comprobar el ajuste del contenido',case when n%3=1 then date '2020-05-15' else date '2027-05-15' end,time '12:00',case when n%3=0 then 'completed' else 'pending' end from generate_series(1,180) n returning id", [userId,current.id]);
+            await db.query('delete from public.tasks where user_id=$1 and id=any($2::uuid[])',[userId,stress.rows.slice(0,10).map(row=>row.id)]);
+            assert.equal((await db.query('select count(*)::int n from public.tasks where academic_year_id=$1',[current.id])).rows[0].n,171);
+            await page.evaluate(()=>{const create=ACAcademicReports.createDocument;ACAcademicReports.createDocument=report=>{window.testAnnualReport=report;return create(report);};});
             for (const [year, theme] of [[current,'dark'],[old,'light']]) {
                 await page.selectOption('#academic-year-select', year.id);
                 await page.waitForFunction(() => !academicYearManager.state.switching);
@@ -242,6 +272,18 @@ const userId = '10000000-0000-4000-8000-000000000001';
                 const download = await downloadPromise;
                 assert.equal(download.suggestedFilename(), `Reporte de Prueba local - ${year.start_year}-${year.end_year}.pdf`);
                 await download.saveAs(path.join(pdfDir, download.suggestedFilename()));
+                const generated=await page.evaluate(()=>window.testAnnualReport);
+                if(year.id===current.id){
+                    assert.deepEqual(generated.history.tasks,{total:181,retained:171,deleted:10});
+                    assert.equal(generated.taskCounts.completed,60);
+                    assert.equal(generated.taskCounts.deleted,7);
+                    assert.equal(Object.values(generated.taskCounts).reduce((a,b)=>a+b),181);
+                    assert.equal(generated.metrics.average,8.1);
+                    assert.equal(generated.metrics.attendance,100);
+                    assert.equal(generated.sections.find(x=>x.title==='Proyectos').progress.find(x=>x.record==='Eliminada posteriormente').value,100);
+                    assert.equal(generated.sections.find(x=>x.title==='Etapas y subtareas').body.filter(x=>x[2]==='Completado').length,3);
+                }
+                fs.writeFileSync(path.join(pdfDir,`metrics-${year.start_year}.json`),JSON.stringify({metrics:generated.metrics,history:generated.history,taskCounts:generated.taskCounts}));
                 await page.waitForFunction(() => !academicReportGenerating);
                 assert.equal(await page.locator('#academic-year-report').isEnabled(), true);
                 assert.equal(reportInvocations, beforeReport + 1, 'double click must not duplicate the read or PDF');
@@ -254,6 +296,6 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.evaluate(() => showLanding());
         assert.equal(await page.locator('.academic-year-control').isVisible(), false, 'selector is not shown on public pages');
         assert.deepEqual(errors, []);
-        console.log('PASS: real forms + local PostgreSQL, future/history states, native keyboard/year switching, historical reload, 13 sections, 8 viewport sizes, dark/light, no header badge/report button, settings card fits; current/historical PDF downloads when TEST_PDF_DIR is set; no new console errors.');
+        console.log(`PASS: real forms + local PostgreSQL, future/history states, keyboard/year switching, historical reload, viewport matrix: ${viewports.length} sizes / 13 sections / dark-light; settings report, current/historical PDF downloads when TEST_PDF_DIR is set; no new console errors.`);
     } finally { if (browser) await browser.close(); await db.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

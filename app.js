@@ -9468,8 +9468,8 @@ async function getAcademicYearReportData(academicYearId) {
     if (data?.year?.user_id !== scope.userId || data?.year?.id !== academicYearId) throw new Error('No se pudo verificar el propietario del reporte.');
     const raw = { ...data, student_name: data.student_name || auth.user.user_metadata?.full_name || currentUser.name };
     return ACAcademicReports.normalize(raw, {
-        gradeSummary: getSubjectGradeSummary, averageGrade: getAverageGrade, gradeItems: getGradeItems,
-        attendance: getAttendanceStats, projectStats: getProjectStats, taskStatus: normalizeTaskStatus,
+        gradeSummary: getSubjectGradeSummary, averageGrade: getAverageGrade, gradeItems: getGradeItems, gradeStatus: getGradeStatus,
+        attendance: getAttendanceStats, projectStats: getProjectStats, stageStatus: getProjectStageStatus, taskStatus: normalizeTaskStatus,
         taskVisualStatus: getTaskVisualStatus, priority: getTaskPriorityLabel, level: getLevel,
         dateTime: (date, time) => {
             if (!date) return 'Sin fecha';
