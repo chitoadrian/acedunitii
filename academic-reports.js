@@ -290,16 +290,8 @@
         }
         function drawMetricGrid(metrics, columns = 4, height = 31, after = 4, options = {}) {
             const gap=spacing.cards, width=(174-gap*(columns-1))/columns, total=Math.ceil(metrics.length/columns)*(height+gap);
-            if (options.paginate) {
-                for(let offset=0;offset<metrics.length;offset+=columns){
-                    const last=offset+columns>=metrics.length, required=height+gap+(last ? options.tail || 0 : 0);
-                    if(ensureSpace(required)) drawSectionHeader('PROGRESO DEL ESTUDIANTE · continuación','',required,true);
-                    metrics.slice(offset,offset+columns).forEach((item,index)=>drawMetricCard(18+index*(width+gap),y,width,item[0],item[1],height));
-                    y+=height+gap;
-                }
-                y+=after;return;
-            }
-            ensureSpace(total);
+            // Keep the complete grid and its trailing notes together, never individual rows.
+            ensureSpace(total+after+(options.tail || 0));
             metrics.forEach((item,index) => drawMetricCard(18+(index%columns)*(width+gap),y+Math.floor(index/columns)*(height+gap),width,item[0],item[1],height,options.centered));
             y += total+after;
         }
@@ -321,10 +313,10 @@
             doc.setFillColor(...(good ? [238,247,242] : improve ? [252,246,234] : [241,245,251])); doc.roundedRect(x,top-4,width,8,2,2,'F');
             doc.text(label,x+4,top+1);
         }
-        function drawEmptyState(message = EMPTY) {
+        function drawEmptyState(message = EMPTY, after = spacing.section) {
             const content = lines(message,162,9), height = content.length*3.9+10;
             ensureSpace(height+8); doc.setFillColor(...paper); doc.setDrawColor(...line); doc.setLineWidth(.2);
-            doc.roundedRect(18,y,174,height,2,2,'FD'); write(message,24,y+7,162,9); y += height+10;
+            doc.roundedRect(18,y,174,height,2,2,'FD'); write(message,24,y+7,162,9); y += height+after;
         }
         function columnWidths(item) {
             if (item.widths) return item.widths;
@@ -395,13 +387,13 @@
             const ratio=value===null ? 0 : Math.max(0,Math.min(1,number(value)/max));
             if(ratio>0){doc.setFillColor(...color);doc.roundedRect(x,top,width*ratio,3.5,Math.min(1.2,width*ratio/2),1.2,'F');}
         }
-        function drawSpotlight(label,value,max,badge='') {
+        function drawSpotlight(label,value,max,badge='',after=9) {
             ensureSpace(49);doc.setFillColor(...paper);doc.setDrawColor(...line);doc.setLineWidth(.2);doc.roundedRect(18,y,174,42,2,2,'FD');
             const centered=max===100, textX=centered ? 105 : 24, alignment=centered ? 'center' : 'left';
             font(8.5,'bold',muted);doc.text(label,textX,y+9,{align:alignment});
             font(25,'bold',ink);doc.text(value===null ? 'Sin datos' : max===10 ? fixed(value)+' / 10' : value+'%',textX,y+24,{align:alignment});
             if(badge)drawStatusBadge(badge,136,y+20);
-            barAt(24,y+32,162,value,max,accent);y+=51;
+            barAt(24,y+32,162,value,max,accent);y+=42+after;
         }
         function drawPlanCards(item) {
             item.cards.forEach(row=>{
@@ -455,8 +447,12 @@
         report.sections.forEach(source=>{
             const item=presentSection(source);
             const compactPlans=item.cards?.length>0 && item.cards.length<=3;
+            const isProgress=item.title==='PROGRESO DEL ESTUDIANTE', values=isProgress ? new Map(item.body) : null, value=key=>values?.get(key) ?? 0;
+            const progressNote='Estos indicadores corresponden únicamente a la actividad registrada en el año lectivo seleccionado.';
+            const pointsNote='Puntos de actividad del año: '+value('Puntos de actividad')+'.';
+            const progressTail=isProgress ? lines(progressNote,174,9).length*9*.3528*1.2+3+lines(pointsNote,174,8.5).length*8.5*.3528*1.2+3+(report.legacyEvidence.length ? 0 : 42) : 0;
             const extra=item.kind==='grades' ? 61 : item.kind==='attendance' ? 100 : item.kind==='tasks' ? 10 : 0;
-            const reserve=compactPlans ? 45 : item.title==='PROGRESO DEL ESTUDIANTE' ? 32 : item.body.length ? Math.min(195,tableHeight(item)+extra) : 22;
+            const reserve=compactPlans ? 45 : isProgress ? 2*(27+spacing.cards)+progressTail : item.body.length ? Math.min(195,tableHeight(item)+extra) : 22;
             drawSectionHeader(item.title,item.note,reserve,item.secondary,item.kind==='tasks' ? {separation:spacing.divider,divider:true} : {});
             if (item.kind==='grades') {
                 drawSpotlight('PROMEDIO GENERAL',report.metrics.average,10,report.metrics.gradeState);
@@ -467,28 +463,25 @@
                 y+=write(`${report.metrics.tasks} creadas · ${report.taskCounts.completed} completadas · ${pending} ${number(pending)===1 ? 'pendiente' : 'pendientes'} · ${report.taskCounts.overdue} vencidas`,18,y,174,9,muted)+4;
             }
             if(item.kind==='attendance' && item.body.length){
-                drawSpotlight('ASISTENCIA GENERAL',report.metrics.attendance,100);
+                drawSpotlight('ASISTENCIA GENERAL',report.metrics.attendance,100,'',spacing.table);
                 const kept=item.body[0],removed=item.body[1];
-                drawMetricGrid([['Presentes',kept[1]],['Faltas',kept[2]],['Atrasos',kept[3]],['Justificadas',kept[4]]],4,29,4,{centered:true});
+                drawMetricGrid([['Presentes',kept[1]],['Faltas',kept[2]],['Atrasos',kept[3]],['Justificadas',kept[4]]],4,29,0,{centered:true});
                 const count=total('Registros de asistencia creados');
                 y+=write(`${count} ${number(count)===1 ? 'asistencia registrada' : 'asistencias registradas'} · ${kept[5]} ${number(kept[5])===1 ? 'vigente' : 'vigentes'} · ${removed[5]} eliminadas posteriormente.`,18,y,174,8.5)+5;
                 if(number(removed[5])) y+=write(`Historial eliminado: Presentes ${removed[1]} · Faltas ${removed[2]} · Atrasos ${removed[3]} · Justificadas ${removed[4]}.`,18,y,174,8.5)+5;
-            } else if(item.title==='PROGRESO DEL ESTUDIANTE'){
-                const values=new Map(item.body), value=key=>values.get(key) ?? 0;
-                const progressNote='Estos indicadores corresponden únicamente a la actividad registrada en el año lectivo seleccionado.';
-                const pointsNote='Puntos de actividad del año: '+value('Puntos de actividad')+'.';
-                const tail=lines(progressNote,174,9).length*9*.3528*1.2+3+lines(pointsNote,174,8.5).length*8.5*.3528*1.2+3+(report.legacyEvidence.length ? 0 : 42);
-                drawMetricGrid([['XP del año',value('XP del año lectivo')],['Nivel alcanzado',value('Nivel según XP del año')],['Días activos',value('Días con actividad registrada')],['Actividades registradas',value('Actividad registrada')],['Racha',value('Racha almacenada en el año')],['Tareas completadas',value('Tareas completadas')]],3,27,0,{paginate:true,tail});
+            } else if(isProgress){
+                drawMetricGrid([['XP del año',value('XP del año lectivo')],['Nivel alcanzado',value('Nivel según XP del año')],['Días activos',value('Días con actividad registrada')],['Actividades registradas',value('Actividad registrada')],['Racha',value('Racha almacenada en el año')],['Tareas completadas',value('Tareas completadas')]],3,27,0,{tail:progressTail});
                 y+=write(progressNote,18,y,174,9)+3;
                 y+=write(pointsNote,18,y,174,8.5)+3;
             } else if(compactPlans) drawPlanCards(item);
             else if(item.body.length) drawTable(item);
-            else drawEmptyState(item.empty);
+            else drawEmptyState(item.empty,item.title==='METAS' ? spacing.table : spacing.section);
         });
         if (report.legacyEvidence.length) {
             const labels={tasks:'Tareas',grades:'Calificaciones',attendance:'Asistencia',events:'Eventos',resources:'Recursos'};
             const historyTable={headers:['Tipo de actividad','Registros anteriores'],body:report.legacyEvidence.map(row=>[labels[row.entity_type]||'Actividad académica',String(row.count)])};
-            drawSectionHeader('REGISTROS HISTÓRICOS ANTERIORES','Antes de habilitar el historial completo de AC Edunity se registraron algunas actividades cuya información detallada ya no se encuentra disponible. Estas cifras se muestran únicamente como referencia y no se incorporan a los totales detallados del reporte.',tableHeight(historyTable),true,{separation:spacing.divider});
+            // The short history table and editorial closing are one final keep-together block.
+            drawSectionHeader('REGISTROS HISTÓRICOS ANTERIORES','Antes de habilitar el historial completo de AC Edunity se registraron algunas actividades cuya información detallada ya no se encuentra disponible. Estas cifras se muestran únicamente como referencia y no se incorporan a los totales detallados del reporte.',tableHeight(historyTable)+spacing.section+42,true,{separation:spacing.divider});
             drawTable(historyTable);
         }
         ensureSpace(42);doc.setDrawColor(...line);doc.setLineWidth(.3);doc.line(18,y,192,y);doc.setDrawColor(...blue);doc.setLineWidth(.6);doc.line(18,y,34,y);doc.setDrawColor(...accent);doc.line(34,y,42,y);y+=12;

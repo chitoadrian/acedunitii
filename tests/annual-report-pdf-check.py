@@ -33,13 +33,17 @@ for cycle in ("2026-2027", "2027-2028"):
         assert section in content, f"Missing section: {section}"
     for technical in ("snapshot", "UUID", "registro fuente", "fila recuperable", "hijos conservados", "preparing", "pending_internal", "completed_internal", "Balance del año", "Conservada"):
         assert technical not in content, f"Technical/redundant wording: {technical}"
+    assert "continuación" not in content, "The complete progress grid must fit on a single page"
     for i, page in enumerate(reader.pages, 1):
         assert abs(float(page.mediabox.width) - 595.28) < 1
         assert abs(float(page.mediabox.height) - 841.89) < 1
         assert f"Página {i} de {len(reader.pages)}" in " ".join(page.extract_text().split())
         if "PROGRESO DEL ESTUDIANTE" in page.extract_text():
-            metrics_row = ("XP del año", "Nivel alcanzado", "Días activos") if "XP del año" in page.extract_text() else ("Actividades registradas", "Racha", "Tareas completadas")
-            assert all(label in page.extract_text() for label in metrics_row), "Progress heading must stay with a complete metric row"
+            metrics_grid = ("XP del año", "Nivel alcanzado", "Días activos", "Actividades registradas", "Racha", "Tareas completadas")
+            assert all(label in page.extract_text() for label in metrics_grid), "Progress heading must stay with all six metric cards"
+    if "REGISTROS HISTÓRICOS ANTERIORES" in content:
+        assert "REGISTROS HISTÓRICOS ANTERIORES" in reader.pages[-1].extract_text()
+        assert "FIN DEL REPORTE" in reader.pages[-1].extract_text(), "History and closing must stay together"
     with pdfplumber.open(filename) as pdf:
         for page in pdf.pages:
             assert "Reporte académico de Prueba local" in page.extract_text()
