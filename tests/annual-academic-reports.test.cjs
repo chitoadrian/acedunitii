@@ -85,3 +85,26 @@ test('Normalization rejects cross-year, cross-account and orphaned grade items',
     assert.throws(()=>reports.normalize({year,tasks:[row({user_id:'other'})]},helpers),/fuera del año/);
     assert.throws(()=>reports.normalize({year,grade_items:[row({grade_id:'missing'})]},helpers),/calificación/);
 });
+test('Student-facing evaluation statuses never expose internal values',()=>{
+    for(const [value,label] of Object.entries({preparing:'En preparación',scheduled:'Programada',completed:'Completada',pending:'Pendiente',pending_internal:'Pendiente',completed_internal:'Completada'})) assert.equal(reports.formatEvaluationStatus(value),label);
+    assert.equal(reports.formatEvaluationStatus('unknown_internal'),'Sin especificar');
+});
+test('Presentation hides redundant history columns, preserves deleted states and does not mutate report data',()=>{
+    const report=reports.normalize({year,tasks:[row({id:'t',title:'Trabajo',status:'completed'})],evaluations:[row({id:'e',title:'Prueba',status:'preparing'})]},helpers);
+    const before=JSON.stringify(report);
+    const tasks=reports.presentSection(report.sections.find(s=>s.kind==='tasks'));
+    assert.deepEqual(tasks.headers,['Tarea','Materia','Fecha','Estado','Prioridad']);
+    assert.equal(tasks.body[0][3],'Completada');
+    const evaluations=reports.presentSection(report.sections.find(s=>s.title==='Evaluaciones'));
+    assert.equal(evaluations.body[0][4],'En preparación');
+    assert.equal(JSON.stringify(report),before);
+    const archived=reports.normalize({year,tasks:[row({id:'t',title:'Trabajo',status:'completed',_record_deleted:true})]},helpers);
+    const historical=reports.presentSection(archived.sections.find(s=>s.kind==='tasks'));
+    assert.equal(historical.headers.at(-1),'Historial');
+    assert.equal(historical.body[0].at(-1),'Eliminada posteriormente');
+    assert.equal(historical.body[0][3],'Completada');
+    for(const section of report.sections.map(reports.presentSection)){
+        if(section.widths) assert.equal(section.widths.reduce((a,b)=>a+b),174);
+        section.body.forEach(cells=>assert.equal(cells.length,section.headers.length));
+    }
+});

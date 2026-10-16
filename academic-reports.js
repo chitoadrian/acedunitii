@@ -176,12 +176,80 @@
             const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob);
         });
     }
+    // Presentation only: never change the normalized academic totals or source rows.
+    function formatEvaluationStatus(value) {
+        const labels = { preparing: 'En preparación', scheduled: 'Programada', completed: 'Completada', pending: 'Pendiente',
+            pending_internal: 'Pendiente', completed_internal: 'Completada', cancelled: 'Cancelada', in_progress: 'En curso', overdue: 'Vencida', Completado: 'Completada' };
+        return labels[value] || (/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ ]+$/.test(text(value)) ? text(value) : 'Sin especificar');
+    }
+    function presentSection(item) {
+        const historical = value => value === 'Eliminada posteriormente';
+        const hasHistory = item.body.some(row => row.some(historical));
+        const rowHistory = value => historical(value) ? value : '';
+        const base = { ...item, note: '', secondary: true, empty: EMPTY };
+        const historyNote = count => count ? ` · ${count} ${count===1 ? 'eliminación posterior' : 'eliminaciones posteriores'}` : '';
+        const removed = item.body.filter(row => row.some(historical)).length;
+        switch (item.title) {
+        case 'Materias del año':
+            return { ...base, title: 'MATERIAS DEL AÑO', secondary: false,
+                note: `${item.body.length} ${item.body.length===1 ? 'materia registrada' : 'materias registradas'} · ${item.body.length-removed} ${item.body.length-removed===1 ? 'activa' : 'activas'} · ${removed} eliminadas posteriormente.`,
+                headers: ['Materia','Tareas','Evaluaciones','Calificaciones','Promedio','Estado'], widths: [45,17,25,27,34,26],
+                body: item.body.map(row => [...row.slice(0,5), historical(row[5]) ? row[5] : 'Activa']) };
+        case 'Tareas del año':
+            return { ...base, title: 'ACTIVIDAD DE TAREAS', secondary: false,
+                headers: ['Tarea','Materia','Fecha','Estado','Prioridad',...(hasHistory ? ['Historial'] : [])],
+                widths: hasHistory ? [50,25,28,23,21,27] : [62,34,30,28,20],
+                body: item.body.map(row => [row[0],row[1],row[2],row[3],row[5],...(hasHistory ? [rowHistory(row[4])] : [])]) };
+        case 'Evaluaciones':
+            return { ...base, title: 'EVALUACIONES', note: `${item.body.length} ${item.body.length===1 ? 'evaluación registrada' : 'evaluaciones registradas'}${historyNote(removed)}.`,
+                headers: ['Evaluación','Materia','Tipo','Fecha','Estado',...(hasHistory ? ['Historial'] : [])],
+                widths: hasHistory ? [36,31,23,30,27,27] : [43,34,26,34,37],
+                body: item.body.map(row => { const split=row[0].lastIndexOf(' / '); return [split<0 ? row[0] : row[0].slice(0,split),split<0 ? 'Sin materia' : row[0].slice(split+3),row[1],row[2],formatEvaluationStatus(row[3]),...(hasHistory ? [rowHistory(row[4])] : [])]; }) };
+        case 'Rendimiento académico': {
+            const hasDeletedGrades = item.body.some(row => number(row[2]) > 0);
+            return { ...base, title: 'RENDIMIENTO ACADÉMICO', secondary: false,
+                note: 'El promedio considera las calificaciones vigentes: parciales 70% y examen 30%, por periodo y materia. Las calificaciones eliminadas o sustituidas se mantienen en el historial, sin afectar el promedio.',
+                headers: ['Materia','Calificaciones',...(hasDeletedGrades ? ['Eliminadas'] : []),'Promedio','Desempeño'],
+                widths: hasDeletedGrades ? [49,26,25,28,46] : [62,29,32,51],
+                body: [...item.body].sort((a,b)=>a[0].localeCompare(b[0],'es')).map(row => [row[0],row[1],...(hasDeletedGrades ? [row[2]] : []),row[3],row[4]]) };
+        }
+        case 'Asistencia':
+            return { ...base, title: 'ASISTENCIA', secondary: false, empty: 'No se registraron asistencias durante este año lectivo.' };
+        case 'Metas':
+            return { ...base, title: 'METAS', cards: item.body, note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'meta registrada' : 'metas registradas'}${historyNote(removed)}.` : '', empty: 'No se registraron metas durante este año lectivo.',
+                headers: ['Meta / materia','Progreso','Estado','Fecha',...(hasHistory ? ['Historial'] : [])],
+                body: item.body.map(row => [...row.slice(0,4),...(hasHistory ? [rowHistory(row[4])] : [])]) };
+        case 'Proyectos':
+            return { ...base, title: 'PROYECTOS', cards: item.body, note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'proyecto registrado' : 'proyectos registrados'}${historyNote(removed)}.` : '', empty: 'No se registraron proyectos durante este año lectivo.',
+                headers: ['Proyecto','Progreso','Etapas','Subtareas','Estado',...(hasHistory ? ['Historial'] : [])],
+                body: item.body.map(row => [...row.slice(0,5),...(hasHistory ? [rowHistory(row[5])] : [])]) };
+        case 'Etapas y subtareas':
+            return { ...base, title: 'DETALLE DE PROYECTOS',
+                headers: ['Elemento / proyecto','Etapa','Estado','Fecha',...(hasHistory ? ['Historial'] : [])],
+                widths: hasHistory ? [53,28,25,37,31] : [69,37,26,42],
+                body: item.body.map(row => [...row.slice(0,4),...(hasHistory ? [rowHistory(row[4])] : [])]) };
+        case 'Calendario y eventos':
+            return { ...base, title: 'CALENDARIO Y EVENTOS', empty: 'No se registraron eventos independientes durante este año lectivo.',
+                note: item.body.length ? `${item.body.length} eventos independientes${historyNote(removed)}.` : '',
+                headers: ['Evento / materia','Tipo','Fecha',...(hasHistory ? ['Historial'] : [])],
+                widths: hasHistory ? [64,32,44,34] : [84,38,52],
+                body: item.body.map(row => [...row.slice(0,3),...(hasHistory ? [rowHistory(row[3])] : [])]) };
+        case 'Mochila y recursos':
+            return { ...base, title: 'RECURSOS DE ESTUDIO', note: `${item.body.length} ${item.body.length===1 ? 'recurso guardado' : 'recursos guardados'}${historyNote(removed)}.`,
+                headers: ['Recurso','Materia','Tipo',...(hasHistory ? ['Historial'] : [])], widths: hasHistory ? [63,49,28,34] : [80,60,34],
+                body: item.body.map(row => [...row.slice(0,3),...(hasHistory ? [rowHistory(row[3])] : [])]) };
+        case 'Progreso del año': return { ...base, title: 'PROGRESO DEL ESTUDIANTE', secondary: false };
+        default: return base;
+        }
+    }
     async function createDocument(report) {
         const [jsPDF, logo] = await Promise.all([libraries(), logoData()]);
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
         doc.setProperties({ title: 'Reporte académico anual ' + report.year.label, author: 'AC Edunity', subject: 'Historial y balance del año lectivo', creator: 'AC Edunity' });
-        const ink = [26,36,65], accent = [100,76,181], blue = [41,108,201], muted = [94,105,125], line = [221,226,237], paper = [249,250,253];
+        const ink = [26,36,65], accent = [104,74,194], blue = [41,108,201], muted = [79,91,112], line = [221,226,236], paper = [247,249,252];
+        const success = [56,139,106], warning = [177,122,36], danger = [184,87,87];
         const generated = new Intl.DateTimeFormat('es-EC', { timeZone: 'America/Guayaquil', dateStyle: 'long', timeStyle: 'short', hour12: true }).format(new Date(report.generatedAt));
+        const generatedDate = new Intl.DateTimeFormat('es-EC', { timeZone: 'America/Guayaquil', dateStyle: 'long' }).format(new Date(report.generatedAt));
         const whitePaper = () => { doc.saveGraphicsState(); doc.setFillColor(255,255,255); doc.rect(0,0,210,297,'F'); doc.restoreGraphicsState(); };
         whitePaper(); doc.internal.events.subscribe('addPage', whitePaper);
         let y = 31;
@@ -194,23 +262,26 @@
             return parts.length * size * .3528 * 1.2;
         }
         function ensureSpace(height) { if (y + height > 273) { doc.addPage(); y = 31; } }
-        function drawSectionHeader(title, note = '', reserve = 20) {
-            const noteLines = note ? lines(note,174,9) : [];
-            ensureSpace(12 + noteLines.length * 3.9 + reserve);
-            doc.setDrawColor(...accent); doc.setLineWidth(.8); doc.line(18,y-4,18,y+1);
-            font(15,'bold',ink); doc.text(title,22,y); y += 8;
-            if (note) y += write(note,18,y,174,9) + 4;
+        function drawSectionHeader(title, note = '', reserve = 20, secondary = false) {
+            const noteHeight = note ? lines(note,174,8.5).length * 8.5 * .3528 * 1.2 + 4 : 0;
+            ensureSpace((secondary ? 7 : 9) + noteHeight + reserve);
+            doc.setDrawColor(...(secondary ? line : accent)); doc.setLineWidth(secondary ? .4 : .8); doc.line(18,y-4,18,y+1);
+            font(secondary ? 11 : 15,'bold',ink); doc.text(title,22,y); y += secondary ? 7 : 9;
+            if (note) y += write(note,18,y,174,8.5) + 4;
         }
-        function drawMetricCard(x, top, width, label, value) {
-            doc.setFillColor(...paper); doc.setDrawColor(...line); doc.setLineWidth(.2); doc.roundedRect(x,top,width,31,2,2,'FD');
+        function drawMetricCard(x, top, width, label, value, height = 31) {
+            doc.setFillColor(255,255,255); doc.setDrawColor(...line); doc.setLineWidth(.2); doc.roundedRect(x,top,width,height,1.5,1.5,'FD');
             doc.setDrawColor(...blue); doc.setLineWidth(.6); doc.line(x+5,top+5,x+12,top+5);
-            font(String(value).length > 10 ? 10 : 19,'bold',ink); doc.text(String(value),x+5,top+17);
-            write(label,x+5,top+24,width-10,8,muted);
+            let size=19; font(size,'bold',ink);
+            while(doc.getTextWidth(String(value)) > width-10 && size > 9) font(--size,'bold',ink);
+            doc.text(String(value),x+5,top+16);
+            write(label,x+5,top+23,width-10,8,muted);
         }
-        function drawMetricGrid(metrics) {
-            ensureSpace(72);
-            metrics.forEach((item,index) => drawMetricCard(18+(index%4)*45.5,y+Math.floor(index/4)*37,37.5,item[0],item[1]));
-            y += 78;
+        function drawMetricGrid(metrics, columns = 4, height = 31, after = 4) {
+            const gap=5, width=(174-gap*(columns-1))/columns, total=Math.ceil(metrics.length/columns)*(height+5);
+            ensureSpace(total);
+            metrics.forEach((item,index) => drawMetricCard(18+(index%columns)*(width+gap),y+Math.floor(index/columns)*(height+5),width,item[0],item[1],height));
+            y += total+after;
         }
         function drawProgressBar(label, value, max = 100, color = blue) {
             font(9,'bold',ink); const labelLines = doc.splitTextToSize(text(label),140);
@@ -224,47 +295,47 @@
             y += 11;
         }
         function drawStatusBadge(label, x, top) {
-            const good = /aprobado|excelente/i.test(label);
-            font(9,'bold',good ? [42,105,85] : muted);
+            const good = /excelente|completad/i.test(label), approved=/aprobado/i.test(label), improve=/necesita mejorar/i.test(label);
+            font(9,'bold',good ? success : approved ? blue : improve ? warning : muted);
             const width = Math.min(78,doc.getTextWidth(label)+8);
-            doc.setFillColor(...(good ? [235,246,241] : [242,242,249])); doc.roundedRect(x,top-4,width,8,2,2,'F');
+            doc.setFillColor(...(good ? [238,247,242] : improve ? [252,246,234] : [241,245,251])); doc.roundedRect(x,top-4,width,8,2,2,'F');
             doc.text(label,x+4,top+1);
         }
-        function drawEmptyState() {
-            const content = lines(EMPTY,162,9), height = content.length*3.9+12;
+        function drawEmptyState(message = EMPTY) {
+            const content = lines(message,162,9), height = content.length*3.9+10;
             ensureSpace(height+8); doc.setFillColor(...paper); doc.setDrawColor(...line); doc.setLineWidth(.2);
-            doc.roundedRect(18,y,174,height,2,2,'FD'); write(EMPTY,24,y+8,162,9); y += height+12;
+            doc.roundedRect(18,y,174,height,2,2,'FD'); write(message,24,y+7,162,9); y += height+10;
         }
         function columnWidths(item) {
-            if (item.kind === 'tasks') return [53,25,27,24,27,18];
-            if (item.kind === 'grades') return [50,22,22,30,50];
-            if (item.title === 'Materias del año') return [47,17,26,16,28,40];
+            if (item.widths) return item.widths;
             return item.headers.map(() => 174/item.headers.length);
         }
         function tableHeight(item) {
             const widths=columnWidths(item), sample=item.body.length<=8 ? item.body : item.body.slice(0,1);
-            const rowHeight=row=>Math.max(...row.map((cell,i)=>lines(cell,widths[i]-4.8,8.3).length))*3.5+4.8;
-            const height=12+sample.reduce((sum,row)=>sum+rowHeight(row),0);
-            return height <= 210 ? height : 12 + rowHeight(sample[0]);
+            const rowHeight=row=>Math.max(...row.map((cell,i)=>lines(cell,widths[i]-6,8.5).length))*8.5*.35278*1.15+6;
+            const height=rowHeight(item.headers)+sample.reduce((sum,row)=>sum+rowHeight(row),0)+1.5;
+            return height <= 205 ? height : rowHeight(item.headers) + rowHeight(sample[0]);
         }
         function drawTable(item) {
             const widths=columnWidths(item);
             ensureSpace(tableHeight(item));
             doc.autoTable({
                 startY:y, margin:{top:28,right:18,bottom:24,left:18}, tableWidth:174,
-                head:[item.headers], body:item.body, theme:'grid', showHead:'everyPage', rowPageBreak:'avoid',
+                head:[item.headers], body:item.body, theme:'striped', showHead:'everyPage', rowPageBreak:'avoid',
                 columnStyles:Object.fromEntries(widths.map((width,index)=>[index,{cellWidth:width}])),
-                styles:{font:'helvetica',fontSize:8.3,cellPadding:2.4,textColor:ink,lineColor:line,lineWidth:.15,overflow:'linebreak'},
-                headStyles:{fillColor:[235,238,247],textColor:ink,fontStyle:'bold',fontSize:8.3},
-                bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:[250,251,253]},
+                styles:{font:'helvetica',fontSize:8.5,cellPadding:3,textColor:ink,lineColor:line,lineWidth:{bottom:.1},overflow:'linebreak'},
+                headStyles:{fillColor:[237,241,248],textColor:ink,fontStyle:'bold',fontSize:8.5},
+                bodyStyles:{fillColor:[255,255,255]},alternateRowStyles:{fillColor:paper},
                 didParseCell(data) {
                     if (data.section !== 'body') return;
                     const content=String(data.cell.raw);
-                    if (/^Eliminad/.test(content)) data.cell.styles.textColor=[127,80,92];
-                    else if (/^(Completad|Aprobado|Excelente)/i.test(content)) data.cell.styles.textColor=[42,105,85];
+                    if (/^Eliminad/.test(content)) data.cell.styles.textColor=danger;
+                    else if (/^(Completad|Excelente)/i.test(content)) data.cell.styles.textColor=success;
+                    else if (/^Aprobado/i.test(content)) data.cell.styles.textColor=blue;
+                    else if (/^Necesita mejorar/i.test(content)) data.cell.styles.textColor=warning;
                 }
             });
-            y=doc.lastAutoTable.finalY+13;
+            y=doc.lastAutoTable.finalY+9;
         }
         function drawTaskBalance() {
             const counts=report.taskCounts;
@@ -279,55 +350,114 @@
             groups.forEach(([label,count,color],index)=>{const column=index%2,row=Math.floor(index/2);doc.setFillColor(...color);doc.circle(19+column*88,y+row*5-1,1,'F');write(label+': '+count,23+column*88,y+row*5,82,8);});
             y+=21;
         }
-        // Formal white cover, with the existing official circular logo.
+        const totals = new Map(report.summary);
+        const total = key => totals.get(key) ?? 0;
+        function drawActivityBalance() {
+            drawSectionHeader('BALANCE DE ACTIVIDAD','',58,true);
+            const columns = [
+                ['Tareas', [['Completadas',report.taskCounts.completed],['Pendientes sin vencer',report.taskCounts.pending],['Próximas',report.taskCounts.upcoming],['Vencidas',report.taskCounts.overdue],['Eliminadas sin completar',report.taskCounts.deleted],['Eliminadas en total',report.history.tasks.deleted]]],
+                ['Registros académicos', [['Calificaciones registradas',total('Calificaciones registradas (casilleros)')],['Calificaciones eliminadas',total('Calificaciones eliminadas (casilleros)')],['Asistencias registradas',total('Registros de asistencia creados')],['Evaluaciones completadas',total('Evaluaciones completadas')],['Metas registradas',total('Metas creadas')],['Proyectos completados',total('Proyectos completados')],['Eventos independientes',total('Eventos del calendario')]]]
+            ];
+            columns.forEach(([title,entries],index)=>{
+                const x=18+index*90;
+                font(9,'bold',ink);doc.text(title,x,y);
+                doc.setDrawColor(...line);doc.setLineWidth(.2);doc.line(x,y+3,x+84,y+3);
+                entries.forEach(([label,value],row)=>{const top=y+10+row*6;write(label,x,top,70,8.5);font(9,'bold',ink);doc.text(String(value),x+84,top,{align:'right'});});
+            });
+            y+=55;
+        }
+        function barAt(x,top,width,value,max=100,color=blue) {
+            doc.setFillColor(233,237,245);doc.roundedRect(x,top,width,3.5,1.2,1.2,'F');
+            const ratio=value===null ? 0 : Math.max(0,Math.min(1,number(value)/max));
+            if(ratio>0){doc.setFillColor(...color);doc.roundedRect(x,top,width*ratio,3.5,Math.min(1.2,width*ratio/2),1.2,'F');}
+        }
+        function drawSpotlight(label,value,max,badge='') {
+            ensureSpace(49);doc.setFillColor(...paper);doc.setDrawColor(...line);doc.setLineWidth(.2);doc.roundedRect(18,y,174,42,2,2,'FD');
+            font(8.5,'bold',muted);doc.text(label,24,y+9);
+            font(25,'bold',ink);doc.text(value===null ? 'Sin datos' : max===10 ? fixed(value)+' / 10' : value+'%',24,y+24);
+            if(badge)drawStatusBadge(badge,136,y+20);
+            barAt(24,y+32,162,value,max,accent);y+=51;
+        }
+        function drawPlanCards(item) {
+            item.cards.forEach(row=>{
+                const titleHeight=lines(row[0],162,10).length*4.3, project=item.title==='PROYECTOS';
+                const history=row[project ? 5 : 4]==='Eliminada posteriormente' ? ' · Eliminada posteriormente' : '';
+                const detail=project ? `${row[4]} · Etapas: ${row[2]} · Subtareas: ${row[3]}${history}` : `${row[2]} · Fecha: ${row[3]}${history}`;
+                const detailHeight=lines(detail,162,8.5).length*3.6, height=titleHeight+detailHeight+24;
+                ensureSpace(height+8);doc.setFillColor(255,255,255);doc.setDrawColor(...line);doc.setLineWidth(.2);doc.roundedRect(18,y,174,height,2,2,'FD');
+                write(row[0],24,y+8,162,10,ink,'bold');
+                const top=y+titleHeight+14;
+                font(9,'bold',accent);doc.text(row[1],186,top,{align:'right'});barAt(24,top-3,139,parseFloat(row[1]),100,accent);
+                write(detail,24,top+8,162,8.5);y+=height+8;
+            });
+        }
+        // Institutional white cover; the official logo and the student's supplied name stay unchanged.
+        doc.setDrawColor(...line);doc.setLineWidth(.3);doc.line(18,23,192,23);
+        doc.setDrawColor(...blue);doc.setLineWidth(1);doc.line(18,23,41,23);doc.setDrawColor(...accent);doc.line(41,23,53,23);
         doc.saveGraphicsState(); doc.circle(105,43,14,null); doc.clip(); doc.discardPath();
         doc.addImage(logo,'PNG',91,29,28,28,undefined,'FAST'); doc.restoreGraphicsState();
         font(12,'bold',blue); doc.text('AC EDUNITY',105,74,{align:'center'});
-        font(26,'bold',ink); doc.text('REPORTE ACADÉMICO ANUAL',105,97,{align:'center'});
-        font(13,'normal',muted); doc.text('Año lectivo '+report.year.label,105,112,{align:'center'});
+        font(24,'bold',ink); doc.text('REPORTE ACADÉMICO ANUAL',105,96,{align:'center'});
+        font(13,'normal',muted); doc.text('Año lectivo '+report.year.label,105,110,{align:'center'});
         doc.setLineWidth(.8); doc.setDrawColor(...blue); doc.line(75,124,105,124);doc.setDrawColor(...accent);doc.line(105,124,135,124);
-        doc.setFillColor(...paper); doc.roundedRect(18,144,174,43,2,2,'F');
-        font(9,'bold',accent); doc.text('ESTUDIANTE',24,155);
-        write(report.studentName,24,167,162,19,ink,'bold');
-        font(9,'bold',accent);doc.text('FECHA DE GENERACIÓN',18,207);write(generated,18,217,174,10);
-        font(10,'normal',blue);doc.text('Generado por AC Edunity',105,251,{align:'center'});
-        font(9,'normal',muted);doc.text('Gestión educativa inteligente y personalizada',105,260,{align:'center'});
+        doc.setFillColor(...paper);doc.roundedRect(18,144,174,70,2,2,'F');
+        font(9,'bold',accent);doc.text('ESTUDIANTE',24,155);
+        const nameHeight=write(report.studentName,24,168,162,19,ink,'bold');
+        const dateTop=Math.max(191,170+nameHeight);
+        font(9,'bold',accent);doc.text('FECHA DE GENERACIÓN',24,dateTop);write(generatedDate,24,dateTop+10,162,10);
+        font(10,'normal',blue);doc.text('Generado por AC Edunity',105,244,{align:'center'});
+        font(9,'normal',muted);doc.text('Gestión educativa inteligente y personalizada',105,253,{align:'center'});
+        font(9,'normal',muted);doc.text('edunity.me',105,262,{align:'center'});
         doc.addPage(); y=32;
-        drawSectionHeader('RESUMEN DEL AÑO LECTIVO','Totales recuperables del ciclo: registros conservados y snapshots de eliminaciones. El promedio y la asistencia general utilizan registros conservados.',76);
-        drawMetricGrid([['Materias creadas',report.metrics.subjects],['Tareas creadas',report.metrics.tasks],['Tareas completadas',report.metrics.completed],['Evaluaciones',report.metrics.evaluations],
+        drawSectionHeader('RESUMEN ACADÉMICO DEL AÑO','Año lectivo '+report.year.label,76);
+        drawMetricGrid([['Materias',report.metrics.subjects],['Tareas creadas',report.metrics.tasks],['Tareas completadas',report.metrics.completed],['Evaluaciones',report.metrics.evaluations],
             ['Promedio general',report.metrics.average===null ? 'Sin datos' : fixed(report.metrics.average)+' / 10'],['Asistencia',report.metrics.attendance===null ? 'Sin datos' : report.metrics.attendance+'%'],['Proyectos',report.metrics.projects],['Recursos',report.metrics.resources]]);
-        drawSectionHeader('Balance académico','Las categorías no se duplican: las completadas incluyen las eliminadas después de completarse. Las demás eliminadas se cuentan aparte.',65);
+        drawActivityBalance();
         drawTaskBalance();
-        write('Conservadas: '+report.history.tasks.retained+' · Eliminadas posteriormente: '+report.history.tasks.deleted+' · Total creado: '+report.history.tasks.total,18,y,174,9);
-        y+=14;
-        write('Cobertura: los snapshots completos comienzan al habilitar este historial. Las acciones anteriores sin fila recuperable se identifican por separado; no se inventan registros.',18,y,174,8.5);
+        y+=write(`Tareas vigentes: ${report.history.tasks.retained} · Eliminadas posteriormente: ${report.history.tasks.deleted}. Pendientes en total: ${total('Tareas pendientes (incluye próximas y vencidas)')} (incluye próximas y vencidas).`,18,y,174,8)+4;
+        write('Las completadas incluyen las eliminadas después de completarse. La actividad anterior al historial completo se presenta por separado cuando no existe información detallada.',18,y,174,8);
         doc.addPage();y=31;
-        drawSectionHeader('Balance del año','Indicadores acumulados del ciclo y estado actual/final, sin mezclar totales históricos con registros conservados.',50);
-        drawTable({headers:['Indicador del año','Resultado'],body:report.summary.map(row=>row.map(text))});
-        report.sections.forEach(item=>{
-            const progressHeight=(item.progress || []).reduce((height,row)=>height+Math.max(6,lines(row.title+' · '+row.record,140,9).length*3.8)+11,0);
-            const extra=item.kind==='grades' ? 40 : item.kind==='attendance' ? 22 : progressHeight;
-            const noteHeight=lines(item.note,174,9).length*3.9+10;
-            const reserve=item.body.length ? tableHeight(item)+extra : 40;
-            drawSectionHeader(item.title,item.note,noteHeight+reserve<=242 ? reserve : 35+extra);
+        report.sections.forEach(source=>{
+            const item=presentSection(source);
+            const compactPlans=item.cards?.length>0 && item.cards.length<=3;
+            const extra=item.kind==='grades' ? 61 : item.kind==='attendance' ? 100 : item.kind==='tasks' ? 10 : 0;
+            const reserve=compactPlans ? 45 : item.title==='PROGRESO DEL ESTUDIANTE' ? 80 : item.body.length ? Math.min(195,tableHeight(item)+extra) : 22;
+            drawSectionHeader(item.title,item.note,reserve,item.secondary);
             if (item.kind==='grades') {
-                drawProgressBar('Promedio final de registros conservados',report.metrics.average,10,accent);
-                ensureSpace(14);drawStatusBadge(report.metrics.gradeState,18,y);y+=14;
+                drawSpotlight('PROMEDIO GENERAL',report.metrics.average,10,report.metrics.gradeState);
+                font(9,'bold',ink);doc.text('RENDIMIENTO POR MATERIA',18,y);y+=7;
             }
-            if (item.kind==='attendance') drawProgressBar('Asistencia general (registros conservados)',report.metrics.attendance);
-            if (item.progress) item.progress.forEach(row=>drawProgressBar(row.title+' · '+row.record,row.value,100,accent));
-            if (item.body.length) drawTable(item); else drawEmptyState();
+            if(item.kind==='tasks'){
+                const pending=total('Tareas pendientes (incluye próximas y vencidas)');
+                y+=write(`${report.metrics.tasks} creadas · ${report.taskCounts.completed} completadas · ${pending} ${number(pending)===1 ? 'pendiente' : 'pendientes'} · ${report.taskCounts.overdue} vencidas`,18,y,174,9,muted)+4;
+            }
+            if(item.kind==='attendance' && item.body.length){
+                drawSpotlight('ASISTENCIA GENERAL',report.metrics.attendance,100);
+                const kept=item.body[0],removed=item.body[1];
+                drawMetricGrid([['Presentes',kept[1]],['Faltas',kept[2]],['Atrasos',kept[3]],['Justificadas',kept[4]]],4,29);
+                const count=total('Registros de asistencia creados');
+                y+=write(`${count} ${number(count)===1 ? 'asistencia registrada' : 'asistencias registradas'} · ${kept[5]} ${number(kept[5])===1 ? 'vigente' : 'vigentes'} · ${removed[5]} eliminadas posteriormente.`,18,y,174,8.5)+5;
+                if(number(removed[5])) y+=write(`Historial eliminado: Presentes ${removed[1]} · Faltas ${removed[2]} · Atrasos ${removed[3]} · Justificadas ${removed[4]}.`,18,y,174,8.5)+5;
+            } else if(item.title==='PROGRESO DEL ESTUDIANTE'){
+                const values=new Map(item.body), value=key=>values.get(key) ?? 0;
+                drawMetricGrid([['XP del año',value('XP del año lectivo')],['Nivel alcanzado',value('Nivel según XP del año')],['Días activos',value('Días con actividad registrada')],['Actividades registradas',value('Actividad registrada')],['Racha',value('Racha almacenada en el año')],['Tareas completadas',value('Tareas completadas')]],3,27,0);
+                y+=write('Estos indicadores corresponden únicamente a la actividad registrada en el año lectivo seleccionado.',18,y,174,9)+3;
+                y+=write('Puntos de actividad del año: '+value('Puntos de actividad')+'.',18,y,174,8.5)+3;
+            } else if(compactPlans) drawPlanCards(item);
+            else if(item.body.length) drawTable(item);
+            else drawEmptyState(item.empty);
         });
         if (report.legacyEvidence.length) {
-            const labels={tasks:'Tareas',grades:'Calificaciones (grupos)',attendance:'Asistencia',events:'Eventos',resources:'Recursos'};
-            drawSectionHeader('Evidencia anterior sin snapshot','Actividad verificable cuyo registro fuente ya no está disponible. No permite reconstruir títulos, fechas límite ni notas. Estas cifras NO se suman a los totales de registros completos.',40);
-            drawTable({headers:['Entidad','Registros fuente no disponibles'],body:report.legacyEvidence.map(row=>[labels[row.entity_type]||row.entity_type,String(row.count)])});
+            const labels={tasks:'Tareas',grades:'Calificaciones',attendance:'Asistencia',events:'Eventos',resources:'Recursos'};
+            const historyTable={headers:['Tipo de actividad','Registros anteriores'],body:report.legacyEvidence.map(row=>[labels[row.entity_type]||'Actividad académica',String(row.count)])};
+            drawSectionHeader('REGISTROS HISTÓRICOS ANTERIORES','Antes de habilitar el historial completo de AC Edunity se registraron algunas actividades cuya información detallada ya no se encuentra disponible. Estas cifras se muestran únicamente como referencia y no se incorporan a los totales detallados del reporte.',tableHeight(historyTable),true);
+            drawTable(historyTable);
         }
-        ensureSpace(50);doc.setDrawColor(...line);doc.setLineWidth(.3);doc.line(18,y,192,y);y+=12;
-        font(14,'bold',ink);doc.text('FIN DEL REPORTE',18,y);y+=8;
-        font(10,'bold',blue);doc.text('AC Edunity · Año lectivo '+report.year.label,18,y);y+=8;
-        y+=write('Este reporte refleja la actividad académica registrada en AC Edunity durante el año lectivo seleccionado.',18,y,174,9)+5;
-        write('Fecha de generación: '+generated,18,y,174,8);
+        ensureSpace(40);doc.setDrawColor(...line);doc.setLineWidth(.3);doc.line(18,y,192,y);doc.setDrawColor(...blue);doc.setLineWidth(.6);doc.line(18,y,34,y);doc.setDrawColor(...accent);doc.line(34,y,42,y);y+=11;
+        font(13,'bold',ink);doc.text('FIN DEL REPORTE',18,y);y+=8;
+        font(10,'bold',blue);doc.text('AC Edunity · Año lectivo '+report.year.label,18,y);y+=7;
+        y+=write('Este documento resume la actividad académica registrada en AC Edunity durante el año lectivo seleccionado.',18,y,174,9)+5;
+        write('Generado el: '+generated+' · edunity.me',18,y,174,8);
         function drawPageHeader() {
             font(8.5,'bold');doc.text('AC EDUNITY',18,15);font(8.5,'normal',muted);doc.text(report.year.label,192,15,{align:'right'});
             doc.setDrawColor(...line);doc.setLineWidth(.2);doc.line(18,20,192,20);
@@ -338,10 +468,10 @@
             font(7.5,'normal',muted);doc.text('Página '+page+' de '+total,192,285,{align:'right'});
             doc.text('edunity.me',192,292,{align:'right'});
         }
-        const total=doc.getNumberOfPages();
-        for(let page=1;page<=total;page++){doc.setPage(page);if(page>1)drawPageHeader();drawPageFooter(page,total);}
+        const pageCount=doc.getNumberOfPages();
+        for(let page=1;page<=pageCount;page++){doc.setPage(page);if(page>1)drawPageHeader();drawPageFooter(page,pageCount);}
         return doc;
     }
-    root.ACAcademicReports = { normalize, filename, studentName, createDocument };
+    root.ACAcademicReports = { normalize, filename, studentName, createDocument, formatEvaluationStatus, presentSection };
     if (typeof module !== 'undefined' && module.exports) module.exports = root.ACAcademicReports;
 })(typeof globalThis !== 'undefined' ? globalThis : window);

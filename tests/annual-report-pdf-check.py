@@ -20,11 +20,19 @@ for cycle in ("2026-2027", "2027-2028"):
     assert "Generado por AC Edunity" in content
     assert "REPORTE ACADÉMICO" in reader.pages[0].extract_text()
     if cycle == "2026-2027":
-        assert "No se registraron datos en esta sección durante este año lectivo." in content
-    assert "RESUMEN DEL AÑO LECTIVO" in reader.pages[1].extract_text()
-    for section in ("Balance del año", "Balance académico", "Materias del año", "Tareas del año", "Evaluaciones", "Rendimiento académico",
-                    "Asistencia", "Metas", "Proyectos", "Etapas y subtareas", "Calendario y eventos", "Mochila y recursos", "Progreso del año", "FIN DEL REPORTE"):
+        assert "No se registraron metas durante este año lectivo." in content
+    assert "RESUMEN ACADÉMICO DEL AÑO" in reader.pages[1].extract_text()
+    assert "BALANCE DE ACTIVIDAD" in reader.pages[1].extract_text()
+    if cycle == "2027-2028":
+        for heading, detail in (("EVALUACIONES", "ACTUAL 2027 Evaluación"), ("CALENDARIO Y EVENTOS", "ACTUAL 2027 Evento"), ("RECURSOS DE ESTUDIO", "ACTUAL 2027 Recurso")):
+            page_text = next(page.extract_text() for page in reader.pages if heading in page.extract_text())
+            assert detail in " ".join(page_text.split()), f"Orphaned heading: {heading}"
+        assert "PROGRESO DEL ESTUDIANTE" in reader.pages[-1].extract_text(), "Avoid an almost empty closing-only page"
+    for section in ("MATERIAS DEL AÑO", "ACTIVIDAD DE TAREAS", "EVALUACIONES", "RENDIMIENTO ACADÉMICO",
+                    "ASISTENCIA", "METAS", "PROYECTOS", "DETALLE DE PROYECTOS", "CALENDARIO Y EVENTOS", "RECURSOS DE ESTUDIO", "PROGRESO DEL ESTUDIANTE", "FIN DEL REPORTE"):
         assert section in content, f"Missing section: {section}"
+    for technical in ("snapshot", "UUID", "registro fuente", "fila recuperable", "hijos conservados", "preparing", "pending_internal", "completed_internal", "Balance del año", "Conservada"):
+        assert technical not in content, f"Technical/redundant wording: {technical}"
     for i, page in enumerate(reader.pages, 1):
         assert abs(float(page.mediabox.width) - 595.28) < 1
         assert abs(float(page.mediabox.height) - 841.89) < 1
@@ -59,7 +67,7 @@ for n in range(1, 181):
 assert "12:00 PM" in reports["2027-2028"]
 assert "private.example" not in reports["2027-2028"]
 assert "ANTERIOR AL HISTORIAL" not in reports["2026-2027"], "A missing title must never be fabricated from activity"
-assert "Evidencia anterior sin snapshot" in reports["2026-2027"]
+assert "REGISTROS HISTÓRICOS ANTERIORES" in reports["2026-2027"]
 assert "8.10" in reports["2027-2028"]
 assert "100%" in reports["2027-2028"]
 assert "Eliminada posteriormente" in reports["2027-2028"]
