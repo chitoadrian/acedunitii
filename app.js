@@ -1664,6 +1664,12 @@ function polishSpanishText(value) {
 
 function appIconSvg(name) {
     const icons = {
+        checklist: '<svg viewBox="0 0 24 24"><path d="m3 6 1.5 1.5L7 4M3 13l1.5 1.5L7 11M3 20l1.5 1.5L7 18M11 6h10M11 13h10M11 20h10"></path></svg>',
+        evaluation: '<svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="3"></rect><rect x="9" y="2" width="6" height="4" rx="1"></rect><path d="m8.5 13 2.5 2.5 4.5-5"></path></svg>',
+        attendance: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M7 3v4M17 3v4M3 10h18m-13 5 3 3 5-5"></path></svg>',
+        target: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle></svg>',
+        layers: '<svg viewBox="0 0 24 24"><path d="m3 7 9-5 9 5-9 5-9-5Zm0 5 9 5 9-5M3 17l9 5 9-5"></path></svg>',
+        history: '<svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.5 7M3 4v7h7M12 7v5l3 2"></path></svg>',
         book: '<svg viewBox="0 0 24 24"><path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H20v17H8.5A3.5 3.5 0 0 0 5 22V5.5Z"></path><path d="M5 5.5A3.5 3.5 0 0 1 8.5 9H20"></path><path d="M9 5h6"></path></svg>',
         check: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"></rect><path d="m8 12 3 3 5-6"></path></svg>',
         calendar: '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"></rect><path d="M8 3v4"></path><path d="M16 3v4"></path><path d="M4 10h16"></path><path d="M8 14h3"></path><path d="M14 14h2"></path></svg>',
@@ -2476,7 +2482,7 @@ function renderWeeklyActivityState(rows, status = 'ready') {
         ${weeklyActivityGridHTML(safeRows)}
         ${hasActivity
             ? '<p class="chart-caption">Tus barras crecen con la actividad académica registrada.</p>'
-            : '<p class="weekly-activity-message">Todavía no tienes actividad registrada.</p>'}
+            : emptyStateHTML({ icon: 'history', title: 'Tu actividad comienza aquí', description: 'Tus avances aparecerán cuando registres actividad académica.', variant: 'compact' })}
     `;
 }
 
@@ -3304,7 +3310,7 @@ function renderAttendance(workspace) {
                                 </div>
                             </article>
                         `;
-                    }).join('') : '<div class="dashboard-empty-note"><strong>No hay registros en este filtro.</strong><span>Cambia el filtro o registra una nueva clase.</span></div>'}
+                    }).join('') : emptyStateHTML({ title: 'No hay registros en este filtro', description: 'Prueba con otro estado de asistencia.', icon: false, variant: 'compact', kind: 'filtered', primaryAction: { label: 'Mostrar todos', action: "filterAttendance('all')" } })}
                 </div>
             </section>
 
@@ -4031,7 +4037,7 @@ function renderTasks(workspace) {
                         </div>
                     </article>
                 `;
-            }).join('') : '<div class="dashboard-empty-note task-empty-filter"><strong>No hay tareas en este filtro.</strong><span>Cambia de filtro o crea una nueva tarea.</span></div>'}
+            }).join('') : emptyStateHTML({ title: 'No hay tareas en este filtro', description: 'Prueba con otro estado para encontrar tus tareas.', icon: false, variant: 'compact', kind: 'filtered', primaryAction: { label: 'Mostrar todas', action: "filterTasks('all')" } })}
         </div>
     `;
 
@@ -7600,11 +7606,7 @@ function renderDashboard(workspace) {
                 </div>
                 <button class="btn-secondary btn-small dashboard-next-evaluation-action" type="button" onclick="viewEvaluationFromDashboard('${escapeHTML(nextEvaluation.id)}')">Ver evaluación <span aria-hidden="true">→</span></button>
             ` : `
-                <div class="dashboard-next-evaluation-copy">
-                    <h3>No tienes evaluaciones próximas.</h3>
-                    <p>Crea una evaluación cuando quieras comenzar a planificar.</p>
-                </div>
-                <button class="btn-secondary btn-small dashboard-next-evaluation-action" type="button" onclick="navigateTo('evaluations')">Crear evaluación <span aria-hidden="true">→</span></button>
+                ${emptyStateHTML({ icon: false, title: 'No tienes evaluaciones próximas', description: 'Planifica tu próxima evaluación para preparar tus estudios con tiempo.', variant: 'compact', primaryAction: { label: 'Crear evaluación', action: "navigateTo('evaluations')" } })}
             `}
         </article>
 
@@ -7656,10 +7658,7 @@ function renderDashboard(workspace) {
                             `).join('')}
                         </ul>
                     ` : `
-                        <div class="dashboard-empty-note">
-                            <strong>No tienes pendientes hoy.</strong>
-                            <span>Buen momento para adelantar una materia o preguntarle algo a Tutor.</span>
-                        </div>
+                        ${emptyStateHTML({ icon: 'calendar', title: 'Tu día está libre', description: 'Aquí verás tus tareas y próximos eventos académicos.', variant: 'embedded' })}
                     `}
             </div>
 
@@ -7717,13 +7716,42 @@ function dashboardCard(icon, label, value, subtext, progress) {
 }
 
 function emptyStateHTML(message, buttonText, action) {
-    return `
-        <div class="empty-state">
-            <div class="empty-icon" aria-hidden="true"></div>
-            <h3>${escapeHTML(message)}</h3>
-            <button class="btn-primary btn-small" onclick="${action}">${escapeHTML(buttonText)}</button>
-        </div>
-    `;
+    // Keep legacy callers compatible; all student empty views share this markup.
+    const modules = {
+        'addSubjectUI()': ['book', 'Aún no tienes materias', 'Crea tu primera materia para comenzar a organizar este año lectivo.', 'Crear materia'],
+        'addTaskUI()': ['checklist', 'Aún no tienes tareas', 'Agrega tu primera tarea y mantén tus pendientes organizados.', 'Crear tarea'],
+        'addCalendarEventUI()': ['calendar', 'Tu agenda está vacía', 'Programa tu próximo evento académico.', 'Agendar evento'],
+        'openEvaluationForm()': ['evaluation', 'Aún no tienes evaluaciones', 'Registra tu próxima evaluación para preparar tus estudios con tiempo.', 'Nueva evaluación'],
+        'showAddGradeForm()': ['chart', 'Aún no tienes calificaciones', 'Registra tu primera calificación para comenzar a visualizar tu rendimiento.', 'Agregar calificación'],
+        'addAttendanceUI()': ['attendance', 'Aún no tienes registros de asistencia', 'Registra tu primera clase para comenzar a llevar el control de tu asistencia.', 'Registrar asistencia'],
+        'addResourceUI()': ['file', 'Tu mochila está vacía', 'Guarda tu primer recurso de estudio y ten tus materiales siempre a mano.', 'Subir PDF']
+    };
+    const legacy = typeof message !== 'object' || message === null;
+    const preset = modules[action];
+    const options = legacy ? {
+        icon: preset?.[0] || false,
+        title: preset?.[1] || message,
+        description: preset?.[2] || '',
+        primaryAction: { label: preset?.[3] || buttonText, action },
+        variant: action === 'addCalendarEventUI()' ? 'embedded' : preset ? 'default' : 'compact',
+        kind: preset ? 'initial' : 'filtered'
+    } : message;
+    const variant = ['compact', 'embedded'].includes(options.variant) ? ` empty-state--${options.variant}` : '';
+    const kind = options.kind === 'filtered' ? 'filtered' : options.kind === 'initial' ? 'initial' : 'contextual';
+    const renderAction = (item, secondary = false) => {
+        if (!item?.label) return '';
+        // Only trusted render code supplies handlers or the existing delegated filter action.
+        const handler = item.action ? ` onclick="${escapeHTML(item.action)}"` : '';
+        const filter = item.clearEvaluations ? ' data-clear-evaluation-filters' : '';
+        return `<button type="button" class="empty-state__button${secondary ? ' empty-state__button--secondary' : ''}"${handler}${filter}>${escapeHTML(item.label)}</button>`;
+    };
+    const actions = renderAction(options.primaryAction) + renderAction(options.secondaryAction, true);
+    return `<div class="empty-state student-empty-state${variant}" data-empty-kind="${kind}">
+        ${options.icon === false ? '' : appIconHTML(options.icon || 'folder', 'empty-state__icon')}
+        <h3 class="empty-state__title">${escapeHTML(options.title || '')}</h3>
+        ${options.description ? `<p class="empty-state__description">${escapeHTML(options.description)}</p>` : ''}
+        ${actions ? `<div class="empty-state__actions">${actions}</div>` : ''}
+    </div>`;
 }
 
 function normalizeSubjectIcon(icon) {
@@ -8108,12 +8136,7 @@ function renderProgress(workspace) {
             </div>
         </section>
 
-        ${xp ? '' : `
-            <div class="progress-empty-callout premium-border">
-                <strong>Completa actividades para desbloquear logros.</strong>
-                <span>Crea materias, termina tareas, sube apuntes, usa Tutor y registra asistencia.</span>
-            </div>
-        `}
+        ${xp ? '' : emptyStateHTML({ icon: 'trend', title: 'Tu progreso empieza aquí', description: 'Completa actividades para avanzar de nivel y desbloquear logros.', variant: 'embedded' })}
 
         <section class="achievements-section progress-achievements premium-border">
             <div class="progress-section-title">
@@ -8458,7 +8481,7 @@ function renderBackpack(workspace) {
                 </div>
             </article>
         `;
-    }).join('') : emptyStateHTML('No encontramos recursos con esos filtros.', 'Limpiar búsqueda', 'resetBackpackFilters()')) : emptyStateHTML('No tienes apuntes todavía 🎒', 'Subir primer PDF', 'addResourceUI()');
+    }).join('') : emptyStateHTML('No encontramos recursos con esos filtros.', 'Limpiar búsqueda', 'resetBackpackFilters()')) : emptyStateHTML({ icon: 'file', title: 'Tu mochila está vacía', description: 'Guarda tu primer recurso de estudio y ten tus materiales siempre a mano.', kind: 'initial', primaryAction: { label: 'Subir PDF', action: 'addResourceUI()' } });
 
     container.querySelectorAll('[data-resource-view]').forEach(button => button.addEventListener('click', () => viewResource(button.dataset.resourceView)));
     container.querySelectorAll('[data-resource-ai]').forEach(button => button.addEventListener('click', () => askAIAboutResource(button.dataset.resourceAi)));
@@ -8775,10 +8798,7 @@ function renderProfile(workspace) {
                     ${recentItems.map(item => `<li><span>${escapeHTML(item.time)}</span><strong>${escapeHTML(item.text)}</strong></li>`).join('')}
                 </ul>
             ` : `
-                <div class="profile-empty-note">
-                    <strong>Tu actividad aparecerá aquí cuando empieces.</strong>
-                    <span>Crea materias, completa tareas, usa Tutor o sube PDFs.</span>
-                </div>
+                ${emptyStateHTML({ icon: 'history', title: 'Aún no hay actividad reciente', description: 'Aquí verás un resumen de tus avances académicos.', variant: 'embedded' })}
             `}
         </section>
     `;
@@ -9307,7 +9327,7 @@ function renderEvaluations(workspace) {
                     <div class="evaluation-card-meta"><span>${evaluation.topics.length} ${evaluation.topics.length === 1 ? 'tema' : 'temas'}</span><span class="evaluation-status status-${evaluation.status}">${escapeHTML(getEvaluationStatusLabel(evaluation.status))}</span><span class="evaluation-priority priority-${evaluation.priority}">${escapeHTML(getEvaluationPriorityLabel(evaluation.priority))}</span></div>
                     ${isFuture ? `<button class="evaluation-tutor-button" type="button" data-evaluation-tutor="${escapeHTML(evaluation.id)}">Preparar con Tutor IA</button>` : ''}
                 </article>`;
-            }).join('') : `<div class="evaluations-empty filtered"><h3>No hay evaluaciones con estos filtros.</h3><button class="btn-secondary btn-small" type="button" data-clear-evaluation-filters>Mostrar todas</button></div>`) : `<div class="evaluations-empty"><span class="evaluations-empty-icon" aria-hidden="true">✓</span><h3>Aún no tienes evaluaciones registradas.</h3><p>Agrega tu próxima evaluación para organizar tu preparación.</p><button class="btn-primary btn-small" type="button" onclick="openEvaluationForm()">+ Nueva evaluación</button></div>`}
+            }).join('') : emptyStateHTML({ title: 'No hay evaluaciones con estos filtros', icon: false, variant: 'compact', kind: 'filtered', primaryAction: { label: 'Mostrar todas', clearEvaluations: true } })) : emptyStateHTML('Aún no tienes evaluaciones', 'Nueva evaluación', 'openEvaluationForm()')}
         </div>`;
     container.querySelectorAll('[data-evaluation-status]').forEach(button => button.addEventListener('click', () => {
         evaluationStatusFilter = button.dataset.evaluationStatus;
