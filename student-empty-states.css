@@ -216,3 +216,11 @@ body #app-page#app-page .dashboard-next-evaluation.is-empty .empty-state__action
 @media (prefers-reduced-motion: reduce) {
     #app-page .student-empty-state, #app-page .student-empty-state * { animation: none !important; transition: none !important; }
 }
+
+/* Light sidebar: retain crisp glyphs on the existing colored tiles, without a halo. */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page .sidebar .sidebar-icon {
+    color: #fff !important;
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page .sidebar .theme-toggle {
+    box-shadow: none !important;
+}
