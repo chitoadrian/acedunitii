@@ -41870,3 +41870,70 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) .academic-notification-
         transition: none !important;
     }
 }
+
+/* Public landing: unified section pills and refined Functions card finishes. */
+#landing-page {
+    --landing-detail-surface: #1b2940;
+    --landing-detail-border: #34445f;
+    --landing-detail-text: #c2cfee;
+    --landing-detail-accent: #92a9df;
+    --landing-detail-card: #172130;
+    --landing-detail-card-border: #2c3a50;
+    --landing-detail-hover-border: #465b7c;
+    --landing-detail-shadow: 0 8px 24px rgba(3, 11, 23, .13);
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page {
+    --landing-detail-surface: #eff3fa;
+    --landing-detail-border: #cdd8e9;
+    --landing-detail-text: #355384;
+    --landing-detail-accent: #4c68a1;
+    --landing-detail-card: #fff;
+    --landing-detail-card-border: #d9e1ed;
+    --landing-detail-hover-border: #b4c4db;
+    --landing-detail-shadow: 0 6px 20px rgba(30, 53, 85, .05);
+}
+body #landing-page.page :is(.hero-badge, .section-eyebrow) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 7px 12px !important;
+    border-color: var(--landing-detail-border) !important;
+    border-radius: 999px;
+    background: var(--landing-detail-surface) !important;
+    color: var(--landing-detail-text) !important;
+    font-size: 12px !important;
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: .045em;
+    box-shadow: none !important;
+    text-shadow: none;
+}
+#landing-page #features .benefit-card {
+    background: var(--landing-detail-card) !important;
+    border-color: var(--landing-detail-card-border) !important;
+    box-shadow: var(--landing-detail-shadow) !important;
+}
+#landing-page #features .benefit-card:hover {
+    border-color: var(--landing-detail-hover-border) !important;
+}
+#landing-page #features .benefit-card::before,
+#landing-page #features .benefit-card::after {
+    content: none !important;
+}
+#landing-page #features .benefit-icon {
+    background: var(--landing-detail-surface) !important;
+    border-color: var(--landing-detail-border) !important;
+    color: var(--landing-detail-accent) !important;
+    box-shadow: none !important;
+}
+#landing-page #features .benefit-icon svg {
+    stroke: currentColor !important;
+}
+#landing-page #features .feature-list {
+    border-color: var(--landing-detail-card-border) !important;
+}
+#landing-page #features .feature-list li::before {
+    background: var(--landing-detail-accent) !important;
+    box-shadow: none !important;
+}
