@@ -101,3 +101,26 @@ test('Welcome is server-driven, acknowledged once, retryable and isolated from s
     await manager.start(f.client,f.owner);assert.equal(manager.state.welcome,null,'new device/session trusts saved server state');
     seen=false;await manager.start(f.client,f.owner);const late=manager.acknowledgeWelcome();manager.reset();resolveAck();assert.equal(await late,false);assert.equal(manager.state.welcome,null);
 });
+
+test('Actual task form explains read-only history before any authentication or save request', async () => {
+    const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
+    const source = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8');
+    const start = source.lastIndexOf('function openTaskForm('), end = source.indexOf('async function deleteTask(', start);
+    let form, authRequests = 0;
+    const notices = [], context = {
+        academicYearManager: { state: { historical: true } }, currentUser: { id: 'fixture-user' },
+        loadWorkspace: () => ({ tasks: [{ id: 'historical-task', title: 'Existing task' }] }), getSubjectOptions: () => ['General'],
+        normalizeDate: value => value || '', taskPriorityOptions: [],
+        openQuickForm: config => { form = config; }, notify: (...args) => notices.push(args),
+        getCurrentSupabaseUser: async () => { authRequests++; throw new Error('must not query'); },
+        logTaskPersistenceError: () => {}
+    };
+    assert.ok(start >= 0 && end > start);
+    const open = vm.runInNewContext('(' + source.slice(start, end) + ')', context);
+    for (const id of [null, 'historical-task']) {
+        open(id);
+        assert.equal(await form.onSubmit({ title: 'Historical task' }), false);
+    }
+    assert.deepEqual(notices, Array.from({ length: 2 }, () => ['Año histórico: solo puedes consultar sus datos.', 'error']));
+    assert.equal(authRequests, 0);
+});

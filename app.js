@@ -12083,6 +12083,10 @@ function openTaskForm(taskId = null) {
             let activityType = null;
 
             try {
+                if (academicYearManager.state.historical) {
+                    notify('Año histórico: solo puedes consultar sus datos.', 'error');
+                    return false;
+                }
                 const authUser = await getCurrentSupabaseUser();
                 if (!authUser?.id || !currentUser?.id || authUser.id !== currentUser.id) {
                     notify('La sesión cambió. Abre nuevamente el formulario.', 'error');
