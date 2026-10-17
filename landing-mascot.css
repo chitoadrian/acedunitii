@@ -1,0 +1,179 @@
+/* Original Edunity mascot. All motion stays inside the existing drag/click target. */
+#landing-page .landing-mascot-slot { display: contents; }
+#landing-page #study-pet {
+    --mascot-surface: #172338;
+    --mascot-border: #3b4d6b;
+    --mascot-text: #e6edf8;
+    --mascot-accent: #b7a8ec;
+    grid-template-columns: minmax(0, 212px) 112px !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: max-content;
+    height: max-content;
+    max-width: calc(100vw - 32px);
+    transform: none !important;
+    animation: none !important;
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page #study-pet {
+    --mascot-surface: #ffffff;
+    --mascot-border: #d4ddec;
+    --mascot-text: #36445e;
+    --mascot-accent: #6956b2;
+}
+#landing-page #study-pet .pet-robot {
+    width: 112px;
+    height: 129px;
+    transform: none;
+    animation: none !important;
+    transition: transform 150ms ease;
+}
+#landing-page #study-pet .edunity-bot {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+#landing-page #study-pet .pet-bubble {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 12px 14px !important;
+    border-color: var(--mascot-border) !important;
+    border-radius: 16px !important;
+    background: var(--mascot-surface) !important;
+    color: var(--mascot-text) !important;
+    box-shadow: 0 6px 18px rgba(9, 20, 39, .12) !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    font-size: 12px !important;
+    font-weight: 500;
+    line-height: 1.4;
+}
+#landing-page #study-pet .pet-bubble strong {
+    color: var(--mascot-accent) !important;
+    font-weight: 700;
+}
+#landing-page #study-pet .pet-bubble::before,
+#landing-page #study-pet .pet-bubble::after {
+    bottom: auto !important;
+    background: var(--mascot-surface) !important;
+    border-color: var(--mascot-border) !important;
+    box-shadow: none !important;
+}
+#landing-page #study-pet .pet-bubble::before { top: calc(50% + 1px); }
+#landing-page #study-pet .pet-bubble::after { top: calc(50% + 8px); }
+#landing-page #study-pet:focus-visible {
+    outline: 2px solid #809bd7;
+    outline-offset: 6px;
+    border-radius: 18px;
+}
+#landing-page #study-pet:active .pet-robot { transform: scale(.96); }
+#landing-page #study-pet .edunity-bot-float {
+    animation: edunity-bot-float 4.8s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-breathe {
+    transform-origin: 80px 148px;
+    animation: edunity-bot-breathe 4.8s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-head {
+    transform-origin: 80px 102px;
+    animation: edunity-bot-tilt 9s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-eyes {
+    transform-origin: 80px 66.5px;
+    animation: edunity-bot-blink 7.4s linear infinite;
+}
+#landing-page #study-pet .edunity-bot-gaze {
+    animation: edunity-bot-glance 11s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-antenna {
+    transform-origin: 80px 33px;
+    animation: edunity-bot-antenna 6.5s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-signal {
+    animation: edunity-bot-signal 3.6s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-wave {
+    transform-origin: 111px 120px;
+    animation: edunity-bot-wave-idle 8s ease-in-out infinite;
+}
+#landing-page #study-pet:is(:hover, :focus-visible) .edunity-bot-wave {
+    animation: edunity-bot-wave-greet 1.4s ease-in-out infinite;
+}
+#landing-page #study-pet .edunity-bot-shadow {
+    fill: rgba(68, 88, 132, .18);
+    transform-origin: 80px 174px;
+    animation: edunity-bot-shadow 4.8s ease-in-out infinite;
+}
+@keyframes edunity-bot-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+@keyframes edunity-bot-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.008, 1.018); }
+}
+@keyframes edunity-bot-tilt {
+    0%, 40%, 100% { transform: rotate(0); }
+    63%, 72% { transform: rotate(-2deg); }
+}
+@keyframes edunity-bot-blink {
+    0%, 43%, 46%, 82%, 85%, 100% { transform: scaleY(1); }
+    44.5%, 83.5% { transform: scaleY(.1); }
+}
+@keyframes edunity-bot-glance {
+    0%, 35%, 76%, 100% { transform: translateX(0); }
+    43%, 61% { transform: translateX(-1.2px); }
+}
+@keyframes edunity-bot-antenna {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+@keyframes edunity-bot-signal {
+    0%, 100% { opacity: .55; }
+    50% { opacity: 1; }
+}
+@keyframes edunity-bot-wave-idle {
+    0%, 60%, 100% { transform: rotate(-4deg); }
+    68%, 82% { transform: rotate(-10deg); }
+    75% { transform: rotate(1deg); }
+}
+@keyframes edunity-bot-wave-greet {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(-24deg); }
+}
+@keyframes edunity-bot-shadow {
+    0%, 100% { transform: scaleX(1); opacity: .8; }
+    50% { transform: scaleX(.84); opacity: .5; }
+}
+@media (max-width: 767px) {
+    #landing-page .landing-mascot-slot {
+        position: relative;
+        display: block;
+        min-height: 108px;
+    }
+    #landing-page #study-pet {
+        position: absolute !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        grid-template-columns: minmax(0, 138px) 76px !important;
+        gap: 12px !important;
+    }
+    /* Existing pointer dragging writes viewport coordinates; keep that contract. */
+    #landing-page #study-pet[style] { position: fixed !important; }
+    #landing-page #study-pet .pet-robot { width: 76px; height: 88px; }
+    #landing-page #study-pet .pet-bubble {
+        padding: 9px 11px !important;
+        font-size: 11px !important;
+        border-radius: 13px !important;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    #landing-page #study-pet,
+    #landing-page #study-pet * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

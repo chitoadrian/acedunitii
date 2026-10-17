@@ -96,6 +96,7 @@
     <link rel="stylesheet" href="auth-ui.css?v=20261013-auth-compact-clean-v4">
     <link rel="stylesheet" href="academic-years.css?v=20261017-academic-year-rollover-welcome-v1">
     <link rel="stylesheet" href="student-empty-states.css?v=20261017-sidebar-light-shadow-fix-v1">
+    <link rel="stylesheet" href="landing-mascot.css?v=20261017-original-mascot-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <script id="theme-preload">
@@ -142,29 +143,6 @@
             </div>
         </nav>
 
-        <div class="study-pet" id="study-pet" role="button" tabindex="0" aria-label="Regístrate e inicia tu estudio">
-            <div class="pet-bubble"><strong>Regístrate</strong> e inicia tu estudio</div>
-            <div class="pet-robot" aria-hidden="true">
-                <span class="robot-antenna"></span>
-                <span class="robot-head">
-                    <span class="robot-visor">
-                        <span class="robot-happy-eye robot-happy-eye-left"></span>
-                        <span class="robot-happy-eye robot-happy-eye-right"></span>
-                        <span class="robot-happy-smile"></span>
-                    </span>
-                </span>
-                <span class="robot-body">
-                    <span class="robot-core"></span>
-                    <span class="robot-chest-mark">AC</span>
-                    <span class="robot-arm robot-arm-left"><span class="robot-hand"></span></span>
-                    <span class="robot-arm robot-arm-right"><span class="robot-hand"></span></span>
-                    <span class="robot-leg robot-leg-left"></span>
-                    <span class="robot-leg robot-leg-right"></span>
-                </span>
-                <span class="robot-shadow"></span>
-            </div>
-        </div>
-
         <section class="hero">
             <div class="hero-content">
                 <div class="hero-left reveal-left">
@@ -178,6 +156,69 @@
                         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4zM8 4h8v3M8 11h8M8 15h5"></path></svg><small><strong>Todo</strong> tu espacio académico</small></span>
                         <span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="3"></rect><path d="M9 2v3M15 2v3M9 11h.01M15 11h.01M9 15h6"></path></svg><small><strong>Tutor</strong> para estudiar mejor</small></span>
                         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M7 16v-4M12 16V8M17 16V5M14 7l3-3 3 3"></path></svg><small><strong>XP</strong> y progreso visual</small></span>
+                    </div>
+                </div>
+                <div class="landing-mascot-slot">
+                    <div class="study-pet" id="study-pet" role="button" tabindex="0" aria-label="Regístrate e inicia tu estudio">
+                        <div class="pet-bubble"><strong>Regístrate</strong> e inicia tu estudio</div>
+                        <div class="pet-robot" aria-hidden="true">
+                            <svg class="edunity-bot" viewBox="0 0 160 184" xmlns="http://www.w3.org/2000/svg" focusable="false">
+                                <defs>
+                                    <linearGradient id="edunity-bot-shell" x1="0" y1="0" x2=".8" y2="1">
+                                        <stop stop-color="#ffffff"/><stop offset=".56" stop-color="#f0f4fc"/><stop offset="1" stop-color="#d5deef"/>
+                                    </linearGradient>
+                                    <linearGradient id="edunity-bot-glass" x1="0" y1="0" x2=".7" y2="1">
+                                        <stop stop-color="#243a59"/><stop offset=".55" stop-color="#142238"/><stop offset="1" stop-color="#101b30"/>
+                                    </linearGradient>
+                                    <linearGradient id="edunity-bot-accent" x1="0" y1="0" x2="1" y2="1">
+                                        <stop stop-color="#9a9be4"/><stop offset="1" stop-color="#4e7abe"/>
+                                    </linearGradient>
+                                    <linearGradient id="edunity-bot-light" x1="0" y1="0" x2="0" y2="1">
+                                        <stop stop-color="#c5eeff"/><stop offset="1" stop-color="#7fc2ef"/>
+                                    </linearGradient>
+                                </defs>
+                                <ellipse class="edunity-bot-shadow" cx="80" cy="174" rx="30" ry="4"/>
+                                <g class="edunity-bot-float">
+                                    <g class="edunity-bot-breathe">
+                                        <rect x="58" y="150" width="17" height="15" rx="7" fill="#7e90b8"/>
+                                        <rect x="85" y="150" width="17" height="15" rx="7" fill="#7e90b8"/>
+                                        <path d="M47 117C35 119 31 130 37 139" fill="none" stroke="#dbe5f4" stroke-width="13" stroke-linecap="round"/>
+                                        <path d="m36 138 3 4" fill="none" stroke="#7b89c4" stroke-width="12" stroke-linecap="round"/>
+                                        <path d="M47 125c0-12 9-20 21-20h24c12 0 21 8 21 20v9c0 17-13 24-33 24s-33-7-33-24Z" fill="url(#edunity-bot-shell)" stroke="#c5d1e5" stroke-width="1.2"/>
+                                        <path d="M54 121v14" fill="none" stroke="url(#edunity-bot-accent)" stroke-width="4" stroke-linecap="round"/>
+                                        <rect x="64" y="119" width="34" height="25" rx="9" fill="#e8edf9" stroke="#d0daf0"/>
+                                        <text x="81" y="137" text-anchor="middle" fill="#415b97" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="750" letter-spacing="-.8">AC</text>
+                                        <path d="M73 150h14" stroke="#98aed2" stroke-width="2" stroke-linecap="round"/>
+                                    </g>
+                                    <g class="edunity-bot-head">
+                                        <g class="edunity-bot-antenna">
+                                            <path d="M80 33V20" stroke="#96a9ce" stroke-width="4" stroke-linecap="round"/>
+                                            <circle cx="80" cy="15" r="6" fill="url(#edunity-bot-accent)" stroke="#d9e3f6" stroke-width="2"/>
+                                            <circle class="edunity-bot-signal" cx="80" cy="15" r="2.5" fill="#e2f1ff"/>
+                                        </g>
+                                        <rect x="12" y="57" width="14" height="26" rx="7" fill="url(#edunity-bot-accent)"/>
+                                        <rect x="134" y="57" width="14" height="26" rx="7" fill="url(#edunity-bot-accent)"/>
+                                        <rect x="20" y="33" width="120" height="76" rx="30" fill="url(#edunity-bot-shell)" stroke="#c5d1e5" stroke-width="1.2"/>
+                                        <rect x="30" y="46" width="100" height="49" rx="20" fill="url(#edunity-bot-glass)" stroke="#304764" stroke-width="1.2"/>
+                                        <path d="M44 52c17-5 48-5 68 0" fill="none" stroke="#d3e5ff" stroke-opacity=".12" stroke-width="2" stroke-linecap="round"/>
+                                        <g class="edunity-bot-gaze">
+                                            <g class="edunity-bot-eyes" fill="url(#edunity-bot-light)">
+                                                <rect x="53" y="59" width="10" height="15" rx="5"/>
+                                                <rect x="97" y="59" width="10" height="15" rx="5"/>
+                                            </g>
+                                            <path d="M72 82q8 7 16 0" fill="none" stroke="#a8d9f8" stroke-width="2.5" stroke-linecap="round"/>
+                                        </g>
+                                        <path d="M60 102h40" fill="none" stroke="#ffffff" stroke-opacity=".65" stroke-width="1.4" stroke-linecap="round"/>
+                                    </g>
+                                    <g class="edunity-bot-wave">
+                                        <path d="M111 120c25 7 37-11 37-28" fill="none" stroke="#dbe5f4" stroke-width="13" stroke-linecap="round"/>
+                                        <path d="M148 95v-6" fill="none" stroke="#7b89c4" stroke-width="13" stroke-linecap="round"/>
+                                        <rect x="139" y="67" width="18" height="23" rx="8" fill="url(#edunity-bot-shell)" stroke="#b9c8e0"/>
+                                        <path d="M145 72v7m6-7v7" fill="none" stroke="#8496bb" stroke-width="1.2" stroke-linecap="round"/>
+                                    </g>
+                                </g>
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 <div class="hero-right hero-visual reveal-right delay-1">
