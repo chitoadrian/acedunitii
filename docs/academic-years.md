@@ -50,7 +50,7 @@ RLS de años y selección usa `(select auth.uid()) = user_id`. Las FKs compuesta
 
 El ciclo cambia el **1 de abril a las 00:00 de America/Guayaquil**. Enero, febrero y marzo siguen en el iniciado el abril anterior. El fin académico es el último día de febrero, incluidos años bisiestos. Marzo no crea un ciclo nuevo. El RPC idempotente inicializa el año al entrar y supera una selección antigua cuando detecta un ciclo nuevo; después respeta la selección manual de historial. En una sesión abierta se comprueba al llegar la medianoche local y al volver a la pestaña; una operación/formulario activo pospone de forma segura el cambio.
 
-Los años anteriores conservan sus acciones de edición. No se crean ciclos anteriores a 2026 ni futuros desde el cliente.
+Los años anteriores son de **solo lectura** desde `20261015141942_annual_academic_reports.sql`: se permite consultar y generar PDF, pero el helper y los triggers rechazan crear, editar o eliminar contenido académico histórico. No se crean ciclos anteriores a 2026 ni futuros desde el cliente.
 
 ## Pruebas
 
@@ -93,3 +93,21 @@ Servir el repositorio localmente y definir TEST_BASE_URL, TEST_BROWSER y opciona
 ## Caché
 
 Todos los scripts modificados y los nuevos recursos usan `20261015-academic-years-v1`. style.css, auth-ui.css, settings.css y time-utils.js conservaron sus versiones porque no cambiaron.
+
+## Experiencia de rollover y bienvenida — octubre de 2026
+
+- El selector visible es un botón con un listbox personalizado. El select anterior queda oculto como compatibilidad, no como popup nativo. Solo muestra los años reales devueltos por el servidor, de reciente a antiguo, con «Año actual»/«Histórico» dentro del menú; el botón cerrado solo muestra el rango.
+- Se reutilizan `getCurrentAcademicYear`, `ensure_academic_year_for_user`, `academicYearManager.select` y el planificador diario existente. No hay polling nuevo. Se evita ejecutar dos rollovers simultáneos. El servidor mantiene la secuencia oficial y el UNIQUE por usuario/inicio; no se inventan ciclos en la interfaz.
+- La migración aditiva `20261017010120_academic_year_rollover_welcome.sql` añade `last_academic_year_welcome_seen` a **user_academic_year_preferences**, no a las preferencias globales de experiencia. Su DEFAULT usa el ciclo actual del servidor para cuentas existentes y nuevas: desplegar a mitad de ciclo o registrarse por primera vez no genera una falsa bienvenida.
+- Al comenzar oficialmente otro ciclo, el RPC existente devuelve `welcome_year_id` si la cuenta tiene un ciclo anterior real y todavía no confirmó el nuevo. No copia datos, XP ni racha. Solo se muestra el diálogo después de cargar el workspace autenticado.
+- «Comenzar nuevo año» confirma mediante el nuevo RPC `acknowledge_academic_year_welcome(uuid)`, selecciona el año actual si hace falta y abre Dashboard. Si falla la red, el diálogo permite reintentar sin perder la bienvenida. La confirmación es idempotente, por cuenta, y se conserva al entrar desde otro dispositivo.
+- Ambos RPC son SECURITY INVOKER, requieren autenticación y respetan RLS existente. La nueva confirmación solo acepta el ciclo actual de la cuenta autenticada. No se modifican políticas, triggers, historial académico ni funciones del PDF.
+- El dropdown soporta Enter/Espacio, flechas, Inicio/Fin, Escape y clic exterior; el diálogo mantiene el foco de teclado. Ambos tienen estilos oscuro/claro y ajuste dentro del viewport desde 360 px.
+
+Pruebas nuevas: `node tests/academic-year-welcome.test.cjs` (PostgreSQL local desechable) y los casos de bienvenida en `tests/academic-years.test.cjs`. Cubren el límite 31 marzo/1 abril en Ecuador, despliegue/registro sin falsa bienvenida, nuevo workspace vacío, XP cero, idempotencia, dos cuentas, nueva sesión/dispositivo, rechazo de histórico/futuro/ajeno y menús con 1/2/4 ciclos.
+
+El E2E `tests/academic-years-browser.cjs` usa formularios reales y la base local: rollover, bienvenida, navegación histórica, recarga, reporte PDF actual/histórico y las 13 secciones en 1920×1080, 1440×900, 1366×768, 1024×768, 768×1024, 430×932, 390×844 y 360×800, oscuro/claro. Las fechas futuras solo se simulan en ese entorno desechable, nunca en Supabase real.
+
+Esta entrega actualiza únicamente las versiones de `academic-years.js`, `app.js` y `academic-years.css` a **20261017-academic-year-rollover-welcome-v1**. La versión y el diseño del generador PDF permanecen intactos.
+
+Migración aplicada en Supabase como `20261017010120`. Se compararon conteos y huellas MD5 de las filas en 26 tablas antes/después, excluyendo únicamente la nueva columna: **26/26 idénticas**. Las 9 preferencias existentes quedaron inicializadas al ciclo 2026; no se crearon ciclos ni datos académicos en producción. Ambos RPC conservan SECURITY INVOKER, search_path vacío, ejecución para authenticated y sin ejecución para anon. Los advisors no añadieron incidencias nuevas; continúan las advertencias previas indicadas arriba.

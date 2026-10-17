@@ -9425,8 +9425,10 @@ let accountSwitchInProgress = false;
 let dashboardAuthorizedUserId = '';
 let authOperationGeneration = 0;
 let academicReportGenerating = false;
+let academicYearSelector = null;
 const academicYearManager = ACAcademicYears.createManager({ onChange: renderAcademicYearSelector });
 let academicYearRolloverTimer = null;
+let academicYearRolloverInProgress = false;
 
 function academicTable(name) {
     return academicYearManager.table(name, getSupabaseClient());
@@ -9445,13 +9447,47 @@ function renderAcademicYearSelector() {
     }
     select.value = state.selectedId;
     document.getElementById('academic-year-label').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Año lectivo';
+    document.getElementById('academic-year-trigger').setAttribute('aria-label', 'Seleccionar año lectivo, ' + document.getElementById('academic-year-label').textContent);
     select.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
+    academicYearSelector ||= ACAcademicYears.createSelector(document.getElementById('academic-year-picker'), id => selectAcademicYear(id));
+    academicYearSelector.update(state, select.disabled || Boolean(state.welcome) || state.welcomeSaving);
+    const welcomeModal = document.getElementById('academic-year-welcome');
+    if (!state.welcome) welcomeModal.hidden = true;
+    const welcomeButton = document.getElementById('academic-year-welcome-start');
+    welcomeButton.disabled = state.welcomeSaving || state.switching || state.pending > 0;
+    welcomeButton.textContent = state.welcomeSaving ? 'Guardando…' : 'Comenzar nuevo año';
     document.getElementById('academic-report-year').textContent = state.years.find(year => year.id === state.selectedId)?.label || 'Sin año seleccionado';
     const reportButton = document.getElementById('academic-year-report');
     reportButton.disabled = !state.selectedId || state.switching || state.pending > 0 || academicReportGenerating;
     reportButton.setAttribute('aria-busy', String(academicReportGenerating));
     reportButton.querySelector('span').textContent = academicReportGenerating ? 'Generando reporte…' : 'Generar reporte';
     document.getElementById('academic-year-status').textContent = state.switching ? 'Cargando año lectivo…' : '';
+}
+
+function maybeShowAcademicYearWelcome() {
+    const state = academicYearManager.state, modal = document.getElementById('academic-year-welcome');
+    if (!state.welcome || !modal || state.ownerId !== currentUser?.id || dashboardAuthorizedUserId !== state.ownerId || !document.getElementById('app-page')?.classList.contains('active')) return;
+    document.getElementById('academic-year-welcome-title').textContent = '¡Bienvenido a ' + state.welcome.label + '!';
+    document.getElementById('academic-year-welcome-history').textContent = 'Tu información de ' + state.welcome.previousLabel + ' sigue guardada.';
+    document.getElementById('academic-year-welcome-error').hidden = true;
+    modal.hidden = false;
+    document.getElementById('academic-year-welcome-start').focus();
+}
+
+async function completeAcademicYearWelcome() {
+    const owner = currentUser?.id;
+    if (!academicYearManager.state.welcome || academicYearManager.state.welcomeSaving) return;
+    const errorMessage = document.getElementById('academic-year-welcome-error');
+    errorMessage.hidden = true;
+    try {
+        if (academicYearManager.state.selectedId !== academicYearManager.state.currentId) await selectAcademicYear(academicYearManager.state.currentId);
+        if (academicYearManager.state.selectedId !== academicYearManager.state.currentId) throw new Error('No se pudo abrir el año actual. Intenta de nuevo.');
+        if (await academicYearManager.acknowledgeWelcome() && owner === currentUser?.id) navigateTo('dashboard');
+    } catch (error) {
+        if (owner !== currentUser?.id) return;
+        errorMessage.textContent = 'No se pudo guardar la confirmación. Intenta de nuevo.';
+        errorMessage.hidden = false;
+    }
 }
 
 async function getAcademicYearReportData(academicYearId) {
@@ -9563,7 +9599,7 @@ function scheduleAcademicYearRollover() {
 
 async function checkAcademicYearRollover() {
     window.clearTimeout(academicYearRolloverTimer);
-    if (!currentUser?.id || !academicYearManager.selected()) return;
+    if (!currentUser?.id || !academicYearManager.selected() || academicYearRolloverInProgress) return;
     const state = academicYearManager.state;
     const cycle = ACAcademicYears.getCurrentAcademicYear().startYear;
     if (state.years.some(year => year.start_year === cycle)) { scheduleAcademicYearRollover(); return; }
@@ -9571,13 +9607,18 @@ async function checkAcademicYearRollover() {
         academicYearRolloverTimer = window.setTimeout(checkAcademicYearRollover, 60000);
         return;
     }
+    const owner = currentUser.id;
+    academicYearRolloverInProgress = true;
     try {
-        await ensureAcademicYearForUser(currentUser.id);
+        await ensureAcademicYearForUser(owner);
         clearAcademicYearViews();
         await syncWorkspaceFromSupabase();
-        await window.ACAcademicNotifications?.start({ userId: currentUser.id, workspace: loadWorkspace() });
+        if (owner !== currentUser?.id) return;
+        await window.ACAcademicNotifications?.start({ userId: owner, workspace: loadWorkspace() });
         refreshWorkspaceUI();
-    } catch (error) { notify('No se pudo abrir el nuevo año lectivo. Intenta de nuevo.', 'error'); scheduleAcademicYearRollover(); }
+        maybeShowAcademicYearWelcome();
+    } catch (error) { if(owner === currentUser?.id) { notify('No se pudo abrir el nuevo año lectivo. Intenta de nuevo.', 'error'); scheduleAcademicYearRollover(); } }
+    finally { academicYearRolloverInProgress = false; }
 }
 const AUTH_PERSISTENCE_MODE_KEY = 'ac_auth_persistence_mode';
 const APP_INSIDE_SESSION_KEY = 'ac_inside_student_app';
@@ -11256,6 +11297,7 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
 
     window.scrollTo(0, 0);
     finishBooting();
+    maybeShowAcademicYearWelcome();
 }
 
 function showApp() {
@@ -12241,6 +12283,16 @@ function refreshWorkspaceUI() {
 
 async function initializeApp() {
     document.getElementById('academic-year-select')?.addEventListener('change', event => selectAcademicYear(event.target.value));
+    document.addEventListener('keydown', event => {
+        const modal = document.getElementById('academic-year-welcome');
+        if (!modal || modal.hidden || !document.getElementById('app-page')?.classList.contains('active')) return;
+        if (event.key === 'Escape') event.preventDefault();
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            const button = document.getElementById('academic-year-welcome-start');
+            (button.disabled ? modal : button).focus();
+        }
+    });
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') void checkAcademicYearRollover();
     });

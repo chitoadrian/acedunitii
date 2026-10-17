@@ -27,11 +27,10 @@
     z-index: 424;
     display: flex;
     align-items: center;
-    gap: 8px;
     box-sizing: border-box;
     width: 156px;
     height: 42px;
-    padding: 0 11px;
+    padding: 0;
     border: 1px solid rgba(139, 126, 238, .35);
     border-radius: 12px;
     background: rgba(35, 34, 54, .94);
@@ -40,7 +39,13 @@
 }
 #app-page .academic-year-control:hover { border-color: rgba(139, 126, 238, .65); }
 #app-page .academic-year-control:focus-within { outline: 2px solid #8b77ff; outline-offset: 3px; }
-#app-page .academic-year-control:has(select:disabled) { opacity: .65; }
+#app-page .academic-year-control:has(#academic-year-trigger:disabled) { opacity: .65; }
+#app-page #academic-year-trigger {
+    display: flex; align-items: center; gap: 8px; width: 100%; height: 100%;
+    padding: 0 11px; border: 0; border-radius: inherit; background: transparent;
+    color: inherit; font: inherit; cursor: pointer; text-align: left;
+}
+#app-page #academic-year-trigger:disabled { cursor: wait; }
 #app-page #academic-year-label {
     flex: 1;
     min-width: 0;
@@ -56,29 +61,68 @@
     border-bottom: 1.5px solid currentColor;
     transform: rotate(45deg);
 }
-/* Keep the native menu, keyboard support and existing change handler. */
-#app-page #academic-year-select {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    min-width: 0;
-    margin: 0;
-    border: 0;
-    border-radius: inherit;
-    opacity: 0;
-    font: inherit;
-    font-size: 13px;
-    cursor: pointer;
+#app-page #academic-year-select[hidden], #app-page #academic-year-menu[hidden],
+#app-page .academic-year-welcome[hidden], #app-page #academic-year-welcome-error[hidden] { display: none; }
+#app-page #academic-year-menu {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    width: min(280px, calc(100vw - 24px)); max-height: min(360px, calc(100dvh - 100px));
+    overflow-y: auto; padding: 8px; box-sizing: border-box; border-radius: 16px;
+    border: 1px solid rgba(139,126,238,.4); background: #232236;
+    box-shadow: 0 16px 42px rgba(0,0,0,.28); color: #edf0ff;
 }
-#app-page #academic-year-select option { color: #edf0ff; background: #232236; }
-#app-page #academic-year-select:disabled { cursor: wait; }
+#app-page .academic-year-menu-title { padding: 9px 10px 11px; font-size: 10px; letter-spacing: .12em; color: #b9b3d9; font-weight: 700; }
+#app-page #academic-year-menu [role="option"] {
+    display: grid; grid-template-columns: 18px minmax(0,1fr); gap: 3px 9px;
+    width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 10px;
+    background: transparent; color: inherit; text-align: left; cursor: pointer; font: inherit;
+}
+#app-page #academic-year-menu [role="option"]:hover,
+#app-page #academic-year-menu [aria-selected="true"] { background: rgba(139,119,255,.13); }
+#app-page #academic-year-menu [role="option"]:focus-visible { outline: 2px solid #8b77ff; outline-offset: -2px; }
+#app-page .academic-year-check { grid-row: span 2; align-self: center; color: #ab98ff; }
+#app-page .academic-year-option-label { font-size: 13px; font-weight: 600; }
+#app-page .academic-year-option-badge { grid-column: 2; justify-self: start; border-radius: 20px; padding: 2px 7px; background: rgba(139,119,255,.12); color: #bfb3f5; font-size: 10px; line-height: 1.5; }
 body.light-theme #app-page .academic-year-toolbar { color: #293657; }
 body.light-theme #app-page .academic-year-control { background: rgba(255, 255, 255, .97); }
-body.light-theme #app-page #academic-year-select option { color: #293657; background: #fff; }
+body.light-theme #app-page #academic-year-menu { color: #293657; background: #fff; border-color: #dfd9f1; box-shadow: 0 16px 42px rgba(36,35,73,.14); }
+body.light-theme #app-page .academic-year-menu-title { color: #625b80; }
+body.light-theme #app-page .academic-year-option-badge { color: #64509c; background: #f1ecfc; }
+/* One focused, server-confirmed welcome, only inside the authenticated app. */
+#app-page .academic-year-welcome {
+    position: fixed; inset: 0; z-index: 6000; display: grid; place-items: center;
+    padding: 24px; box-sizing: border-box; overflow-y: auto;
+    background: rgba(9,12,29,.7); backdrop-filter: blur(8px);
+}
+#app-page .academic-year-welcome-card {
+    box-sizing: border-box; width: min(100%,560px); padding: 32px;
+    border: 1px solid rgba(139,119,255,.35); border-radius: 24px; background: #202034;
+    color: #edf0ff; box-shadow: 0 24px 80px rgba(0,0,0,.3); text-align: center;
+}
+#app-page .academic-year-welcome-card img { display: block; margin: 0 auto 18px; border-radius: 50%; }
+#app-page .academic-year-welcome-kicker { display: block; color: #b4a3ff; font-size: 11px; font-weight: 700; letter-spacing: .12em; }
+#app-page .academic-year-welcome-card h2 { margin: 12px 0; font-size: clamp(22px,3vw,30px); line-height: 1.25; color: inherit; }
+#app-page .academic-year-welcome-card p { font-size: 14px; line-height: 1.65; color: #c1c5df; margin: 9px 0; }
+#app-page .academic-year-welcome-history { margin: 22px 0; padding: 16px; border: 1px solid rgba(139,119,255,.16); border-radius: 14px; background: rgba(139,119,255,.07); }
+#app-page .academic-year-welcome-history strong { font-size: 14px; }
+#app-page #academic-year-welcome-start {
+    /* The legacy global button/theme rules use !important. Keep this new CTA consistent. */
+    width: 100%; min-height: 46px !important; white-space: normal;
+    background: linear-gradient(110deg,#7253d8,#3b64ba) !important;
+    box-shadow: 0 8px 22px rgba(91,78,185,.22);
+}
+#app-page #academic-year-welcome-start:focus-visible { outline: 2px solid #b4a3ff; outline-offset: 4px; }
+#app-page #academic-year-welcome-error { color: #ffb7b7; }
+body.light-theme #app-page .academic-year-welcome-card { background: #fff; color: #293657; border-color: #dfd9f1; }
+body.light-theme #app-page .academic-year-welcome-card p { color: #56627e; }
+body.light-theme #app-page .academic-year-welcome-kicker { color: #7151bf; }
+body.light-theme #app-page #academic-year-welcome-error { color: #a53343; }
 @media (max-width: 768px) {
-    #app-page .academic-year-control { top: 14px; right: 118px; width: 150px; height: 40px; padding-inline: 9px; }
+    #app-page .academic-year-control { top: 14px; right: 118px; width: 150px; height: 40px; }
+    #app-page #academic-year-trigger { padding-inline: 9px; }
 }
 @media (max-width: 767px) {
     #app-page .academic-year-toolbar { min-height: 20px; margin: 0 0 12px; }
+    #app-page #academic-year-menu { right: min(0px, calc(100vw - 410px)); }
+    #app-page .academic-year-welcome { padding: 16px; }
+    #app-page .academic-year-welcome-card { padding: 24px 20px; border-radius: 20px; }
 }

@@ -1,0 +1,53 @@
+// Disposable PostgreSQL only. Never changes production dates or academic data.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const {PGlite}=require('@electric-sql/pglite');
+const ids=['10000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000003'];
+const sqlFile=name=>fs.readFileSync(path.join(__dirname,'../supabase/migrations',name),'utf8');
+(async()=>{
+    const db=new PGlite(),q=async(sql,args=[])=> (await db.query(sql,args)).rows;
+    const asUser=async id=>{await db.exec('reset role');await q("select set_config('request.jwt.claim.sub',$1,false)",[id]);await db.exec('set role authenticated');};
+    const clock=async year=>{await db.exec('reset role');await db.exec(`create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select ${year} $$`);};
+    const ensure=async()=> (await q('select public.ensure_academic_year_for_user() state'))[0].state;
+    try{
+        await db.exec(fs.readFileSync(path.join(__dirname,'fixtures/academic-years-before.sql'),'utf8'));
+        for(const id of ids.slice(0,2))await q('insert into auth.users(id) values($1)',[id]);
+        for(const file of ['20261015130622_add_academic_year_management.sql','20261015132831_optimize_academic_year_indexes.sql','20261015141942_annual_academic_reports.sql'])await db.exec(sqlFile(file));
+        assert.equal((await q("select public.current_academic_start_year('2027-04-01 04:59:59+00') n"))[0].n,2026);
+        assert.equal((await q("select public.current_academic_start_year('2027-04-01 05:00:00+00') n"))[0].n,2027);
+        await clock(2026);await asUser(ids[0]);const before=await ensure();const oldId=before.current_id;
+        const subject=(await q("insert into public.subjects(user_id,name,academic_year_id) values($1,'Materia anterior',$2) returning id",[ids[0],oldId]))[0];
+        await q("insert into public.tasks(user_id,subject_id,academic_year_id,title,status) values($1,$2,$3,'Tarea anterior','completed')",[ids[0],subject.id,oldId]);
+        const previousTasks=await q('select to_jsonb(t) row from public.tasks t');
+        await db.exec('reset role');await db.exec(sqlFile('20261017010120_academic_year_rollover_welcome.sql'));
+        await asUser(ids[0]);assert.equal((await ensure()).welcome_year_id,null,'deployment mid-cycle must not show welcome');
+        assert.deepEqual(await q('select to_jsonb(t) row from public.tasks t'),previousTasks);
+        await clock(2027);await asUser(ids[0]);const next=await ensure();
+        assert.equal(next.years.length,2);assert.equal(next.selected_id,next.current_id);assert.equal(next.welcome_year_id,next.current_id);
+        assert.equal(next.years[0].xp,0);assert.equal(next.years[0].streak,0);
+        for(const table of ['subjects','tasks','evaluations','grades','attendance','events','resources','projects','goals','project_stages','project_subtasks','user_activity_events'])assert.equal((await q(`select count(*)::int n from public.${table} where academic_year_id=$1`,[next.current_id]))[0].n,0,table+' must start empty');
+        assert.equal((await ensure()).years.length,2,'repeated rollover cannot duplicate years');
+        assert.equal((await ensure()).welcome_year_id,next.current_id,'unconfirmed welcome remains retryable');
+        const ack=await q('select public.acknowledge_academic_year_welcome($1) state',[next.current_id]);assert.equal(ack[0].state.acknowledged,true);
+        assert.equal((await ensure()).welcome_year_id,null,'fresh device reads the same server confirmation');
+        await q('select public.acknowledge_academic_year_welcome($1)',[next.current_id]);
+        await assert.rejects(q('select public.acknowledge_academic_year_welcome($1)',[oldId]),/no está disponible/);
+        await assert.rejects(q('update public.user_academic_year_preferences set last_academic_year_welcome_seen=2028 where user_id=$1',[ids[0]]));
+        await q('update public.user_academic_year_preferences set selected_academic_year_id=$1 where user_id=$2',[oldId,ids[0]]);
+        assert.equal((await ensure()).selected_id,oldId);assert.deepEqual(await q('select to_jsonb(t) row from public.tasks t'),previousTasks);
+        for(const statement of ['update public.tasks set title=title where academic_year_id=$1','delete from public.tasks where academic_year_id=$1'])await assert.rejects(q(statement,[oldId]),/Año histórico/);
+        await q('update public.user_academic_year_preferences set selected_academic_year_id=$1 where user_id=$2',[next.current_id,ids[0]]);
+        await q("insert into public.subjects(user_id,name,academic_year_id) values($1,'Nueva materia',$2)",[ids[0],next.current_id]);
+        assert.equal((await q('select count(*)::int n from public.subjects where academic_year_id=$1',[oldId]))[0].n,1);
+        await assert.rejects(q('insert into public.user_academic_years(user_id,start_year) values($1,2028)',[ids[0]]));
+        await asUser(ids[1]);const other=await ensure();assert.ok(other.welcome_year_id);assert.notEqual(other.current_id,next.current_id);
+        await assert.rejects(q('select public.acknowledge_academic_year_welcome($1)',[next.current_id]),/no está disponible/);
+        assert.equal((await q('select count(*)::int n from public.tasks'))[0].n,0);
+        await q('select public.acknowledge_academic_year_welcome($1)',[other.current_id]);
+        await db.exec('reset role');await q('insert into auth.users(id) values($1)',[ids[2]]);await asUser(ids[2]);
+        const fresh=await ensure();assert.equal(fresh.years.length,1);assert.equal(fresh.welcome_year_id,null,'first registration is not an official rollover');
+        await clock(2029);await asUser(ids[0]);const later=await ensure();assert.equal(later.years.length,4);assert.equal(later.welcome_year_id,later.current_id);
+        assert.equal(later.years[0].start_year,2029);await q('select public.acknowledge_academic_year_welcome($1)',[later.current_id]);assert.equal((await ensure()).welcome_year_id,null);
+        await db.exec('reset role;set role anon');await assert.rejects(q('select public.ensure_academic_year_for_user()'));await assert.rejects(q('select public.acknowledge_academic_year_welcome($1)',[later.current_id]));
+        console.log('PASS: March/April Ecuador boundary; no deployment/registration false welcome; official idempotent rollover; empty new workspace/XP; unchanged read-only history; per-user and fresh-device confirmation; future/foreign/anonymous rejection; 1/2/4 real cycles.');
+    }finally{await db.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

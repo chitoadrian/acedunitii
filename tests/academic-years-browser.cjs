@@ -23,8 +23,9 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await db.query('delete from public.tasks where id=$1',[legacy.rows[0].id]);
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015161306_academic_record_history.sql'), 'utf8'));
         await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261015161909_optimize_academic_history_fk.sql'), 'utf8'));
-        // Only this disposable DB simulates 2027; production clock/data are untouched.
-        await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2027 $$");
+        // Freeze the local baseline before adding the safe deployment welcome marker.
+        await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2026 $$");
+        await db.exec(fs.readFileSync(path.join(__dirname, '../supabase/migrations/20261017010120_academic_year_rollover_welcome.sql'), 'utf8'));
         await db.query("select set_config('request.jwt.claim.sub',$1,false)", [userId]);
         await db.exec('set role authenticated');
         const quoted = name => { if (!/^[a-z_]+$/.test(name)) throw new Error('invalid identifier'); return `"${name}"`; };
@@ -34,6 +35,7 @@ const userId = '10000000-0000-4000-8000-000000000001';
                 try {
                     if (request.rpc) {
                         if (request.rpc === 'ensure_academic_year_for_user') return { data: (await db.query('select public.ensure_academic_year_for_user() v')).rows[0].v, error: null };
+                        if (request.rpc === 'acknowledge_academic_year_welcome') return { data: (await db.query('select public.acknowledge_academic_year_welcome($1) v',[request.args.p_academic_year_id])).rows[0].v, error: null };
                         if (request.rpc === 'get_five_day_activity') return { data: (await db.query('select * from public.get_five_day_activity($1)', [request.args.p_academic_year_id])).rows, error: null };
                         if (request.rpc === 'get_academic_year_report') { reportInvocations++; if (reportGate) await reportGate; return { data: (await db.query('select public.get_academic_year_report($1) v', [request.args.p_academic_year_id])).rows[0].v, error: null }; }
                         if (request.rpc === 'increment_academic_year_progress') return { data: (await db.query('select * from public.increment_academic_year_progress($1,$2,$3)', [request.args.p_year_id, request.args.p_delta, request.args.p_bump_streak])).rows[0], error: null };
@@ -68,13 +70,15 @@ const userId = '10000000-0000-4000-8000-000000000001';
         browser = await chromium.launch({ headless: true, executablePath: process.env.TEST_BROWSER });
         const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
         const errors = []; page.on('pageerror', error => errors.push(error.message));
+        const outputDir = process.env.TEST_SCREENSHOT_DIR;
+        if (outputDir) fs.mkdirSync(outputDir, { recursive: true });
         const libraryRequests = [];
         page.on('request', request => { if (request.url().includes('/assets/vendor/jspdf')) libraryRequests.push(request.url()); });
         page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
         await page.exposeFunction('academicTestQuery', execute);
-        const boot = async () => {
-            await page.goto(process.env.TEST_BASE_URL || 'http://127.0.0.1:4184', { waitUntil: 'networkidle' });
-            await page.evaluate(async userId => {
+        const boot = async (target = page) => {
+            await target.goto(process.env.TEST_BASE_URL || 'http://127.0.0.1:4184', { waitUntil: 'networkidle' });
+            await target.evaluate(async userId => {
                 const user = { id: userId, email: 'local-test@example.test', email_confirmed_at: '2026-01-01', user_metadata: { full_name: 'Prueba local' } };
                 const makeQuery = table => {
                     const state = { table, method: 'select', filters: [], orders: [] };
@@ -99,16 +103,54 @@ const userId = '10000000-0000-4000-8000-000000000001';
                 await bootstrapAuthenticatedApp(user);
                 await showDashboard('subjects', { validatedUser: user });
             }, userId);
-            await page.waitForTimeout(300);
+            await target.waitForTimeout(300);
         };
         await boot();
+        assert.equal(await page.locator('#academic-year-welcome').isVisible(),false,'no false deployment welcome');
+        assert.equal(await page.locator('#academic-year-select').isVisible(),false,'native select is never visible');
+        await page.locator('#academic-year-trigger').click();
+        assert.equal(await page.locator('#academic-year-menu [role="option"]').count(),1);
+        await page.keyboard.press('Escape');
+        // Real app rollover flow, with a simulated date only in this disposable DB/browser.
+        await db.exec('reset role');
+        await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2027 $$");
+        await db.exec('set role authenticated');
+        await page.evaluate(async()=>{const cycle=ACAcademicYears.getCurrentAcademicYear(new Date('2027-04-01T05:00:00Z'));ACAcademicYears.getCurrentAcademicYear=()=>cycle;await checkAcademicYearRollover();});
+        assert.equal(await page.locator('#academic-year-welcome').isVisible(),true);
+        assert.ok((await page.locator('#academic-year-welcome-title').innerText()).includes('2027 - 2028'));
+        assert.equal(await page.evaluate(()=>['subjects','tasks','evaluations','grades','attendance','projects','goals','resources'].every(key=>!loadWorkspace()[key]?.length)),true,'new cycle begins empty');
+        for(const [width,height] of [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[430,932],[390,844],[360,800]]){
+            await page.setViewportSize({width,height});
+            for(const theme of ['dark','light']){
+                await page.evaluate(theme=>document.body.classList.toggle('light-theme',theme==='light'),theme);
+                await page.waitForTimeout(300); // Let the existing theme transition settle before visual checks.
+                const fits=await page.locator('.academic-year-welcome-card').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight&&el.scrollWidth<=el.clientWidth&&document.documentElement.scrollWidth<=innerWidth;});
+                assert.equal(fits,true,`welcome ${width}/${theme}`);
+                const cta=await page.locator('#academic-year-welcome-start').evaluate(el=>({height:el.getBoundingClientRect().height,background:getComputedStyle(el).backgroundImage,disabled:el.disabled}));
+                assert.ok(cta.height>=44,`welcome touch target ${width}/${theme}`);
+                assert.equal(cta.disabled,false);assert.ok(cta.background.includes('114, 83, 216'),`welcome keeps a readable blue-violet CTA: ${width}/${theme} ${JSON.stringify(cta)}`);
+                if(outputDir)await page.screenshot({path:path.join(outputDir,`year-welcome-${theme}-${width}.png`)});
+            }
+        }
+        await page.locator('#academic-year-welcome-start').focus();await page.keyboard.press('Tab');
+        assert.equal(await page.locator('#academic-year-welcome-start').evaluate(el=>el===document.activeElement),true);
+        await page.locator('#academic-year-welcome-start').click();
+        await page.waitForFunction(()=>!academicYearManager.state.welcome);
+        assert.equal(await page.evaluate(()=>currentSection),'dashboard');
+        const device=await browser.newPage({viewport:{width:390,height:844}});
+        await device.exposeFunction('academicTestQuery',execute);await boot(device);
+        assert.equal(await device.locator('#academic-year-welcome').isVisible(),false,'separate browser context does not repeat acknowledged welcome');
+        await device.close();await page.setViewportSize({width:1440,height:900});
+        const selectYear=async id=>{await page.locator('#academic-year-trigger').click();await page.locator(`#academic-year-menu [data-year-id="${id}"]`).click();await page.waitForFunction(id=>academicYearManager.state.selectedId===id&&!academicYearManager.state.switching,id);};
         assert.equal(await page.locator('#academic-year-select option').count(), 2);
+        await page.locator('#academic-year-trigger').click();await page.locator('#dashboard h1').click();
+        assert.equal(await page.locator('#academic-year-menu').isVisible(),false,'outside click dismisses listbox');
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica') === false, 'new cycle must start empty');
         const years = await page.evaluate(() => academicYearManager.state.years);
         const old = years.find(y => y.start_year === 2026), current = years.find(y => y.start_year === 2027);
         assert.equal(await page.locator('#academic-year-label').innerText(), current.label);
         assert.ok((await page.locator('#academic-year-select option:checked').innerText()).includes('Año actual'));
-        await page.selectOption('#academic-year-select', old.id);
+        await selectYear(old.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
         assert.equal(await page.locator('#academic-year-label').innerText(), old.label, 'closed control shows only the selected year');
         assert.equal(await page.locator('#academic-year-state').count(), 0, 'no visible state badge under the selector');
@@ -117,7 +159,7 @@ const userId = '10000000-0000-4000-8000-000000000001';
         assert.ok((await page.locator('#subjects').innerText()).includes('Materia histórica'));
         await boot();
         assert.equal(await page.inputValue('#academic-year-select'), old.id, 'reload preserves explicit historical selection');
-        await page.selectOption('#academic-year-select', current.id);
+        await selectYear(current.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
         assert.equal(await page.evaluate(() => academicYearManager.state.historical), false);
         assert.equal(await page.locator('#academic-report-year').textContent(), current.label);
@@ -140,18 +182,16 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.waitForFunction(() => loadWorkspace().tasks.some(t => t.title === 'PRUEBA TAREA AÑO LECTIVO'));
         const persisted = (await db.query("select academic_year_id from public.tasks where title='PRUEBA TAREA AÑO LECTIVO'")).rows;
         assert.equal(persisted[0].academic_year_id, current.id);
-        // The original native select remains operable by keyboard, including year changes.
+        // The custom listbox supports button activation, arrows, Home/End and selection.
         const firstYear = await page.locator('#academic-year-select option').first().getAttribute('value');
         const lastYear = await page.locator('#academic-year-select option').last().getAttribute('value');
-        await page.locator('#academic-year-select').press('Home');
+        await page.locator('#academic-year-trigger').press('Space');await page.keyboard.press('Home');await page.keyboard.press('Enter');
         await page.waitForFunction(id => academicYearManager.state.selectedId === id && !academicYearManager.state.switching, firstYear);
-        await page.locator('#academic-year-select').press('End');
+        await page.locator('#academic-year-trigger').press('Enter');await page.keyboard.press('End');await page.keyboard.press('Enter');
         await page.waitForFunction(id => academicYearManager.state.selectedId === id && !academicYearManager.state.switching, lastYear);
-        await page.selectOption('#academic-year-select', current.id);
+        await selectYear(current.id);
         await page.waitForFunction(() => !academicYearManager.state.switching);
         const sections = ['dashboard','subjects','tasks','calendar','evaluations','grades','attendance','goals-projects','progress','backpack','profile','settings','ai-assistant'];
-        const outputDir = process.env.TEST_SCREENSHOT_DIR;
-        if (outputDir) fs.mkdirSync(outputDir, { recursive: true });
         const viewports=process.env.TEST_PDF_ONLY ? [] : [[1920,1080],[1440,900],[1366,768],[1024,768],[768,1024],[430,932],[390,844],[360,800]];
         for (const [width, height] of viewports) {
             await page.setViewportSize({ width, height });
@@ -199,12 +239,19 @@ const userId = '10000000-0000-4000-8000-000000000001';
                     }
                     // Existing wide module content is checked separately from the new toolbar.
                     if (section === 'subjects' || section === 'dashboard') assert.equal(measure.overflow, false, `${width}/${theme}/${section}`);
+                    if(section==='dashboard'){
+                        await page.locator('#academic-year-trigger').click();
+                        const menuFits=await page.locator('#academic-year-menu').evaluate(el=>{const r=el.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&el.scrollWidth<=el.clientWidth;});
+                        assert.equal(menuFits,true,`dropdown ${width}/${theme}`);
+                        if(outputDir)await page.screenshot({path:path.join(outputDir,`year-dropdown-${theme}-${width}.png`)});
+                        await page.keyboard.press('ArrowDown');await page.keyboard.press('ArrowUp');await page.keyboard.press('Escape');
+                    }
                 }
                 if (outputDir && [1440,768,390,360].includes(width)) {
                     await page.evaluate(() => navigateTo('dashboard'));
                     await page.waitForTimeout(1500);
                     await page.screenshot({ path: path.join(outputDir, `academic-years-${theme}-${width}.png`) });
-                    await page.locator('#academic-year-select').click();
+                    await page.locator('#academic-year-trigger').click();
                     await page.screenshot({ path: path.join(outputDir, `academic-years-menu-${theme}-${width}.png`) });
                     await page.keyboard.press('Escape');
                 }
@@ -214,7 +261,7 @@ const userId = '10000000-0000-4000-8000-000000000001';
         await page.evaluate(() => toggleSidebarCollapse());
         const rightWithCollapsedSidebar = await page.locator('.academic-year-control').evaluate(el => el.getBoundingClientRect().right);
         assert.equal(rightWithCollapsedSidebar, 1440 - 130, 'selector remains right-aligned when sidebar is collapsed');
-        await page.locator('#academic-year-select').focus();
+        await page.locator('#academic-year-trigger').focus();
         assert.equal(await page.locator('.academic-year-control').evaluate(el => getComputedStyle(el).outlineStyle), 'solid');
         // Actual download, from the real button and the real read-only report RPC.
         const pdfDir = process.env.TEST_PDF_DIR;
@@ -247,7 +294,7 @@ const userId = '10000000-0000-4000-8000-000000000001';
             assert.equal((await db.query('select count(*)::int n from public.tasks where academic_year_id=$1',[current.id])).rows[0].n,171);
             await page.evaluate(()=>{const create=ACAcademicReports.createDocument;ACAcademicReports.createDocument=report=>{window.testAnnualReport=report;return create(report);};});
             for (const [year, theme] of [[current,'dark'],[old,'light']]) {
-                await page.selectOption('#academic-year-select', year.id);
+                await selectYear(year.id);
                 await page.waitForFunction(() => !academicYearManager.state.switching);
                 await page.evaluate(theme => document.body.classList.toggle('light-theme', theme === 'light'), theme);
                 await page.setViewportSize({ width: 390, height: 844 });
@@ -292,6 +339,20 @@ const userId = '10000000-0000-4000-8000-000000000001';
             assert.equal(await page.inputValue('#academic-year-select'), old.id, 'report generation does not change the selected historical year');
             assert.equal(reportInvocations, 2, 'one read-only snapshot per requested report');
             assert.equal(libraryRequests.length, 2, 'PDF libraries load once each, on demand');
+        }
+        // Existing server sequencing also supports a four-cycle menu, without UI-invented rows.
+        await db.exec('reset role');
+        await db.exec("create or replace function public.current_academic_start_year(p_at timestamptz default now()) returns integer language sql stable as $$ select 2029 $$");
+        await db.exec('set role authenticated');
+        await page.evaluate(async()=>{const cycle={startYear:2029};ACAcademicYears.getCurrentAcademicYear=()=>cycle;await checkAcademicYearRollover();});
+        await page.locator('#academic-year-welcome-start').click();await page.waitForFunction(()=>!academicYearManager.state.welcome);
+        for(const width of [1440,360]){
+            await page.setViewportSize({width,height:width===360?800:900});
+            await page.locator('#academic-year-trigger').click();
+            assert.equal(await page.locator('#academic-year-menu [role="option"]').count(),4);
+            assert.deepEqual(await page.locator('.academic-year-option-label').allTextContents(),['2029 - 2030','2028 - 2029','2027 - 2028','2026 - 2027']);
+            if(outputDir)await page.screenshot({path:path.join(outputDir,`year-four-cycles-${width}.png`)});
+            await page.keyboard.press('Escape');
         }
         await page.evaluate(() => showLanding());
         assert.equal(await page.locator('.academic-year-control').isVisible(), false, 'selector is not shown on public pages');

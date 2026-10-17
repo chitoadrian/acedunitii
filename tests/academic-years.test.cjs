@@ -85,3 +85,19 @@ test('Actual production callers cannot bypass the academic table helper', () => 
         assert.equal(new RegExp(`(?:getSupabaseClient\\(\\)|sb)\\s*\\.from\\(['\"](${names})['\"]\\)`).test(source), false, file);
     }
 });
+test('Welcome is server-driven, acknowledged once, retryable and isolated from stale account responses',async()=>{
+    const f=fixture(), manager=createManager();let seen=false,fail=false,resolveAck,hold=false,calls=0;
+    f.client.rpc=async(name,args)=>{
+        if(name==='ensure_academic_year_for_user')return {data:{years:[2026,2027].map(n=>({id:`year-${n}`,user_id:f.owner,start_year:n,label:`${n} - ${n+1}`})),current_id:'year-2027',selected_id:'year-2027',welcome_year_id:seen?null:'year-2027'}};
+        calls++;assert.equal(args.p_academic_year_id,'year-2027');
+        if(hold)await new Promise(resolve=>resolveAck=resolve);
+        if(fail)return {error:new Error('offline')};seen=true;return {data:{acknowledged:true,year_id:'year-2027'}};
+    };
+    await manager.start(f.client,f.owner);
+    assert.equal(manager.state.welcome.previousLabel,'2026 - 2027');
+    fail=true;await assert.rejects(manager.acknowledgeWelcome(),/offline/);assert.ok(manager.state.welcome);assert.equal(manager.state.welcomeSaving,false);
+    fail=false;hold=true;const first=manager.acknowledgeWelcome();assert.equal(await manager.acknowledgeWelcome(),false);resolveAck();await first;
+    assert.equal(calls,2);assert.equal(manager.state.welcome,null);
+    await manager.start(f.client,f.owner);assert.equal(manager.state.welcome,null,'new device/session trusts saved server state');
+    seen=false;await manager.start(f.client,f.owner);const late=manager.acknowledgeWelcome();manager.reset();resolveAck();assert.equal(await late,false);assert.equal(manager.state.welcome,null);
+});
