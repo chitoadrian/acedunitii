@@ -158,12 +158,21 @@ body #app-page#app-page .student-empty-state.empty-state--compact .empty-state__
     height: 44px;
     margin-bottom: 18px;
 }
+/* Empty evaluation card: header and copy share the same left content edge. */
+body #app-page#app-page .dashboard-next-evaluation.is-empty {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: "header" "copy" !important;
+}
 body #app-page#app-page .dashboard-next-evaluation.is-empty > .student-empty-state {
-    grid-column: 2 / -1;
+    grid-area: copy;
     align-items: flex-start !important;
     padding: 0 !important;
     min-height: 0 !important;
     text-align: left;
+}
+body #app-page#app-page .dashboard-next-evaluation.is-empty .empty-state__actions {
+    align-self: flex-start;
+    justify-content: flex-start;
 }
 
 /* A zero-data CTA lives inside its empty state; filtered results keep headers. */
@@ -203,7 +212,6 @@ body #app-page#app-page .dashboard-next-evaluation.is-empty > .student-empty-sta
         min-height: 170px !important;
         padding: 26px 16px !important;
     }
-    body #app-page#app-page .dashboard-next-evaluation.is-empty > .student-empty-state { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) {
     #app-page .student-empty-state, #app-page .student-empty-state * { animation: none !important; transition: none !important; }
