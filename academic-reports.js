@@ -8,12 +8,18 @@
     const status = value => ({ completed: 'Completado', pending: 'Pendiente', in_progress: 'En progreso', paused: 'Pausado', overdue: 'Vencida', upcoming: 'Próxima' })[value] || text(value);
     const deleted = row => row._record_deleted === true;
     const recordState = row => deleted(row) ? 'Eliminada posteriormente' : 'Conservada';
-    function studentName(value) {
-        const name = text(value);
-        return !name || /^(undefined|null)$/i.test(name) || name.includes('@') ? 'Estudiante' : name;
+    function getStudentDisplayName(...candidates) {
+        for (const value of candidates) {
+            if (typeof value !== 'string') continue;
+            const name = text(value);
+            if (name && !/^(undefined|null|estudiante)$/i.test(name) && !name.includes('@') &&
+                !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(name)) return name;
+        }
+        return 'Estudiante';
     }
+    const studentName = getStudentDisplayName;
     function filename(name, year) {
-        const safe = studentName(name).replace(/[<>:"/\\|?*]/g, ' ').replace(/\s+/g, ' ').replace(/[. ]+$/g, '').trim().slice(0, 150);
+        const safe = studentName(name).replace(/[<>:"/\\|?*]/g, ' ').replace(/\s+/g, ' ').replace(/[. ]+$/g, '').trim();
         return `Reporte de ${safe || 'Estudiante'} - ${year.start_year}-${year.end_year}.pdf`;
     }
     function normalize(raw, helpers) {
@@ -177,11 +183,14 @@
         });
     }
     // Presentation only: never change the normalized academic totals or source rows.
-    function formatEvaluationStatus(value) {
-        const labels = { preparing: 'En preparación', scheduled: 'Programada', completed: 'Completada', pending: 'Pendiente',
-            pending_internal: 'Pendiente', completed_internal: 'Completada', cancelled: 'Cancelada', in_progress: 'En curso', overdue: 'Vencida', Completado: 'Completada' };
-        return labels[value] || (/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ ]+$/.test(text(value)) ? text(value) : 'Sin especificar');
+    function formatReportStatus(value, feminine = false) {
+        const complete = feminine ? 'Completada' : 'Completado';
+        const labels = { preparing: 'En preparación', scheduled: 'Programada', completed: complete, pending: 'Pendiente',
+            pending_internal: 'Pendiente', completed_internal: complete, cancelled: 'Cancelada', paused: 'Pausado',
+            in_progress: 'En progreso', overdue: 'Vencida', upcoming: 'Próxima', Completado: complete };
+        return Object.hasOwn(labels,value) ? labels[value] : (/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ ]+$/.test(text(value)) ? text(value) : 'Sin especificar');
     }
+    function formatEvaluationStatus(value) { return formatReportStatus(value, true); }
     function presentSection(item) {
         const historical = value => value === 'Eliminada posteriormente';
         const hasHistory = item.body.some(row => row.some(historical));
@@ -192,14 +201,14 @@
         switch (item.title) {
         case 'Materias del año':
             return { ...base, title: 'MATERIAS DEL AÑO', secondary: false, kind: 'subjects',
-                note: `${item.body.length} ${item.body.length===1 ? 'materia registrada' : 'materias registradas'} · ${item.body.length-removed} ${item.body.length-removed===1 ? 'activa' : 'activas'} · ${removed} eliminadas posteriormente.`,
+                note: `${item.body.length} ${item.body.length===1 ? 'materia registrada' : 'materias registradas'} · ${item.body.length-removed} ${item.body.length-removed===1 ? 'activa' : 'activas'} · ${removed} ${removed===1 ? 'eliminada' : 'eliminadas'} posteriormente.`,
                 headers: ['Materia','Tareas','Evaluaciones','Calificaciones','Promedio','Estado'], widths: [45,17,25,27,34,26],
                 body: item.body.map(row => [...row.slice(0,5), historical(row[5]) ? row[5] : 'Activa']) };
         case 'Tareas del año':
             return { ...base, title: 'ACTIVIDAD DE TAREAS', secondary: false,
                 headers: ['Tarea','Materia','Fecha','Estado','Prioridad',...(hasHistory ? ['Historial'] : [])],
                 widths: hasHistory ? [47,25,31,23,21,27] : [57,35,36,26,20],
-                body: item.body.map(row => [row[0],row[1],row[2].replace(/\s*·\s*/, '\n'),row[3],row[5],...(hasHistory ? [rowHistory(row[4])] : [])]) };
+                body: item.body.map(row => [row[0],row[1],row[2].replace(/\s*·\s*/, '\n'),formatReportStatus(row[3],true),row[5],...(hasHistory ? [rowHistory(row[4])] : [])]) };
         case 'Evaluaciones':
             return { ...base, title: 'EVALUACIONES', note: `${item.body.length} ${item.body.length===1 ? 'evaluación registrada' : 'evaluaciones registradas'}${historyNote(removed)}.`,
                 headers: ['Evaluación','Materia','Tipo','Fecha','Estado',...(hasHistory ? ['Historial'] : [])],
@@ -216,21 +225,21 @@
         case 'Asistencia':
             return { ...base, title: 'ASISTENCIA', secondary: false, empty: 'No se registraron asistencias durante este año lectivo.' };
         case 'Metas':
-            return { ...base, title: 'METAS', cards: item.body, note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'meta registrada' : 'metas registradas'}${historyNote(removed)}.` : '', empty: 'No se registraron metas durante este año lectivo.',
+            return { ...base, title: 'METAS', cards: item.body.map(row=>row.map((cell,index)=>index===2 ? formatReportStatus(cell,true) : cell)), note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'meta registrada' : 'metas registradas'}${historyNote(removed)}.` : '', empty: 'No se registraron metas durante este año lectivo.',
                 headers: ['Meta / materia','Progreso','Estado','Fecha',...(hasHistory ? ['Historial'] : [])],
-                body: item.body.map(row => [...row.slice(0,4),...(hasHistory ? [rowHistory(row[4])] : [])]) };
+                body: item.body.map(row => [row[0],row[1],formatReportStatus(row[2],true),row[3],...(hasHistory ? [rowHistory(row[4])] : [])]) };
         case 'Proyectos':
-            return { ...base, title: 'PROYECTOS', cards: item.body, note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'proyecto registrado' : 'proyectos registrados'}${historyNote(removed)}.` : '', empty: 'No se registraron proyectos durante este año lectivo.',
+            return { ...base, title: 'PROYECTOS', cards: item.body.map(row=>row.map((cell,index)=>index===4 ? formatReportStatus(cell) : cell)), note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'proyecto registrado' : 'proyectos registrados'}${historyNote(removed)}.` : '', empty: 'No se registraron proyectos durante este año lectivo.',
                 headers: ['Proyecto','Progreso','Etapas','Subtareas','Estado',...(hasHistory ? ['Historial'] : [])],
-                body: item.body.map(row => [...row.slice(0,5),...(hasHistory ? [rowHistory(row[5])] : [])]) };
+                body: item.body.map(row => [...row.slice(0,4),formatReportStatus(row[4]),...(hasHistory ? [rowHistory(row[5])] : [])]) };
         case 'Etapas y subtareas':
             return { ...base, title: 'DETALLE DE PROYECTOS',
                 headers: ['Elemento / proyecto','Etapa','Estado','Fecha',...(hasHistory ? ['Historial'] : [])],
                 widths: hasHistory ? [53,28,25,37,31] : [69,37,26,42],
-                body: item.body.map(row => [...row.slice(0,4),...(hasHistory ? [rowHistory(row[4])] : [])]) };
+                body: item.body.map(row => [row[0],row[1],formatReportStatus(row[2]),row[3],...(hasHistory ? [rowHistory(row[4])] : [])]) };
         case 'Calendario y eventos':
             return { ...base, title: 'CALENDARIO Y EVENTOS', empty: 'No se registraron eventos independientes durante este año lectivo.',
-                note: item.body.length ? `${item.body.length} eventos independientes${historyNote(removed)}.` : '',
+                note: item.body.length ? `${item.body.length} ${item.body.length===1 ? 'evento independiente' : 'eventos independientes'}${historyNote(removed)}.` : '',
                 headers: ['Evento / materia','Tipo','Fecha',...(hasHistory ? ['Historial'] : [])],
                 widths: hasHistory ? [64,32,44,34] : [84,38,52],
                 body: item.body.map(row => [...row.slice(0,3),...(hasHistory ? [rowHistory(row[3])] : [])]) };
@@ -460,14 +469,14 @@
             }
             if(item.kind==='tasks'){
                 const pending=total('Tareas pendientes (incluye próximas y vencidas)');
-                y+=write(`${report.metrics.tasks} creadas · ${report.taskCounts.completed} completadas · ${pending} ${number(pending)===1 ? 'pendiente' : 'pendientes'} · ${report.taskCounts.overdue} vencidas`,18,y,174,9,muted)+4;
+                y+=write(`${report.metrics.tasks} ${number(report.metrics.tasks)===1 ? 'creada' : 'creadas'} · ${report.taskCounts.completed} ${number(report.taskCounts.completed)===1 ? 'completada' : 'completadas'} · ${pending} ${number(pending)===1 ? 'pendiente' : 'pendientes'} · ${report.taskCounts.overdue} ${number(report.taskCounts.overdue)===1 ? 'vencida' : 'vencidas'}`,18,y,174,9,muted)+4;
             }
             if(item.kind==='attendance' && item.body.length){
                 drawSpotlight('ASISTENCIA GENERAL',report.metrics.attendance,100,'',spacing.table);
                 const kept=item.body[0],removed=item.body[1];
                 drawMetricGrid([['Presentes',kept[1]],['Faltas',kept[2]],['Atrasos',kept[3]],['Justificadas',kept[4]]],4,29,0,{centered:true});
                 const count=total('Registros de asistencia creados');
-                y+=write(`${count} ${number(count)===1 ? 'asistencia registrada' : 'asistencias registradas'} · ${kept[5]} ${number(kept[5])===1 ? 'vigente' : 'vigentes'} · ${removed[5]} eliminadas posteriormente.`,18,y,174,8.5)+5;
+                y+=write(`${count} ${number(count)===1 ? 'asistencia registrada' : 'asistencias registradas'} · ${kept[5]} ${number(kept[5])===1 ? 'vigente' : 'vigentes'} · ${removed[5]} ${number(removed[5])===1 ? 'eliminada' : 'eliminadas'} posteriormente.`,18,y,174,8.5)+5;
                 if(number(removed[5])) y+=write(`Historial eliminado: Presentes ${removed[1]} · Faltas ${removed[2]} · Atrasos ${removed[3]} · Justificadas ${removed[4]}.`,18,y,174,8.5)+5;
             } else if(isProgress){
                 drawMetricGrid([['XP del año',value('XP del año lectivo')],['Nivel alcanzado',value('Nivel según XP del año')],['Días activos',value('Días con actividad registrada')],['Actividades registradas',value('Actividad registrada')],['Racha',value('Racha almacenada en el año')],['Tareas completadas',value('Tareas completadas')]],3,27,0,{tail:progressTail});
@@ -503,6 +512,6 @@
         for(let page=1;page<=pageCount;page++){doc.setPage(page);if(page>1)drawPageHeader();drawPageFooter(page,pageCount);}
         return doc;
     }
-    root.ACAcademicReports = { normalize, filename, studentName, createDocument, formatEvaluationStatus, presentSection };
+    root.ACAcademicReports = { normalize, filename, studentName, getStudentDisplayName, createDocument, formatEvaluationStatus, formatReportStatus, presentSection };
     if (typeof module !== 'undefined' && module.exports) module.exports = root.ACAcademicReports;
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -9466,7 +9466,8 @@ async function getAcademicYearReportData(academicYearId) {
     if (error) throw error;
     if (!academicYearManager.matches(scope) || currentUser?.id !== scope.userId) throw new Error('La cuenta o el año lectivo cambió durante la generación.');
     if (data?.year?.user_id !== scope.userId || data?.year?.id !== academicYearId) throw new Error('No se pudo verificar el propietario del reporte.');
-    const raw = { ...data, student_name: data.student_name || auth.user.user_metadata?.full_name || currentUser.name };
+    // The RPC supplies profiles.full_name; metadata is a display-only fallback, never email-derived.
+    const raw = { ...data, student_name: ACAcademicReports.getStudentDisplayName(data.student_name, auth.user.user_metadata?.full_name) };
     return ACAcademicReports.normalize(raw, {
         gradeSummary: getSubjectGradeSummary, averageGrade: getAverageGrade, gradeItems: getGradeItems, gradeStatus: getGradeStatus,
         attendance: getAttendanceStats, projectStats: getProjectStats, stageStatus: getProjectStageStatus, taskStatus: normalizeTaskStatus,

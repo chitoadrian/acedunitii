@@ -31,6 +31,36 @@ test('Exact filename, sanitization, real name, no email/undefined fallback',()=>
     assert.equal(reports.filename('null',year),'Reporte de Estudiante - 2026-2027.pdf');
     assert.equal(reports.studentName('private@example.com'),'Estudiante');
 });
+test('One display-name resolver prefers the real profile, validates fallbacks and never derives an email name',()=>{
+    assert.equal(reports.studentName,reports.getStudentDisplayName);
+    assert.equal(reports.getStudentDisplayName(' Ana María Pérez ','Otro nombre'),'Ana María Pérez');
+    for(const invalid of ['',null,undefined,'null','undefined','Estudiante','private@example.com','123e4567-e89b-12d3-a456-426614174000',{}]){
+        assert.equal(reports.getStudentDisplayName(invalid,'Nombre del registro'),'Nombre del registro');
+        assert.equal(reports.getStudentDisplayName(invalid),'Estudiante');
+    }
+    const name='Juan Carlos Rodríguez Fernández';
+    const report=reports.normalize({year,student_name:name},helpers);
+    assert.equal(report.studentName,name);
+    assert.equal(report.filename,'Reporte de Juan Carlos Rodríguez Fernández - 2026-2027.pdf');
+    const visible=reports.normalize({year,student_name:'Ana / María: Pérez'},helpers);
+    assert.equal(visible.studentName,'Ana / María: Pérez');
+    assert.equal(visible.filename,'Reporte de Ana María Pérez - 2026-2027.pdf');
+    assert.equal(reports.filename('A'.repeat(151),year),'Reporte de '+'A'.repeat(151)+' - 2026-2027.pdf');
+});
+test('Actual report builder uses RPC profile name and verified user metadata only, not currentUser email fallback',async()=>{
+    let profileName=null,metadataName=null;
+    const env={ACAcademicReports:{...reports,normalize:raw=>raw},currentUser:{id:'user',name:'email-derived-name'},
+        academicYearManager:{scope:()=>({userId:'user',yearId:'year'}),matches:()=>true},
+        getSupabaseClient:()=>({auth:{getUser:async()=>({data:{user:{id:'user',user_metadata:{full_name:metadataName}}}})},rpc:async()=>({data:{year,student_name:profileName}})})};
+    for(const name of ['getSubjectGradeSummary','getAverageGrade','getGradeItems','getGradeStatus','getAttendanceStats','getProjectStats','getProjectStageStatus','normalizeTaskStatus','getTaskVisualStatus','getTaskPriorityLabel','getLevel'])env[name]=()=>{};
+    const builder=ast.body.find(node=>node.type==='FunctionDeclaration' && node.id.name==='getAcademicYearReportData');
+    vm.createContext(env);vm.runInContext(source.slice(builder.start,builder.end),env);
+    assert.equal((await env.getAcademicYearReportData('year')).student_name,'Estudiante');
+    metadataName='Nombre completo registrado';
+    assert.equal((await env.getAcademicYearReportData('year')).student_name,metadataName);
+    profileName='Nombre completo del perfil';
+    assert.equal((await env.getAcademicYearReportData('year')).student_name,profileName);
+});
 test('No data still produces all report sections and zero totals',()=>{
     const report=reports.normalize({year,student_name:'Ana',generated_at:'2026-10-15T12:00:00Z'},helpers);
     assert.equal(report.sections.length,11);
@@ -117,5 +147,28 @@ test('Task layout keeps date and AM/PM time together on separate lines without c
         assert.equal(shown.widths.reduce((a,b)=>a+b),174);
         assert.equal(shown.body[0].length,shown.headers.length);
         assert.equal(JSON.stringify(section),before);
+    }
+});
+test('Controlled status columns are human-readable without altering user subject names or source rows',()=>{
+    const names=['Algebra','biologia','quimica','Fisica','Lengua y literaura'];
+    const report=reports.normalize({year,subjects:names.map((name,i)=>row({id:'s'+i,name})),project_subtasks:[row({id:'sub',title:'Prueba',status:'unknown_internal'})]},helpers);
+    assert.deepEqual(report.sections.find(s=>s.title==='Materias del año').body.map(r=>r[0]),[...names].sort((a,b)=>a.localeCompare(b,'es',{numeric:true})));
+    const source=report.sections.find(s=>s.title==='Etapas y subtareas'),before=JSON.stringify(source);
+    assert.equal(reports.presentSection(source).body[0][2],'Sin especificar');
+    assert.equal(JSON.stringify(source),before);
+    for(const [value,label] of Object.entries({pending:'Pendiente',in_progress:'En progreso',cancelled:'Cancelada',completed:'Completado'}))assert.equal(reports.formatReportStatus(value),label);
+    assert.equal(reports.formatReportStatus('123e4567-e89b-12d3-a456-426614174000'),'Sin especificar');
+    for(const value of ['constructor','__proto__','toString'])assert.equal(reports.formatReportStatus(value),'Sin especificar');
+    assert.equal(reports.formatEvaluationStatus('in_progress'),'En progreso');
+    const task=reports.presentSection({title:'Tareas del año',kind:'tasks',headers:[],body:[['Tarea','Algebra','Sin fecha','completed_internal','Conservada','Alta']]});
+    assert.equal(task.body[0][3],'Completada');
+});
+test('Section descriptions use correct singular/plural, including one deleted subject and one event',()=>{
+    const subject=reports.presentSection({title:'Materias del año',headers:[],body:[['Algebra','0','0','0','Sin calificaciones','Eliminada posteriormente']]});
+    assert.equal(subject.note,'1 materia registrada · 0 activas · 1 eliminada posteriormente.');
+    for(const [title,singular,plural] of [['Evaluaciones','evaluación registrada','evaluaciones registradas'],['Mochila y recursos','recurso guardado','recursos guardados'],['Calendario y eventos','evento independiente','eventos independientes']]){
+        const item={title,headers:[],body:[['Prueba / Algebra','Examen','Sin fecha','pending','Conservada']]};
+        assert.ok(reports.presentSection(item).note.startsWith('1 '+singular));
+        assert.ok(reports.presentSection({...item,body:[...item.body,...item.body]}).note.startsWith('2 '+plural));
     }
 });
