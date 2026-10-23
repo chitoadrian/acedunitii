@@ -43,6 +43,13 @@
     box-shadow: none !important;
     filter: none !important;
 }
+/* Login alone uses the PNG's existing transparency; other logo surfaces stay unchanged. */
+#login-page .auth-card .auth-brand-logo {
+    background: transparent !important;
+}
+body:not(.light-theme) #login-page .auth-card .auth-brand-logo {
+    filter: drop-shadow(0 0 .75px rgba(220, 231, 255, .85)) !important;
+}
 @media (max-width: 767px) {
     #login-page .auth-card .auth-brand-logo,
     #register-page .auth-card .auth-brand-logo,

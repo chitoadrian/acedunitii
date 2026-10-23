@@ -65,3 +65,12 @@ test('Brand CSS touches only logos and the report changes only its branding reso
     assert.match(css,/object-fit: contain !important/);
     assert.match(read('academic-reports.js').toString(), new RegExp("fetch\\('favicon-192\\.png\\?v="+version+"'\\)"));
 });
+
+test('Only the upper login logo overrides its white surface with existing PNG transparency', () => {
+    const css = read('branding.css').toString();
+    const rule = css.match(/^#login-page \.auth-card \.auth-brand-logo \{([^}]+)\}/m);
+    assert.ok(rule);
+    assert.equal(rule[1].trim(), 'background: transparent !important;');
+    assert.match(css, /body:not\(\.light-theme\) #login-page \.auth-card \.auth-brand-logo \{\s*filter: drop-shadow/);
+    assert.match(html, /href="branding\.css\?v=20261022-login-logo-transparent-v2"/);
+});
