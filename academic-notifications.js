@@ -37,6 +37,7 @@
     let markAllButton = null;
     let panelOpen = false;
     let stateLoadGeneration = 0;
+    let loadingStates = false;
 
     function escapeHTML(value) {
         return String(value ?? '')
@@ -406,7 +407,7 @@
     function updateVisibility(sectionId) {
         if (!mount()) return false;
         const authenticated = Boolean(ownerId && document.body.classList.contains('is-dashboard'));
-        const visible = shouldShowBell(sectionId, authenticated);
+        const visible = !loadingStates && shouldShowBell(sectionId, authenticated);
         center.hidden = !visible;
         if (!visible) closePanel(false);
         return visible;
@@ -414,18 +415,24 @@
 
     async function start({ userId, workspace } = {}) {
         mount();
+        loadingStates = true;
         ownerId = String(userId || '');
         latestWorkspace = workspace || root.loadWorkspace?.() || {};
+        updateVisibility(root.currentSection || document.querySelector('#app-page .section.active')?.id || 'dashboard');
+        const generation = stateLoadGeneration + 1;
         try {
             await loadStates();
         } catch (error) {
             console.warn('[ACADEMIC NOTIFICATIONS] No se pudieron cargar estados:', { message: error?.message || 'network_error', code: error?.code || null });
         }
+        if (generation !== stateLoadGeneration || !ownerId) return notifications;
+        loadingStates = false;
         return refresh(latestWorkspace);
     }
 
     function stop() {
         stateLoadGeneration += 1;
+        loadingStates = false;
         ownerId = '';
         stateRows = [];
         notifications = [];

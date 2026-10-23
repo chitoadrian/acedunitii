@@ -1213,6 +1213,7 @@ function legacyHandleLogoutLocal() {
 // ============================================
 
 function navigateTo(sectionId, evt) {
+    const navigationStartedAt = performance.now();
     if (evt && evt.preventDefault) evt.preventDefault();
 
     // Remover clase active de secciones
@@ -1242,6 +1243,7 @@ function navigateTo(sectionId, evt) {
 
     currentSection = sectionId;
     rememberAppView(sectionId);
+    renderWorkspaceSection(sectionId);
     window.ACAcademicNotifications?.updateVisibility(sectionId);
 
     // Scroll al top en mobile
@@ -1249,6 +1251,7 @@ function navigateTo(sectionId, evt) {
         document.querySelector('.main-content').scrollTop = 0;
         closeSidebar();
     }
+    logAppTiming(`navigation ${sectionId}`, navigationStartedAt);
 }
 
 // ============================================
@@ -9449,6 +9452,20 @@ let academicYearSelector = null;
 const academicYearManager = ACAcademicYears.createManager({ onChange: renderAcademicYearSelector });
 let academicYearRolloverTimer = null;
 let academicYearRolloverInProgress = false;
+const dirtyWorkspaceSections = new Set();
+let renderedWorkspace = null;
+let renderedWorkspaceProgress = '';
+
+function invalidateWorkspaceSections() {
+    ['dashboard', 'subjects', 'tasks', 'calendar', 'grades', 'attendance', 'progress',
+        'backpack', 'profile', 'evaluations', 'goals-projects'].forEach(id => dirtyWorkspaceSections.add(id));
+    renderedWorkspace = workspaceState;
+    renderedWorkspaceProgress = `${workspaceState?.xp}:${workspaceState?.streak}`;
+}
+
+function logAppTiming(phase, startedAt) {
+    console.info(`[PERF] ${phase}: ${Math.round(performance.now() - startedAt)} ms`);
+}
 
 function academicTable(name) {
     return academicYearManager.table(name, getSupabaseClient());
@@ -9806,6 +9823,7 @@ function resetAuthForms() {
 function clearAuthenticatedClientState() {
     authOperationGeneration += 1;
     dashboardAuthorizedUserId = '';
+    dirtyWorkspaceSections.clear();
     closeSessionChoice();
     setTutorAuthenticatedUser(null);
     switchAppSettingsUser(null);
@@ -10655,7 +10673,7 @@ async function ensureProfileRow(user, fallbackName = '') {
     return created;
 }
 
-async function syncWorkspaceFromSupabase() {
+async function syncWorkspaceFromSupabase({ profile = null } = {}) {
     if (!currentUser?.id) {
         profileState = null;
         workspaceState = mergeWorkspaceState();
@@ -10666,7 +10684,9 @@ async function syncWorkspaceFromSupabase() {
     if (!scope.yearId) throw new Error('No hay un año lectivo seleccionado.');
     const sb = getSupabaseClient();
     const [profileRes, subjectsRes, tasksRes, eventsRes, evaluationsRes, attendanceRes, resourcesRes, gradesRes, projectsRes, goalsRes, stagesRes, subtasksRes] = await Promise.all([
-        sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+        profile?.id === currentUser.id
+            ? Promise.resolve({ data: profile, error: null })
+            : sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
         academicTable('subjects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: true }),
         academicTable('tasks').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
         academicTable('events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true }),
@@ -10924,19 +10944,41 @@ function requestWelcomeEmailForConfirmedUser(user) {
 }
 
 async function bootstrapAuthenticatedApp(user, fallbackName = '') {
+    const generation = authOperationGeneration;
+    const startedAt = performance.now();
     setTutorAuthenticatedUser(user);
-
-    const profile = await ensureProfileRow(user, fallbackName);
+    currentUser = getPublicUserFromAuth(user);
+    // Apply this account's existing preferences immediately; remote preferences
+    // and notices must not hold the academic workspace behind another round trip.
+    const preferencesReady = switchAppSettingsUser(user, { deferReminders: true })
+        .catch(error => console.warn('[SETTINGS] Preferencias aplazadas:', error?.message || 'network_error'));
+    // Both operations depend only on the already validated Auth user. The year
+    // RPC references auth.users, not profiles; academic queries still wait for both.
+    const [profile] = await Promise.all([
+        ensureProfileRow(user, fallbackName),
+        ensureAcademicYearForUser(user.id)
+    ]);
+    if (generation !== authOperationGeneration) throw new Error('La sesión cambió durante la carga.');
     currentUser = getPublicUserFromAuth(user, profile);
-    await ensureAcademicYearForUser(user.id);
-    await switchAppSettingsUser(user);
     console.log('[Supabase] Usuario autenticado validado', { userId: user.id });
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
-    await syncWorkspaceFromSupabase();
-    await window.ACAcademicNotifications?.start({ userId: user.id, workspace: loadWorkspace() });
+    await syncWorkspaceFromSupabase({ profile });
+    if (generation !== authOperationGeneration) throw new Error('La sesión cambió durante la carga.');
+    const scope = academicYearManager.scope();
+    const stillCurrent = () => generation === authOperationGeneration && currentUser?.id === user.id && academicYearManager.matches(scope);
     dashboardAuthorizedUserId = user.id;
     updateDashboardGreeting();
+    logAppTiming('authenticated workspace', startedAt);
+    // Yield the first frame to the validated, fully loaded academic view.
+    window.requestAnimationFrame(() => {
+        if (!stillCurrent()) return;
+        void window.ACAcademicNotifications?.start({ userId: user.id, workspace: loadWorkspace() })
+            .catch(error => console.warn('[ACADEMIC NOTIFICATIONS] Carga aplazada:', error?.message || 'network_error'));
+    });
+    void preferencesReady.then(() => {
+        if (stillCurrent()) return runSmartReminders();
+    }).catch(error => console.warn('[SETTINGS] Preferencias aplazadas:', error?.message || 'network_error'));
 }
 
 async function updateProfileProgress(deltaXp, { bumpStreak = false } = {}) {
@@ -11318,6 +11360,13 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
     window.scrollTo(0, 0);
     finishBooting();
     maybeShowAcademicYearWelcome();
+    if (Number.isFinite(options.startedAt)) {
+        window.requestAnimationFrame(() => {
+            if (generation === authOperationGeneration && dashboardAuthorizedUserId === authUser.id) {
+                logAppTiming(`${options.source || 'app'} dashboard interactive`, options.startedAt);
+            }
+        });
+    }
 }
 
 function showApp() {
@@ -11580,6 +11629,7 @@ async function handleLogin(event) {
     if (loginInProgress) return;
 
     loginInProgress = true;
+    const loginStartedAt = performance.now();
     const generation = ++authOperationGeneration;
     const loginForm = document.getElementById('login-form');
     const loginButton = loginForm?.querySelector('button[type="submit"]');
@@ -11615,12 +11665,14 @@ async function handleLogin(event) {
         }
         const authUser = data.user || data.session?.user;
         if (!data.session || !authUser) throw new Error('No se encontró una sesión válida.');
+        logAppTiming('login credentials accepted', loginStartedAt);
 
         const validatedUser = await getValidatedAuthUser();
         if (generation !== authOperationGeneration) return;
         if (!validatedUser || validatedUser.id !== authUser.id) {
             throw new Error('La sesión no pudo validarse.');
         }
+        logAppTiming('login session validated', loginStartedAt);
 
         await bootstrapAuthenticatedApp(validatedUser);
         if (generation !== authOperationGeneration) return;
@@ -11628,7 +11680,7 @@ async function handleLogin(event) {
         resetAuthForms();
         notify('Sesión iniciada correctamente.', 'success');
         playInterfaceSound();
-        await showDashboard('dashboard', { validatedUser });
+        await showDashboard('dashboard', { validatedUser, startedAt: loginStartedAt, source: 'login' });
     } catch (error) {
         if (generation === authOperationGeneration) {
             console.error('[LOGIN] Error de autenticación:', error?.message || error);
@@ -12288,24 +12340,36 @@ async function completeTask(taskId) {
     }
 }
 
+function renderWorkspaceSection(sectionId, workspace) {
+    // Directed CRUD helpers replace workspaceState; no full sync is needed to
+    // invalidate previously visited views. XP/streak also have in-place updates.
+    if (renderedWorkspace !== workspaceState || renderedWorkspaceProgress !== `${workspaceState?.xp}:${workspaceState?.streak}`) {
+        invalidateWorkspaceSections();
+    }
+    if (!dirtyWorkspaceSections.has(sectionId)) return;
+    const renderers = {
+        dashboard: renderDashboard, subjects: renderSubjects, tasks: renderTasks,
+        calendar: renderCalendarSection, grades: renderGrades, attendance: renderAttendance,
+        progress: renderProgress, backpack: renderBackpack, profile: renderProfile,
+        evaluations: renderEvaluations, 'goals-projects': renderGoalsProjects
+    };
+    const render = renderers[sectionId];
+    if (!render) return;
+    const snapshot = workspace || loadWorkspace();
+    render(snapshot);
+    if (sectionId === 'grades') updateGradeSubjectOptions(snapshot);
+    dirtyWorkspaceSections.delete(sectionId);
+}
+
 function refreshWorkspaceUI() {
     const workspace = loadWorkspace();
-    renderDashboard(workspace);
-    renderSubjects(workspace);
-    renderTasks(workspace);
-    renderCalendarSection(workspace);
-    renderGrades(workspace);
-    renderAttendance(workspace);
-    renderProgress(workspace);
-    renderBackpack(workspace);
-    renderProfile(workspace);
-    renderEvaluations(workspace);
-    renderGoalsProjects(workspace);
-    updateGradeSubjectOptions(workspace);
+    invalidateWorkspaceSections();
+    renderWorkspaceSection(currentSection, workspace);
     window.ACAcademicNotifications?.refresh(workspace);
 }
 
 async function initializeApp() {
+    const appStartedAt = performance.now();
     document.getElementById('academic-year-select')?.addEventListener('change', event => selectAcademicYear(event.target.value));
     document.addEventListener('keydown', event => {
         const modal = document.getElementById('academic-year-welcome');
@@ -12437,7 +12501,7 @@ async function initializeApp() {
                 const restoredView = getStoredAppView();
                 console.log('[APP] Restaurando panel con sesión validada:', restoredView);
                 await bootstrapAuthenticatedApp(authUser);
-                await showDashboard(restoredView, { validatedUser: authUser });
+                await showDashboard(restoredView, { validatedUser: authUser, startedAt: appStartedAt, source: 'restore' });
                 return;
             }
         }
@@ -12599,8 +12663,9 @@ async function persistAppSettings(nextSettings = appSettings) {
     }
 }
 
-async function switchAppSettingsUser(user) {
+async function switchAppSettingsUser(user, { deferReminders = false } = {}) {
     const userId = user?.id ? String(user.id) : '';
+    const generation = authOperationGeneration;
     dashboardSettingsDraft = null;
     settingsReminderKey = '';
 
@@ -12630,6 +12695,7 @@ async function switchAppSettingsUser(user) {
             .maybeSingle();
 
         if (error) throw error;
+        if (generation !== authOperationGeneration || appSettingsOwnerId !== userId) return;
 
         if (data) {
             appSettings = appSettingsFromDatabase(data);
@@ -12648,9 +12714,10 @@ async function switchAppSettingsUser(user) {
         });
     }
 
+    if (generation !== authOperationGeneration || appSettingsOwnerId !== userId) return;
     clearLegacyGlobalSettings();
     applyAppSettings();
-    await runSmartReminders();
+    if (!deferReminders) await runSmartReminders();
 }
 
 function updateSettingsSwitchLabel(input) {
