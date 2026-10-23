@@ -40764,10 +40764,15 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-
 }
 
 #landing-page .hero-visual.active .mockup-bars i {
-    animation: heroPanelBarOscillate 4.8s ease-in-out infinite;
+    animation: heroPanelBarGrow1 5.4s ease-in-out infinite both;
 }
 
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(even) i { animation-delay: -2.4s; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(2) i { animation-name: heroPanelBarGrow2; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(3) i { animation-name: heroPanelBarGrow3; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(4) i { animation-name: heroPanelBarGrow4; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(5) i { animation-name: heroPanelBarGrow5; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(6) i { animation-name: heroPanelBarGrow6; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(7) i { animation-name: heroPanelBarGrow7; }
 
 #landing-page .metric-card, #landing-page .tutor-card { min-height: 74px; }
 
@@ -40834,9 +40839,34 @@ html.reduce-app-motion #landing-page .hero-visual.active .mockup-bars i {
     transform: scaleY(1);
 }
 
-@keyframes heroPanelBarOscillate {
-    0%, 100% { transform: scaleY(.94); }
-    50% { transform: scaleY(1); }
+/* Shared 5.4 s clock: stagger only growth; hold, return and restart together. */
+@keyframes heroPanelBarGrow1 {
+    0%, 90%, 100% { transform: scaleY(0); }
+    20%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow2 {
+    0%, 4%, 90%, 100% { transform: scaleY(0); }
+    24%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow3 {
+    0%, 8%, 90%, 100% { transform: scaleY(0); }
+    28%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow4 {
+    0%, 12%, 90%, 100% { transform: scaleY(0); }
+    32%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow5 {
+    0%, 16%, 90%, 100% { transform: scaleY(0); }
+    36%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow6 {
+    0%, 20%, 90%, 100% { transform: scaleY(0); }
+    40%, 70% { transform: scaleY(1); }
+}
+@keyframes heroPanelBarGrow7 {
+    0%, 24%, 90%, 100% { transform: scaleY(0); }
+    44%, 70% { transform: scaleY(1); }
 }
 
 @keyframes heroPanelStatusPulse { 0%, 100% { opacity: .68; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }

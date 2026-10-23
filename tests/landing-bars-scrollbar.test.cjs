@@ -11,15 +11,42 @@ test('Seven public preview bars retain exact labels, heights and no new markup',
     const graph = html.match(/<div class="mockup-bars"[^>]*>(.*?)<\/div>/)[1];
     assert.deepEqual([...graph.matchAll(/<small>(.*?)<\/small>/g)].map(x=>x[1]), ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']);
     assert.deepEqual([...graph.matchAll(/--bar:(\d+)%/g)].map(x=>Number(x[1])), [42,65,54,82,70,48,76]);
-    assert.match(html,/style\.css\?v=20261022-weekly-bars-page-scrollbar-v1/);
+    assert.match(html,/style\.css\?v=20261022-weekly-bars-sequential-growth-v2/);
 });
 
-test('Only public bars oscillate: subtle scale, stable baseline and opposite even phases', () => {
-    assert.match(css, /#landing-page \.hero-visual\.active \.mockup-bars i \{\s*animation: heroPanelBarOscillate 4\.8s ease-in-out infinite;/);
-    assert.match(css, /span:nth-child\(even\) i \{ animation-delay: -2\.4s; \}/);
+test('Only public bars grow on a synchronized 5.4-second clock without changing layout', () => {
+    assert.match(css, /#landing-page \.hero-visual\.active \.mockup-bars i \{\s*animation: heroPanelBarGrow1 5\.4s ease-in-out infinite both;/);
     assert.match(css, /transform-origin: center bottom/);
-    assert.match(css, /@keyframes heroPanelBarOscillate \{\s*0%, 100% \{ transform: scaleY\(\.94\); \}\s*50% \{ transform: scaleY\(1\); \}/);
-    assert.doesNotMatch(css, /animation: heroPanelBarGrow|animation-duration: 160ms; animation-delay: 0ms/);
+    assert.doesNotMatch(css, /heroPanelBarOscillate|animation-delay: -2\.4s/);
+    const animatedRules = [...css.matchAll(/([^{}]+)\{([^{}]*heroPanelBarGrow\d[^{}]*)\}/g)];
+    assert.equal(animatedRules.length,7);
+    for(const [,selector,body] of animatedRules) {
+        assert.ok(selector.trim().startsWith('#landing-page .hero-visual.active .mockup-bars'));
+        assert.doesNotMatch(body,/width:|height:|margin:|padding:|position:|background:|box-shadow:/);
+    }
+});
+
+test('Lun to Dom stagger only the growth, then hold, reset together and loop without jumps', () => {
+    const frames = [];
+    for(let i=1;i<=7;i++) {
+        if(i>1) assert.ok(css.includes(`#landing-page .hero-visual.active .mockup-bars > span:nth-child(${i}) i { animation-name: heroPanelBarGrow${i}; }`));
+        const keyframes = css.match(new RegExp(`@keyframes heroPanelBarGrow${i} \\{([\\s\\S]*?)\\n\\}`))[1];
+        const groups = [...keyframes.matchAll(/([\d%,\s]+)\{\s*transform: scaleY\((\d)\);\s*\}/g)];
+        assert.equal(groups.length,2);
+        const timeline = groups.flatMap(([,percentages,scale])=>[...percentages.matchAll(/(\d+)%/g)].map(x=>({time:Number(x[1]),scale:Number(scale)}))).sort((a,b)=>a.time-b.time);
+        const start = (i-1)*4, full = start+20;
+        assert.deepEqual(timeline.filter(x=>x.scale===1).map(x=>x.time),[full,70]);
+        assert.equal(timeline[0].scale,0);
+        assert.equal(timeline.at(-1).scale,0);
+        assert.ok(timeline.some(x=>x.time===start && x.scale===0));
+        assert.ok(timeline.some(x=>x.time===90 && x.scale===0));
+        assert.equal(timeline.at(-1).time,100);
+        assert.doesNotMatch(keyframes,/opacity|height|width|translate|scaleY\((?![01]\))/);
+        frames.push({start,full});
+    }
+    assert.deepEqual(frames.map(x=>x.start),[0,4,8,12,16,20,24]);
+    assert.ok(Math.abs((70-frames.at(-1).full)*5.4/100-1.404)<1e-9); // All seven fully visible together.
+    assert.ok(frames.at(-1).full<70);
 });
 
 test('Existing reduced-motion, disabled animations and performance preferences stop motion', () => {
