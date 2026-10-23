@@ -175,7 +175,7 @@
         return librariesPromise;
     }
     async function logoData() {
-        const response = await fetch('favicon-192.png');
+        const response = await fetch('favicon-192.png?v=20261022-official-branding-v1');
         if (!response.ok) throw new Error('No se pudo cargar el logo del reporte.');
         const blob = await response.blob();
         return new Promise((resolve, reject) => {

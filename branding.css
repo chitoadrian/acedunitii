@@ -1,0 +1,59 @@
+/* Official branding: preserve the supplied artwork, never crop it to a circle. */
+#landing-page .nav-logo .brand-logo,
+#app-page .sidebar .sidebar-logo .brand-logo,
+#login-page .login-intro-logo,
+#register-page .register-intro-logo,
+.boot-loader-logo-wrapper .boot-loader-logo,
+.settings-about-content img,
+#academic-year-welcome .academic-year-welcome-card > img {
+    object-fit: contain !important;
+    border-radius: 0 !important;
+    clip-path: none !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+    padding: 0 !important;
+    flex-shrink: 0;
+}
+.boot-loader-logo-wrapper {
+    overflow: visible;
+    border-radius: 0;
+}
+/* The full official lockup has navy lettering. Its small white presentation
+   surface preserves that exact lettering in both themes, without inversion. */
+#login-page .auth-card .auth-brand-logo,
+#register-page .auth-card .auth-brand-logo,
+#password-recovery-result-page .password-recovery-result-logo {
+    box-sizing: border-box !important;
+    width: 92px !important;
+    height: 110px !important;
+    min-width: 92px !important;
+    min-height: 110px !important;
+    max-width: 92px !important;
+    max-height: 110px !important;
+    flex: 0 0 auto !important;
+    aspect-ratio: auto !important;
+    object-fit: contain !important;
+    padding: 7px !important;
+    border-radius: 12px !important;
+    clip-path: none !important;
+    background: #fff !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+@media (max-width: 767px) {
+    #login-page .auth-card .auth-brand-logo,
+    #register-page .auth-card .auth-brand-logo,
+    #password-recovery-result-page .password-recovery-result-logo {
+        width: 76px !important;
+        height: 91px !important;
+        min-width: 76px !important;
+        min-height: 91px !important;
+        max-width: 76px !important;
+        max-height: 91px !important;
+        padding: 6px !important;
+        border-radius: 10px !important;
+    }
+}
