@@ -40764,15 +40764,10 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .landing-
 }
 
 #landing-page .hero-visual.active .mockup-bars i {
-    animation: heroPanelBarGrow 480ms cubic-bezier(.22, 1, .36, 1) both;
+    animation: heroPanelBarOscillate 4.8s ease-in-out infinite;
 }
 
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(2) i { animation-delay: 45ms; }
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(3) i { animation-delay: 90ms; }
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(4) i { animation-delay: 135ms; }
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(5) i { animation-delay: 180ms; }
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(6) i { animation-delay: 225ms; }
-#landing-page .hero-visual.active .mockup-bars > span:nth-child(7) i { animation-delay: 270ms; }
+#landing-page .hero-visual.active .mockup-bars > span:nth-child(even) i { animation-delay: -2.4s; }
 
 #landing-page .metric-card, #landing-page .tutor-card { min-height: 74px; }
 
@@ -40833,9 +40828,16 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #landing-page .hero-min
 html.performance-mode #landing-page .dashboard-mockup::before, html.performance-mode #landing-page .panel-status { animation: none !important; }
 
 html.performance-mode #landing-page .dashboard-mockup::before { opacity: .06; }
-html.performance-mode #landing-page .hero-visual.active .mockup-bars i { animation-duration: 160ms; animation-delay: 0ms; }
+html.performance-mode #landing-page .hero-visual.active .mockup-bars i,
+html.reduce-app-motion #landing-page .hero-visual.active .mockup-bars i {
+    animation: none;
+    transform: scaleY(1);
+}
 
-@keyframes heroPanelBarGrow { from { opacity: .55; transform: scaleY(0); } to { opacity: 1; transform: scaleY(1); } }
+@keyframes heroPanelBarOscillate {
+    0%, 100% { transform: scaleY(.94); }
+    50% { transform: scaleY(1); }
+}
 
 @keyframes heroPanelStatusPulse { 0%, 100% { opacity: .68; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
 
@@ -41936,4 +41938,67 @@ body #landing-page.page :is(.hero-badge, .section-eyebrow) {
 #landing-page #features .feature-list li::before {
     background: var(--landing-detail-accent) !important;
     box-shadow: none !important;
+}
+
+/* Page scrollbar only: html owns regular views, body owns the public landing.
+   Existing inner scroll areas keep their own selectors and dimensions. */
+html:root,
+body,
+body:is(.is-landing, .landing-mode, .landing-active) {
+    --page-scroll-track: #101b2a;
+    --page-scroll-thumb: #4c9daf;
+    --page-scroll-hover: #70bdcc;
+    scrollbar-color: var(--page-scroll-thumb) var(--page-scroll-track) !important;
+    scrollbar-width: thin !important;
+}
+html:root:has(body:is(.light-theme, .light-mode, [data-theme="light"])),
+body:is(.light-theme, .light-mode, [data-theme="light"]) {
+    --page-scroll-track: #eaf0f5;
+    --page-scroll-thumb: #3c8192;
+    --page-scroll-hover: #286b7b;
+}
+/* Chromium/Safari: prefer the rounded native pseudo-elements. Firefox uses
+   the standard thin scrollbar above. No scroll geometry/overflow is changed. */
+@supports selector(::-webkit-scrollbar) {
+    html:root,
+    body,
+    body:is(.is-landing, .landing-mode, .landing-active) {
+        scrollbar-color: auto !important;
+        scrollbar-width: auto !important;
+    }
+    html:root::-webkit-scrollbar,
+    body::-webkit-scrollbar,
+    body:is(.is-landing, .landing-mode, .landing-active)::-webkit-scrollbar {
+        width: 10px !important;
+    }
+    html:root::-webkit-scrollbar-track,
+    body::-webkit-scrollbar-track,
+    body:is(.is-landing, .landing-mode, .landing-active)::-webkit-scrollbar-track {
+        background: var(--page-scroll-track) !important;
+    }
+    html:root::-webkit-scrollbar-thumb,
+    body::-webkit-scrollbar-thumb,
+    body:is(.is-landing, .landing-mode, .landing-active)::-webkit-scrollbar-thumb {
+        min-height: 44px;
+        border: 2px solid var(--page-scroll-track) !important;
+        border-radius: 999px !important;
+        background: var(--page-scroll-thumb) !important;
+        background-clip: padding-box !important;
+    }
+    html:root::-webkit-scrollbar-thumb:hover,
+    body::-webkit-scrollbar-thumb:hover,
+    body:is(.is-landing, .landing-mode, .landing-active)::-webkit-scrollbar-thumb:hover {
+        background-color: var(--page-scroll-hover) !important;
+    }
+}
+@media (forced-colors: active) {
+    html:root,
+    body,
+    body:is(.is-landing, .landing-mode, .landing-active) {
+        --page-scroll-track: Canvas;
+        --page-scroll-thumb: ButtonText;
+        --page-scroll-hover: Highlight;
+        scrollbar-color: auto !important;
+        scrollbar-width: auto !important;
+    }
 }
