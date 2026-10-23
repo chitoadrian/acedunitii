@@ -12,7 +12,9 @@ function declaration(text, name) {
     return matches.at(-1)[0];
 }
 function context(functions, globals = {}, text = source) {
-    const scope = vm.createContext({ console: { info() {}, log() {}, warn() {} }, performance: { now: () => 0 }, ...globals });
+    const scope = vm.createContext({ console: { info() {}, log() {}, warn() {} }, performance: { now: () => 0 },
+        measureAppOperation: async (_, operation) => operation(),
+        RESOURCE_METADATA_COLUMNS: 'id,user_id,subject_id,title,file_name,description,created_at,academic_year_id', ...globals });
     vm.runInContext(functions.map(name => declaration(text, name)).join('\n'), scope);
     return scope;
 }

@@ -8250,6 +8250,9 @@ function openResourceForm(resourceId = null) {
                     file_url: payload.fileDataUrl || payload.fileUrl || null,
                     description: payload.description
                 };
+                // A metadata-only resource has not downloaded its stored PDF.
+                // Updating its title/description must never overwrite that file.
+                if (resourceId && !uploadedFile && resource?.fileLoaded === false) delete resourceData.file_url;
                 console.log("[RESOURCES] insertando recurso", resourceData);
 
                 if (resourceId) {
@@ -8500,15 +8503,54 @@ function resetBackpackFilters() {
     renderBackpack(loadWorkspace());
 }
 
+function ensureResourceFile(resourceId) {
+    const scope = academicYearManager.scope();
+    const resource = workspaceState?.resources?.find(item => item.id === resourceId);
+    if (!resource || !scope.userId || scope.userId !== currentUser?.id || !scope.yearId) {
+        return Promise.reject(new Error('El recurso no está disponible en el año seleccionado.'));
+    }
+    if (resource.fileLoaded !== false) return Promise.resolve(resource);
+    const key = `${scope.userId}:${scope.yearId}:${scope.generation}:${resourceId}`;
+    if (resourceFileRequests.has(key)) return resourceFileRequests.get(key);
+    const request = measureAppOperation('data requested PDF', async () => {
+        const { data, error } = await academicTable('resources').select('id,file_url').eq('id', resourceId).single();
+        if (error) throw error;
+        if (!academicYearManager.matches(scope) || currentUser?.id !== scope.userId) throw new Error('La cuenta o el año lectivo cambió durante la carga.');
+        const current = workspaceState?.resources?.find(item => item.id === resourceId);
+        if (!current || data?.id !== resourceId) throw new Error('El recurso ya no está disponible.');
+        if (current.fileLoaded !== false) return current; // An intervening edit supplied a newer PDF.
+        const loaded = { ...current, fileDataUrl: data.file_url || '', fileUrl: data.file_url || '', fileLoaded: true };
+        workspaceState = { ...workspaceState, resources: workspaceState.resources.map(item => item.id === resourceId ? loaded : item) };
+        return loaded;
+    }).finally(() => resourceFileRequests.delete(key));
+    resourceFileRequests.set(key, request);
+    return request;
+}
+
 function viewResource(resourceId) {
     const resource = loadWorkspace().resources.find(item => item.id === resourceId);
     if (!resource) return;
-
+    if (resource.fileLoaded === false) {
+        // Reserve the existing PDF viewer during the click, before asynchronous
+        // loading, so browser popup protection does not break the original action.
+        const tab = window.open('', '_blank');
+        if (tab) {
+            tab.document.title = resource.fileName || resource.title || 'PDF';
+            tab.document.body.innerHTML = '<p style="font-family: Arial, sans-serif; padding: 24px;">Abriendo PDF...</p>';
+        }
+        void ensureResourceFile(resourceId).then(loaded => {
+            if (!loaded.fileDataUrl) { tab?.close(); viewResource(resourceId); return; }
+            openPdfResource(loaded, 'Abriste un PDF desde Mochila Digital.', tab);
+        }).catch(error => {
+            tab?.close();
+            notify(error.message || 'No se pudo abrir el PDF. Intenta nuevamente.', 'error');
+        });
+        return;
+    }
     if (resource.fileDataUrl) {
         openPdfResource(resource, 'Abriste un PDF desde Mochila Digital.');
         return;
     }
-
     showAIResult(`Vista del recurso: ${resource.title}`, `Materia: ${resource.subject || 'General'}\nArchivo: ${resource.fileName || 'PDF'}\nTipo: ${resource.tag || resource.type || 'PDF'}\n\nDescripción:\n${resource.description || resource.content || 'Sin descripción'}\n\nCuando conectes Google Drive o Supabase Storage, esta vista podra abrir el archivo real desde la nube.`);
 }
 
@@ -8533,7 +8575,8 @@ function createPdfObjectUrl(dataUrl, fallbackMime = 'application/pdf') {
     return URL.createObjectURL(new Blob(bytes, { type: mime || fallbackMime }));
 }
 
-function openPdfResource(resource, recentText = 'Abriste un PDF desde Mochila Digital.') {
+function openPdfResource(resource, recentText = 'Abriste un PDF desde Mochila Digital.', existingTab = null) {
+    if (existingTab?.closed) return false;
     if (!resource.fileDataUrl) {
         notify('Este recurso no tiene el archivo PDF guardado. Editalo y vuelve a subir el PDF.', 'error');
         return false;
@@ -8543,11 +8586,12 @@ function openPdfResource(resource, recentText = 'Abriste un PDF desde Mochila Di
     try {
         pdfUrl = createPdfObjectUrl(resource.fileDataUrl, resource.fileMime || 'application/pdf');
     } catch (error) {
+        existingTab?.close();
         notify('No se pudo preparar el PDF. Vuelve a subir el archivo.', 'error');
         return false;
     }
 
-    const tab = window.open('', '_blank');
+    const tab = existingTab || window.open('', '_blank');
     if (tab) {
         tab.document.title = resource.fileName || resource.title || 'PDF';
         tab.document.body.innerHTML = '<p style="font-family: Arial, sans-serif; padding: 24px;">Abriendo PDF...</p>';
@@ -9467,6 +9511,15 @@ function logAppTiming(phase, startedAt) {
     console.info(`[PERF] ${phase}: ${Math.round(performance.now() - startedAt)} ms`);
 }
 
+async function measureAppOperation(phase, operation) {
+    const startedAt = performance.now();
+    try { return await operation(); }
+    finally { logAppTiming(phase, startedAt); }
+}
+
+const RESOURCE_METADATA_COLUMNS = 'id,user_id,subject_id,title,file_name,description,created_at,academic_year_id';
+const resourceFileRequests = new Map();
+
 function academicTable(name) {
     return academicYearManager.table(name, getSupabaseClient());
 }
@@ -9824,6 +9877,7 @@ function clearAuthenticatedClientState() {
     authOperationGeneration += 1;
     dashboardAuthorizedUserId = '';
     dirtyWorkspaceSections.clear();
+    resourceFileRequests.clear();
     closeSessionChoice();
     setTutorAuthenticatedUser(null);
     switchAppSettingsUser(null);
@@ -9846,9 +9900,9 @@ function isConfirmedAuthUser(user) {
 
 async function getValidatedAuthUser() {
     const sb = getSupabaseClient();
-    const { data: sessionData, error: sessionError } = await sb.auth.getSession();
+    const { data: sessionData, error: sessionError } = await measureAppOperation('auth session lookup', () => sb.auth.getSession());
     if (sessionError || !sessionData?.session) return null;
-    const { data: userData, error: userError } = await sb.auth.getUser();
+    const { data: userData, error: userError } = await measureAppOperation('auth server verification', () => sb.auth.getUser());
     if (userError || !userData?.user || userData.user.id !== sessionData.session.user?.id) return null;
     if (!isConfirmedAuthUser(userData.user)) return null;
     return userData.user;
@@ -10692,7 +10746,7 @@ async function syncWorkspaceFromSupabase({ profile = null } = {}) {
         academicTable('events').select('*').eq('user_id', currentUser.id).order('event_date', { ascending: true }),
         academicTable('evaluations').select('*').eq('user_id', currentUser.id).order('evaluation_date', { ascending: true }),
         academicTable('attendance').select('*').eq('user_id', currentUser.id).order('date', { ascending: false }),
-        academicTable('resources').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
+        measureAppOperation('data resource metadata', () => academicTable('resources').select(RESOURCE_METADATA_COLUMNS).eq('user_id', currentUser.id).order('created_at', { ascending: false })),
         academicTable('grades').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
         academicTable('projects').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
         academicTable('goals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false }),
@@ -10840,6 +10894,7 @@ async function syncWorkspaceFromSupabase({ profile = null } = {}) {
         fileName: resource.file_name || 'PDF',
         fileDataUrl: resource.file_url || '',
         fileUrl: resource.file_url || '',
+        fileLoaded: Object.prototype.hasOwnProperty.call(resource, 'file_url'),
         fileMime: 'application/pdf',
         description: resource.description || '',
         content: resource.description || '',
@@ -10853,10 +10908,10 @@ async function syncWorkspaceFromSupabase({ profile = null } = {}) {
     const gradeIds = gradeRows.map(grade => grade.id).filter(Boolean);
     let gradeItemsRows = [];
     if (gradeIds.length) {
-        const gradeItemsRes = await academicTable('grade_items')
+        const gradeItemsRes = await measureAppOperation('data grade items', () => academicTable('grade_items')
             .select('*')
             .in('grade_id', gradeIds)
-            .order('item_date', { ascending: true });
+            .order('item_date', { ascending: true }));
 
         if (gradeItemsRes.error) {
             logSupabaseError('grade_items sync select', gradeItemsRes.error);
@@ -10955,15 +11010,15 @@ async function bootstrapAuthenticatedApp(user, fallbackName = '') {
     // Both operations depend only on the already validated Auth user. The year
     // RPC references auth.users, not profiles; academic queries still wait for both.
     const [profile] = await Promise.all([
-        ensureProfileRow(user, fallbackName),
-        ensureAcademicYearForUser(user.id)
+        measureAppOperation('data profile', () => ensureProfileRow(user, fallbackName)),
+        measureAppOperation('data academic year', () => ensureAcademicYearForUser(user.id))
     ]);
     if (generation !== authOperationGeneration) throw new Error('La sesión cambió durante la carga.');
     currentUser = getPublicUserFromAuth(user, profile);
     console.log('[Supabase] Usuario autenticado validado', { userId: user.id });
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     requestWelcomeEmailForConfirmedUser(user);
-    await syncWorkspaceFromSupabase({ profile });
+    await measureAppOperation('data initial academic workspace', () => syncWorkspaceFromSupabase({ profile }));
     if (generation !== authOperationGeneration) throw new Error('La sesión cambió durante la carga.');
     const scope = academicYearManager.scope();
     const stillCurrent = () => generation === authOperationGeneration && currentUser?.id === user.id && academicYearManager.matches(scope);
@@ -11304,6 +11359,7 @@ function showLanding(options = {}) {
 }
 
 async function showDashboard(sectionId = 'dashboard', options = {}) {
+    const dashboardStartedAt = performance.now();
     const generation = authOperationGeneration;
     let authUser = options.validatedUser || null;
     if (!authUser || dashboardAuthorizedUserId !== authUser.id) {
@@ -11360,6 +11416,7 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
     window.scrollTo(0, 0);
     finishBooting();
     maybeShowAcademicYearWelcome();
+    logAppTiming('dashboard render', dashboardStartedAt);
     if (Number.isFinite(options.startedAt)) {
         window.requestAnimationFrame(() => {
             if (generation === authOperationGeneration && dashboardAuthorizedUserId === authUser.id) {
@@ -11658,7 +11715,7 @@ async function handleLogin(event) {
         setAuthPersistenceMode(remember);
         const sb = getSupabaseClient();
         console.log('[LOGIN] Iniciando autenticación', { persistence: remember ? 'local' : 'session' });
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
+        const { data, error } = await measureAppOperation('auth signInWithPassword', () => sb.auth.signInWithPassword({ email, password }));
         if (error) {
             logSupabaseError('auth signInWithPassword', error);
             throw error;
@@ -11809,7 +11866,7 @@ function mapSavedAttendanceRow(row) {
 }
 
 function mapSavedResourceRow(row) {
-    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), title: row.title || '', fileName: row.file_name || 'PDF', fileDataUrl: row.file_url || '', fileUrl: row.file_url || '', fileMime: 'application/pdf', description: row.description || '', content: row.description || '', type: 'PDF', tag: row.tag || 'Apunte', uploadedAt: row.created_at || new Date().toISOString(), usedAI: Boolean(row.used_ai || row.usedAI) };
+    return { id: row.id, subjectId: row.subject_id || '', subject: getWorkspaceSubjectName(row.subject_id), title: row.title || '', fileName: row.file_name || 'PDF', fileDataUrl: row.file_url || '', fileUrl: row.file_url || '', fileLoaded: Object.prototype.hasOwnProperty.call(row, 'file_url'), fileMime: 'application/pdf', description: row.description || '', content: row.description || '', type: 'PDF', tag: row.tag || 'Apunte', uploadedAt: row.created_at || new Date().toISOString(), usedAI: Boolean(row.used_ai || row.usedAI) };
 }
 
 function mapSavedGradeRow(row, items = []) {
@@ -12442,6 +12499,7 @@ async function initializeApp() {
 
         if (!authListenerReady) {
             sb.auth.onAuthStateChange(async (authEvent, session) => {
+                const callbackStartedAt = performance.now();
                 console.log('[Supabase Auth] Evento recibido:', {
                     event: authEvent,
                     hasSession: Boolean(session)
@@ -12470,6 +12528,7 @@ async function initializeApp() {
                     }
                     return;
                 }
+                logAppTiming(`auth callback ${authEvent}`, callbackStartedAt);
             });
             authListenerReady = true;
         }
