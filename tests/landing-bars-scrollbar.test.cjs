@@ -11,7 +11,8 @@ test('Seven public preview bars retain exact labels, heights and no new markup',
     const graph = html.match(/<div class="mockup-bars"[^>]*>(.*?)<\/div>/)[1];
     assert.deepEqual([...graph.matchAll(/<small>(.*?)<\/small>/g)].map(x=>x[1]), ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']);
     assert.deepEqual([...graph.matchAll(/--bar:(\d+)%/g)].map(x=>Number(x[1])), [42,65,54,82,70,48,76]);
-    assert.match(html,/style\.css\?v=20261022-weekly-bars-sequential-growth-v2/);
+    // Other scoped CSS refinements can advance the shared stylesheet cache version.
+    assert.match(html,/href="style\.css\?v=\d{8}-[a-z0-9-]+"/);
 });
 
 test('Only public bars grow on a synchronized 5.4-second clock without changing layout', () => {

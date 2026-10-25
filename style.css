@@ -38465,15 +38465,25 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .evaluation-toolbar label { display: flex; align-items: center; gap: 10px; color: var(--text-secondary, #a7b0c2); white-space: nowrap; }
 .evaluation-toolbar select { min-width: 190px; border: 1px solid var(--border-color, rgba(148, 163, 184, .2)); border-radius: 12px; padding: 10px 36px 10px 12px; color: var(--text-primary, #eef2ff); background: var(--input-bg, #111827); }
 .evaluation-card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; min-width: 0; }
-.evaluation-card { position: relative; display: flex; flex-direction: column; gap: 11px; min-width: 0; padding: 19px; overflow: visible; border: 1px solid color-mix(in srgb, var(--subject-color) 42%, var(--border-color, transparent)); border-radius: 20px; background: var(--surface, rgba(15, 23, 42, .76)); box-shadow: 0 16px 38px rgba(2, 6, 23, .14); }
-.evaluation-card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: transparent; box-shadow: inset 4px 0 0 var(--subject-color); pointer-events: none; }
-.evaluation-card-top, .evaluation-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.evaluation-subject { color: var(--subject-color); font-weight: 800; }
-.evaluation-card h3 { margin: 0; color: var(--text-primary, #eef2ff); font-size: 1.08rem; line-height: 1.35; overflow-wrap: break-word; }
-.evaluation-card-schedule { margin: 0; color: var(--text-secondary, #a7b0c2); line-height: 1.5; }
-.evaluation-countdown-wrap { display: grid; gap: 3px; padding: 11px 12px; border-radius: 13px; background: color-mix(in srgb, var(--subject-color) 9%, transparent); }
-.evaluation-countdown-wrap > span { color: var(--text-secondary, #a7b0c2); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; }
-.evaluation-countdown { color: var(--text-primary, #eef2ff); font-size: .98rem; font-variant-numeric: tabular-nums; }
+/* Evaluation cards: compact proportions; subject identity is a 3px accent, not a frame. */
+#evaluations .evaluation-card { position: relative; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 15px 17px; overflow: visible; border: 1px solid var(--border-color, rgba(148, 163, 184, .18)); border-radius: 20px; background: var(--surface, rgba(15, 23, 42, .76)); box-shadow: 0 5px 18px rgba(2, 6, 23, .09); transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease; }
+#evaluations .evaluation-card::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: transparent; box-shadow: inset 3px 0 0 var(--subject-color); pointer-events: none; }
+@media (hover: hover) {
+    #evaluations .evaluation-card:hover { z-index: 2; transform: translateY(-1px); border-color: color-mix(in srgb, var(--subject-color) 24%, rgba(148, 163, 184, .22)); box-shadow: 0 8px 22px rgba(2, 6, 23, .12); }
+}
+#evaluations .evaluation-card:focus-within { z-index: 3; }
+#evaluations .evaluation-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+#evaluations .evaluation-subject { min-width: 0; color: color-mix(in srgb, var(--subject-color) 82%, #f4f7fb); font-size: .8rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+#evaluations .evaluation-card h3 { margin: 0; color: var(--text-primary, #eef2ff); font-size: 1.08rem; line-height: 1.35; overflow-wrap: anywhere; }
+#evaluations .evaluation-card-schedule { margin: 0; color: var(--text-secondary, #a7b0c2); font-size: .76rem; line-height: 1.5; overflow-wrap: anywhere; }
+#evaluations .evaluation-countdown-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 10px; border: 1px solid rgba(148, 163, 184, .1); border-radius: 10px; background: rgba(148, 163, 184, .055); }
+#evaluations .evaluation-countdown-wrap > span { display: inline-flex; flex: 0 0 15px; color: var(--text-secondary, #a7b0c2); font-size: 0; line-height: 0; }
+#evaluations .evaluation-countdown-wrap > span::before { content: ''; width: 15px; height: 15px; background: currentColor; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3C/svg%3E") center / contain no-repeat; }
+#evaluations .evaluation-countdown { min-width: 0; color: var(--text-primary, #eef2ff); font-size: .78rem; font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1.4; overflow-wrap: anywhere; }
+#evaluations .evaluation-card-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px; }
+#evaluations .evaluation-card-meta > span { max-width: 100%; padding: 4px 8px; border: 1px solid rgba(148, 163, 184, .13); border-radius: 999px; font-size: .7rem; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+#evaluations .evaluation-card-meta > span:first-child { color: var(--text-secondary, #a7b0c2); background: rgba(148, 163, 184, .055); }
+#evaluations .evaluation-card-meta :is(.evaluation-status, .evaluation-priority) { border-color: color-mix(in srgb, currentColor 16%, transparent); background: color-mix(in srgb, currentColor 8%, transparent); }
 .evaluation-status, .evaluation-priority { display: inline-flex; align-items: center; width: fit-content; border-radius: 999px; padding: 6px 10px; font-size: .78rem; font-weight: 750; }
 .status-pending { color: #93c5fd; background: rgba(37, 99, 235, .16); }
 .status-preparing { color: #fcd34d; background: rgba(245, 158, 11, .16); }
@@ -38482,8 +38492,8 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .priority-low { color: #86efac; background: rgba(34, 197, 94, .14); }
 .priority-medium { color: #fde68a; background: rgba(245, 158, 11, .14); }
 .priority-high { color: #fca5a5; background: rgba(239, 68, 68, .14); }
-.evaluation-tutor-button { width: 100%; margin-top: auto; border: 1px solid color-mix(in srgb, var(--subject-color) 60%, transparent); border-radius: 12px; padding: 10px 12px; color: var(--text-primary, #eef2ff); background: color-mix(in srgb, var(--subject-color) 13%, transparent); cursor: pointer; font-weight: 700; }
-.evaluation-tutor-button:hover { background: color-mix(in srgb, var(--subject-color) 22%, transparent); }
+#evaluations .evaluation-tutor-button { width: 100%; margin-top: auto; border: 1px solid color-mix(in srgb, var(--subject-color) 22%, transparent); border-radius: 10px; padding: 8px 11px; color: var(--text-primary, #eef2ff); background: color-mix(in srgb, var(--subject-color) 6%, transparent); cursor: pointer; font-size: .76rem; font-weight: 650; transition: background-color 200ms ease; }
+#evaluations .evaluation-tutor-button:hover { background: color-mix(in srgb, var(--subject-color) 11%, transparent); }
 .evaluation-menu-wrap { position: relative; margin-left: auto; }
 .evaluation-menu-button { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid var(--border-color, rgba(148, 163, 184, .22)); border-radius: 10px; color: var(--text-primary, #eef2ff); background: var(--surface-soft, rgba(15, 23, 42, .5)); font-size: 1.35rem; line-height: 1; cursor: pointer; }
 .evaluation-menu-button:hover, .evaluation-menu-button:focus-visible { border-color: var(--subject-color); outline: 2px solid color-mix(in srgb, var(--subject-color) 28%, transparent); outline-offset: 2px; }
@@ -38492,6 +38502,10 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .evaluation-menu button { width: 100%; border: 0; border-radius: 9px; padding: 10px 11px; color: var(--text-primary, #eef2ff); background: transparent; text-align: left; cursor: pointer; }
 .evaluation-menu button:hover, .evaluation-menu button:focus-visible { outline: none; background: color-mix(in srgb, var(--subject-color) 12%, transparent); }
 .evaluation-menu button.is-danger { color: #ef8e8e; }
+#evaluations .evaluation-menu-button { flex-shrink: 0; transition: background-color 200ms ease, border-color 200ms ease; }
+#evaluations .evaluation-menu-button:focus-visible,
+#evaluations .evaluation-menu button:focus-visible,
+#evaluations .evaluation-tutor-button:focus-visible { outline: 2px solid #8b7de4; outline-offset: 2px; }
 .evaluations-empty { grid-column: 1 / -1; display: grid; justify-items: center; gap: 10px; padding: 48px 24px; border: 1px dashed var(--border-color, rgba(148, 163, 184, .28)); border-radius: 20px; color: var(--text-secondary, #a7b0c2); text-align: center; background: var(--surface-soft, rgba(15, 23, 42, .45)); }
 .evaluations-empty h3, .evaluations-empty p { margin: 0; }
 .evaluations-empty-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; color: #a78bfa; background: rgba(124, 58, 237, .15); font-size: 1.5rem; }
@@ -38544,7 +38558,10 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #ai-assistant .tutor-au
 .dashboard-next-evaluation strong, .dashboard-next-evaluation b, .dashboard-next-evaluation em { min-width: 0; overflow-wrap: break-word; }
 .dashboard-next-evaluation b { font-weight: 650; }
 .dashboard-next-evaluation em { grid-column: 3; grid-row: 1 / span 2; color: var(--text-secondary, #a7b0c2); font-style: normal; }
-body.light-theme .evaluation-card, body.light-theme .evaluation-summary-grid article { box-shadow: 0 14px 32px rgba(71, 85, 105, .09); }
+body.light-theme .evaluation-summary-grid article { box-shadow: 0 14px 32px rgba(71, 85, 105, .09); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #evaluations .evaluation-card { border-color: rgba(15, 23, 42, .12); box-shadow: 0 4px 16px rgba(71, 85, 105, .06); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #evaluations .evaluation-subject { color: color-mix(in srgb, var(--subject-color) 58%, #172033); }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #evaluations .evaluation-countdown-wrap { border-color: rgba(15, 23, 42, .055); background: rgba(15, 23, 42, .025); }
 body.light-theme .evaluation-filter-group button:hover, body.light-theme .evaluation-filter-group button.active { color: #fff; }
 body.light-theme .evaluation-status.status-pending { color: #1d4ed8; }
 body.light-theme .evaluation-status.status-preparing, body.light-theme .evaluation-priority.priority-medium { color: #92400e; }
@@ -38565,9 +38582,15 @@ body.light-theme .evaluation-priority.priority-high { color: #b91c1c; }
     .dashboard-next-evaluation span, .dashboard-next-evaluation em { grid-column: auto; grid-row: auto; }
 }
 @media (max-width: 420px) {
-    .evaluation-card { padding: 18px 16px; }
+    #evaluations .evaluation-card { padding: 14px 15px; }
     .evaluation-card .card-actions { grid-template-columns: 1fr; }
     .evaluation-topic-input-row { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #evaluations .evaluation-card,
+    #evaluations .evaluation-card:hover,
+    #evaluations .evaluation-menu-button,
+    #evaluations .evaluation-tutor-button { transition: none; transform: none; }
 }
 
 /* Evaluation delete modal */
