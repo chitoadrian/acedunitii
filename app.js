@@ -3953,6 +3953,18 @@ function openTaskInGoogleCalendar(taskId) {
     return opened;
 }
 
+function taskCardIcon(name) {
+    const paths = {
+        edit: '<path d="m4 20 4.5-1L20 7.5 16.5 4 5 15.5 4 20Zm10-13 3.5 3.5"/>',
+        delete: '<path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/>',
+        priority: '<path d="M5 21V4m0 1h13l-3 4 3 4H5"/>',
+        bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+        calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18"/>',
+        clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+    };
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.calendar}</svg>`;
+}
+
 function renderTasks(workspace) {
     const list = document.getElementById('tasks-list');
     if (!list) return;
@@ -3987,6 +3999,7 @@ function renderTasks(workspace) {
         ['completed', 'Completadas'],
         ['overdue', 'Vencidas']
     ];
+    const taskReadOnly = Boolean(academicYearManager.state.historical);
 
     list.innerHTML = `
         <div class="task-filter task-filter-modern">
@@ -4008,35 +4021,37 @@ function renderTasks(workspace) {
                 const priorityClass = getTaskPriorityClass(task.priority || 'media');
                 const taskSubject = workspace.subjects.find(subject => subject.id === task.subjectId || subject.name === task.subject);
                 const subjectColor = getAcademicColorValue(taskSubject?.color);
-                const actionLayoutClass = task.status !== 'completed' ? 'has-complete' : 'no-complete';
+                const description = task.description || 'Sin descripción registrada.';
+                const taskActionId = escapeHTML(task.id);
                 return `
-                    <article class="task-item task-card-modern priority-${priorityClass}" style="${getAcademicCardStyle(subjectColor)}" data-status="${escapeHTML(visualStatus)}" data-id="${escapeHTML(task.id)}">
-                        ${neonLinesHTML()}
-                        <div class="task-card-main">
-                            <label class="task-checkbox task-check-modern" title="Marcar como completada">
-                                <input type="checkbox" onclick="toggleTask(this)" ${task.status === 'completed' ? 'checked' : ''}>
-                                <span></span>
+                    <article class="task-item task-card-premium" style="${getAcademicCardStyle(subjectColor)}" data-status="${escapeHTML(visualStatus)}" data-id="${taskActionId}">
+                        <div class="task-card__header">
+                            <label class="task-card__check" title="${task.status === 'completed' ? 'Marcar como pendiente' : 'Marcar como completada'}">
+                                <input type="checkbox" aria-label="${task.status === 'completed' ? 'Marcar como pendiente' : 'Completar tarea'}: ${escapeHTML(task.title)}" onclick="toggleTask(this)" ${task.status === 'completed' ? 'checked' : ''} ${taskReadOnly ? 'disabled' : ''}>
+                                <span aria-hidden="true"></span>
                             </label>
-                            <div class="task-content">
-                                <div class="task-title-row">
+                            <div class="task-card__heading">
+                                <div class="task-card__title-row">
                                     <h4>${escapeHTML(task.title)}</h4>
-                                    <span class="task-status status-${escapeHTML(visualStatus)}">${escapeHTML(getTaskStatusLabel(visualStatus))}</span>
+                                    <span class="task-card__state" data-state="${escapeHTML(visualStatus)}">${escapeHTML(getTaskStatusLabel(visualStatus))}</span>
                                 </div>
-                                <p class="task-subject" style="color:${subjectColor}">${escapeHTML(task.subject || 'General')}</p>
-                                <p class="task-description">${escapeHTML(task.description || 'Sin descripción registrada.')}</p>
-                                <div class="task-meta-grid">
-                                    <span><strong>Fecha:</strong> ${escapeHTML(task.due || 'Sin fecha')}</span>
-                                    <span><strong>Tiempo:</strong> ${escapeHTML(getTaskDaysText(task))}</span>
-                                    <span><strong>Prioridad:</strong> <em class="task-priority ${priorityClass}">${escapeHTML(getTaskPriorityLabel(task.priority || 'media'))}</em></span>
-                                    <span><strong>Recordatorios:</strong> ${task.remindersEnabled === true ? 'Activos' : 'Desactivados'}</span>
-                                </div>
+                                <p class="task-card__subject">${escapeHTML(task.subject || 'General')}</p>
                             </div>
                         </div>
-                        <div class="task-card-actions ${actionLayoutClass}">
-                            <button class="btn-secondary btn-small" data-task-edit="${escapeHTML(task.id)}">Editar</button>
-                            ${task.status !== 'completed' ? `<button class="btn-primary btn-small" data-task-complete="${escapeHTML(task.id)}">Completar</button>` : ''}
-                            ${ACGoogleCalendarManual.render('task', task.id)}
-                            <button class="btn-danger btn-small" data-task-delete="${escapeHTML(task.id)}">Eliminar</button>
+                        <div class="task-card__description">
+                            <p>${escapeHTML(description.length > 220 ? `${description.slice(0, 200)}…` : description)}</p>
+                            ${description.length > 220 ? `<details><summary>Ver descripción completa</summary><p>${escapeHTML(description)}</p></details>` : ''}
+                        </div>
+                        <div class="task-card__info">
+                            <div class="task-card__fact">${taskCardIcon('calendar')}<span><small>Fecha</small><strong>${escapeHTML(task.due || 'Sin fecha')}</strong></span></div>
+                            <div class="task-card__fact">${taskCardIcon('clock')}<span><small>Tiempo</small><strong>${escapeHTML(getTaskDaysText(task))}</strong></span></div>
+                            <div class="task-card__fact" data-priority="${priorityClass}">${taskCardIcon('priority')}<span><small>Prioridad</small><strong>${escapeHTML(getTaskPriorityLabel(task.priority || 'media'))}</strong></span></div>
+                            <div class="task-card__fact" data-reminders="${task.remindersEnabled === true}">${taskCardIcon('bell')}<span><small>Recordatorios</small><strong>${task.remindersEnabled === true ? 'Activos' : 'Desactivados'}</strong></span></div>
+                        </div>
+                        <div class="task-card__actions" role="group" aria-label="Acciones de ${escapeHTML(task.title)}">
+                            <button class="task-card__action" type="button" data-task-edit="${taskActionId}" aria-label="Editar" data-tooltip="Editar" ${taskReadOnly ? 'disabled' : ''}>${taskCardIcon('edit')}</button>
+                            <button class="task-card__action task-card__action--delete" type="button" data-task-delete="${taskActionId}" aria-label="Eliminar" data-tooltip="Eliminar" ${taskReadOnly ? 'disabled' : ''}>${taskCardIcon('delete')}</button>
+                            ${ACGoogleCalendarManual.render('task', task.id, { compact: true })}
                         </div>
                     </article>
                 `;
@@ -4046,8 +4061,7 @@ function renderTasks(workspace) {
 
     list.querySelectorAll('[data-task-filter]').forEach(button => button.addEventListener('click', () => filterTasks(button.dataset.taskFilter, button)));
     list.querySelectorAll('[data-task-edit]').forEach(button => button.addEventListener('click', () => openTaskForm(button.dataset.taskEdit)));
-    list.querySelectorAll('[data-task-delete]').forEach(button => button.addEventListener('click', () => deleteTask(button.dataset.taskDelete)));
-    list.querySelectorAll('[data-task-complete]').forEach(button => button.addEventListener('click', () => completeTask(button.dataset.taskComplete)));
+    list.querySelectorAll('[data-task-delete]').forEach(button => button.addEventListener('click', () => openTaskDeleteDialog(button.dataset.taskDelete, button)));
 }
 
 function addCalendarEventUI() {
@@ -12328,6 +12342,96 @@ function openTaskForm(taskId = null) {
             }
         }
     });
+}
+
+function openTaskDeleteDialog(taskId, triggerElement = null) {
+    const task = loadWorkspace().tasks.find(item => item.id === taskId);
+    if (!task || academicYearManager.state.historical || document.querySelector('.task-delete-modal')) return;
+    const ownerId = currentUser?.id;
+    const scope = academicYearManager.scope();
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal task-delete-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card task-delete-card" role="dialog" aria-modal="true" aria-labelledby="task-delete-title" aria-describedby="task-delete-description task-delete-name" tabindex="-1">
+            <span class="task-delete-icon">${taskCardIcon('delete')}</span>
+            <h3 id="task-delete-title">¿Seguro que quieres borrar la tarea?</h3>
+            <p id="task-delete-description">Esta acción eliminará la tarea seleccionada y no se podrá deshacer.</p>
+            <strong id="task-delete-name">${escapeHTML(task.title)}</strong>
+            <p class="task-delete-error" role="alert" hidden></p>
+            <div class="task-delete-actions">
+                <button class="btn-secondary" type="button" data-cancel-task-delete>Cancelar</button>
+                <button class="btn-danger" type="button" data-confirm-task-delete>Eliminar tarea</button>
+            </div>
+        </div>`;
+
+    const card = modal.querySelector('[role="dialog"]');
+    const cancel = modal.querySelector('[data-cancel-task-delete]');
+    const confirm = modal.querySelector('[data-confirm-task-delete]');
+    const errorText = modal.querySelector('.task-delete-error');
+    let isDeleting = false;
+    let isClosing = false;
+    const close = (deleted = false) => {
+        if (isClosing) return;
+        isClosing = true;
+        document.removeEventListener('keydown', handleKeydown);
+        modal.classList.add('is-closing');
+        const animations = modal.getAnimations?.({ subtree: true }) || [];
+        void Promise.allSettled(animations.map(animation => animation.finished)).then(() => {
+            modal.remove();
+            const target = !deleted && triggerElement?.isConnected
+                ? triggerElement : document.querySelector('#tasks button:not(:disabled)');
+            target?.focus({ preventScroll: true });
+        });
+    };
+    const handleKeydown = event => {
+        if (isClosing) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            if (!isDeleting) close();
+        }
+        if (event.key === 'Tab') {
+            const buttons = [...modal.querySelectorAll('button:not(:disabled)')];
+            const first = buttons[0], last = buttons[buttons.length - 1];
+            if (!first) { event.preventDefault(); card.focus(); }
+            else if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+                event.preventDefault(); last.focus();
+            } else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) {
+                event.preventDefault(); first.focus();
+            }
+        }
+    };
+    modal.addEventListener('click', event => {
+        if (!isDeleting && (event.target === modal || event.target.closest('[data-cancel-task-delete]'))) close();
+    });
+    confirm.addEventListener('click', async () => {
+        if (isDeleting || isClosing) return;
+        if (currentUser?.id !== ownerId || !academicYearManager.matches(scope) || academicYearManager.state.historical) {
+            errorText.textContent = 'La cuenta o el año lectivo cambió. Cierra este aviso y vuelve a abrir la tarea.';
+            errorText.hidden = false;
+            return;
+        }
+        isDeleting = true;
+        cancel.disabled = confirm.disabled = true;
+        confirm.textContent = 'Eliminando…';
+        card.setAttribute('aria-busy', 'true');
+        errorText.hidden = true;
+        try {
+            const deleted = await deleteTask(taskId);
+            if (deleted) { close(true); return; }
+            errorText.textContent = 'No se pudo eliminar la tarea. Tus datos se conservan; inténtalo nuevamente.';
+        } catch (_) {
+            errorText.textContent = 'No se pudo eliminar la tarea. Tus datos se conservan; inténtalo nuevamente.';
+        }
+        isDeleting = false;
+        cancel.disabled = confirm.disabled = false;
+        confirm.textContent = 'Eliminar tarea';
+        card.setAttribute('aria-busy', 'false');
+        errorText.hidden = false;
+        confirm.focus();
+    });
+    document.body.appendChild(modal);
+    document.addEventListener('keydown', handleKeydown);
+    cancel.focus();
 }
 
 async function deleteTask(taskId) {

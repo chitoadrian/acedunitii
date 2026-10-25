@@ -105,7 +105,7 @@ test('Welcome is server-driven, acknowledged once, retryable and isolated from s
 test('Actual task form explains read-only history before any authentication or save request', async () => {
     const fs = require('node:fs'), path = require('node:path'), vm = require('node:vm');
     const source = fs.readFileSync(path.join(__dirname, '../app.js'), 'utf8');
-    const start = source.lastIndexOf('function openTaskForm('), end = source.indexOf('async function deleteTask(', start);
+    const formSource = [...source.matchAll(/^function openTaskForm\([^\n]*\) \{[\s\S]*?^\}/gm)].at(-1)?.[0];
     let form, authRequests = 0;
     const notices = [], context = {
         academicYearManager: { state: { historical: true } }, currentUser: { id: 'fixture-user' },
@@ -115,8 +115,8 @@ test('Actual task form explains read-only history before any authentication or s
         getCurrentSupabaseUser: async () => { authRequests++; throw new Error('must not query'); },
         logTaskPersistenceError: () => {}
     };
-    assert.ok(start >= 0 && end > start);
-    const open = vm.runInNewContext('(' + source.slice(start, end) + ')', context);
+    assert.ok(formSource, 'Extract the form itself, independently of adjacent UI helpers');
+    const open = vm.runInNewContext('(' + formSource + ')', context);
     for (const id of [null, 'historical-task']) {
         open(id);
         assert.equal(await form.onSubmit({ title: 'Historical task' }), false);

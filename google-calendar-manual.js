@@ -143,9 +143,18 @@
     root.getGoogleCalendarSavedLabel = savedLabel;
     if (typeof document === 'undefined') return;
 
-    function content(type, id) {
+    function content(type, id, compact = false) {
         const s = controller.state(type, id);
         const disabled = !s.valid || s.busy || (!s.loaded && !s.loadFailed);
+        // Presentation-only variant for task cards; the controller/actions stay shared.
+        if (compact && type === 'task') {
+            const action = s.confirmed ? 'remove' : s.loadFailed ? 'retry' : s.opened ? 'confirm' : 'open';
+            const label = s.busy ? 'Guardando…' : s.confirmed ? 'Quitar confirmación de Google Calendar'
+                : s.loadFailed ? 'Reintentar estado de Google Calendar' : s.opened
+                    ? 'Confirmo que ya lo guardé en Google Calendar' : 'Agregar a Google Calendar';
+            const mark = s.confirmed || s.opened ? '<path d="m9 15 2 2 4-4"/>' : '<path d="M9 15h6m-3-3v6"/>';
+            return `<button type="button" class="task-card__action task-card__action--calendar${s.confirmed ? ' is-confirmed' : ''}" data-gcal-action="${action}" aria-label="${label}" data-tooltip="${label}" ${disabled ? 'disabled' : ''}><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18"/>${mark}</svg></button>`;
+        }
         const button = (action, label, primary = false) => `<button type="button" class="${primary ? 'btn-primary' : 'btn-secondary'} btn-small" data-gcal-action="${action}" ${action === 'confirm' ? 'title="Pulsa aquí cuando hayas guardado el evento en Google Calendar." aria-label="Confirmo que ya lo guardé en Google Calendar"' : ''} ${disabled ? 'disabled' : ''}>${label}</button>`;
         if (s.confirmed) return `<span class="gcal-manual-success" role="status" title="Confirmado manualmente por ti; no verificado por Google">✓ ${savedLabel(type)}</span><button type="button" class="gcal-manual-remove" data-gcal-action="remove" aria-label="Quitar confirmación" title="Quitar confirmación" ${disabled ? 'disabled' : ''}>${s.busy ? '…' : '×'}</button>`;
         if (s.loadFailed) return `${button('retry', 'Reintentar estado')}<small>No se pudo consultar tu confirmación.</small>`;
@@ -157,7 +166,7 @@
         const focusHost = active?.closest?.('[data-gcal-manual]');
         const action = active?.dataset?.gcalAction;
         document.querySelectorAll('[data-gcal-manual]').forEach(host => {
-            host.innerHTML = content(host.dataset.gcalType, host.dataset.gcalId);
+            host.innerHTML = content(host.dataset.gcalType, host.dataset.gcalId, host.dataset.gcalCompact === 'true');
             if (host === focusHost) {
                 const target = host.querySelector(`[data-gcal-action="${action}"]:not(:disabled)`)
                     || host.querySelector('button:not(:disabled)');
@@ -195,11 +204,12 @@
             if (!controller.state(type, id).valid || controller.state(type, id).busy) return;
             return confirmCalendarRemoval(type, id, trigger);
         },
-        render(type, id) {
+        render(type, id, { compact = false } = {}) {
             if (!types.has(type) || !uuid.test(id || '')) return '';
             const s = controller.state(type, id);
             if (s.valid && !s.loaded && !s.loadFailed) void controller.load();
-            return `<div class="gcal-manual-controls" data-gcal-manual data-gcal-type="${type}" data-gcal-id="${id}" tabindex="-1" aria-live="polite">${content(type, id)}</div>`;
+            const taskCompact = compact && type === 'task';
+            return `<div class="gcal-manual-controls" data-gcal-manual data-gcal-type="${type}" data-gcal-id="${id}" ${taskCompact ? 'data-gcal-compact="true"' : ''} tabindex="-1" aria-live="polite">${content(type, id, taskCompact)}</div>`;
         }
     };
     async function removeFromAcademicCalendar(type, id) {

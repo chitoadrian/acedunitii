@@ -1,0 +1,251 @@
+/* Task cards only. New child classes avoid the legacy four-cell/table rules. */
+#app-page #tasks .task-board.task-list-modern { grid-auto-rows: auto !important; }
+#app-page #tasks .task-card-premium {
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    margin: 0;
+    /* The legacy .task-item sets these two properties !important globally. */
+    padding: 20px !important;
+    gap: 16px !important;
+    overflow: visible;
+    color: var(--tasks-text);
+    background: var(--tasks-surface);
+    backdrop-filter: none;
+    border: 1px solid var(--tasks-border);
+    border-radius: 18px;
+    box-shadow: 0 5px 18px rgb(2 8 23 / 9%);
+    opacity: 1;
+    transform: none;
+    transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+#app-page #tasks .task-card-premium::before,
+#app-page #tasks .task-card-premium::after { content: none; }
+#app-page #tasks .task-card-premium:hover,
+#app-page #tasks .task-card-premium:focus-within {
+    z-index: 2;
+    border-color: color-mix(in srgb, var(--subject-color, var(--tasks-accent)) 38%, var(--tasks-border));
+    box-shadow: 0 9px 24px rgb(2 8 23 / 13%);
+}
+@media (hover: hover) {
+    #app-page #tasks .task-card-premium:hover { transform: translateY(-2px); }
+}
+#tasks .task-card__header { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+#tasks .task-card__heading { flex: 1; min-width: 0; }
+#tasks .task-card__title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+#tasks .task-card__title-row h4 {
+    flex: 1;
+    min-width: 0;
+    margin: 3px 0 0;
+    color: var(--tasks-text);
+    font-size: 1.03rem;
+    font-weight: 700;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+#tasks .task-card-premium[data-status="completed"] h4 {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    text-decoration-color: var(--tasks-muted);
+}
+#tasks .task-card__check {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 32px;
+    width: 32px;
+    min-height: 44px;
+    margin-top: -5px;
+    cursor: pointer;
+}
+#tasks .task-card__check input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: inherit; }
+#tasks .task-card__check > span {
+    display: grid;
+    place-items: center;
+    width: 23px;
+    height: 23px;
+    border: 1.5px solid var(--tasks-border-strong);
+    border-radius: 7px;
+    background: var(--tasks-surface-soft);
+    transition: background-color 180ms ease, border-color 180ms ease;
+    pointer-events: none;
+}
+#tasks .task-card__check input:checked + span { background: var(--tasks-success); border-color: var(--tasks-success); }
+#tasks .task-card__check input:checked + span::after { content: "✓"; color: #fff; font-size: 15px; font-weight: 800; }
+#tasks .task-card__check input:focus-visible + span { outline: 2px solid var(--tasks-accent); outline-offset: 4px; }
+#tasks .task-card__check:has(input:disabled) { cursor: not-allowed; }
+#tasks .task-card__state {
+    --task-state: var(--tasks-accent);
+    flex: 0 1 auto;
+    max-width: 128px;
+    padding: 5px 9px;
+    border: 1px solid color-mix(in srgb, var(--task-state) 23%, transparent);
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--task-state) 65%, var(--tasks-text));
+    background: color-mix(in srgb, var(--task-state) 11%, var(--tasks-surface));
+    font-size: .65rem;
+    font-weight: 650;
+    line-height: 1.4;
+    text-align: center;
+}
+#tasks .task-card__state[data-state="overdue"] { --task-state: var(--tasks-danger); }
+#tasks .task-card__state[data-state="completed"] { --task-state: var(--tasks-success); }
+#tasks .task-card__state[data-state="upcoming"] { --task-state: var(--tasks-warning); }
+#tasks .task-card__subject {
+    display: inline-block;
+    max-width: 100%;
+    margin: 8px 0 0;
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: color-mix(in srgb, var(--subject-color, var(--tasks-accent)) 55%, var(--tasks-text));
+    background: color-mix(in srgb, var(--subject-color, var(--tasks-accent)) 9%, var(--tasks-surface));
+    font-size: .72rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+#tasks .task-card__description { color: var(--tasks-muted); font-size: .8rem; line-height: 1.65; overflow-wrap: anywhere; }
+#tasks .task-card__description p { margin: 0; white-space: pre-line; }
+#tasks .task-card__description summary { width: fit-content; margin-top: 7px; color: var(--tasks-text); cursor: pointer; font-size: .74rem; }
+#tasks .task-card__description details[open] p { margin-top: 10px; }
+#tasks .task-card__info { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: auto; }
+#tasks .task-card__fact {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 10px 11px;
+    border: 1px solid color-mix(in srgb, var(--tasks-border) 70%, transparent);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--tasks-surface-soft) 65%, var(--tasks-surface));
+}
+#tasks .task-card__fact > span { min-width: 0; }
+#tasks .task-card__fact small { display: block; margin-bottom: 3px; color: var(--tasks-muted); font-size: .65rem; line-height: 1.4; }
+#tasks .task-card__fact strong { display: block; color: var(--tasks-text); font-size: .76rem; font-weight: 600; line-height: 1.45; overflow-wrap: anywhere; }
+#tasks .task-card__fact svg { flex: 0 0 17px; width: 17px; height: 17px; color: var(--tasks-muted); }
+#tasks .task-card__fact[data-priority="high"] strong,
+#tasks .task-card__fact[data-priority="high"] svg { color: var(--tasks-danger); }
+#tasks .task-card__fact[data-priority="medium"] strong,
+#tasks .task-card__fact[data-priority="medium"] svg { color: var(--tasks-warning); }
+#tasks .task-card__fact[data-priority="low"] strong,
+#tasks .task-card__fact[data-priority="low"] svg,
+#tasks .task-card__fact[data-reminders="true"] svg { color: var(--tasks-success); }
+#tasks .task-card__actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; padding-top: 1px; }
+#tasks .task-card__actions .gcal-manual-controls { display: flex; gap: 0; flex: 0 0 auto; width: auto; margin: 0; }
+#tasks .task-card__action {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    color: var(--tasks-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    box-shadow: none;
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+}
+/* A 38px visible surface inside an accessible 44px touch target. */
+#tasks .task-card__action::before { content: ""; position: absolute; inset: 3px; border: 1px solid var(--tasks-border); border-radius: 10px; background: var(--tasks-surface-soft); transition: background-color 180ms ease, border-color 180ms ease; }
+#tasks .task-card__action svg { z-index: 1; width: 18px; height: 18px; pointer-events: none; }
+#tasks .task-card__action:hover:not(:disabled),
+#tasks .task-card__action:focus-visible { color: var(--tasks-text); transform: translateY(-1px); }
+#tasks .task-card__action:hover:not(:disabled)::before { background: color-mix(in srgb, var(--tasks-accent) 15%, var(--tasks-surface)); border-color: color-mix(in srgb, var(--tasks-accent) 35%, var(--tasks-border)); }
+#tasks .task-card__action--delete:hover:not(:disabled) { color: var(--tasks-danger); }
+#tasks .task-card__action--delete:hover:not(:disabled)::before { background: color-mix(in srgb, var(--tasks-danger) 12%, var(--tasks-surface)); border-color: color-mix(in srgb, var(--tasks-danger) 30%, var(--tasks-border)); }
+#tasks .task-card__action--calendar:hover:not(:disabled),
+#tasks .task-card__action--calendar.is-confirmed { color: var(--tasks-success); }
+#tasks .task-card__action--calendar:hover:not(:disabled)::before { background: color-mix(in srgb, var(--tasks-success) 10%, var(--tasks-surface)); border-color: color-mix(in srgb, var(--tasks-success) 30%, var(--tasks-border)); }
+#tasks .task-card__action:focus-visible,
+#tasks .task-card__description summary:focus-visible { outline: 2px solid var(--tasks-accent); outline-offset: 2px; }
+#tasks .task-card__action:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+#tasks .task-card__action::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    bottom: calc(100% + 6px);
+    width: max-content;
+    max-width: 210px;
+    padding: 7px 10px;
+    border: 1px solid var(--tasks-border-strong);
+    border-radius: 8px;
+    color: var(--tasks-text);
+    background: var(--tasks-surface-raised);
+    box-shadow: 0 5px 16px rgb(0 0 0 / 13%);
+    font-size: .7rem;
+    font-weight: 500;
+    line-height: 1.45;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(3px);
+    transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+}
+@media (hover: hover) {
+    #tasks .task-card__action:hover:not(:disabled)::after { opacity: 1; visibility: visible; transform: none; }
+}
+#tasks .task-card__action:focus-visible::after { opacity: 1; visibility: visible; transform: none; }
+#tasks .task-card-premium svg,
+.task-delete-modal svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card-premium { box-shadow: 0 4px 18px rgb(15 23 42 / 5%); }
+/* The site's light-theme strong rule is !important; restore priority tones only here. */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card__fact[data-priority="high"] strong { color: var(--tasks-danger) !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card__fact[data-priority="medium"] strong { color: var(--tasks-warning) !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #tasks .task-card__fact[data-priority="low"] strong { color: var(--tasks-success) !important; }
+
+/* Task-only confirmation uses the existing quick-modal surface and delete handler. */
+body .task-delete-modal { --task-dialog-surface: #151d2c; --task-dialog-text: #f4f7fb; --task-dialog-muted: #a8b3c5; --task-dialog-border: #30394b; --task-dialog-danger: #ff9daa; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgb(2 6 23 / 65%); animation: task-dialog-overlay-in 200ms ease both; }
+body .task-delete-modal .task-delete-card { box-sizing: border-box; width: min(100%, 440px); max-width: 440px; max-height: calc(100dvh - 40px); margin: 0; padding: 28px; overflow: auto; border: 1px solid var(--task-dialog-border); border-radius: 20px; background: var(--task-dialog-surface); color: var(--task-dialog-text); box-shadow: 0 24px 70px rgb(0 0 0 / 24%); animation: task-dialog-card-in 200ms cubic-bezier(.2,.7,.3,1) both; }
+.task-delete-modal .task-delete-icon { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 18px; color: var(--task-dialog-danger); background: color-mix(in srgb, var(--task-dialog-danger) 10%, transparent); border: 1px solid color-mix(in srgb, var(--task-dialog-danger) 20%, transparent); border-radius: 14px; }
+.task-delete-modal .task-delete-icon svg { width: 23px; height: 23px; }
+body .task-delete-card h3 { margin: 0 0 10px; color: var(--task-dialog-text); font-size: 1.16rem; line-height: 1.4; }
+.task-delete-modal #task-delete-description { margin: 0; color: var(--task-dialog-muted); font-size: .86rem; line-height: 1.65; }
+.task-delete-modal #task-delete-name { display: block; margin-top: 15px; color: var(--task-dialog-text); font-size: .86rem; line-height: 1.5; overflow-wrap: anywhere; }
+.task-delete-modal .task-delete-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+body .task-delete-actions button { width: auto !important; min-width: 0; min-height: 44px; padding: 10px 16px; border: 1px solid var(--task-dialog-border); border-radius: 10px; background: transparent; color: var(--task-dialog-text); box-shadow: none; font: inherit; font-size: .8rem; font-weight: 600; }
+body .task-delete-actions [data-confirm-task-delete] { border-color: #c84758; background: #bd3649; color: #fff; }
+body .task-delete-actions [data-confirm-task-delete]:hover:not(:disabled) { background: #a72d3e; }
+body .task-delete-actions [data-cancel-task-delete]:hover:not(:disabled) { background: color-mix(in srgb, var(--task-dialog-text) 6%, transparent); }
+.task-delete-actions button:focus-visible { outline: 2px solid #8b85ef; outline-offset: 3px; }
+.task-delete-actions button:disabled { opacity: .65; cursor: wait; }
+.task-delete-modal .task-delete-error { margin: 16px 0 0; padding: 10px 12px; border-radius: 9px; color: var(--task-dialog-danger); background: color-mix(in srgb, var(--task-dialog-danger) 9%, transparent); font-size: .8rem; line-height: 1.5; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) .task-delete-modal { --task-dialog-surface: #fff; --task-dialog-text: #172033; --task-dialog-muted: #58667b; --task-dialog-border: #e0e4ed; --task-dialog-danger: #b42f42; }
+body .task-delete-modal.is-closing { animation: task-dialog-overlay-out 180ms ease both; }
+body .task-delete-modal.is-closing .task-delete-card { animation: task-dialog-card-out 180ms ease both; }
+@keyframes task-dialog-overlay-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes task-dialog-overlay-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes task-dialog-card-in { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes task-dialog-card-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(3px) scale(.98); } }
+@media (max-width: 599px) {
+    #app-page #tasks .task-card-premium { padding: 16px !important; gap: 14px !important; }
+    #tasks .task-card__header { gap: 7px; }
+    #tasks .task-card__title-row { gap: 8px; }
+    #tasks .task-card__title-row h4 { font-size: .96rem; }
+    #tasks .task-card__state { max-width: 105px; padding: 4px 7px; font-size: .6rem; }
+    #tasks .task-card__fact { padding: 9px; gap: 7px; }
+    #tasks .task-card__fact strong { font-size: .72rem; }
+    body .task-delete-modal { padding: 16px; }
+    body .task-delete-modal .task-delete-card { padding: 22px; max-height: calc(100dvh - 32px); }
+    .task-delete-modal .task-delete-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+    #app-page #tasks .task-card-premium,
+    #app-page #tasks .task-card-premium:hover,
+    #tasks .task-card__action,
+    #tasks .task-card__action:hover:not(:disabled),
+    #tasks .task-card__action::before,
+    #tasks .task-card__action::after,
+    #tasks .task-card__check > span { transition: none; transform: none; }
+    body .task-delete-modal,
+    body .task-delete-modal .task-delete-card { animation: none; }
+}
