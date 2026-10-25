@@ -4933,11 +4933,11 @@ function renderGrades(workspace) {
     container.innerHTML = `
         <div class="grades-toolbar">
             <div class="grade-summary">
-                <strong>Promedio general: ${average.toFixed(2)}</strong>
+                <strong><span class="grade-summary-label">Promedio general:</span> <span class="grade-summary-value">${average.toFixed(2)}</span></strong>
                 <span class="grade-status ${getGradeStatus(average).replace(' ', '-')}">${getGradeStatus(average)}</span>
             </div>
             <div class="grade-formula-note">Fórmula: promedio de parciales 70% + examen 30%.</div>
-            <select onchange="setGradeSort(this.value)">
+            <select aria-label="Ordenar calificaciones" onchange="setGradeSort(this.value)">
                 <option value="subject" ${gradeSortMode === 'subject' ? 'selected' : ''}>Ordenar por materia</option>
                 <option value="high" ${gradeSortMode === 'high' ? 'selected' : ''}>Promedio mayor</option>
                 <option value="low" ${gradeSortMode === 'low' ? 'selected' : ''}>Promedio menor</option>
