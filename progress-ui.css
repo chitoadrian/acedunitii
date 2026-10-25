@@ -1,0 +1,352 @@
+/* Academic progress presentation. All values and unlock rules remain in renderProgress. */
+#app-page #progress {
+    --pr-surface: #1B2232;
+    --pr-elevated: #222C40;
+    --pr-text: #F2F5FD;
+    --pr-muted: #ADB9CE;
+    --pr-border: #354158;
+    --pr-purple: #B2A4FF;
+    --pr-blue: #8DB9FF;
+    --pr-cyan: #67D6D4;
+    --pr-amber: #F1BC76;
+    --pr-locked: #9AA7BD;
+    --pr-fill-start: #8874F6;
+    --pr-fill-end: #5D9BE7;
+    --pr-track: #334057;
+    --pr-shadow: 0 8px 24px rgba(6, 12, 25, .12);
+}
+
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #progress {
+    --pr-surface: #FFFFFF;
+    --pr-elevated: #F5F7FC;
+    --pr-text: #202A3F;
+    --pr-muted: #5D6C83;
+    --pr-border: #DCE3EF;
+    --pr-purple: #6953BD;
+    --pr-blue: #4267AF;
+    --pr-cyan: #247F86;
+    --pr-amber: #996020;
+    --pr-locked: #5F6F86;
+    --pr-fill-start: #7761DA;
+    --pr-fill-end: #3C80C1;
+    --pr-track: #E3E8F2;
+    --pr-shadow: 0 7px 22px rgba(35, 51, 84, .05);
+}
+
+#app-page #progress .progress-container {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px !important;
+    min-width: 0;
+}
+
+#progress :is(.progress-level-hero, .progress-personal-stats, .progress-journey, .progress-collection, .progress-metric, .progress-reward) {
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+#progress :is(.progress-level-hero, .progress-journey, .progress-collection) {
+    border: 1px solid var(--pr-border);
+    border-radius: 22px;
+    background: var(--pr-surface);
+    box-shadow: var(--pr-shadow);
+    color: var(--pr-text);
+}
+
+#progress .progress-level-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 192px;
+    align-items: center;
+    gap: 28px;
+    padding: 26px 30px;
+    background:
+        radial-gradient(ellipse at 100% 0, color-mix(in srgb, var(--pr-fill-start) 14%, transparent), transparent 62%),
+        linear-gradient(115deg, var(--pr-surface), color-mix(in srgb, var(--pr-fill-end) 5%, var(--pr-surface)));
+}
+
+#progress .progress-level-copy { min-width: 0; }
+
+#progress .progress-level-eyebrow {
+    display: block;
+    color: var(--pr-purple);
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+#progress .progress-level-copy h2 {
+    margin: 10px 0 7px;
+    color: var(--pr-text);
+    font-size: clamp(36px, 3.4vw, 46px);
+    font-weight: 800;
+    letter-spacing: -.045em;
+    line-height: 1.08;
+}
+
+#progress .progress-level-copy > p {
+    margin: 0;
+    color: var(--pr-muted);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+#progress .progress-level-xp {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 7px 18px;
+    margin: 20px 0 10px;
+    color: var(--pr-muted);
+    font-size: 12px;
+    font-weight: 550;
+    font-variant-numeric: tabular-nums;
+}
+
+#progress .progress-level-xp > :first-child { color: var(--pr-text); }
+
+#progress .progress-level-track {
+    height: 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--pr-track);
+}
+
+#progress .progress-level-fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--pr-fill-start), var(--pr-fill-end));
+    transition: width 800ms cubic-bezier(.22, 1, .36, 1);
+    transform-origin: left;
+    animation: ac-progress-bar-enter 800ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+#progress .progress-level-copy > small {
+    display: block;
+    margin-top: 8px;
+    color: var(--pr-muted);
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: right;
+}
+
+#progress .progress-radial {
+    position: relative;
+    width: 168px;
+    height: 168px;
+    justify-self: center;
+    flex-shrink: 0;
+}
+
+#progress .progress-radial > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+}
+
+#progress :is(.progress-radial-track, .progress-radial-ring) {
+    fill: none;
+    stroke-width: 6;
+}
+
+#progress .progress-radial-track { stroke: var(--pr-track); }
+
+#progress .progress-radial-ring {
+    stroke: url(#progress-ring-gradient);
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: calc(100 - var(--progress-percent));
+    animation: ac-progress-ring-enter 900ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* A round SVG line cap must not imply progress when the actual value is zero. */
+#progress .progress-radial.is-empty .progress-radial-ring { visibility: hidden; }
+
+#progress .progress-radial-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--pr-muted);
+}
+
+#progress .progress-radial-label > span { font-size: 10px; font-weight: 600; }
+#progress .progress-radial-label > strong {
+    color: var(--pr-text);
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -.04em;
+}
+#progress .progress-radial-label > small { font-size: 10px; }
+
+#progress .progress-personal-stats { display: grid; gap: 12px; }
+#progress .progress-primary-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+#progress .progress-activity-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+#progress .progress-metric {
+    --metric-color: var(--pr-blue);
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    border: 1px solid var(--pr-border);
+    border-radius: 18px;
+    background: var(--pr-surface);
+    color: var(--pr-text);
+    transition: transform 200ms ease, border-color 200ms ease;
+}
+
+#progress .metric-streak { --metric-color: var(--pr-amber); }
+#progress .metric-trophy { --metric-color: var(--pr-purple); }
+#progress .metric-status, #progress .metric-tasks { --metric-color: var(--pr-cyan); }
+#progress .progress-metric > div { display: grid; gap: 5px; min-width: 0; }
+#progress .progress-metric-label { color: var(--pr-muted); font-size: 12px; font-weight: 550; line-height: 1.4; }
+#progress .progress-metric-value { color: var(--pr-text); font-size: 26px; font-weight: 750; line-height: 1.15; letter-spacing: -.025em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#progress .metric-status .progress-metric-value { font-size: 22px; }
+#progress .progress-metric small { color: var(--pr-muted); font-size: 11px; line-height: 1.4; }
+
+#progress .progress-metric-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--metric-color) 24%, var(--pr-border));
+    background: color-mix(in srgb, var(--metric-color) 10%, var(--pr-surface));
+    color: var(--metric-color);
+}
+
+#progress :is(.progress-metric-icon, .progress-reward-medal, .progress-reward-state, .progress-journey-check) svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#progress .progress-activity-metrics .progress-metric { padding: 13px 20px; background: color-mix(in srgb, var(--pr-elevated) 55%, var(--pr-surface)); }
+#progress .progress-activity-metrics .progress-metric > div { grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 12px; }
+#progress .progress-activity-metrics .progress-metric-value { grid-column: 2; grid-row: 1 / 3; align-self: center; font-size: 24px; }
+
+#progress :is(.progress-journey, .progress-collection) { padding: 22px; }
+#progress .progress-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 20px; margin-bottom: 22px; }
+#progress .progress-panel-heading > div { min-width: 0; }
+#progress .progress-panel-heading h3 { margin: 0; color: var(--pr-text); font-size: 17px; font-weight: 750; line-height: 1.35; letter-spacing: -.02em; }
+#progress .progress-panel-heading p { margin: 5px 0 0; color: var(--pr-muted); font-size: 12px; line-height: 1.5; }
+#progress .progress-panel-counter { display: inline-flex; align-items: center; flex-shrink: 0; gap: 8px; padding: 6px 10px; border: 1px solid var(--pr-border); border-radius: 9px; background: var(--pr-elevated); color: var(--pr-muted); font-size: 11px; line-height: 1.5; }
+#progress .progress-panel-counter strong { color: var(--pr-text); font-size: 12px; font-weight: 700; }
+
+#progress .progress-journey-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); list-style: none; margin: 0; padding: 6px 0 4px; }
+#progress .progress-journey-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; min-width: 0; text-align: center; }
+#progress .progress-journey-step::before { content: ""; position: absolute; z-index: 0; top: 25px; right: 50%; width: 100%; height: 2px; background: var(--pr-track); }
+#progress .progress-journey-step:first-child::before { display: none; }
+#progress .progress-journey-step.is-reached::before { background: color-mix(in srgb, var(--pr-fill-start) 70%, var(--pr-track)); }
+#progress .progress-journey-node { position: relative; z-index: 1; display: grid; place-items: center; width: 50px; height: 50px; box-sizing: border-box; border: 1px solid var(--pr-border); border-radius: 17px; background: var(--pr-elevated); color: var(--pr-muted); font-size: 18px; font-weight: 750; font-variant-numeric: tabular-nums; }
+#progress .is-reached .progress-journey-node { border-color: color-mix(in srgb, var(--pr-purple) 42%, var(--pr-border)); background: color-mix(in srgb, var(--pr-purple) 14%, var(--pr-surface)); color: var(--pr-purple); }
+#progress .is-current .progress-journey-node { border-color: transparent; outline: 1px solid color-mix(in srgb, var(--pr-purple) 55%, transparent); outline-offset: 4px; background: linear-gradient(135deg, #6D55C5, #426BAF); color: #FFFFFF; }
+#progress .progress-journey-check { position: absolute; right: -5px; top: -5px; display: grid; place-items: center; padding: 2px; border-radius: 50%; background: var(--pr-surface); color: var(--pr-cyan); }
+#progress .progress-journey-check svg { width: 15px; height: 15px; }
+#progress .progress-journey-caption { display: grid; gap: 5px; min-width: 0; }
+#progress .progress-journey-caption strong { color: var(--pr-text); font-size: 12px; font-weight: 650; line-height: 1.4; }
+#progress .progress-journey-caption small { color: var(--pr-muted); font-size: 10px; line-height: 1.4; }
+#progress .is-current .progress-journey-caption small { color: var(--pr-purple); font-weight: 750; }
+
+#progress .progress-reward-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+#progress .progress-reward {
+    --reward-color: var(--pr-purple);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 20px 14px 16px;
+    border: 1px solid var(--pr-border);
+    border-radius: 18px;
+    background: var(--pr-elevated);
+    text-align: center;
+    transition: transform 200ms ease, border-color 200ms ease, background-color 200ms ease;
+}
+#progress .progress-reward:is([data-kind="task"], [data-kind="done"], [data-kind="constant"]) { --reward-color: var(--pr-cyan); }
+#progress .progress-reward:is([data-kind="note"], [data-kind="pdf"], [data-kind="average"]) { --reward-color: var(--pr-blue); }
+#progress .progress-reward[data-kind="streak"] { --reward-color: var(--pr-amber); }
+#progress .progress-reward.is-unlocked { border-color: color-mix(in srgb, var(--reward-color) 25%, var(--pr-border)); background: linear-gradient(155deg, color-mix(in srgb, var(--reward-color) 7%, var(--pr-surface)), var(--pr-surface)); }
+#progress .progress-reward-medal { display: grid; place-items: center; width: 56px; height: 56px; margin-bottom: 4px; border: 1px solid color-mix(in srgb, var(--reward-color) 32%, var(--pr-border)); border-radius: 19px 19px 22px 22px; background: color-mix(in srgb, var(--reward-color) 12%, var(--pr-surface)); color: var(--reward-color); }
+#progress .progress-reward-medal svg { width: 27px; height: 27px; }
+#progress .is-locked .progress-reward-medal { border-color: var(--pr-border); background: var(--pr-surface); color: var(--pr-locked); }
+#progress .progress-reward h4 { width: 100%; margin: 0; color: var(--pr-text); font-size: 13px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; text-wrap: balance; }
+#progress .progress-reward > p { width: 100%; margin: 0 0 5px; color: var(--pr-muted); font-size: 11px; line-height: 1.5; overflow-wrap: anywhere; }
+#progress .progress-reward-state { display: inline-flex; align-items: center; gap: 5px; margin-top: auto; padding: 4px 7px; border-radius: 7px; border: 1px solid var(--pr-border); background: var(--pr-surface); color: var(--pr-muted); font-size: 10px; font-weight: 600; line-height: 1.4; }
+#progress .is-unlocked .progress-reward-state { color: var(--reward-color); border-color: color-mix(in srgb, var(--reward-color) 22%, var(--pr-border)); }
+#progress .progress-reward-state svg { width: 12px; height: 12px; }
+
+@media (hover: hover) {
+    #progress .progress-metric:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--metric-color) 45%, var(--pr-border)); }
+    #progress .progress-reward:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--reward-color) 45%, var(--pr-border)); }
+}
+
+@media (max-width: 1100px) {
+    #progress .progress-level-hero { grid-template-columns: minmax(0, 1fr) 164px; gap: 20px; padding: 24px; }
+    #progress .progress-primary-metrics { gap: 10px; }
+    #progress .progress-metric { grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 16px; }
+    #progress .progress-metric-icon { width: 36px; height: 36px; border-radius: 12px; }
+    #progress .progress-metric-icon svg { width: 22px; height: 22px; }
+    #progress .progress-metric-value { font-size: 24px; }
+    #progress .metric-status .progress-metric-value { font-size: 20px; }
+    #progress .progress-reward-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+    #app-page #progress .progress-container { gap: 16px !important; }
+    #progress .progress-level-hero { grid-template-columns: minmax(0, 1fr); gap: 18px; padding: 22px; border-radius: 20px; }
+    #progress .progress-radial { grid-row: 2; width: 144px; height: 144px; }
+    #progress .progress-radial-label > strong { font-size: 38px; }
+    #progress .progress-level-copy h2 { font-size: 38px; }
+    #progress .progress-primary-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #progress .metric-status { grid-column: 1 / -1; }
+    #progress .progress-metric { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 16px; }
+    #progress .metric-status { grid-template-columns: 36px minmax(0, 1fr); }
+    #progress .progress-activity-metrics { gap: 10px; }
+    #progress .progress-activity-metrics .progress-metric { padding: 14px; }
+    #progress .progress-activity-metrics .progress-metric > div { grid-template-columns: minmax(0, 1fr); gap: 5px; }
+    #progress .progress-activity-metrics .progress-metric-value { grid-column: 1; grid-row: 2; }
+    #progress :is(.progress-journey, .progress-collection) { padding: 18px; border-radius: 20px; }
+    #progress .progress-panel-heading { flex-wrap: wrap; margin-bottom: 20px; }
+    #progress .progress-panel-heading h3 { font-size: 16px; }
+    #progress .progress-panel-counter { padding: 4px 8px; }
+    #progress .progress-journey-list { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 0; }
+    #progress .progress-journey-step { flex-direction: row; gap: 20px; align-items: center; padding: 0 4px 24px; text-align: left; }
+    #progress .progress-journey-step:last-child { padding-bottom: 0; }
+    #progress .progress-journey-step::before { top: -24px; left: 28px; right: auto; width: 2px; height: 49px; }
+    #progress .progress-journey-node { flex-shrink: 0; }
+    #progress .progress-reward-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    #progress .progress-reward { padding: 16px 10px 13px; border-radius: 15px; }
+    #progress .progress-reward h4 { font-size: 12px; }
+    #progress .progress-reward > p { font-size: 11px; }
+    #progress .progress-reward-medal { width: 48px; height: 48px; border-radius: 16px; }
+    #progress .progress-reward-medal svg { width: 24px; height: 24px; }
+}
+
+@keyframes ac-progress-ring-enter {
+    from { stroke-dashoffset: 100; }
+}
+
+@keyframes ac-progress-bar-enter {
+    from { transform: scaleX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #progress :is(.progress-radial-ring, .progress-level-fill, .progress-metric, .progress-reward) { animation: none !important; transition: none !important; }
+    #progress :is(.progress-metric, .progress-reward):hover { transform: none; }
+}
+
+html.performance-mode #progress :is(.progress-radial-ring, .progress-level-fill, .progress-metric, .progress-reward),
+html.reduce-app-motion #progress :is(.progress-radial-ring, .progress-level-fill, .progress-metric, .progress-reward) { animation: none; transition: none; }
+html.reduce-app-motion #progress :is(.progress-metric, .progress-reward):hover { transform: none; }

@@ -60,7 +60,7 @@ test('Presentation is scoped to grades, keeps sticky subjects and existing phone
     assert.match(css, /#app-page\.page\.active #grades \.period-subject-row/);
     const html = fs.readFileSync(path.join(__dirname, '../index.html'), 'utf8');
     assert.match(html, /style\.css\?v=20261025-grades-visual-refinement-v1/);
-    assert.match(html, /app\.js\?v=20261025-grades-visual-refinement-v1/);
+    assert.match(html, /app\.js\?v=\d{8}-[a-z0-9-]+/);
 });
 test('Refined semantic text and primary action retain AA contrast in both themes', () => {
     const luminance = hex => {

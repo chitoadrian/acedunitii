@@ -8110,63 +8110,76 @@ function renderProgress(workspace) {
     const pathLevels = [1, 2, 3, 4, 5];
 
     container.innerHTML = `
-        <div class="progress-hero premium-border">
-            <div class="progress-hero-copy">
-                <span class="progress-eyebrow">Camino académico</span>
+        <section class="progress-level-hero" aria-label="Tu progreso actual">
+            <div class="progress-level-copy">
+                <span class="progress-level-eyebrow">Camino académico</span>
                 <h2>Nivel ${level}</h2>
                 <p>${xp ? 'Estás cerca del siguiente nivel.' : 'Completa actividades para desbloquear logros.'}</p>
-                <div class="progress-xp-meta">
+                <div class="progress-level-xp">
                     <span>${xp} XP acumulado</span>
                     <span>${xpToNext} XP para nivel ${level + 1}</span>
                 </div>
-                <div class="xp-bar progress-xp-bar" aria-label="Progreso de XP">
-                    <div class="xp-fill" style="width:${xpProgress}%"></div>
+                <div class="progress-level-track" role="progressbar" aria-label="Progreso de XP" aria-valuemin="0" aria-valuemax="${xpPerLevel}" aria-valuenow="${xpCurrent}">
+                    <div class="progress-level-fill" style="width:${xpProgress}%"></div>
                 </div>
                 <small>${xpCurrent}/${xpPerLevel} XP en este nivel</small>
             </div>
-            <div class="progress-level-orb" style="--xp:${xpProgress}%">
-                <strong>${level}</strong>
-                <span>Nivel actual</span>
+            <div class="progress-radial ${xpProgress === 0 ? 'is-empty' : ''}" style="--progress-percent:${xpProgress}" role="img" aria-label="Nivel ${level}: ${Number(xpProgress.toFixed(1))}% de avance">
+                <svg viewBox="0 0 168 168" aria-hidden="true" focusable="false">
+                    <defs><linearGradient id="progress-ring-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="var(--pr-fill-start)"></stop><stop offset="100%" stop-color="var(--pr-fill-end)"></stop></linearGradient></defs>
+                    <circle class="progress-radial-track" cx="84" cy="84" r="72"></circle>
+                    <circle class="progress-radial-ring" cx="84" cy="84" r="72" pathLength="100"></circle>
+                </svg>
+                <div class="progress-radial-label" aria-hidden="true">
+                    <span>Nivel actual</span>
+                    <strong>${level}</strong>
+                    <small>${Number(xpProgress.toFixed(1))}% del nivel</small>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <div class="progress-stat-grid">
+        <section class="progress-personal-stats" aria-label="Estadísticas personales">
+          <div class="progress-primary-metrics">
             ${progressStatCard('streak', 'Racha actual', `${workspace.streak || 0}`, 'días activos')}
             ${progressStatCard('trophy', 'Logros desbloqueados', `${unlocked}/${achievements.length}`, 'insignias premium')}
             ${progressStatCard('status', 'Estado', xp ? 'En progreso' : 'Inicial', xp ? 'sigue avanzando' : 'empieza desde cero')}
+          </div>
+          <div class="progress-activity-metrics">
             ${progressStatCard('activity', 'Actividad académica', workspace.subjects.length + workspace.tasks.length + workspace.resources.length, 'acciones registradas')}
             ${progressStatCard('tasks', 'Tareas completadas', completedTasks, 'retos terminados')}
-        </div>
+          </div>
+        </section>
 
-        <section class="progress-path premium-border">
-            <div class="progress-section-title">
-                <h3>Camino del estudiante</h3>
-                <p>Avanza por niveles mientras usas AC Edunity.</p>
-            </div>
-            <div class="student-path">
+        <section class="progress-journey" aria-label="Camino del estudiante">
+            <header class="progress-panel-heading">
+                <div><h3>Camino del estudiante</h3><p>Avanza por niveles mientras usas AC Edunity.</p></div>
+                <span class="progress-panel-counter">Nivel actual <strong>${level}</strong></span>
+            </header>
+            <ol class="progress-journey-list">
                 ${pathLevels.map(pathLevel => `
-                    <div class="path-step ${level >= pathLevel ? 'active' : ''} ${level === pathLevel ? 'current' : ''}">
-                        <span>${pathLevel}</span>
-                        <small>Nivel ${pathLevel}</small>
-                    </div>
+                    <li class="progress-journey-step ${level >= pathLevel ? 'is-reached' : ''} ${level === pathLevel ? 'is-current' : ''}" ${level === pathLevel ? 'aria-current="step"' : ''}>
+                        <span class="progress-journey-node">${pathLevel}${level > pathLevel ? `<span class="progress-journey-check" aria-hidden="true">${achievementIconSvg('done')}</span>` : ''}</span>
+                        <div class="progress-journey-caption"><strong>Nivel ${pathLevel}</strong><small>${level === pathLevel ? 'Actual' : level > pathLevel ? 'Alcanzado' : 'Por alcanzar'}</small></div>
+                    </li>
                 `).join('')}
-            </div>
+            </ol>
         </section>
 
         ${xp ? '' : emptyStateHTML({ icon: 'trend', title: 'Tu progreso empieza aquí', description: 'Completa actividades para avanzar de nivel y desbloquear logros.', variant: 'embedded' })}
 
-        <section class="achievements-section progress-achievements premium-border">
-            <div class="progress-section-title">
-                <h3>Logros desbloqueados</h3>
-                <p>Insignias que reflejan tu avance real dentro de la plataforma.</p>
-            </div>
-            <div class="achievements-grid premium-achievements-grid">
+        <section class="progress-collection" aria-label="Colección de logros">
+            <header class="progress-panel-heading">
+                <div><h3>Logros desbloqueados</h3><p>Insignias que reflejan tu avance real dentro de la plataforma.</p></div>
+                <span class="progress-panel-counter"><strong>${unlocked}/${achievements.length}</strong></span>
+            </header>
+            <div class="progress-reward-grid">
                 ${achievements.map(item => `
-                    <div class="achievement premium-achievement progress-achievement-card ${item.unlocked ? 'unlocked' : 'locked'}">
-                        ${achievementIconHTML(item.icon, item.unlocked)}
-                        <p>${escapeHTML(item.name)}</p>
-                        <small>${item.unlocked ? escapeHTML(item.detail) : 'Bloqueado'}</small>
-                    </div>
+                    <article class="progress-reward ${item.unlocked ? 'is-unlocked' : 'is-locked'}" data-kind="${escapeHTML(item.icon)}">
+                        <span class="progress-reward-medal" aria-hidden="true">${achievementIconSvg(item.icon)}</span>
+                        <h4>${escapeHTML(item.name)}</h4>
+                        <p>${escapeHTML(item.detail)}</p>
+                        <span class="progress-reward-state"><span aria-hidden="true">${achievementIconSvg(item.unlocked ? 'done' : 'lock')}</span>${item.unlocked ? 'Desbloqueado' : 'Bloqueado'}</span>
+                    </article>
                 `).join('')}
             </div>
         </section>
@@ -8187,14 +8200,14 @@ function progressStatIconSvg(type) {
 
 function progressStatCard(type, label, value, detail) {
     return `
-        <div class="progress-stat premium-progress-stat stat-${escapeHTML(type)} premium-border">
-            <span class="progress-stat-icon stroke-icon" aria-hidden="true">${progressStatIconSvg(type)}</span>
+        <article class="progress-metric metric-${escapeHTML(type)}">
+            <span class="progress-metric-icon" aria-hidden="true">${progressStatIconSvg(type)}</span>
             <div>
-                <span class="stat-label">${escapeHTML(label)}</span>
-                <span class="stat-value">${escapeHTML(value)}</span>
+                <span class="progress-metric-label">${escapeHTML(label)}</span>
+                <strong class="progress-metric-value">${escapeHTML(value)}</strong>
                 <small>${escapeHTML(detail)}</small>
             </div>
-        </div>
+        </article>
     `;
 }
 function readFileAsDataUrl(file) {
