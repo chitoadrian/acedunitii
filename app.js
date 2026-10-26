@@ -2398,13 +2398,39 @@ function normalizeFiveDayActivityRows(rows) {
     });
 }
 
+// Presentation only: mouse/keyboard/touch share the same verified daily summary.
+function handleWeeklyActivityTooltip(event) {
+    const grid = event.currentTarget;
+    const day = event.target.closest('button.weekly-activity-day');
+    if (!day || !grid?.contains(day)) return;
+    if (event.type === 'keydown') {
+        if (event.key !== 'Escape') return;
+        event.preventDefault();
+        day.removeAttribute('data-tooltip-open');
+        day.setAttribute('data-tooltip-dismissed', '');
+    } else if (event.type === 'focusout') {
+        if (event.relatedTarget && day.contains(event.relatedTarget)) return;
+        day.removeAttribute('data-tooltip-open');
+        day.removeAttribute('data-tooltip-dismissed');
+    } else if (event.type === 'click') {
+        const open = !day.hasAttribute('data-tooltip-open');
+        grid.querySelectorAll('.weekly-activity-day').forEach(button => {
+            button.removeAttribute('data-tooltip-open');
+            button.removeAttribute('data-tooltip-dismissed');
+        });
+        day.toggleAttribute('data-tooltip-open', open);
+        day.toggleAttribute('data-tooltip-dismissed', !open);
+        day.focus({ preventScroll: true });
+    }
+}
+
 function weeklyActivityGridHTML(rows, { loading = false } = {}) {
     const safeRows = normalizeFiveDayActivityRows(rows);
     const maxPoints = Math.max(1, ...safeRows.map(item => item.points));
 
     return `
-        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}${safeRows.some(item => item.points > 0) ? '' : ' is-empty'}" aria-label="Actividad académica en un periodo móvil de cinco días">
-            ${safeRows.map(item => {
+        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}${safeRows.some(item => item.points > 0) ? '' : ' is-empty'}" aria-label="Actividad académica en un periodo móvil de cinco días" onclick="handleWeeklyActivityTooltip(event)" onkeydown="handleWeeklyActivityTooltip(event)" onfocusout="handleWeeklyActivityTooltip(event)">
+            ${safeRows.map((item, index) => {
                 const height = item.points > 0 ? Math.max(22, Math.round((item.points / maxPoints) * 100)) : 0;
                 const pointLabel = item.points === 1 ? 'punto' : 'puntos';
                 const activityLabel = item.activityCount === 1 ? 'actividad' : 'actividades';
@@ -2421,14 +2447,20 @@ function weeklyActivityGridHTML(rows, { loading = false } = {}) {
                     : item.points > 0
                         ? `${item.fullDay}: ${activitySummary}`
                         : `${item.fullDay}: sin actividad`;
+                const tooltipId = `weekly-activity-tooltip-${index}`;
 
                 return `
-                    <div class="weekly-activity-day" tabindex="0" role="img" aria-label="${escapeHTML(description)}" data-tooltip="${escapeHTML(tooltip)}">
+                    <button type="button" class="weekly-activity-day${!loading && item.points > 0 ? ' has-activity' : ''}" tabindex="0" aria-label="${escapeHTML(description)}" aria-describedby="${tooltipId}" data-tooltip="${escapeHTML(tooltip)}">
                         <span class="weekly-activity-track" aria-hidden="true">
                             <span class="weekly-activity-bar${item.points === 0 ? ' is-empty' : ''}" style="--weekly-bar-height:${loading ? 18 : height}%"></span>
                         </span>
                         <span class="weekly-activity-label" aria-hidden="true">${escapeHTML(item.day)}</span>
-                    </div>
+                        <span class="weekly-activity-tooltip" role="tooltip" id="${tooltipId}">
+                            <strong>${escapeHTML(item.fullDay)}</strong>
+                            <span>${loading ? 'Cargando actividad…' : item.points > 0 ? `${item.points} ${pointLabel}` : 'Sin actividad registrada'}</span>
+                            ${!loading && item.activityCount > 0 ? `<small>${item.activityCount} ${activityLabel} ${item.activityCount === 1 ? 'registrada' : 'registradas'}</small>` : ''}
+                        </span>
+                    </button>
                 `;
             }).join('')}
         </div>

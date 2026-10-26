@@ -168,16 +168,56 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #dashboard {
 #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps button { grid-column: 3 !important; grid-row: 1 !important; min-width: 48px !important; width: auto !important; min-height: 34px !important; padding: 5px 9px !important; border: 1px solid var(--dc-border) !important; border-radius: 8px !important; background: var(--dc-surface) !important; color: var(--dc-blue) !important; font-size: 10px !important; font-weight: 650 !important; box-shadow: none !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps .done button { color: var(--dc-cyan) !important; }
 
-/* Five-day data and accessible tooltips stay unchanged; zero data stays visually quiet. */
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid { min-height: 0 !important; margin: 10px 0 0 !important; gap: 16px !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day { grid-template-rows: 112px 18px !important; gap: 7px !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-track { width: min(28px, 70%) !important; height: 112px !important; border: 1px solid var(--dc-border) !important; border-radius: 8px !important; background: var(--dc-elevated) !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-bar { border-radius: 7px !important; background: linear-gradient(180deg, var(--dc-blue), var(--dc-purple)) !important; box-shadow: none !important; animation: none !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-label { color: var(--dc-muted) !important; font-size: 10px !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid.is-empty:not(.is-loading) .weekly-activity-day { grid-template-rows: 22px 18px !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid.is-empty:not(.is-loading) .weekly-activity-track { height: 22px !important; }
+/* Five real days, balanced with the adjacent checklist; no change to points or heights %. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout > .weekly-progress-card[data-dashboard-module="weekly"] {
+    --weekly-gold-top: #F2CE7A;
+    --weekly-gold-base: #D9A846;
+    --weekly-gold-text: #E6C16C;
+    display: flex !important;
+    flex-direction: column !important;
+    align-self: stretch !important;
+    min-height: 330px !important;
+    transform: none !important;
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout > .weekly-progress-card[data-dashboard-module="weekly"] {
+    --weekly-gold-top: #B17B21;
+    --weekly-gold-base: #926018;
+    --weekly-gold-text: #8A5B18;
+}
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-progress-card .weekly-activity-content { display: flex; flex-direction: column; flex: 1; gap: 12px; min-height: 0; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid { flex: 1; align-items: stretch !important; min-height: 150px !important; margin: 0 !important; gap: clamp(8px, 1.8vw, 24px) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day { appearance: none; display: grid !important; grid-template-rows: minmax(120px, 1fr) 20px !important; align-items: end; justify-items: center; gap: 9px !important; width: 100%; min-width: 0; min-height: 0; height: 100%; margin: 0; padding: 0 !important; border: 0 !important; border-radius: 9px; background: transparent !important; box-shadow: none !important; font: inherit; cursor: pointer; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day::after { content: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-track { width: min(38px, 76%) !important; height: 100% !important; min-height: 120px; border: 1px solid var(--dc-border) !important; border-radius: 10px !important; background: var(--dc-elevated) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day:not(.has-activity) .weekly-activity-track { opacity: .55; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-bar { border-radius: 9px !important; background: linear-gradient(180deg, var(--weekly-gold-top), var(--weekly-gold-base)) !important; box-shadow: none !important; animation: none !important; transform-origin: center bottom; transition: height 550ms ease, filter 160ms ease; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-progress-card .has-activity .weekly-activity-bar { animation: dashboard-weekly-grow 600ms cubic-bezier(.22, .61, .36, 1) 1 both !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-label { color: var(--dc-muted) !important; font-size: 11px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day.has-activity .weekly-activity-label { color: var(--weekly-gold-text) !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-bar.is-empty { height: 0 !important; background: transparent !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .chart-caption { margin: 12px 0 0 !important; color: var(--dc-muted) !important; font-size: 10px !important; line-height: 1.5 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .chart-caption { margin: 0 !important; color: var(--dc-muted) !important; font-size: 10px !important; line-height: 1.5 !important; }
+
+/* Tooltip text uses only the existing RPC's points and activity_count. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip { position: absolute; z-index: 12; left: 50%; bottom: calc(100% + 10px); display: grid; gap: 5px; width: 190px; max-width: calc(100vw - 64px); padding: 12px 14px; border: 1px solid var(--dc-border); border-radius: 12px; background: var(--dc-elevated); color: var(--dc-text); box-shadow: var(--dc-shadow); text-align: left; white-space: normal; pointer-events: none; opacity: 0; visibility: hidden; transform: translate(-50%, 6px); transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip strong { color: var(--dc-text); font-size: 12px; line-height: 1.4; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip > span { color: var(--dc-text); font-size: 12px; line-height: 1.45; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip small { color: var(--dc-muted); font-size: 10px; line-height: 1.4; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day:first-child .weekly-activity-tooltip { left: 0; transform: translate(0, 6px); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day:last-child .weekly-activity-tooltip { left: auto; right: 0; transform: translate(0, 6px); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day:is(:focus-visible, [data-tooltip-open]):not([data-tooltip-dismissed]) .weekly-activity-tooltip { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day:is(:first-child, :last-child):is(:focus-visible, [data-tooltip-open]):not([data-tooltip-dismissed]) .weekly-activity-tooltip { transform: translate(0, 0); }
+@media (hover: hover) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid:not(:has(.weekly-activity-day:focus-visible)) .weekly-activity-day:hover:not([data-tooltip-dismissed]) .weekly-activity-tooltip { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid:not(:has(.weekly-activity-day:focus-visible)) .weekly-activity-day:is(:first-child, :last-child):hover:not([data-tooltip-dismissed]) .weekly-activity-tooltip { transform: translate(0, 0); }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid:has(.weekly-activity-day:hover) .weekly-activity-day[data-tooltip-open]:not(:hover):not(:focus-visible) .weekly-activity-tooltip { opacity: 0; visibility: hidden; }
+}
+@keyframes dashboard-weekly-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-progress-card .has-activity .weekly-activity-bar { animation: none !important; transition: none !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip { transition: none !important; }
+}
+body:is(.reduce-app-motion, .performance-mode) #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-progress-card .has-activity .weekly-activity-bar { animation: none !important; transition: none !important; }
+body:is(.reduce-app-motion, .performance-mode) #app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-tooltip { transition: none !important; }
 
 /* Local empty states override the shared, deliberately spacious module defaults. */
 #app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state { display: grid !important; grid-template-columns: 30px minmax(0, 1fr) !important; gap: 4px 12px !important; align-items: center !important; justify-items: start !important; min-height: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 12px 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; text-align: left !important; }
@@ -185,7 +225,7 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #dashboard {
 #app-page.page.active #dashboard .dashboard-compact-workspace .empty-state__icon svg { width: 17px !important; height: 17px !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state .empty-state__title { grid-column: 2; margin: 0 !important; color: var(--dc-text) !important; font-size: 14px !important; line-height: 1.4 !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state .empty-state__description { grid-column: 2; margin: 0 !important; max-width: none !important; color: var(--dc-muted) !important; font-size: 11px !important; line-height: 1.5 !important; }
-#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-content > .student-empty-state { margin-top: 12px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-content > .student-empty-state { margin-top: 0 !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty > .student-empty-state { grid-area: copy !important; grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "title action" "description action" !important; padding: 0 !important; gap: 4px 18px !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__title { grid-area: title !important; }
 #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__description { grid-area: description !important; }

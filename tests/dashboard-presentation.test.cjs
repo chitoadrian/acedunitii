@@ -114,7 +114,7 @@ test('Five-day dates, counts, heights and keyboard tooltip access are preserved'
     const { context } = createRenderer();
     const rows = [{ day_key: 'sat', day_label: 'Sáb', full_day: 'Sábado', points: 10, activity_count: 2 }, { day_key: 'sun', points: 20, activity_count: 3 }];
     const html = context.weeklyActivityGridHTML(rows);
-    assert.equal((html.match(/class="weekly-activity-day"/g) || []).length, 5);
+    assert.equal((html.match(/class="weekly-activity-day[\s"]/g) || []).length, 5);
     assert.equal((html.match(/tabindex="0"/g) || []).length, 5);
     assert.match(html, /10 puntos en 2 actividades/);
     assert.match(html, /--weekly-bar-height:50%/);
@@ -129,7 +129,7 @@ test('CSS is isolated, adaptive, reduced-motion safe and never hides document ov
     assert.doesNotMatch(css, /infinite|overflow-x:\s*hidden|:root|#landing-page|\.sidebar/);
     assert.match(css, /button:focus-visible/);
     const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-    assert.match(html, /dashboard-ui\.css\?v=20261026-premium-compact-dashboard-v1/);
+    assert.match(html, /dashboard-ui\.css\?v=20261026-weekly-progress-premium-v1/);
     assert.match(html, /app\.js\?v=\d{8}-[a-z0-9-]+/);
 });
 test('Legacy ring minimum height, checklist placement and the 768px flow boundary are explicitly handled', () => {
