@@ -101,6 +101,8 @@ test('Presentation has no new requests, persistence, timers or per-card listener
     for (const node of nodes.filter(n => n.type === 'FunctionDeclaration' && ['weeklyActivityGridHTML', 'handleWeeklyActivityTooltip'].includes(n.id.name))) assert.doesNotMatch(source.slice(node.start, node.end), /fetch\(|\.from\(|\.rpc\(|localStorage|sessionStorage|setTimeout|setInterval|addEventListener/);
     assert.match(css, /align-self: stretch !important;\s+min-height: 330px/);
     assert.match(css, /min-height: 330px !important;\s+transform: none !important/);
+    assert.match(css, /\.weekly-activity-grid \{[^}]*min-height: 130px !important/);
+    assert.match(css, /grid-template-rows: minmax\(100px, 1fr\) 20px/);
     assert.match(css, /dashboard-weekly-grow 600ms[^;]+ 1 both/);
     assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
     assert.match(css, /body:is\(\.reduce-app-motion, \.performance-mode\)[^\n]*\.weekly-activity-bar \{ animation: none/);

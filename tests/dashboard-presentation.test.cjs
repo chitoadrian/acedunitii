@@ -129,7 +129,7 @@ test('CSS is isolated, adaptive, reduced-motion safe and never hides document ov
     assert.doesNotMatch(css, /infinite|overflow-x:\s*hidden|:root|#landing-page|\.sidebar/);
     assert.match(css, /button:focus-visible/);
     const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-    assert.match(html, /dashboard-ui\.css\?v=20261026-weekly-progress-premium-v1/);
+    assert.match(html, /dashboard-ui\.css\?v=20261026-weekly-progress-premium-v2/);
     assert.match(html, /app\.js\?v=\d{8}-[a-z0-9-]+/);
 });
 test('Legacy ring minimum height, checklist placement and the 768px flow boundary are explicitly handled', () => {
