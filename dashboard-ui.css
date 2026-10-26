@@ -1,0 +1,247 @@
+/* Compact academic Dashboard. Scoped to its presentation wrapper, not the app shell. */
+#app-page #dashboard {
+    --dc-surface: #192132;
+    --dc-elevated: #202A3D;
+    --dc-text: #EFF3FC;
+    --dc-muted: #AEBBD0;
+    --dc-border: #344158;
+    --dc-blue: #8ABAFF;
+    --dc-purple: #B4A3FB;
+    --dc-cyan: #6ED2C3;
+    --dc-amber: #EAC28B;
+    --dc-track: #303C53;
+    --dc-shadow: 0 6px 20px rgba(6, 12, 25, .12);
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #dashboard {
+    --dc-surface: #FFFFFF;
+    --dc-elevated: #F5F7FC;
+    --dc-text: #243047;
+    --dc-muted: #5A6980;
+    --dc-border: #DCE3EF;
+    --dc-blue: #486FAA;
+    --dc-purple: #6957B8;
+    --dc-cyan: #2A7D72;
+    --dc-amber: #986B2B;
+    --dc-track: #E5EAF3;
+    --dc-shadow: 0 5px 18px rgba(35, 51, 84, .045);
+}
+
+#app-page.page.active #dashboard .dashboard-compact-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    width: 100%;
+    min-width: 0;
+    color: var(--dc-text);
+}
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-hero, .dashboard-grid, .dashboard-clean-layout, .dashboard-panel-card, .dashboard-stat-card) {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-hero, .dashboard-panel-card, .dashboard-stat-card) {
+    border: 1px solid var(--dc-border) !important;
+    border-radius: 19px !important;
+    background: var(--dc-surface) !important;
+    color: var(--dc-text) !important;
+    box-shadow: var(--dc-shadow) !important;
+    backdrop-filter: none !important;
+    overflow: visible !important;
+}
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-hero, .dashboard-panel-card, .dashboard-stat-card)::before,
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-hero, .dashboard-panel-card, .dashboard-stat-card)::after { content: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace h3::after { content: none !important; }
+
+/* Welcome, one contextual destination, and the six original routes. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-student-hero {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.35fr) minmax(250px, .85fr) !important;
+    grid-template-areas: "welcome next" "actions actions" !important;
+    align-items: center !important;
+    gap: 20px 28px !important;
+    padding: 22px 24px !important;
+    background: linear-gradient(115deg, var(--dc-surface), color-mix(in srgb, var(--dc-purple) 5%, var(--dc-surface))) !important;
+}
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-copy { grid-area: welcome; display: block !important; min-width: 0; max-width: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-eyebrow { display: inline-block !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--dc-purple) !important; font-size: 10px !important; font-weight: 750 !important; letter-spacing: .08em; line-height: 1.3 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero h1 { margin: 10px 0 7px !important; color: var(--dc-text) !important; font-size: clamp(27px, 2.6vw, 35px) !important; line-height: 1.12 !important; letter-spacing: -.035em !important; text-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-copy > p { margin: 0 !important; color: var(--dc-muted) !important; font-size: 12px !important; line-height: 1.5 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-meta { display: flex !important; flex-wrap: wrap !important; gap: 8px 16px !important; margin-top: 12px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-meta > span { padding: 0 !important; min-height: 0 !important; border: 0 !important; background: transparent !important; color: var(--dc-muted) !important; font-size: 10.5px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step { grid-area: next; display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: start; gap: 12px; padding: 15px; border: 1px solid var(--dc-border); border-radius: 15px; background: color-mix(in srgb, var(--dc-elevated) 70%, var(--dc-surface)); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step > div { min-width: 0; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step-icon { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid color-mix(in srgb, var(--dc-blue) 22%, var(--dc-border)); border-radius: 10px; background: color-mix(in srgb, var(--dc-blue) 9%, var(--dc-surface)); color: var(--dc-blue); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step-eyebrow { display: inline; color: var(--dc-text); font-size: 11px; font-weight: 750; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step small { display: inline; margin-left: 7px; color: var(--dc-purple); font-size: 9.5px; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step h2 { margin: 6px 0 4px; color: var(--dc-text); font-size: 14px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step p { margin: 0; color: var(--dc-muted); font-size: 10.5px; line-height: 1.5; overflow-wrap: anywhere; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step button { display: inline-flex; align-items: center; gap: 14px; min-height: 36px; margin-top: 6px; padding: 5px 0; border: 0; background: transparent; color: var(--dc-blue); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-actions { grid-area: actions; display: grid !important; grid-template-columns: repeat(6, minmax(0, 1fr)) !important; gap: 8px !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-actions button { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 7px !important; width: 100% !important; min-width: 0 !important; min-height: 42px !important; height: auto !important; padding: 9px !important; border: 1px solid var(--dc-border) !important; border-radius: 11px !important; background: var(--dc-elevated) !important; box-shadow: none !important; color: var(--dc-text) !important; font-size: 11px !important; font-weight: 650 !important; white-space: normal !important; line-height: 1.35 !important; transition: background-color 180ms ease, border-color 180ms ease !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-quick-action-icon { width: 16px !important; height: 16px !important; min-width: 16px !important; color: var(--dc-muted) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-quick-action-icon svg { width: 16px !important; height: 16px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-tutor-action { color: var(--dc-purple) !important; border-color: color-mix(in srgb, var(--dc-purple) 30%, var(--dc-border)) !important; }
+
+/* Compact metrics: the data and meaningful task/grade bars are unchanged. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-grid { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 14px !important; align-items: stretch !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card { --dc-accent: var(--dc-blue); display: grid !important; grid-template-rows: auto auto 1fr auto !important; align-content: start !important; gap: 6px !important; padding: 14px 16px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card[data-dashboard-module="tasks"] { --dc-accent: var(--dc-amber); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card[data-dashboard-module="calendar"] { --dc-accent: var(--dc-cyan); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card[data-dashboard-module="grades"] { --dc-accent: var(--dc-purple); }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-header { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; min-width: 0 !important; min-height: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-icon { display: grid !important; place-items: center !important; width: 28px !important; height: 28px !important; min-width: 28px !important; border: 1px solid color-mix(in srgb, var(--dc-accent) 24%, var(--dc-border)) !important; border-radius: 9px !important; color: var(--dc-accent) !important; background: color-mix(in srgb, var(--dc-accent) 8%, var(--dc-surface)) !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-icon svg { width: 17px !important; height: 17px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-label { color: var(--dc-muted) !important; font-size: 10px !important; font-weight: 650 !important; letter-spacing: .025em !important; line-height: 1.4 !important; white-space: normal !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-value { display: block !important; min-width: 0 !important; margin: 3px 0 0 !important; color: var(--dc-text) !important; -webkit-text-fill-color: var(--dc-text) !important; background: none !important; font-size: 26px !important; font-weight: 750 !important; line-height: 1.15 !important; letter-spacing: -.025em !important; text-shadow: none !important; overflow: visible !important; white-space: normal !important; overflow-wrap: anywhere !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace [data-dashboard-module="calendar"] .stat-value { font-size: 18px !important; line-height: 1.35 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-subtext { margin: 0 !important; min-height: 0 !important; color: var(--dc-muted) !important; font-size: 10.5px !important; line-height: 1.45 !important; white-space: normal !important; overflow-wrap: anywhere !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .stat-icon { flex: 0 0 28px !important; max-width: 28px !important; padding: 0 !important; box-sizing: border-box !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .progress-bar { width: 100% !important; height: 5px !important; min-height: 0 !important; margin: 4px 0 0 !important; border: 0 !important; border-radius: 999px !important; background: var(--dc-track) !important; overflow: hidden !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .progress-fill { min-width: 0 !important; height: 100% !important; border-radius: inherit !important; background: linear-gradient(90deg, #8271DB, #638FDC) !important; box-shadow: none !important; animation: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card .progress-fill { background: var(--dc-accent) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card:is([data-dashboard-module="subjects"], [data-dashboard-module="calendar"]) > .progress-bar { display: none !important; }
+
+/* Two balanced rows, with no fixed heights or artificial stretching of empty states. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; grid-template-areas: none !important; gap: 18px !important; align-items: start !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout > .dashboard-panel-card { grid-column: auto !important; grid-row: auto !important; grid-area: auto !important; align-self: start !important; padding: 18px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout > :is(.dashboard-progress-card, .dashboard-day-card) { align-self: stretch !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-title { display: flex !important; align-items: flex-start !important; gap: 10px !important; margin: 0 0 14px !important; padding: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-title > div { min-width: 0; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-title h3 { margin: 0 !important; color: var(--dc-text) !important; font-size: 15px !important; font-weight: 750 !important; line-height: 1.35 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-title p { margin: 4px 0 0 !important; color: var(--dc-muted) !important; font-size: 10.5px !important; line-height: 1.45 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-icon { display: grid !important; place-items: center !important; width: 32px !important; height: 32px !important; min-width: 32px !important; border: 1px solid var(--dc-border) !important; border-radius: 10px !important; color: var(--dc-blue) !important; background: var(--dc-elevated) !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .panel-icon svg { width: 18px !important; height: 18px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.panel-icon, .dashboard-next-evaluation-icon) { flex: 0 0 32px !important; max-width: 32px !important; padding: 0 !important; box-sizing: border-box !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-body { display: grid !important; grid-template-columns: 88px minmax(0, 1fr) !important; align-items: center !important; gap: 16px !important; min-height: 0 !important; padding: 5px 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-xp-ring { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; width: 88px !important; height: 88px !important; min-width: 88px !important; min-height: 0 !important; max-height: none !important; border: 0 !important; border-radius: 50% !important; background: radial-gradient(circle, var(--dc-surface) 0 62%, transparent 63%), conic-gradient(#8B78EA var(--xp, 0%), var(--dc-track) 0) !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-xp-ring span { color: var(--dc-text) !important; font-size: 22px !important; font-weight: 750 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-xp-ring small { color: var(--dc-muted) !important; font-size: 8px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-details { display: grid !important; gap: 8px !important; min-width: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-details > strong { color: var(--dc-text) !important; font-size: 17px !important; line-height: 1.35 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-details > span { color: var(--dc-muted) !important; font-size: 11px !important; line-height: 1.45 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-achievements { display: flex !important; flex-wrap: wrap !important; gap: 5px !important; margin: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-achievements span { margin: 0 !important; padding: 4px 6px !important; border: 1px solid var(--dc-border) !important; border-radius: 7px !important; color: var(--dc-muted) !important; background: var(--dc-elevated) !important; font-size: 9px !important; line-height: 1.35 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list { display: grid !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list li { display: grid !important; grid-template-columns: 65px minmax(0, 1fr) !important; gap: 10px !important; align-items: start !important; padding: 10px 0 !important; border: 0 !important; border-bottom: 1px solid var(--dc-border) !important; border-radius: 0 !important; background: transparent !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list li:last-child { border-bottom: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list li > span { padding: 4px 5px !important; border: 1px solid var(--dc-border) !important; border-radius: 6px !important; background: var(--dc-elevated) !important; color: var(--dc-blue) !important; font-size: 9px !important; text-align: center !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list li > div { min-width: 0; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list strong { display: block; color: var(--dc-text) !important; font-size: 12px !important; line-height: 1.45 !important; white-space: normal !important; overflow-wrap: anywhere; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-day-list small { display: block; margin-top: 4px; color: var(--dc-muted) !important; font-size: 10px !important; line-height: 1.5 !important; white-space: normal !important; }
+
+/* Next evaluation keeps the existing countdown and detail handler. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation { display: grid !important; grid-template-columns: minmax(150px, .8fr) minmax(0, 1.5fr) auto auto !important; grid-template-areas: "header copy countdown action" !important; gap: 12px 18px !important; align-items: center !important; padding: 17px 20px !important; cursor: default !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-header { grid-area: header !important; display: flex !important; align-items: center !important; flex-wrap: wrap; gap: 9px !important; min-width: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-header > div { display: grid; gap: 4px; min-width: 0; flex: 1; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-icon { display: grid !important; place-items: center !important; width: 32px !important; height: 32px !important; min-width: 32px !important; border: 1px solid var(--dc-border) !important; border-radius: 10px !important; background: var(--dc-elevated) !important; color: var(--dc-purple) !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-icon svg { width: 18px !important; height: 18px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-header span { grid-row: auto !important; color: var(--dc-muted) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: .035em !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-header strong { color: var(--dc-text) !important; font-size: 11px !important; line-height: 1.4 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-copy { grid-area: copy !important; min-width: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-copy h3 { margin: 0 0 5px !important; color: var(--dc-text) !important; font-size: 15px !important; line-height: 1.4 !important; overflow-wrap: anywhere !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-copy p { margin: 0 !important; color: var(--dc-muted) !important; font-size: 11px !important; line-height: 1.5 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-countdown { grid-area: countdown !important; display: grid !important; gap: 3px !important; padding: 8px 10px !important; border: 1px solid var(--dc-border) !important; border-radius: 10px !important; background: var(--dc-elevated) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-countdown span { color: var(--dc-muted) !important; font-size: 10px !important; font-weight: 500 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-countdown strong { color: var(--dc-purple) !important; font-size: 12px !important; font-variant-numeric: tabular-nums; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-action { grid-area: action !important; white-space: normal !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "header" "copy" !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation-badge { padding: 4px 7px !important; border-radius: 6px !important; background: color-mix(in srgb, var(--dc-amber) 10%, var(--dc-surface)) !important; color: var(--dc-amber) !important; font-size: 10px !important; }
+
+/* Academic checklist, with real completion states and no strike-through. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-step-count { display: block; margin-top: 5px; color: var(--dc-cyan); font-size: 10px; font-weight: 650; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps { display: grid !important; gap: 7px !important; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps li { display: grid !important; grid-template-columns: 28px minmax(0, 1fr) auto !important; align-items: center !important; gap: 10px !important; padding: 8px 10px !important; min-height: 0 !important; margin: 0 !important; border: 1px solid var(--dc-border) !important; border-radius: 11px !important; background: var(--dc-elevated) !important; opacity: 1 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps li.done { border-color: color-mix(in srgb, var(--dc-cyan) 22%, var(--dc-border)) !important; background: color-mix(in srgb, var(--dc-cyan) 5%, var(--dc-surface)) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps li.done { text-decoration: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps li > div { display: grid !important; gap: 3px !important; min-width: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps :is(strong, small) { margin: 0 !important; text-decoration: none !important; opacity: 1 !important; white-space: normal !important; overflow: visible !important; overflow-wrap: anywhere !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps strong { color: var(--dc-text) !important; font-size: 12px !important; line-height: 1.35 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps small { color: var(--dc-muted) !important; font-size: 10px !important; font-weight: 400 !important; line-height: 1.4 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .step-number { display: grid !important; place-items: center !important; width: 28px !important; height: 28px !important; min-width: 28px !important; margin: 0 !important; border: 1px solid var(--dc-border) !important; border-radius: 9px !important; color: var(--dc-muted) !important; background: var(--dc-surface) !important; font-size: 11px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .done .step-number { color: var(--dc-cyan) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-step-check { display: grid; place-items: center; width: 16px; height: 16px; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-step-check svg { width: 16px; height: 16px; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps button { grid-column: 3 !important; grid-row: 1 !important; min-width: 48px !important; width: auto !important; min-height: 34px !important; padding: 5px 9px !important; border: 1px solid var(--dc-border) !important; border-radius: 8px !important; background: var(--dc-surface) !important; color: var(--dc-blue) !important; font-size: 10px !important; font-weight: 650 !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps .done button { color: var(--dc-cyan) !important; }
+
+/* Five-day data and accessible tooltips stay unchanged; zero data stays visually quiet. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid { min-height: 0 !important; margin: 10px 0 0 !important; gap: 16px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-day { grid-template-rows: 112px 18px !important; gap: 7px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-track { width: min(28px, 70%) !important; height: 112px !important; border: 1px solid var(--dc-border) !important; border-radius: 8px !important; background: var(--dc-elevated) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-bar { border-radius: 7px !important; background: linear-gradient(180deg, var(--dc-blue), var(--dc-purple)) !important; box-shadow: none !important; animation: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-label { color: var(--dc-muted) !important; font-size: 10px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid.is-empty:not(.is-loading) .weekly-activity-day { grid-template-rows: 22px 18px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-grid.is-empty:not(.is-loading) .weekly-activity-track { height: 22px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-bar.is-empty { height: 0 !important; background: transparent !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .chart-caption { margin: 12px 0 0 !important; color: var(--dc-muted) !important; font-size: 10px !important; line-height: 1.5 !important; }
+
+/* Local empty states override the shared, deliberately spacious module defaults. */
+#app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state { display: grid !important; grid-template-columns: 30px minmax(0, 1fr) !important; gap: 4px 12px !important; align-items: center !important; justify-items: start !important; min-height: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 12px 0 !important; border: 0 !important; border-radius: 0 !important; background: transparent !important; text-align: left !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state .empty-state__icon { grid-column: 1; grid-row: 1 / 3; width: 30px !important; height: 30px !important; min-width: 30px !important; margin: 0 !important; border-radius: 10px !important; border: 1px solid var(--dc-border) !important; background: var(--dc-elevated) !important; color: var(--dc-blue) !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .empty-state__icon svg { width: 17px !important; height: 17px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state .empty-state__title { grid-column: 2; margin: 0 !important; color: var(--dc-text) !important; font-size: 14px !important; line-height: 1.4 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .student-empty-state .empty-state__description { grid-column: 2; margin: 0 !important; max-width: none !important; color: var(--dc-muted) !important; font-size: 11px !important; line-height: 1.5 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .weekly-activity-content > .student-empty-state { margin-top: 12px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty > .student-empty-state { grid-area: copy !important; grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "title action" "description action" !important; padding: 0 !important; gap: 4px 18px !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__title { grid-area: title !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__description { grid-area: description !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__actions { grid-area: action !important; display: flex !important; align-self: center !important; width: auto !important; margin: 0 !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-next-evaluation-action, .empty-state__button) { display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; min-height: 38px !important; width: auto !important; padding: 8px 12px !important; border: 1px solid var(--dc-border) !important; border-radius: 10px !important; background: var(--dc-elevated) !important; color: var(--dc-text) !important; font-size: 11px !important; font-weight: 650 !important; line-height: 1.4 !important; box-shadow: none !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .empty-state__button { border-color: transparent !important; background: linear-gradient(110deg, #5368CB, #6252C3) !important; color: #FFFFFF !important; }
+#app-page.page.active #dashboard .dashboard-compact-workspace :is(.dashboard-next-step-icon, .dashboard-step-check) svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step-icon svg { width: 18px; height: 18px; }
+#app-page.page.active #dashboard .dashboard-compact-workspace button:focus-visible { outline: 2px solid var(--dc-blue) !important; outline-offset: 3px !important; }
+
+@media (hover: hover) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace button:hover { border-color: color-mix(in srgb, var(--dc-blue) 45%, var(--dc-border)) !important; filter: brightness(1.04); }
+}
+@media (max-width: 1100px) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-actions { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation { grid-template-columns: minmax(0, 1fr) auto !important; grid-template-areas: "header copy" "countdown action" !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "header" "copy" !important; }
+}
+@media (max-width: 900px) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-student-hero { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "welcome" "next" "actions" !important; gap: 16px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout { grid-template-columns: minmax(0, 1fr) !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-step { padding: 13px; }
+}
+/* The legacy tablet breakpoint puts the navigation in flow at exactly 768px,
+   while the phone drawer starts at 767px. Keep this Dashboard beside it only. */
+@media (min-width: 768px) and (max-width: 768px) {
+    #app-page.page.active:has(> .main-content > #dashboard.section.active) { display: flex; align-items: flex-start; }
+    #app-page.page.active:has(> .main-content > #dashboard.section.active) > .main-content { flex: 1; min-width: 0; width: auto !important; margin: 0 !important; }
+}
+@media (max-width: 600px) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace { gap: 14px; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-student-hero { padding: 18px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero h1 { font-size: 28px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-actions { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-hero-actions button { min-height: 44px !important; padding: 8px 5px !important; font-size: 10.5px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-grid { gap: 10px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-stat-card { padding: 13px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .stat-label { font-size: 9px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .stat-subtext { font-size: 10px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .stat-value { font-size: 24px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout { gap: 14px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-clean-layout > .dashboard-panel-card { padding: 16px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-body { grid-template-columns: 76px minmax(0, 1fr) !important; gap: 12px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-xp-ring { width: 76px !important; height: 76px !important; min-width: 76px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-progress-details > strong { font-size: 15px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "header" "copy" "countdown" "action" !important; padding: 16px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty { grid-template-areas: "header" "copy" !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation.is-empty > .student-empty-state { grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "title" "description" "action" !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-next-evaluation .empty-state__actions { margin-top: 8px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps li { gap: 8px !important; padding: 8px !important; }
+    #app-page.page.active #dashboard .dashboard-compact-workspace .dashboard-steps button { min-height: 36px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #app-page.page.active #dashboard .dashboard-compact-workspace :is(button, .progress-fill, .weekly-activity-bar) { transition: none !important; animation: none !important; }
+}
+/* Customization must win over every presentation rule, including empty-state layouts. */
+#app-page.page.active #dashboard .dashboard-compact-workspace [data-dashboard-module][hidden],
+#app-page.page.active #dashboard .dashboard-compact-workspace [data-dashboard-modules-empty][hidden] { display: none !important; }

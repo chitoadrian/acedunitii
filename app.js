@@ -2403,7 +2403,7 @@ function weeklyActivityGridHTML(rows, { loading = false } = {}) {
     const maxPoints = Math.max(1, ...safeRows.map(item => item.points));
 
     return `
-        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}" aria-label="Actividad académica en un periodo móvil de cinco días">
+        <div class="weekly-activity-grid${loading ? ' is-loading' : ''}${safeRows.some(item => item.points > 0) ? '' : ' is-empty'}" aria-label="Actividad académica en un periodo móvil de cinco días">
             ${safeRows.map(item => {
                 const height = item.points > 0 ? Math.max(22, Math.round((item.points / maxPoints) * 100)) : 0;
                 const pointLabel = item.points === 1 ? 'punto' : 'puntos';
@@ -7528,6 +7528,45 @@ document.addEventListener('keydown', (event) => {
 
 // Inicializar la aplicación cuando se carga la página
 // Dashboard limpio sin emojis para evitar caracteres rotos por codificacion.
+// Read-only presentation: choose one useful destination from this year's loaded workspace.
+function getDashboardNextStep(workspace, now = Date.now()) {
+    let next = null;
+    let nextTime = Infinity;
+    let pendingTask = null;
+    const present = (item, kind, date, time) => {
+        const validDate = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) && Number.isFinite(Date.parse(`${date}T12:00:00-05:00`));
+        return {
+            kind,
+            title: item.title || (kind === 'task' ? 'Tarea pendiente' : kind === 'evaluation' ? 'Evaluación' : 'Evento académico'),
+            meta: [item.subject || 'General', validDate ? formatEvaluationCompactDate(date) : 'Sin fecha límite', ACEdunityTime.formatTime24ForDisplay(time)].filter(Boolean).join(' · '),
+            route: kind === 'task' ? 'tasks' : kind === 'evaluation' ? 'evaluations' : 'calendar',
+            label: kind === 'task' ? 'Ver tarea' : kind === 'evaluation' ? 'Ver evaluaciones' : 'Ver calendario',
+            category: kind === 'task' ? 'Tarea pendiente' : kind === 'evaluation' ? 'Evaluación próxima' : 'Evento académico',
+            icon: kind === 'task' ? 'check' : 'calendar'
+        };
+    };
+    const consider = (item, kind, date, time) => {
+        const clock = ACEdunityTime.normalize24HourTime(time) || '23:59';
+        const timestamp = /^\d{4}-\d{2}-\d{2}$/.test(String(date || '')) ? Date.parse(`${date}T${clock}:00-05:00`) : NaN;
+        if (timestamp >= now && timestamp < nextTime) {
+            nextTime = timestamp;
+            next = present(item, kind, date, time);
+        }
+    };
+    for (const task of workspace.tasks || []) {
+        if (task.status === 'completed') continue;
+        pendingTask ||= task;
+        consider(task, 'task', task.due, task.dueTime);
+    }
+    for (const evaluation of workspace.evaluations || []) {
+        if (evaluation.status !== 'completed') consider(evaluation, 'evaluation', evaluation.date, evaluation.time);
+    }
+    for (const event of workspace.events || []) consider(event, 'event', event.date || event.day, event.time);
+    return next || (pendingTask ? present(pendingTask, 'task', pendingTask.due, pendingTask.dueTime) : {
+        title: 'Todo al día. Puedes organizar tu próxima actividad.', meta: '', route: 'calendar', label: 'Abrir calendario', category: 'Tu agenda', icon: 'calendar'
+    });
+}
+
 function renderDashboard(workspace) {
     const section = document.getElementById('dashboard');
     if (!section) return;
@@ -7572,7 +7611,9 @@ function renderDashboard(workspace) {
         { label: 'Pregunta a Tutor', done: workspace.resources.some(resource => resource.usedAI), action: "navigateTo('ai-assistant')", hint: 'Practica con resúmenes, preguntas y flashcards.' }
     ];
 
+    const nextStep = getDashboardNextStep(workspace);
     section.innerHTML = `
+      <div class="dashboard-compact-workspace">
         <div class="dashboard-hero dashboard-student-hero">
             <div class="dashboard-hero-copy">
                 <span class="dashboard-eyebrow">Panel académico</span>
@@ -7582,18 +7623,28 @@ function renderDashboard(workspace) {
                     <span>${escapeHTML(readableDate)}</span>
                     <span>Un avance pequeño también cuenta.</span>
                 </div>
+            </div>
+            <aside class="dashboard-next-step" aria-label="Tu próximo paso">
+                <span class="dashboard-next-step-icon" aria-hidden="true">${appIconSvg(nextStep.icon)}</span>
+                <div>
+                    <span class="dashboard-next-step-eyebrow">Tu próximo paso</span>
+                    <small>${escapeHTML(nextStep.category)}</small>
+                    <h2>${escapeHTML(nextStep.title)}</h2>
+                    ${nextStep.meta ? `<p>${escapeHTML(nextStep.meta)}</p>` : ''}
+                    <button type="button" onclick="navigateTo('${escapeHTML(nextStep.route)}')">${escapeHTML(nextStep.label)} <span aria-hidden="true">→</span></button>
+                </div>
+            </aside>
                 <div class="quick-actions-bar dashboard-hero-actions">
-                    <button type="button" onclick="navigateTo('subjects')">+ Nueva materia</button>
-                    <button type="button" onclick="navigateTo('tasks')">+ Nueva tarea</button>
-                    <button type="button" onclick="navigateTo('calendar')">+ Nuevo evento</button>
-                    <button type="button" onclick="navigateTo('evaluations')">+ Nueva evaluación</button>
-                    <button type="button" onclick="navigateTo('backpack')">+ Subir apunte</button>
+                    <button type="button" onclick="navigateTo('subjects')">${appIconHTML('book', 'dashboard-quick-action-icon')}Nueva materia</button>
+                    <button type="button" onclick="navigateTo('tasks')">${appIconHTML('check', 'dashboard-quick-action-icon')}Nueva tarea</button>
+                    <button type="button" onclick="navigateTo('calendar')">${appIconHTML('calendar', 'dashboard-quick-action-icon')}Nuevo evento</button>
+                    <button type="button" onclick="navigateTo('evaluations')">${appIconHTML('evaluation', 'dashboard-quick-action-icon')}Nueva evaluación</button>
+                    <button type="button" onclick="navigateTo('backpack')">${appIconHTML('file', 'dashboard-quick-action-icon')}Subir apunte</button>
                     <button class="dashboard-tutor-action" type="button" data-dashboard-module="tutor" onclick="navigateTo('ai-assistant')">
                         ${appIconHTML('bot', 'dashboard-quick-action-icon')}
                         Tutor IA
                     </button>
                 </div>
-            </div>
         </div>
 
         <div class="dashboard-grid">
@@ -7685,12 +7736,13 @@ function renderDashboard(workspace) {
                         <div>
                             <h3>${isEmpty ? 'Empieza configurando tu espacio académico' : 'Centro del estudiante'}</h3>
                             <p>${isEmpty ? 'Sigue estos pasos para construir tu plataforma desde cero.' : 'Completa estos pasos para mantener tu espacio al día.'}</p>
+                            <small class="dashboard-step-count">${steps.slice(0, 4).filter(step => step.done).length} de 4 pasos completados</small>
                         </div>
                     </div>
                     <ol class="starter-list dashboard-steps">
                         ${steps.slice(0, 4).map((step, index) => `
                             <li class="${step.done ? 'done' : ''}">
-                                <span class="step-number">${step.done ? 'OK' : index + 1}</span>
+                                <span class="step-number">${step.done ? appIconHTML('check', 'dashboard-step-check') : index + 1}</span>
                                 <div>
                                     <strong>${escapeHTML(step.label)}</strong>
                                     <small>${escapeHTML(step.hint)}</small>
@@ -7705,8 +7757,9 @@ function renderDashboard(workspace) {
         <div class="dashboard-modules-empty" data-dashboard-modules-empty hidden>
             <strong>No tienes módulos visibles.</strong>
             <p>Elige qué información quieres ver en tu panel principal.</p>
-            <button class="btn-primary btn-small" type="button" onclick="openSettingsModal('dashboard')">Personalizar panel</button>
+            <button class="btn-primary btn-small" type="button" onclick="navigateTo('settings'); openSettingsModal('dashboard')">Personalizar panel</button>
         </div>
+      </div>
     `;
     applyDashboardModulePreferences();
     ensureEvaluationCountdownTimer();
