@@ -1,0 +1,298 @@
+/* Modern academic workspace. Everything is isolated to Metas y Proyectos. */
+#app-page #goals-projects-content {
+    --pgp-surface: #192234;
+    --pgp-raised: #212C40;
+    --pgp-text: #EFF3FC;
+    --pgp-muted: #AEBBD0;
+    --pgp-border: #35445D;
+    --pgp-indigo: #B7AAF6;
+    --pgp-blue: #8AB9F5;
+    --pgp-cyan: #73D1C2;
+    --pgp-green: #8DD3AD;
+    --pgp-amber: #E5C08B;
+    --pgp-red: #F0A5AB;
+    --pgp-track: #303D54;
+    --pgp-map: #10162B;
+    --pgp-connector: #7285A4;
+    --pgp-shadow: 0 6px 22px rgba(5, 11, 25, .12);
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #goals-projects-content {
+    --pgp-surface: #FFFFFF;
+    --pgp-raised: #F4F6FB;
+    --pgp-text: #25324A;
+    --pgp-muted: #596981;
+    --pgp-border: #D9E1EE;
+    --pgp-indigo: #65529E;
+    --pgp-blue: #426EA9;
+    --pgp-cyan: #287B70;
+    --pgp-green: #337753;
+    --pgp-amber: #936529;
+    --pgp-red: #A3404C;
+    --pgp-track: #E5EAF3;
+    --pgp-map: #F1F4F8;
+    --pgp-connector: #8593AB;
+    --pgp-shadow: 0 5px 18px rgba(32, 48, 76, .045);
+}
+#app-page.page.active #goals-projects-content { min-width: 0; color: var(--pgp-text); }
+#app-page.page.active #goals-projects-content :is(.gp-card, .gp-stats article, .gp-project-hero, .gp-detail-panel, .gp-stage-card, .gp-subtask-card, .gp-node) { box-sizing: border-box !important; min-width: 0 !important; height: auto !important; }
+#app-page.page.active #goals-projects-content :is(.gp-card, .gp-stats article, .gp-project-hero, .gp-stage-card)::before,
+#app-page.page.active #goals-projects-content :is(.gp-card, .gp-stats article, .gp-project-hero, .gp-stage-card)::after { content: none !important; }
+#app-page.page.active #goals-projects-content :is(h1, h2, h3, strong) { text-shadow: none !important; }
+#app-page.page.active #goals-projects-content :is(h1, h2, h3)::after { content: none !important; }
+#app-page.page.active #goals-projects-content :is(button, summary, .gp-map-shell):focus-visible { outline: 2px solid var(--pgp-blue) !important; outline-offset: 3px !important; }
+#app-page.page.active #goals-projects-content button:disabled { opacity: .5; cursor: not-allowed; }
+#app-page.page.active #goals-projects-content :is(.gp-stat-icon, .gp-meta-icon, .gp-menu-icon, .gp-control-icon, .gp-node-icon) svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Header and four original indicators. */
+#app-page.page.active #goals-projects-content .gp-header { display: flex !important; align-items: center !important; gap: 18px !important; justify-content: space-between !important; margin: 0 0 20px !important; padding: 0 !important; }
+#app-page.page.active #goals-projects-content .gp-header > div:first-child { min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-kicker { display: block !important; margin: 0 0 6px !important; color: var(--pgp-indigo) !important; font-size: 10px !important; font-weight: 750; letter-spacing: .07em; line-height: 1.4; }
+#app-page.page.active #goals-projects-content .gp-header h1 { margin: 0 !important; color: var(--pgp-text) !important; font-size: clamp(25px, 2.6vw, 31px) !important; line-height: 1.2 !important; letter-spacing: -.03em; }
+#app-page.page.active #goals-projects-content .gp-header p { margin: 8px 0 0 !important; color: var(--pgp-muted) !important; font-size: 12px !important; line-height: 1.5; }
+#app-page.page.active #goals-projects-content .gp-header-actions { display: flex; flex-wrap: wrap; gap: 8px; flex-shrink: 0; }
+#app-page.page.active #goals-projects-content :is(.gp-header-actions, .gp-section-title) > button,
+#app-page.page.active #goals-projects-content .gp-header-actions button { min-height: 38px !important; padding: 8px 13px !important; border-radius: 10px !important; font-size: 12px !important; font-weight: 650; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .btn-primary { background: linear-gradient(110deg, #5367C6, #6251BC) !important; color: #FFFFFF !important; border: 1px solid transparent !important; }
+#app-page.page.active #goals-projects-content .btn-secondary { background: var(--pgp-raised) !important; color: var(--pgp-text) !important; border: 1px solid var(--pgp-border) !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-stats { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 12px !important; margin: 0 0 18px !important; }
+#app-page.page.active #goals-projects-content .gp-stats article { display: grid !important; grid-template-columns: 30px minmax(0, 1fr) !important; grid-template-rows: auto auto !important; align-content: center !important; align-items: center !important; gap: 3px 10px !important; min-height: 78px !important; padding: 13px 15px !important; border: 1px solid var(--pgp-border) !important; border-radius: 15px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; transform: none !important; }
+#app-page.page.active #goals-projects-content .gp-stat-icon { grid-column: 1; grid-row: 1 / 3; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; border: 1px solid var(--pgp-border); background: var(--pgp-raised); color: var(--pgp-blue); }
+#app-page.page.active #goals-projects-content .gp-stat-icon svg { width: 17px; height: 17px; }
+#app-page.page.active #goals-projects-content .gp-stats article:nth-child(2) .gp-stat-icon { color: var(--pgp-indigo); }
+#app-page.page.active #goals-projects-content .gp-stats article:nth-child(3) .gp-stat-icon { color: var(--pgp-green); }
+#app-page.page.active #goals-projects-content .gp-stats article:nth-child(4) .gp-stat-icon { color: var(--pgp-cyan); }
+#app-page.page.active #goals-projects-content .gp-stats article > strong { grid-column: 2; grid-row: 2; color: var(--pgp-text) !important; font-size: 24px !important; line-height: 1.15 !important; background: none !important; -webkit-text-fill-color: var(--pgp-text) !important; }
+#app-page.page.active #goals-projects-content .gp-stats article > span:not(.gp-stat-icon) { grid-column: 2; grid-row: 1; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.4; }
+#app-page.page.active #goals-projects-content .gp-filters { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; margin: 0 0 16px !important; }
+#app-page.page.active #goals-projects-content :is(.gp-filters, .gp-tabs) button { min-height: 34px !important; margin: 0 !important; padding: 7px 12px !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; background: var(--pgp-raised) !important; color: var(--pgp-muted) !important; font-size: 11px !important; font-weight: 650; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content :is(.gp-filters, .gp-tabs) button.active { border-color: color-mix(in srgb, var(--pgp-indigo) 40%, var(--pgp-border)) !important; color: var(--pgp-indigo) !important; background: color-mix(in srgb, var(--pgp-indigo) 10%, var(--pgp-surface)) !important; }
+
+/* Content-sized cards; a single project never becomes an oversized full-width tile. */
+#app-page.page.active #goals-projects-content .gp-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)) !important; gap: 16px !important; align-items: start !important; }
+#app-page.page.active #goals-projects-content .gp-card { position: relative; display: grid !important; align-content: start !important; gap: 12px !important; width: 100% !important; max-width: 480px !important; min-height: 0 !important; margin: 0 !important; padding: 18px !important; border: 1px solid var(--pgp-border) !important; border-top: 2px solid color-mix(in srgb, var(--subject-color, #7C83D9) 40%, var(--pgp-border)) !important; border-radius: 17px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; overflow: visible !important; transform: none !important; }
+#app-page.page.active #goals-projects-content .gp-card:has(details[open]) { z-index: 15; }
+#app-page.page.active #goals-projects-content :is(.gp-stage-card, .gp-subtask-card) { position: relative; overflow: visible !important; }
+#app-page.page.active #goals-projects-content :is(.gp-stage-card, .gp-subtask-card):has(details[open]) { z-index: 15; }
+#app-page.page.active #goals-projects-content .gp-card-top { display: flex !important; align-items: center; justify-content: space-between; gap: 10px; margin: 0 !important; }
+#app-page.page.active #goals-projects-content .gp-type { padding: 4px 8px !important; border: 1px solid color-mix(in srgb, var(--pgp-indigo) 24%, var(--pgp-border)) !important; border-radius: 7px !important; background: color-mix(in srgb, var(--pgp-indigo) 10%, var(--pgp-surface)) !important; color: var(--pgp-indigo) !important; font-size: 10px !important; font-weight: 700; }
+#app-page.page.active #goals-projects-content .gp-goal-card .gp-type { color: var(--pgp-cyan) !important; background: color-mix(in srgb, var(--pgp-cyan) 8%, var(--pgp-surface)) !important; }
+#app-page.page.active #goals-projects-content .gp-card-heading { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: start !important; gap: 12px; margin: 0 !important; }
+#app-page.page.active #goals-projects-content .gp-card-heading > div { min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-card-subject { display: inline-flex !important; align-items: center; gap: 6px; margin: 0 0 6px !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.4; text-transform: none !important; letter-spacing: .01em !important; }
+#app-page.page.active #goals-projects-content .gp-card-subject::before { content: ""; flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--subject-color, var(--pgp-blue)); }
+#app-page.page.active #goals-projects-content .gp-card h2 { margin: 0 !important; color: var(--pgp-text) !important; font-size: 17px !important; line-height: 1.4 !important; font-weight: 700; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-card-progress-pill { display: inline-flex; align-items: center; min-height: 30px !important; padding: 5px 8px !important; border: 1px solid var(--pgp-border) !important; border-radius: 8px !important; background: var(--pgp-raised) !important; color: var(--pgp-indigo) !important; font-size: 12px !important; font-weight: 750; }
+#app-page.page.active #goals-projects-content .gp-card-description { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; margin: 0; color: var(--pgp-muted); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-card-badges { display: flex !important; flex-wrap: wrap; gap: 6px !important; margin: 0 !important; }
+#app-page.page.active #goals-projects-content :is(.gp-card-badges > span, .gp-project-meta > span, .gp-stage-status) { display: inline-flex !important; align-items: center; width: auto !important; padding: 4px 7px !important; border: 1px solid var(--pgp-border) !important; border-radius: 6px !important; background: var(--pgp-raised) !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.35 !important; font-weight: 650; }
+#app-page.page.active #goals-projects-content :is(.status-completed, .gp-status-completed, .gp-subtask-status.completed, .priority-low) { color: var(--pgp-green) !important; }
+#app-page.page.active #goals-projects-content :is(.status-in_progress, .gp-status-in_progress, .gp-subtask-status.pending) { color: var(--pgp-blue) !important; }
+#app-page.page.active #goals-projects-content :is(.priority-high, .gp-status-overdue, .gp-subtask-status.overdue, .overdue) { color: var(--pgp-red) !important; }
+#app-page.page.active #goals-projects-content .priority-medium { color: var(--pgp-amber) !important; }
+#app-page.page.active #goals-projects-content .gp-card-progress-copy { display: flex !important; flex-wrap: wrap; justify-content: space-between; gap: 6px; margin: 2px 0 -6px !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.5; }
+#app-page.page.active #goals-projects-content .gp-card-progress-copy strong { color: var(--pgp-text) !important; font-size: 10px !important; }
+#app-page.page.active #goals-projects-content :is(.gp-progress, .gp-stage-progress) { width: 100% !important; height: 6px !important; min-height: 0 !important; margin: 0 !important; border: 0 !important; border-radius: 999px !important; background: var(--pgp-track) !important; box-shadow: none !important; overflow: hidden !important; }
+#app-page.page.active #goals-projects-content :is(.gp-progress, .gp-stage-progress) > span { display: block; height: 100% !important; min-height: 0 !important; border-radius: inherit !important; background: linear-gradient(90deg, #8177D7, #429EBD) !important; box-shadow: none !important; animation: none !important; }
+#app-page.page.active #goals-projects-content .gp-card-guidance { margin: -3px 0 0 !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.45; }
+#app-page.page.active #goals-projects-content .gp-card-meta { display: flex !important; flex-wrap: wrap !important; gap: 8px 12px !important; margin: 0 !important; padding: 10px 0 0 !important; border-top: 1px solid var(--pgp-border); }
+#app-page.page.active #goals-projects-content .gp-card-meta > span { display: inline-flex !important; align-items: center; gap: 5px; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.5; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) { display: inline-grid; place-items: center; flex: 0 0 14px; width: 14px; height: 14px; }
+#app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) svg { width: 14px; height: 14px; }
+#app-page.page.active #goals-projects-content .gp-project-open { display: flex; justify-content: space-between; align-items: center; width: 100% !important; min-height: 36px !important; margin: 0 !important; padding: 8px 11px !important; border-radius: 9px !important; font-size: 11px !important; line-height: 1.4; }
+
+/* Existing action menus and their original callbacks. */
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) { position: relative !important; margin: 0 !important; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) > summary { display: grid; place-items: center; width: 32px !important; height: 32px !important; padding: 0 !important; border: 1px solid transparent !important; border-radius: 8px !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 22px !important; line-height: 1 !important; cursor: pointer; list-style: none; }
+#app-page.page.active #goals-projects-content summary::-webkit-details-marker { display: none; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu)[open] > summary { border-color: var(--pgp-border) !important; background: var(--pgp-raised) !important; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) > div { position: absolute !important; z-index: 30 !important; top: calc(100% + 5px) !important; right: 0 !important; left: auto !important; display: grid; gap: 3px; width: max-content !important; min-width: 190px; max-width: min(260px, 82vw); padding: 6px !important; border: 1px solid var(--pgp-border) !important; border-radius: 12px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu):not([open]) > div { display: none !important; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) > div > button { display: flex !important; align-items: center; gap: 8px; min-height: 34px; padding: 8px 9px !important; border: 0 !important; border-radius: 7px !important; background: transparent !important; color: var(--pgp-text) !important; text-align: left !important; font-size: 11px !important; line-height: 1.4; white-space: normal; }
+#app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) > div > button.danger { color: var(--pgp-red) !important; }
+
+/* Project summary, stages, subtasks and progress keep their original data/controls. */
+#app-page.page.active #goals-projects-content .gp-back { min-height: 32px !important; margin: 0 0 14px !important; padding: 6px 10px !important; border: 1px solid var(--pgp-border) !important; border-radius: 8px !important; background: var(--pgp-raised) !important; color: var(--pgp-muted) !important; font-size: 11px !important; }
+#app-page.page.active #goals-projects-content .gp-project-hero { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center; gap: 20px; min-height: 0 !important; margin: 0 0 16px !important; padding: 20px !important; border: 1px solid var(--pgp-border) !important; border-radius: 18px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; }
+#app-page.page.active #goals-projects-content .gp-project-hero-copy { min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-project-hero h1 { margin: 0 0 11px !important; color: var(--pgp-text) !important; font-size: clamp(23px, 2.3vw, 29px) !important; line-height: 1.3 !important; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-project-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+#app-page.page.active #goals-projects-content .gp-project-guidance { display: block !important; margin: 11px 0 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 11px !important; line-height: 1.45; }
+#app-page.page.active #goals-projects-content .gp-project-progress { display: grid; grid-template-columns: minmax(0, 1fr) !important; justify-items: center; gap: 7px; max-width: 110px; }
+#app-page.page.active #goals-projects-content .gp-project-progress > span { color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.4; text-align: center; }
+#app-page.page.active #goals-projects-content .gp-ring { width: 80px !important; height: 80px !important; min-width: 80px !important; min-height: 80px !important; padding: 0 !important; border: 0 !important; border-radius: 50%; background: radial-gradient(circle, var(--pgp-surface) 0 60%, transparent 62%), conic-gradient(#8B7BDC var(--progress), var(--pgp-track) 0) !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-ring strong { color: var(--pgp-text) !important; font-size: 19px !important; }
+#app-page.page.active #goals-projects-content .gp-tabs { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; margin: 0 0 14px !important; }
+#app-page.page.active #goals-projects-content .gp-detail-panel { margin: 0 !important; padding: 18px !important; border: 1px solid var(--pgp-border) !important; border-radius: 17px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; }
+#app-page.page.active #goals-projects-content .gp-executive-summary { display: grid !important; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) !important; gap: 16px !important; }
+#app-page.page.active #goals-projects-content .gp-executive-summary > article { min-width: 0; min-height: 0 !important; margin: 0 !important; padding: 16px !important; border: 1px solid var(--pgp-border) !important; border-radius: 12px !important; background: var(--pgp-raised) !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-executive-summary h3 { margin: 0 !important; color: var(--pgp-text) !important; font-size: 15px !important; line-height: 1.4; }
+#app-page.page.active #goals-projects-content .gp-executive-summary p { color: var(--pgp-muted) !important; font-size: 12px !important; line-height: 1.65; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-summary-description header { gap: 10px; margin-bottom: 14px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-icon { display: grid; place-items: center; width: 30px !important; height: 30px !important; min-width: 30px !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; background: var(--pgp-surface) !important; color: var(--pgp-indigo) !important; font-size: 15px; }
+#app-page.page.active #goals-projects-content .gp-summary-description footer { margin-top: 18px !important; padding-top: 12px !important; color: var(--pgp-muted); font-size: 11px; }
+#app-page.page.active #goals-projects-content .gp-summary-metrics { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 8px !important; margin-top: 13px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-metrics > div { display: flex !important; align-items: center !important; gap: 10px !important; min-height: 0 !important; padding: 9px !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; background: var(--pgp-surface) !important; }
+#app-page.page.active #goals-projects-content .gp-summary-metric-icon { width: 25px !important; height: 25px !important; color: var(--pgp-blue) !important; font-size: 14px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-metrics strong { color: var(--pgp-text) !important; font-size: 16px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-metrics small { color: var(--pgp-muted) !important; font-size: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-next { grid-column: 1 / -1 !important; display: flex !important; align-items: center; justify-content: space-between; gap: 16px; }
+#app-page.page.active #goals-projects-content .gp-summary-next small { color: var(--pgp-muted) !important; font-size: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-summary-next strong { display: block; margin-top: 4px; color: var(--pgp-text) !important; font-size: 12px !important; }
+#app-page.page.active #goals-projects-content .gp-section-title { display: flex !important; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin: 0 0 16px !important; }
+#app-page.page.active #goals-projects-content .gp-section-title h2 { margin: 0 !important; color: var(--pgp-text) !important; font-size: 19px !important; }
+#app-page.page.active #goals-projects-content .gp-section-title p { margin: 6px 0 0 !important; color: var(--pgp-muted) !important; font-size: 11px !important; line-height: 1.5; }
+#app-page.page.active #goals-projects-content .gp-stage-list { display: grid !important; gap: 14px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-card { min-height: 0 !important; margin: 0 !important; padding: 17px !important; border: 1px solid var(--pgp-border) !important; border-radius: 14px !important; background: var(--pgp-raised) !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-stage-card > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-heading { display: flex; align-items: center; gap: 10px; min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-stage-heading > div { min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-stage-number { display: grid; place-items: center; flex: 0 0 30px; width: 30px !important; height: 30px !important; padding: 0 !important; border-radius: 9px !important; color: var(--pgp-indigo) !important; background: var(--pgp-surface) !important; font-size: 12px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-eyebrow { color: var(--pgp-muted) !important; font-size: 9px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-heading h3 { margin: 3px 0 0 !important; color: var(--pgp-text) !important; font-size: 14px !important; line-height: 1.4; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-stage-meta { display: flex; flex-wrap: wrap; gap: 7px 15px; margin: 0 0 9px !important; color: var(--pgp-muted) !important; font-size: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-meta strong { color: var(--pgp-text) !important; font-size: inherit; }
+#app-page.page.active #goals-projects-content .gp-stage-actions { display: flex; justify-content: space-between; gap: 10px; margin: 9px 0 !important; }
+#app-page.page.active #goals-projects-content .gp-stage-order { display: flex; gap: 6px; }
+#app-page.page.active #goals-projects-content .gp-stage-order button { min-height: 30px; padding: 5px 8px !important; border: 1px solid var(--pgp-border) !important; border-radius: 7px !important; color: var(--pgp-muted) !important; background: var(--pgp-surface) !important; font-size: 10px; }
+#app-page.page.active #goals-projects-content .gp-stage-subtasks { margin-top: 12px !important; padding-top: 12px !important; border-top: 1px solid var(--pgp-border) !important; background: transparent !important; }
+#app-page.page.active #goals-projects-content .gp-stage-subtasks-title { margin-bottom: 10px !important; color: var(--pgp-muted) !important; font-size: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-stage-subtasks-title small { font-size: 10px; }
+#app-page.page.active #goals-projects-content .gp-subtask-list { display: grid; gap: 9px !important; margin: 0 !important; padding: 0 !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-card { margin: 0 !important; padding: 12px !important; border: 1px solid var(--pgp-border) !important; border-radius: 11px !important; background: var(--pgp-surface) !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-card-head { display: grid !important; grid-template-columns: 34px minmax(0, 1fr) 32px !important; align-items: center; gap: 9px; }
+#app-page.page.active #goals-projects-content .gp-subtask-state { width: 34px !important; height: 34px !important; min-width: 34px !important; padding: 0 !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; color: var(--pgp-muted) !important; background: var(--pgp-raised) !important; box-shadow: none !important; font-size: 17px !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-state.completed { color: var(--pgp-green) !important; border-color: color-mix(in srgb, var(--pgp-green) 35%, var(--pgp-border)) !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-title { min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-subtask-title strong { color: var(--pgp-text) !important; font-size: 13px !important; line-height: 1.45 !important; text-decoration: none !important; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-subtask-status { margin-top: 5px !important; padding: 3px 6px !important; border: 1px solid var(--pgp-border) !important; border-radius: 5px !important; background: var(--pgp-raised) !important; font-size: 9px !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-description { margin: 9px 0 0 43px !important; color: var(--pgp-muted) !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-description p { margin: 0 !important; color: var(--pgp-muted) !important; font-size: 11px !important; line-height: 1.6 !important; text-decoration: none !important; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-subtask-description:not(.is-expanded):has(button) p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+#app-page.page.active #goals-projects-content .gp-subtask-description.is-expanded p { display: block; }
+#app-page.page.active #goals-projects-content .gp-subtask-description button { padding: 5px 0 !important; color: var(--pgp-blue) !important; background: transparent !important; border: 0 !important; font-size: 10px; }
+#app-page.page.active #goals-projects-content .gp-subtask-meta { display: flex !important; flex-wrap: wrap; gap: 12px 22px !important; margin: 11px 0 0 43px !important; padding: 9px 0 0 !important; border-top: 1px solid var(--pgp-border) !important; background: transparent !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-meta > span { display: flex; flex-wrap: wrap; gap: 7px; align-items: baseline; }
+#app-page.page.active #goals-projects-content .gp-subtask-meta small { color: var(--pgp-muted) !important; font-size: 9px !important; }
+#app-page.page.active #goals-projects-content .gp-subtask-meta strong { color: var(--pgp-text); font-size: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-add-subtask { min-height: 34px; margin-top: 12px !important; padding: 6px 10px !important; border: 1px dashed var(--pgp-border) !important; border-radius: 8px !important; background: transparent !important; color: var(--pgp-blue) !important; font-size: 11px; }
+#app-page.page.active #goals-projects-content .gp-stage-empty { min-height: 0 !important; padding: 14px 0 !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 11px; }
+#app-page.page.active #goals-projects-content .gp-progress-view { display: grid; gap: 18px !important; }
+#app-page.page.active #goals-projects-content .gp-progress-overview { min-height: 0 !important; padding: 14px !important; border: 1px solid var(--pgp-border) !important; border-radius: 12px !important; background: var(--pgp-raised) !important; }
+#app-page.page.active #goals-projects-content .gp-progress-overview p { color: var(--pgp-muted) !important; font-size: 11px !important; }
+#app-page.page.active #goals-projects-content .gp-progress-metrics { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 10px !important; }
+#app-page.page.active #goals-projects-content .gp-progress-metrics article { min-width: 0; min-height: 0 !important; padding: 13px !important; border: 1px solid var(--pgp-border) !important; border-radius: 10px !important; background: var(--pgp-raised) !important; }
+#app-page.page.active #goals-projects-content .gp-progress-metrics strong { color: var(--pgp-text) !important; font-size: 20px !important; }
+#app-page.page.active #goals-projects-content .gp-progress-metrics span { color: var(--pgp-muted); font-size: 10px; }
+#app-page.page.active #goals-projects-content .gp-stage-breakdown > div { display: grid; gap: 9px; }
+#app-page.page.active #goals-projects-content .gp-stage-breakdown article { padding: 12px !important; border: 1px solid var(--pgp-border) !important; border-radius: 10px !important; background: var(--pgp-raised) !important; }
+#app-page.page.active #goals-projects-content .gp-stage-breakdown header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; color: var(--pgp-text); font-size: 12px; }
+#app-page.page.active #goals-projects-content .gp-stage-breakdown :is(header > span, small) { color: var(--pgp-muted); font-size: 10px; }
+
+/* A stable three-column tree: project -> stages -> subtasks. Only its shell scrolls. */
+#app-page.page.active #goals-projects-content .gp-map-toolbar { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: end; gap: 16px !important; margin-bottom: 16px !important; }
+#app-page.page.active #goals-projects-content .gp-map-toolbar h2 { margin: 0 !important; color: var(--pgp-text) !important; font-size: 19px !important; line-height: 1.4; }
+#app-page.page.active #goals-projects-content .gp-map-toolbar p { margin: 6px 0 0 !important; color: var(--pgp-muted) !important; font-size: 11px !important; line-height: 1.5; }
+#app-page.page.active #goals-projects-content .gp-map-controls { display: flex !important; flex-wrap: wrap !important; justify-content: flex-end; gap: 6px !important; max-width: 510px; }
+#app-page.page.active #goals-projects-content .gp-map-controls button { display: inline-flex !important; align-items: center; justify-content: center; gap: 6px; min-height: 36px !important; padding: 7px 10px !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; background: var(--pgp-raised) !important; color: var(--pgp-text) !important; box-shadow: none !important; font-size: 10.5px !important; line-height: 1.35; font-weight: 650; white-space: normal !important; }
+#app-page.page.active #goals-projects-content .gp-map-controls button.active { color: var(--pgp-indigo) !important; border-color: color-mix(in srgb, var(--pgp-indigo) 35%, var(--pgp-border)) !important; }
+#app-page.page.active #goals-projects-content .gp-map-controls .gp-map-download-pdf { color: #FFFFFF !important; background: #5863B9 !important; border-color: transparent !important; }
+#app-page.page.active #goals-projects-content .gp-map-shell { width: 100% !important; min-width: 0 !important; max-width: 100% !important; max-height: min(70dvh, 760px); margin: 0 !important; padding: 0 !important; border: 1px solid var(--pgp-border) !important; border-radius: 13px !important; background: var(--pgp-map) !important; overflow: auto !important; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--pgp-connector) var(--pgp-map); -webkit-overflow-scrolling: touch; }
+#app-page.page.active #goals-projects-content .gp-map { position: relative; display: grid !important; grid-template-columns: 240px max-content !important; align-items: center !important; justify-content: center !important; gap: 48px !important; width: max-content !important; min-width: 100% !important; max-width: none !important; min-height: 250px; margin: 0 !important; padding: 28px !important; box-sizing: border-box !important; background: var(--pgp-map) !important; }
+#app-page.page.active #goals-projects-content :is(.gp-map-root-column, .gp-map-branches, .gp-map-branch, .gp-map-stage-row, .gp-map-subtasks) { position: relative !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; background: transparent !important; }
+#app-page.page.active #goals-projects-content .gp-map-root-column { width: 240px !important; justify-self: auto !important; }
+#app-page.page.active #goals-projects-content .gp-map-branches { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; align-items: stretch !important; gap: 24px !important; width: 506px; }
+#app-page.page.active #goals-projects-content .gp-map-branch { display: grid !important; grid-template-columns: 220px 250px !important; align-items: center !important; gap: 36px !important; height: auto !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content .gp-map-stage-row { display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; align-items: center !important; gap: 6px !important; }
+#app-page.page.active #goals-projects-content .gp-map-subtasks { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; }
+#app-page.page.active #goals-projects-content :is(.gp-map-root-column, .gp-map-branches, .gp-map-subtasks, .gp-map-stage-row)::before,
+#app-page.page.active #goals-projects-content :is(.gp-map-root-column, .gp-map-branches, .gp-map-subtasks)::after,
+#app-page.page.active #goals-projects-content .gp-node::before,
+#app-page.page.active #goals-projects-content .gp-node::after { content: none !important; }
+#app-page.page.active #goals-projects-content .gp-node { position: relative !important; display: grid !important; align-content: start !important; gap: 7px !important; width: 100% !important; max-width: none !important; min-height: 0 !important; margin: 0 !important; padding: 13px !important; border: 1px solid var(--pgp-border) !important; border-radius: 11px !important; background: var(--pgp-surface) !important; color: var(--pgp-text) !important; box-shadow: none !important; text-align: left !important; white-space: normal !important; overflow: visible !important; transform: none !important; }
+#app-page.page.active #goals-projects-content .gp-node strong { display: block; color: inherit !important; font-size: 13px !important; line-height: 1.45 !important; font-weight: 650; overflow-wrap: anywhere; }
+#app-page.page.active #goals-projects-content .gp-node :is(small, em) { display: block; color: var(--pgp-muted) !important; font-size: 9.5px !important; line-height: 1.45; font-style: normal; }
+#app-page.page.active #goals-projects-content .gp-node.project { padding: 18px !important; border-color: #7381BA !important; background: linear-gradient(130deg, #34488B, #4A448C) !important; color: #FFFFFF !important; }
+#app-page.page.active #goals-projects-content .gp-node.project strong { color: #FFFFFF !important; font-size: 16px !important; }
+#app-page.page.active #goals-projects-content .gp-node.project :is(small, b, .gp-node-subject) { color: #E5EAFE !important; font-size: 10px !important; line-height: 1.5; }
+#app-page.page.active #goals-projects-content .gp-node-icon { display: grid; place-items: center; width: 28px !important; height: 28px !important; min-width: 28px !important; border: 1px solid #8292CC !important; border-radius: 8px !important; background: rgba(255,255,255,.08) !important; color: #FFFFFF !important; }
+#app-page.page.active #goals-projects-content .gp-node-icon svg { width: 16px; height: 16px; }
+#app-page.page.active #goals-projects-content .gp-node-progress { width: 100%; height: 5px !important; margin: 3px 0 !important; border-radius: 999px; background: rgba(255,255,255,.18) !important; overflow: hidden; }
+#app-page.page.active #goals-projects-content .gp-node-progress > i { display: block; height: 100%; border-radius: inherit; background: #A2E0E1 !important; }
+#app-page.page.active #goals-projects-content .gp-node:is(.stage, .subtask) { display: grid !important; grid-template-columns: 22px minmax(0, 1fr) !important; align-items: start; gap: 9px !important; }
+#app-page.page.active #goals-projects-content .gp-node:is(.stage, .subtask) > span:last-child { display: grid; gap: 4px; min-width: 0; }
+#app-page.page.active #goals-projects-content .gp-node-index,
+#app-page.page.active #goals-projects-content .gp-map-check { display: grid; place-items: center; width: 22px !important; height: 22px !important; border-radius: 6px; background: var(--pgp-raised) !important; color: var(--pgp-indigo) !important; font-size: 11px !important; }
+#app-page.page.active #goals-projects-content .gp-node.completed { border-color: color-mix(in srgb, var(--pgp-green) 36%, var(--pgp-border)) !important; }
+#app-page.page.active #goals-projects-content .gp-node.completed .gp-map-check { color: var(--pgp-green) !important; }
+#app-page.page.active #goals-projects-content .gp-node.goal { color: var(--pgp-text) !important; border-color: color-mix(in srgb, var(--pgp-cyan) 32%, var(--pgp-border)) !important; }
+#app-page.page.active #goals-projects-content .gp-collapse { position: static !important; display: grid; place-items: center; width: 28px !important; height: 28px !important; min-width: 28px !important; padding: 0 !important; margin: 0 !important; border: 1px solid var(--pgp-border) !important; border-radius: 8px !important; background: var(--pgp-surface) !important; color: var(--pgp-muted) !important; font-size: 16px !important; box-shadow: none !important; }
+#app-page.page.active #goals-projects-content :is(.gp-map-hidden-count, .gp-map-no-subtasks) { padding: 12px !important; border: 1px dashed var(--pgp-border) !important; border-radius: 9px; background: transparent !important; color: var(--pgp-muted) !important; font-size: 11px !important; line-height: 1.5; }
+/* Connectors follow each row's natural center, never absolute node coordinates. */
+#app-page.page.active #goals-projects-content .gp-map-branch::before,
+#app-page.page.active #goals-projects-content .gp-map-branch::after,
+#app-page.page.active #goals-projects-content .gp-map-stage-row::after,
+#app-page.page.active #goals-projects-content .gp-node.project::after,
+#app-page.page.active #goals-projects-content .gp-node.subtask::before,
+#app-page.page.active #goals-projects-content .gp-node.subtask::after { content: "" !important; position: absolute !important; z-index: 0 !important; inset: auto !important; border: 0 !important; border-radius: 1px !important; background: var(--pgp-connector) !important; opacity: 1 !important; filter: none !important; transform: none !important; pointer-events: none; }
+#app-page.page.active #goals-projects-content .gp-map-branch::before { left: -24px !important; top: -12px !important; bottom: -12px !important; width: 1px !important; height: auto !important; }
+#app-page.page.active #goals-projects-content .gp-map-branch:first-child::before { top: 50% !important; }
+#app-page.page.active #goals-projects-content .gp-map-branch:last-child::before { bottom: 50% !important; }
+#app-page.page.active #goals-projects-content .gp-map-branch:only-child::before { content: none !important; }
+#app-page.page.active #goals-projects-content .gp-map-branch::after { left: -24px !important; top: 50% !important; width: 24px !important; height: 1px !important; }
+#app-page.page.active #goals-projects-content .gp-node.project::after { right: -24px !important; top: 50% !important; width: 24px !important; height: 1px !important; }
+#app-page.page.active #goals-projects-content .gp-map-stage-row::after { right: -18px !important; top: 50% !important; width: 18px !important; height: 1px !important; }
+#app-page.page.active #goals-projects-content .gp-node.subtask::before { left: -18px !important; top: -5px !important; bottom: -5px !important; width: 1px !important; height: auto !important; }
+#app-page.page.active #goals-projects-content .gp-node.subtask:first-child::before { top: 50% !important; }
+#app-page.page.active #goals-projects-content .gp-node.subtask:last-child::before { bottom: 50% !important; }
+#app-page.page.active #goals-projects-content .gp-node.subtask:only-child::before { content: none !important; }
+#app-page.page.active #goals-projects-content .gp-node.subtask::after { left: -18px !important; top: 50% !important; width: 18px !important; height: 1px !important; }
+#app-page.page.active #goals-projects-content .gp-map-goal-branch .gp-map-stage-row::after,
+#app-page.page.active #goals-projects-content .gp-map-branch:has(.gp-map-no-subtasks) .gp-map-stage-row::after,
+#app-page.page.active #goals-projects-content .gp-map:not(:has(.gp-map-branch)) .gp-node.project::after { content: none !important; }
+
+@media (hover: hover) {
+    #app-page.page.active #goals-projects-content :is(button, summary):hover { filter: brightness(1.04); }
+    #app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) > div > button:hover { background: var(--pgp-raised) !important; }
+    #app-page.page.active #goals-projects-content .gp-node:hover { border-color: var(--pgp-blue) !important; }
+}
+@media (max-width: 1100px) {
+    #app-page.page.active #goals-projects-content .gp-header { align-items: flex-start !important; }
+    #app-page.page.active #goals-projects-content .gp-header-actions { flex-direction: column; }
+    #app-page.page.active #goals-projects-content .gp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    #app-page.page.active #goals-projects-content .gp-map-toolbar { grid-template-columns: minmax(0, 1fr) !important; }
+    #app-page.page.active #goals-projects-content .gp-map-controls { justify-content: flex-start; max-width: none; }
+}
+@media (max-width: 850px) {
+    #app-page.page.active #goals-projects-content .gp-executive-summary { grid-template-columns: minmax(0, 1fr) !important; }
+    #app-page.page.active #goals-projects-content .gp-progress-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (min-width: 768px) and (max-width: 768px) {
+    #app-page.page.active:has(> .main-content > #goals-projects.section.active) { display: flex; align-items: flex-start; }
+    #app-page.page.active:has(> .main-content > #goals-projects.section.active) > .main-content { flex: 1; min-width: 0; width: auto !important; margin: 0 !important; }
+}
+@media (max-width: 600px) {
+    #app-page.page.active #goals-projects-content .gp-header { flex-direction: column; gap: 14px !important; }
+    #app-page.page.active #goals-projects-content .gp-header-actions { flex-direction: row; width: 100%; }
+    #app-page.page.active #goals-projects-content .gp-header-actions button { flex: 1; min-width: 0; font-size: 11px !important; }
+    #app-page.page.active #goals-projects-content .gp-stats { gap: 9px !important; }
+    #app-page.page.active #goals-projects-content .gp-stats article { padding: 12px !important; gap: 3px 8px !important; }
+    #app-page.page.active #goals-projects-content .gp-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 13px !important; }
+    #app-page.page.active #goals-projects-content .gp-card { padding: 16px !important; }
+    #app-page.page.active #goals-projects-content .gp-project-hero { padding: 16px !important; gap: 12px; }
+    #app-page.page.active #goals-projects-content .gp-project-hero h1 { font-size: 22px !important; }
+    #app-page.page.active #goals-projects-content .gp-project-progress { max-width: 80px; }
+    #app-page.page.active #goals-projects-content .gp-project-progress .gp-ring { width: 64px !important; height: 64px !important; min-width: 64px !important; min-height: 64px !important; }
+    #app-page.page.active #goals-projects-content .gp-project-progress .gp-ring strong { font-size: 16px !important; }
+    #app-page.page.active #goals-projects-content .gp-detail-panel { padding: 13px !important; }
+    #app-page.page.active #goals-projects-content .gp-executive-summary > article { padding: 13px !important; }
+    #app-page.page.active #goals-projects-content .gp-summary-next { flex-direction: column; align-items: flex-start; }
+    #app-page.page.active #goals-projects-content .gp-stage-card { padding: 13px !important; }
+    #app-page.page.active #goals-projects-content .gp-stage-card > header { align-items: flex-start; flex-wrap: wrap; }
+    #app-page.page.active #goals-projects-content .gp-subtask-card { padding: 10px !important; }
+    #app-page.page.active #goals-projects-content :is(.gp-subtask-description, .gp-subtask-meta) { margin-left: 0 !important; }
+    #app-page.page.active #goals-projects-content .gp-map-controls button { flex: 1 1 calc(50% - 6px); min-width: 0; font-size: 10px !important; }
+    #app-page.page.active #goals-projects-content .gp-map-shell { max-height: 65dvh; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #app-page.page.active #goals-projects-content :is(button, .gp-node, .gp-progress > span, .gp-stage-progress > span) { animation: none !important; transition: none !important; }
+}
