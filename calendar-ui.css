@@ -1,0 +1,401 @@
+/* Calendar and academic agenda: presentation only. Existing actions stay unchanged. */
+#app-page #calendar {
+    --agenda-surface: #171d2b;
+    --agenda-soft: #1c2435;
+    --agenda-cell: rgba(148, 163, 184, .045);
+    --agenda-line: rgba(148, 163, 184, .15);
+    --agenda-text: #eef2fc;
+    --agenda-muted: #a0aec4;
+    --agenda-accent: #b4a7ff;
+    --agenda-accent-soft: rgba(139, 114, 246, .13);
+    --agenda-info: #a2d4ff;
+    --agenda-danger: #ffb4be;
+    --agenda-tooltip: #ecf1ff;
+    --agenda-tooltip-text: #172135;
+}
+body.light-theme #app-page #calendar {
+    --agenda-surface: #fff;
+    --agenda-soft: #f4f6fc;
+    --agenda-cell: #f8f9fd;
+    --agenda-line: rgba(73, 88, 122, .16);
+    --agenda-text: #202c46;
+    --agenda-muted: #596a85;
+    --agenda-accent: #6650be;
+    --agenda-accent-soft: #efebfc;
+    --agenda-info: #27669b;
+    --agenda-danger: #b53b55;
+    --agenda-tooltip: #26334f;
+    --agenda-tooltip-text: #fff;
+}
+#app-page #calendar .calendar-container {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 20px !important;
+}
+#app-page #calendar .calendar-side { gap: 16px !important; }
+#app-page #calendar :is(.calendar-mini, .events-list, .calendar-sync-card) {
+    background: var(--agenda-surface) !important;
+    border-color: var(--agenda-line) !important;
+    box-shadow: 0 8px 24px rgba(12, 21, 46, .045) !important;
+    min-width: 0 !important;
+}
+#app-page #calendar .calendar-sync-card {
+    grid-template-columns: 36px minmax(0, 1fr) auto !important;
+    gap: 4px 12px !important;
+    padding: 15px !important;
+}
+#app-page #calendar .calendar-sync-icon {
+    grid-column: 1 !important;
+    grid-row: 1 / 3 !important;
+    width: 36px !important;
+    height: 36px !important;
+    background-color: var(--agenda-soft) !important;
+    background-size: 22px !important;
+    border-color: var(--agenda-line) !important;
+    border-radius: 11px !important;
+}
+#app-page #calendar .calendar-sync-card h3 {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    font-size: .85rem !important;
+    color: var(--agenda-text) !important;
+}
+#app-page #calendar .calendar-sync-card p {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+    font-size: .72rem !important;
+    line-height: 1.5 !important;
+    color: var(--agenda-muted) !important;
+}
+#app-page #calendar .calendar-sync-card .btn-primary {
+    min-width: 0 !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    font-size: .73rem !important;
+    white-space: nowrap;
+}
+#app-page #calendar .calendar-mini { padding: 20px !important; }
+#app-page #calendar .calendar-toolbar {
+    grid-template-columns: 34px minmax(0, 1fr) 34px !important;
+    gap: 10px !important;
+    margin-bottom: 15px !important;
+}
+#app-page #calendar .calendar-title {
+    font-size: clamp(1.05rem, 1.5vw, 1.3rem) !important;
+    color: var(--agenda-text) !important;
+}
+#app-page #calendar .calendar-title-block p { color: var(--agenda-muted) !important; }
+#app-page #calendar .calendar-month-btn {
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    background: var(--agenda-soft) !important;
+    border-color: var(--agenda-line) !important;
+    color: var(--agenda-text) !important;
+    font-size: 1.2rem !important;
+}
+#app-page #calendar .calendar-grid.calendar-grid-wide { gap: 7px !important; }
+#app-page #calendar .calendar-day-label {
+    min-height: 24px !important;
+    color: var(--agenda-muted) !important;
+}
+#app-page #calendar .calendar-day {
+    aspect-ratio: auto !important;
+    height: auto !important;
+    min-height: clamp(50px, 4.7vw, 70px) !important;
+    padding: 9px !important;
+    border-radius: 10px !important;
+    background: var(--agenda-cell) !important;
+    border-color: var(--agenda-line) !important;
+    color: var(--agenda-text) !important;
+    font-size: .8rem !important;
+    transform: none !important;
+}
+#app-page #calendar .calendar-day.muted {
+    background: transparent !important;
+    border-color: transparent !important;
+}
+#app-page #calendar .calendar-day.has-event {
+    background: color-mix(in srgb, #60a5fa 9%, var(--agenda-surface)) !important;
+    border-color: color-mix(in srgb, #60a5fa 32%, var(--agenda-line)) !important;
+}
+#app-page #calendar .calendar-day.is-today {
+    background: var(--agenda-accent-soft) !important;
+    border-color: var(--agenda-accent) !important;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--agenda-accent) 12%, transparent) !important;
+}
+#app-page #calendar .calendar-day.is-today::before {
+    color: var(--agenda-accent) !important;
+    font-size: .53rem !important;
+    right: 6px !important;
+    bottom: 7px !important;
+}
+#app-page #calendar .calendar-event-marker {
+    top: 6px !important;
+    right: 5px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    padding: 0 4px !important;
+    color: var(--agenda-info) !important;
+    background: color-mix(in srgb, #60a5fa 12%, var(--agenda-surface)) !important;
+}
+#app-page #calendar .calendar-day:not(.muted):is(:hover, :focus-visible) {
+    outline: 2px solid var(--agenda-accent) !important;
+    outline-offset: 1px !important;
+    background: var(--agenda-accent-soft) !important;
+}
+#app-page #calendar .events-list {
+    position: static !important;
+    padding: 18px !important;
+}
+#app-page #calendar .events-list > h3 {
+    margin: 0 0 15px !important;
+    color: var(--agenda-text) !important;
+    font-size: 1rem !important;
+}
+#app-page #calendar #custom-events-list {
+    gap: 11px !important;
+    max-height: min(660px, 68dvh) !important;
+    padding: 2px 5px 3px 2px !important;
+    overflow: auto !important;
+    scrollbar-width: thin;
+    scrollbar-color: #5f9fae transparent;
+}
+#app-page #calendar #custom-events-list::-webkit-scrollbar { width: 5px; height: 5px; }
+#app-page #calendar #custom-events-list::-webkit-scrollbar-track { background: transparent; }
+#app-page #calendar #custom-events-list::-webkit-scrollbar-thumb { background: #5f9fae; border-radius: 8px; }
+#app-page #calendar .event-item.event-custom {
+    display: grid !important;
+    grid-template-columns: 43px minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 10px 12px !important;
+    min-width: 0 !important;
+    padding: 14px !important;
+    background: var(--agenda-cell) !important;
+    border: 1px solid var(--agenda-line) !important;
+    border-radius: 13px !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+#app-page #calendar .event-item::before {
+    background: var(--subject-color, #9685ed) !important;
+    top: 14px !important;
+    bottom: 14px !important;
+    left: -1px !important;
+    width: 3px !important;
+    border-radius: 4px !important;
+}
+#app-page #calendar .event-date {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    grid-column: 1;
+    grid-row: 1 / 3;
+    width: 43px !important;
+    height: 49px !important;
+    min-height: 49px !important;
+    min-width: 0 !important;
+    padding: 6px 2px !important;
+    background: var(--subject-color-soft, var(--agenda-accent-soft)) !important;
+    border-color: var(--agenda-line) !important;
+    border-radius: 10px !important;
+}
+#app-page #calendar .event-date .day { color: var(--agenda-text) !important; font-size: 1.1rem !important; }
+#app-page #calendar .event-date .month { color: var(--agenda-muted) !important; font-size: .57rem !important; }
+#app-page #calendar .event-content { min-width: 0 !important; }
+#app-page #calendar .event-content h4 {
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+    margin: 0 0 6px !important;
+    color: var(--agenda-text) !important;
+    font-size: .88rem !important;
+    line-height: 1.4 !important;
+}
+#app-page #calendar .event-content p {
+    margin: 0 0 7px !important;
+    color: var(--agenda-muted) !important;
+    font-size: .71rem !important;
+    line-height: 1.5 !important;
+    overflow-wrap: anywhere;
+}
+#app-page #calendar .calendar-agenda-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+#app-page #calendar .event-badge {
+    margin: 0 !important;
+    padding: 3px 7px !important;
+    max-width: 100%;
+    color: var(--agenda-accent) !important;
+    background: var(--agenda-accent-soft) !important;
+    font-size: .63rem !important;
+    overflow-wrap: anywhere;
+}
+#app-page #calendar .calendar-agenda-subject {
+    color: var(--agenda-muted);
+    font-size: .66rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+#app-page #calendar .event-content .event-alert {
+    margin: 7px 0 0 !important;
+    color: var(--agenda-info) !important;
+    font-size: .66rem !important;
+}
+#app-page #calendar .event-custom .card-actions {
+    grid-column: 2;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    min-width: 0;
+}
+#app-page #calendar .event-custom .gcal-manual-controls {
+    display: flex !important;
+    width: auto !important;
+    flex: 0 1 auto !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+#app-page #calendar .event-custom .card-actions button {
+    position: relative;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 34px !important;
+    height: auto !important;
+    min-height: 34px !important;
+    padding: 7px !important;
+    margin: 0 !important;
+    border: 1px solid var(--agenda-line) !important;
+    border-radius: 9px !important;
+    background: var(--agenda-soft) !important;
+    color: var(--agenda-muted) !important;
+    box-shadow: none !important;
+    font-size: .68rem !important;
+    line-height: 1.4 !important;
+    white-space: normal !important;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+#app-page #calendar .event-custom .card-actions :is(.app-icon, svg) {
+    display: block !important;
+    width: 17px !important;
+    height: 17px !important;
+    margin: 0 !important;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+#app-page #calendar .event-custom .card-actions :is(.calendar-agenda-action, .gcal-entity-delete, [data-gcal-action="open"]) {
+    width: 34px !important;
+    height: 34px !important;
+}
+#app-page #calendar .event-custom .card-actions [data-gcal-action="open"] { font-size: 0 !important; }
+#app-page #calendar [data-gcal-action="open"]::before {
+    content: "";
+    width: 17px;
+    height: 17px;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Crect x='4' y='5' width='16' height='16' rx='3'/%3E%3Cpath d='M8 3v4m8-4v4M4 11h16m-11 4h2m2 3h2'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+#app-page #calendar .event-custom .card-actions button:is(:hover, :focus-visible) {
+    background: var(--agenda-accent-soft) !important;
+    border-color: var(--agenda-accent) !important;
+    color: var(--agenda-accent) !important;
+}
+#app-page #calendar .event-custom .card-actions button:focus-visible,
+#app-page #calendar .calendar-month-btn:focus-visible {
+    outline: 2px solid var(--agenda-accent) !important;
+    outline-offset: 2px;
+}
+#app-page #calendar .event-custom .card-actions .calendar-agenda-danger { color: var(--agenda-danger) !important; }
+#app-page #calendar .event-custom .card-actions button:disabled { opacity: .5; cursor: wait; }
+#app-page #calendar .gcal-manual-success {
+    color: var(--agenda-info) !important;
+    font-size: .65rem !important;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+#app-page #calendar .card-actions :is([data-tooltip], .gcal-entity-delete, [data-gcal-action="open"])::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    z-index: 5;
+    right: 0;
+    bottom: calc(100% + 7px);
+    width: max-content;
+    max-width: 175px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: var(--agenda-tooltip);
+    color: var(--agenda-tooltip-text);
+    font-family: inherit;
+    font-weight: 600;
+    line-height: 1.4;
+    font-size: 11px;
+    white-space: normal;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 150ms ease, transform 150ms ease;
+}
+#app-page #calendar .card-actions > [data-tooltip]:first-child::after { left: 0; right: auto; }
+#app-page #calendar .card-actions .gcal-entity-delete::after { content: attr(aria-label); }
+#app-page #calendar .card-actions [data-gcal-action="open"]::after { content: "Agregar a Google Calendar"; }
+#app-page #calendar .card-actions button:is(:hover, :focus-visible)::after { opacity: 1; transform: none; }
+#app-page #calendar .events-list .empty-state { padding: 24px 14px !important; min-height: 0 !important; }
+
+/* Existing notification fieldset was confined to one half of the event form. */
+body .quick-modal-card:is([aria-label="Crear evento"], [aria-label="Editar evento"]) .event-notification-field {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 1200px) {
+    #app-page #calendar .calendar-container { gap: 16px !important; }
+    #app-page #calendar .calendar-sync-card { grid-template-columns: 36px minmax(0, 1fr) !important; }
+    #app-page #calendar .calendar-sync-card .btn-primary { grid-column: 2 !important; grid-row: 3 !important; justify-self: start; margin-top: 6px !important; }
+    #app-page #calendar :is(.calendar-mini, .events-list) { padding: 15px !important; }
+    #app-page #calendar .event-item.event-custom { padding: 12px !important; gap: 10px !important; }
+}
+@media (max-width: 1000px) {
+    #app-page #calendar .calendar-container { grid-template-columns: minmax(0, 1fr) !important; }
+    #app-page #calendar .calendar-sync-card { grid-template-columns: 36px minmax(0, 1fr) auto !important; }
+    #app-page #calendar .calendar-sync-card .btn-primary { grid-column: 3 !important; grid-row: 1 / 3 !important; margin-top: 0 !important; }
+    #app-page #calendar .calendar-day { min-height: 58px !important; }
+}
+@media (min-width: 768px) and (max-width: 768px) {
+    #app-page.page.active:has(> .main-content > #calendar.section.active) { display: flex; align-items: flex-start; }
+    #app-page.page.active:has(> .main-content > #calendar.section.active) > .main-content { flex: 1; min-width: 0; width: auto !important; margin: 0 !important; }
+}
+@media (max-width: 767px) {
+    #app-page #calendar .calendar-container { gap: 16px !important; }
+    #app-page #calendar .calendar-sync-card { grid-template-columns: 32px minmax(0, 1fr) !important; padding: 13px !important; }
+    #app-page #calendar .calendar-sync-icon { width: 32px !important; height: 32px !important; }
+    #app-page #calendar .calendar-sync-card .btn-primary { grid-column: 2 !important; grid-row: 3 !important; justify-self: start; margin-top: 5px !important; }
+    #app-page #calendar .calendar-mini { padding: 14px !important; }
+    #app-page #calendar .calendar-day { min-height: 46px !important; padding: 6px !important; font-size: .72rem !important; }
+    #app-page #calendar .calendar-grid.calendar-grid-wide { gap: 5px !important; }
+    #app-page #calendar .calendar-event-marker { top: 21px !important; right: 5px !important; min-width: 14px !important; height: 14px !important; font-size: .53rem !important; }
+    #app-page #calendar .calendar-day.has-event::after { width: 8px !important; left: 6px !important; bottom: 7px !important; }
+    #app-page #calendar .calendar-day.is-today::before { font-size: .48rem !important; bottom: 6px !important; right: 4px !important; }
+    #app-page #calendar #custom-events-list { max-height: none !important; overflow: visible !important; padding: 2px !important; }
+    #app-page #calendar .event-custom .card-actions button { min-width: 36px !important; min-height: 36px !important; }
+    #app-page #calendar .event-custom .card-actions :is(.calendar-agenda-action, .gcal-entity-delete, [data-gcal-action="open"]) { width: 36px !important; height: 36px !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #app-page #calendar *, #app-page #calendar *::after { transition: none !important; }
+}

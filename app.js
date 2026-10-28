@@ -2847,6 +2847,13 @@ function addCalendarEventUI() {
     });
 }
 
+function calendarAgendaActionHTML(icon, label, attribute, id, danger = false) {
+    const graphic = icon === 'eye'
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+        : taskCardIcon(icon === 'trash' ? 'delete' : icon);
+    return `<button class="calendar-agenda-action${danger ? ' calendar-agenda-danger' : ''}" type="button" ${attribute}="${escapeHTML(id)}" aria-label="${escapeHTML(label)}" data-tooltip="${escapeHTML(label)}">${graphic}</button>`;
+}
+
 function renderCalendarSection(workspace) {
     const container = document.querySelector('.calendar-container');
     if (!container) return;
@@ -2933,7 +2940,7 @@ function generateCalendar() {
             const dayEvents = eventsByDate[dateKey] || [];
             const title = dayEvents.map(event => event.title).join(', ');
             html += `
-                <div class="calendar-day ${dayEvents.length ? 'has-event' : ''} ${dateKey === todayKey ? 'is-today' : ''}" title="${escapeHTML(title)}">
+                <div class="calendar-day ${dayEvents.length ? 'has-event' : ''} ${dateKey === todayKey ? 'is-today' : ''}" tabindex="0" aria-label="${escapeHTML(`${day} de ${monthNames[month]} de ${year}${dayEvents.length ? `: ${dayEvents.length} actividades. ${title}` : ': sin actividades'}`)}" ${dateKey === todayKey ? 'aria-current="date"' : ''} title="${escapeHTML(title)}">
                     <span class="calendar-day-number">${day}</span>
                     ${dayEvents.length ? `<span class="calendar-event-marker">${dayEvents.length}</span>` : ''}
                 </div>
@@ -4374,6 +4381,7 @@ function renderCalendarSection(workspace) {
         ...evaluationEvents,
         ...planningEvents
     ].sort((a, b) => `${a.date || ''} ${a.time || ''}`.localeCompare(`${b.date || ''} ${b.time || ''}`));
+    const subjectsById = new Map((workspace.subjects || []).map(subject => [subject.id, subject]));
     container.innerHTML = `
         <div class="calendar-side">
             <div class="calendar-sync-card">
@@ -4390,21 +4398,23 @@ function renderCalendarSection(workspace) {
                 ${events.length ? events.map(event => {
                     const eventDate = /^\d{4}-\d{2}-\d{2}$/.test(event.date || '') ? new Date(`${event.date}T12:00:00-05:00`) : null;
                     const eventMonth = eventDate ? new Intl.DateTimeFormat('es-EC', { month: 'short', timeZone: 'America/Guayaquil' }).format(eventDate).replace('.', '').toUpperCase() : 'AC';
+                    const dateLabel = eventDate ? new Intl.DateTimeFormat('es-EC', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Guayaquil' }).format(eventDate) : event.date || 'Sin fecha';
+                    const subject = subjectsById.get(event.subjectId);
                     return `
-                        <div class="event-item event-custom ${event.kind === 'evaluation' ? 'event-evaluation' : ''} ${isEventSoon(event) ? 'event-soon' : ''}">
+                        <div class="event-item event-custom ${event.kind === 'evaluation' ? 'event-evaluation' : ''} ${isEventSoon(event) ? 'event-soon' : ''}" ${subject ? `style="${getAcademicCardStyle(subject.color)}"` : ''}>
                             <div class="event-date"><span class="day">${escapeHTML((event.date || event.day || '--').slice(-2))}</span><span class="month">${escapeHTML(eventMonth)}</span></div>
                             <div class="event-content">
                                 <h4>${escapeHTML(event.title)}</h4>
-                                <p>${escapeHTML(event.date || 'Sin fecha')}  ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p>
-                                <span class="event-badge">${escapeHTML(event.calendarType || event.type)}</span>
+                                <p class="calendar-agenda-datetime">${escapeHTML(dateLabel)} · ${escapeHTML(ACEdunityTime.formatTime24ForDisplay(event.time, 'Sin hora'))}</p>
+                                <div class="calendar-agenda-tags"><span class="event-badge">${escapeHTML(event.calendarType || event.type)}</span>${subject || event.subject ? `<span class="calendar-agenda-subject">${escapeHTML(subject?.name || event.subject)}</span>` : ''}</div>
                                 ${isEventSoon(event) ? '<p class="event-alert">Evento cercano</p>' : ''}
-                                <div class="card-actions gcal-card-actions">
+                            </div>
+                            <div class="card-actions gcal-card-actions">
                                     ${event.kind === 'evaluation'
-                                        ? `<button class="btn-secondary btn-small" data-calendar-evaluation="${escapeHTML(event.id)}">Ver evaluación</button>${ACGoogleCalendarManual.renderCalendarRemove('evaluation', event.id)}${ACGoogleCalendarManual.render('evaluation', event.id)}`
+                                        ? `${calendarAgendaActionHTML('eye', 'Ver evaluación', 'data-calendar-evaluation', event.id)}${ACGoogleCalendarManual.renderCalendarRemove('evaluation', event.id)}${ACGoogleCalendarManual.render('evaluation', event.id)}`
                                         : event.kind !== 'event'
-                                            ? `<button class="btn-secondary btn-small" data-calendar-planning="${escapeHTML(event.projectId || '')}">Ver en Metas y Proyectos</button>${ACGoogleCalendarManual.renderCalendarRemove(event.kind, event.entityId)}${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
-                                            : `<button class="btn-secondary btn-small" data-event-edit="${escapeHTML(event.id)}">Editar</button>${ACGoogleCalendarManual.renderCalendarRemove('event', event.id)}${ACGoogleCalendarManual.render('event', event.id)}<button class="btn-danger btn-small" data-event-delete="${escapeHTML(event.id)}">Eliminar evento</button>`}
-                                </div>
+                                            ? `${calendarAgendaActionHTML('eye', 'Ver en Metas y Proyectos', 'data-calendar-planning', event.projectId || '')}${ACGoogleCalendarManual.renderCalendarRemove(event.kind, event.entityId)}${ACGoogleCalendarManual.render(event.kind, event.entityId)}`
+                                            : `${calendarAgendaActionHTML('edit', 'Editar', 'data-event-edit', event.id)}${ACGoogleCalendarManual.renderCalendarRemove('event', event.id)}${ACGoogleCalendarManual.render('event', event.id)}${calendarAgendaActionHTML('trash', 'Eliminar evento', 'data-event-delete', event.id, true)}`}
                             </div>
                         </div>
                     `;
