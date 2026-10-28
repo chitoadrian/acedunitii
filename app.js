@@ -5105,7 +5105,7 @@ function openResourceForm(resourceId = null) {
 
 async function deleteResource(resourceId) {
     const deleteKey = `resource:${resourceId}`;
-    if (!beginWorkspaceDelete(deleteKey)) return;
+    if (!beginWorkspaceDelete(deleteKey)) return false;
     const workspace = loadWorkspace();
     const resource = workspace.resources.find(item => item.id === resourceId);
     try {
@@ -5124,8 +5124,10 @@ async function deleteResource(resourceId) {
         removeWorkspaceItems('resources', item => item.id === resourceId);
         refreshResourceViews();
         notify('Recurso eliminado.', 'info');
+        return true;
     } catch (error) {
         notify(error.message || 'No se pudo eliminar el recurso.', 'error');
+        return false;
     } finally {
         finishWorkspaceDelete(deleteKey);
     }
@@ -8476,7 +8478,7 @@ function ensureBackpackToolbar(section, workspace) {
         .join('');
 
     header.insertAdjacentHTML('afterend', `
-        <div class="backpack-toolbar">
+        <div class="backpack-toolbar bp-toolbar">
             <label class="backpack-search">
                 <span>Buscar recurso</span>
                 <input type="search" id="backpack-search" placeholder="Buscar PDF, apunte o proyecto..." value="${escapeHTML(backpackFilterText)}">
@@ -8488,7 +8490,7 @@ function ensureBackpackToolbar(section, workspace) {
             <label>
                 <span>Tipo</span>
                 <select id="backpack-type-filter">
-                    <option value="all">PDF / Apunte / Guía / Proyecto</option>
+                    <option value="all">Todos los tipos</option>
                     <option value="PDF">PDF</option>
                     <option value="Apunte">Apunte</option>
                     <option value="Guia">Guía</option>
@@ -8570,10 +8572,24 @@ function getBackpackResourcesForView(workspace) {
         });
 }
 
+function backpackCardIcon(name) {
+    const paths = {
+        view: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+        tutor: '<rect x="5" y="7" width="14" height="11" rx="4"/><path d="M12 7V4m-2.5 11h5M3 11v3m18-3v3"/><circle cx="9" cy="12" r=".8"/><circle cx="15" cy="12" r=".8"/>',
+        edit: '<path d="m4 20 4.5-1L20 7.5 16.5 4 5 15.5 4 20Zm10-13 3.5 3.5"/>',
+        delete: '<path d="M3 6h18M9 6V4h6v2M5 6l1 14h12l1-14M10 10v6M14 10v6"/>',
+        file: '<path d="M6 3h8l4 4v14H6V3Zm8 0v5h4M9 12h6M9 16h4"/>'
+    };
+    return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${paths[name] || paths.file}</svg>`;
+}
+
 function renderBackpack(workspace) {
     const section = document.getElementById('backpack');
     const container = document.querySelector('.backpack-container');
     if (!section || !container) return;
+
+    const searchHadFocus = document.activeElement?.id === 'backpack-search';
+    const searchSelection = searchHadFocus ? [document.activeElement.selectionStart, document.activeElement.selectionEnd] : null;
 
     const header = section.querySelector('.section-header');
     if (header) {
@@ -8595,31 +8611,36 @@ function renderBackpack(workspace) {
         const color = getAcademicColorValue(getResourceColor(workspace, resource));
         const status = getResourceStatus(resource);
         const uploadedAt = resource.uploadedAt || resource.createdAt || new Date().toISOString();
+        const readOnly = academicYearManager.state.historical;
         return `
-            <article class="resource-card library-resource-card" style="${getAcademicCardStyle(color)}">
-                ${neonLinesHTML()}
-                <div class="resource-top">
-                    ${appIconHTML('file', 'resource-icon resource-pdf-icon pdf-icon material-icon')}
-                    <div class="resource-info">
+            <article class="bp-resource-card" style="${getAcademicCardStyle(color)}">
+                <div class="bp-card-header">
+                    <span class="bp-file-icon">${backpackCardIcon('file')}</span>
+                    <div class="bp-card-heading">
                         <h4>${escapeHTML(resource.title)}</h4>
-                        <p class="resource-type">${escapeHTML(resource.subject || 'General')} - ${escapeHTML(resource.fileName || 'PDF')}</p>
+                        <p class="bp-file-name">${escapeHTML(resource.fileName || 'PDF')}</p>
                     </div>
                 </div>
-                <div class="resource-meta-row">
-                    <span class="resource-subject-chip">${escapeHTML(resource.subject || 'General')}</span>
-                    <span class="resource-status ${escapeHTML(status.className)}">${escapeHTML(status.label)}</span>
+                <div class="bp-card-labels">
+                    <span class="bp-subject">${escapeHTML(resource.subject || 'General')}</span>
+                    <span class="bp-status" data-state="${escapeHTML(status.className)}">${escapeHTML(status.label)}</span>
                 </div>
-                <p class="resource-description">${escapeHTML(shortDescription)}</p>
-                <div class="resource-data">
-                    <span>${escapeHTML(resource.tag || resource.type || 'PDF')}</span>
-                    <span>Subido el: ${escapeHTML(formatResourceDate(uploadedAt))}</span>
-                    <span>${escapeHTML(getRelativeResourceDate(uploadedAt))}</span>
+                <div class="bp-description">
+                    <p>${escapeHTML(shortDescription)}</p>
+                    ${description.length > 120 ? `<details><summary>Ver descripción completa</summary><p>${escapeHTML(description)}</p></details>` : ''}
                 </div>
-                <div class="resource-actions resource-actions-grid">
-                    <button class="btn-secondary btn-small" data-resource-view="${escapeHTML(resource.id)}">Ver</button>
-                    <button class="btn-secondary btn-small" data-resource-ai="${escapeHTML(resource.id)}">Preguntar a Tutor</button>
-                    <button class="btn-secondary btn-small" data-resource-edit="${escapeHTML(resource.id)}">Editar</button>
-                    <button class="btn-danger btn-small" data-resource-delete="${escapeHTML(resource.id)}">Eliminar</button>
+                <div class="bp-card-footer">
+                    <div class="bp-card-facts">
+                        <span class="bp-resource-kind">${escapeHTML(resource.tag || resource.type || 'PDF')}</span>
+                        <span>Subido el: ${escapeHTML(formatResourceDate(uploadedAt))}</span>
+                        <span>${escapeHTML(getRelativeResourceDate(uploadedAt))}</span>
+                    </div>
+                    <div class="bp-card-actions">
+                        <button class="bp-card-action" type="button" data-resource-view="${escapeHTML(resource.id)}" aria-label="Ver recurso" data-tooltip="Ver recurso">${backpackCardIcon('view')}</button>
+                        <button class="bp-card-action bp-card-action--tutor" type="button" data-resource-ai="${escapeHTML(resource.id)}" aria-label="Preguntar a Tutor" data-tooltip="Preguntar a Tutor">${backpackCardIcon('tutor')}</button>
+                        <button class="bp-card-action" type="button" data-resource-edit="${escapeHTML(resource.id)}" aria-label="Editar" data-tooltip="Editar" ${readOnly ? 'disabled' : ''}>${backpackCardIcon('edit')}</button>
+                        <button class="bp-card-action bp-card-action--delete" type="button" data-resource-delete="${escapeHTML(resource.id)}" aria-label="Eliminar" data-tooltip="Eliminar" ${readOnly ? 'disabled' : ''}>${backpackCardIcon('delete')}</button>
+                    </div>
                 </div>
             </article>
         `;
@@ -8628,7 +8649,91 @@ function renderBackpack(workspace) {
     container.querySelectorAll('[data-resource-view]').forEach(button => button.addEventListener('click', () => viewResource(button.dataset.resourceView)));
     container.querySelectorAll('[data-resource-ai]').forEach(button => button.addEventListener('click', () => askAIAboutResource(button.dataset.resourceAi)));
     container.querySelectorAll('[data-resource-edit]').forEach(button => button.addEventListener('click', () => openResourceForm(button.dataset.resourceEdit)));
-    container.querySelectorAll('[data-resource-delete]').forEach(button => button.addEventListener('click', () => deleteResource(button.dataset.resourceDelete)));
+    container.querySelectorAll('[data-resource-delete]').forEach(button => button.addEventListener('click', () => openResourceDeleteDialog(button.dataset.resourceDelete, button)));
+    if (searchHadFocus) {
+        const search = document.getElementById('backpack-search');
+        search?.focus({ preventScroll: true });
+        if (search && searchSelection?.every(Number.isInteger)) search.setSelectionRange(...searchSelection);
+    }
+}
+
+function openResourceDeleteDialog(resourceId, triggerElement = null) {
+    const resource = loadWorkspace().resources.find(item => item.id === resourceId);
+    if (!resource || academicYearManager.state.historical || document.querySelector('.task-delete-modal')) return;
+    const ownerId = currentUser?.id;
+    const scope = academicYearManager.scope();
+    // Reuse the proven Task confirmation surface, animations and keyboard pattern.
+    const modal = document.createElement('div');
+    modal.className = 'quick-modal task-delete-modal resource-delete-modal';
+    modal.innerHTML = `
+        <div class="quick-modal-card task-delete-card" role="dialog" aria-modal="true" aria-labelledby="resource-delete-title" aria-describedby="resource-delete-description resource-delete-name" tabindex="-1">
+            <span class="task-delete-icon">${backpackCardIcon('delete')}</span>
+            <h3 id="resource-delete-title">¿Seguro que quieres eliminar este recurso?</h3>
+            <p id="resource-delete-description">Esta acción eliminará el recurso seleccionado y no se podrá deshacer.</p>
+            <strong id="resource-delete-name">${escapeHTML(resource.title)}</strong>
+            <p class="task-delete-error" role="alert" hidden></p>
+            <div class="task-delete-actions">
+                <button class="btn-secondary" type="button" data-cancel-resource-delete>Cancelar</button>
+                <button class="btn-danger" type="button" data-confirm-resource-delete>Eliminar recurso</button>
+            </div>
+        </div>`;
+    const card = modal.querySelector('[role="dialog"]');
+    const cancel = modal.querySelector('[data-cancel-resource-delete]');
+    const confirm = modal.querySelector('[data-confirm-resource-delete]');
+    const errorText = modal.querySelector('.task-delete-error');
+    let busy = false, closing = false;
+    const close = (deleted = false) => {
+        if (closing) return;
+        closing = true;
+        document.removeEventListener('keydown', handleKeydown);
+        modal.classList.add('is-closing');
+        const animations = modal.getAnimations?.({ subtree: true }) || [];
+        void Promise.allSettled(animations.map(animation => animation.finished)).then(() => {
+            modal.remove();
+            const target = !deleted && triggerElement?.isConnected ? triggerElement : document.getElementById('backpack-search');
+            target?.focus({ preventScroll: true });
+        });
+    };
+    const handleKeydown = event => {
+        if (closing) return;
+        if (event.key === 'Escape') { event.preventDefault(); if (!busy) close(); }
+        if (event.key === 'Tab') {
+            const buttons = [...modal.querySelectorAll('button:not(:disabled)')];
+            const first = buttons[0], last = buttons[buttons.length - 1];
+            if (!first) { event.preventDefault(); card.focus(); }
+            else if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && (document.activeElement === last || !modal.contains(document.activeElement))) { event.preventDefault(); first.focus(); }
+        }
+    };
+    modal.addEventListener('click', event => {
+        if (!busy && (event.target === modal || event.target.closest('[data-cancel-resource-delete]'))) close();
+    });
+    confirm.addEventListener('click', async () => {
+        if (busy || closing) return;
+        if (currentUser?.id !== ownerId || !academicYearManager.matches(scope) || academicYearManager.state.historical) {
+            errorText.textContent = 'La cuenta o el año lectivo cambió. Cierra este aviso y vuelve a abrir el recurso.';
+            errorText.hidden = false;
+            return;
+        }
+        busy = true;
+        cancel.disabled = confirm.disabled = true;
+        confirm.textContent = 'Eliminando…';
+        card.setAttribute('aria-busy', 'true');
+        errorText.hidden = true;
+        try {
+            if (await deleteResource(resourceId)) { close(true); return; }
+        } catch (_) { /* Keep the confirmation open and preserve a safe retry. */ }
+        errorText.textContent = 'No se pudo eliminar el recurso. Tus datos se conservan; inténtalo nuevamente.';
+        errorText.hidden = false;
+        busy = false;
+        cancel.disabled = confirm.disabled = false;
+        confirm.textContent = 'Eliminar recurso';
+        card.setAttribute('aria-busy', 'false');
+        confirm.focus();
+    });
+    document.body.appendChild(modal);
+    document.addEventListener('keydown', handleKeydown);
+    cancel.focus();
 }
 
 function resetBackpackFilters() {
