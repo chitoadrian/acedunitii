@@ -1244,6 +1244,7 @@ function navigateTo(sectionId, evt) {
     currentSection = sectionId;
     rememberAppView(sectionId);
     renderWorkspaceSection(sectionId);
+    if (sectionId === 'ai-assistant') window.ACTutorMath?.typeset(section);
     window.ACAcademicNotifications?.updateVisibility(sectionId);
 
     // Scroll al top en mobile
@@ -5285,7 +5286,10 @@ function formatTutorInlineMarkdown(value) {
         .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
 }
 
-function renderTutorMarkdown(value) {
+function renderTutorMarkdown(value, prepared = false) {
+    if (!prepared && typeof window !== 'undefined' && window.ACTutorMath) {
+        return window.ACTutorMath.markdown(value, text => renderTutorMarkdown(text, true));
+    }
     const lines = String(value || '').replace(/\r\n?/g, '\n').split('\n');
     const output = [];
     let paragraph = [];
@@ -5368,6 +5372,7 @@ function appendTutorMessage(type, content, title = '') {
     message.innerHTML = `${safeTitle}${safeContent || '<p></p>'}`;
 
     messages.appendChild(message);
+    if (!isUser) window.ACTutorMath?.typeset(message);
     scrollTutorHistoryToEnd(messages, shouldFollowLatest);
     return true;
 }

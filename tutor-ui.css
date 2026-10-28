@@ -164,6 +164,14 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant
 #app-page #ai-assistant .tutor-message :is(p, ul, ol):last-child { margin-bottom: 0; }
 #app-page #ai-assistant .tutor-message :is(code, pre) { color: var(--tui-text); background: var(--tui-raised); }
 #app-page #ai-assistant .tutor-message pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+#app-page #ai-assistant .tutor-code { padding: 12px; border: 1px solid var(--tui-border); border-radius: 8px; font-size: 12px; line-height: 1.6; }
+#app-page #ai-assistant .tutor-math { color: inherit; max-width: 100%; }
+#app-page #ai-assistant .tutor-math-inline { display: inline-block; vertical-align: middle; overflow-x: auto; overflow-y: hidden; padding: 3px 1px; }
+#app-page #ai-assistant .tutor-math-block { display: block; min-width: 0; margin: 12px 0; padding: 6px 1px; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #659fac transparent; }
+#app-page #ai-assistant .tutor-math .katex { font-size: 1.2em; line-height: 1.3; }
+#app-page #ai-assistant .tutor-math .katex-display { margin: 0; }
+#app-page #ai-assistant .tutor-math-fallback { color: var(--tui-muted); font: inherit; overflow-wrap: anywhere; }
+#app-page #ai-assistant .tutor-math:focus-visible { outline: 2px solid var(--tui-blue); outline-offset: 2px; }
 #app-page #ai-assistant .tutor-message hr { height: 1px; margin: 15px 0; background: var(--tui-border); }
 #app-page #ai-assistant .tutor-thinking { border-style: dashed; color: var(--tui-muted); }
 #app-page #ai-assistant .tutor-practice-grid { gap: 10px; }
@@ -228,6 +236,21 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant
 @media (min-width: 768px) and (max-width: 768px) {
     #app-page.page.active:has(> .main-content > #ai-assistant.section.active) { display: flex; align-items: flex-start; }
     #app-page.page.active:has(> .main-content > #ai-assistant.section.active) > .main-content { flex: 1; min-width: 0; width: auto !important; margin: 0 !important; }
+}
+/* Reclaim vertical whitespace for reading, without widening the panel or hiding its composer. */
+@media (min-width: 768px) {
+    #app-page #ai-assistant { padding-bottom: 0; }
+    #app-page > .main-content:has(> #ai-assistant.section.active) { padding-bottom: 6px !important; }
+}
+@media (min-width: 881px) {
+    /* The shared .section margin uses !important; override only this view's top margin. */
+    #app-page #ai-assistant { margin-top: -42px !important; }
+    #app-page #ai-assistant .tutor-shell { gap: 12px; }
+    #app-page #ai-assistant .tutor-chat-card { height: clamp(520px, calc(100dvh - 130px), 1000px); padding-block: 16px; gap: 10px; }
+    #app-page #ai-assistant .tutor-tabs { padding-bottom: 11px; }
+    #app-page #ai-assistant .tutor-composer { padding-block: 10px 8px; }
+    #app-page #ai-assistant .tutor-composer textarea { min-height: 44px; height: 44px; }
+    #app-page #ai-assistant .tutor-composer-bar { padding-top: 7px; }
 }
 @media (max-width: 767px) {
     #app-page #ai-assistant .tutor-shell { gap: 14px; }
