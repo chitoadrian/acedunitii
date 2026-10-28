@@ -99,6 +99,30 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #goals-projec
 #app-page.page.active #goals-projects-content .gp-card-meta > span { display: inline-flex !important; align-items: center; gap: 5px; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.5; overflow-wrap: anywhere; }
 #app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) { display: inline-grid; place-items: center; flex: 0 0 14px; width: 14px; height: 14px; }
 #app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) svg { width: 14px; height: 14px; }
+/* Metadata's outer labels have padding; their nested icon circles must not inherit it. */
+#app-page.page.active #goals-projects-content .gp-card-meta > span > .gp-meta-icon {
+    box-sizing: border-box !important;
+    display: inline-grid !important;
+    place-items: center;
+    flex: 0 0 22px;
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    margin: 0;
+    padding: 0 !important;
+    border: 1px solid var(--pgp-border) !important;
+    border-radius: 50% !important;
+    background: var(--pgp-raised) !important;
+    line-height: 1;
+}
+#app-page.page.active #goals-projects-content .gp-card-meta > span > .gp-meta-icon svg {
+    display: block;
+    flex: none;
+    width: 12px;
+    height: 12px;
+    margin: 0;
+    padding: 0;
+}
 #app-page.page.active #goals-projects-content .gp-project-open { display: flex; justify-content: space-between; align-items: center; width: 100% !important; min-height: 36px !important; margin: auto 0 0 !important; padding: 8px 11px !important; border-radius: 9px !important; font-size: 11px !important; line-height: 1.4; }
 
 /* Share natural internal tracks only when two or more cards can fit. */
