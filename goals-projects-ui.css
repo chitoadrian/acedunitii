@@ -67,9 +67,10 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #goals-projec
 #app-page.page.active #goals-projects-content :is(.gp-filters, .gp-tabs) button { min-height: 34px !important; margin: 0 !important; padding: 7px 12px !important; border: 1px solid var(--pgp-border) !important; border-radius: 9px !important; background: var(--pgp-raised) !important; color: var(--pgp-muted) !important; font-size: 11px !important; font-weight: 650; box-shadow: none !important; }
 #app-page.page.active #goals-projects-content :is(.gp-filters, .gp-tabs) button.active { border-color: color-mix(in srgb, var(--pgp-indigo) 40%, var(--pgp-border)) !important; color: var(--pgp-indigo) !important; background: color-mix(in srgb, var(--pgp-indigo) 10%, var(--pgp-surface)) !important; }
 
-/* Content-sized cards; a single project never becomes an oversized full-width tile. */
-#app-page.page.active #goals-projects-content .gp-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)) !important; gap: 16px !important; align-items: start !important; }
-#app-page.page.active #goals-projects-content .gp-card { position: relative; display: grid !important; align-content: start !important; gap: 12px !important; width: 100% !important; max-width: 480px !important; min-height: 0 !important; margin: 0 !important; padding: 18px !important; border: 1px solid var(--pgp-border) !important; border-top: 2px solid color-mix(in srgb, var(--subject-color, #7C83D9) 40%, var(--pgp-border)) !important; border-radius: 17px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; overflow: visible !important; transform: none !important; }
+/* Each row stretches to its tallest card; single-column rows remain content-sized. */
+#app-page.page.active #goals-projects-content .gp-grid { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)) !important; gap: 16px !important; align-items: stretch !important; container-type: inline-size; }
+#app-page.page.active #goals-projects-content .gp-card { position: relative; display: flex !important; flex-direction: column; gap: 12px !important; width: 100% !important; max-width: 480px !important; min-height: 0 !important; margin: 0 !important; padding: 18px !important; border: 1px solid var(--pgp-border) !important; border-top: 2px solid color-mix(in srgb, var(--subject-color, #7C83D9) 40%, var(--pgp-border)) !important; border-radius: 17px !important; background: var(--pgp-surface) !important; box-shadow: var(--pgp-shadow) !important; overflow: visible !important; transform: none !important; }
+#app-page.page.active #goals-projects-content .gp-card > * { flex-shrink: 0; }
 #app-page.page.active #goals-projects-content .gp-card:has(details[open]) { z-index: 15; }
 #app-page.page.active #goals-projects-content :is(.gp-stage-card, .gp-subtask-card) { position: relative; overflow: visible !important; }
 #app-page.page.active #goals-projects-content :is(.gp-stage-card, .gp-subtask-card):has(details[open]) { z-index: 15; }
@@ -98,7 +99,24 @@ body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #goals-projec
 #app-page.page.active #goals-projects-content .gp-card-meta > span { display: inline-flex !important; align-items: center; gap: 5px; min-width: 0; padding: 0 !important; border: 0 !important; background: transparent !important; color: var(--pgp-muted) !important; font-size: 10px !important; line-height: 1.5; overflow-wrap: anywhere; }
 #app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) { display: inline-grid; place-items: center; flex: 0 0 14px; width: 14px; height: 14px; }
 #app-page.page.active #goals-projects-content :is(.gp-meta-icon, .gp-menu-icon, .gp-control-icon) svg { width: 14px; height: 14px; }
-#app-page.page.active #goals-projects-content .gp-project-open { display: flex; justify-content: space-between; align-items: center; width: 100% !important; min-height: 36px !important; margin: 0 !important; padding: 8px 11px !important; border-radius: 9px !important; font-size: 11px !important; line-height: 1.4; }
+#app-page.page.active #goals-projects-content .gp-project-open { display: flex; justify-content: space-between; align-items: center; width: 100% !important; min-height: 36px !important; margin: auto 0 0 !important; padding: 8px 11px !important; border-radius: 9px !important; font-size: 11px !important; line-height: 1.4; }
+
+/* Share natural internal tracks only when two or more cards can fit. */
+@supports (grid-template-rows: subgrid) {
+    @container (min-width: 676px) {
+        #app-page.page.active #goals-projects-content .gp-card { display: grid !important; grid-template-rows: subgrid; grid-row: span 9; align-content: stretch; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-top { grid-row: 1; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-heading { grid-row: 2; }
+        #app-page.page.active #goals-projects-content .gp-card:not(:has(> .gp-card-description)) > .gp-card-heading { grid-row: 2 / 4; align-content: start; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-description { grid-row: 3; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-badges { grid-row: 4; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-progress-copy { grid-row: 5; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-progress { grid-row: 6; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-guidance { grid-row: 7; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-card-meta { grid-row: 8; }
+        #app-page.page.active #goals-projects-content .gp-card > .gp-project-open { grid-row: 9; }
+    }
+}
 
 /* Existing action menus and their original callbacks. */
 #app-page.page.active #goals-projects-content :is(.gp-menu, .gp-stage-menu, .gp-subtask-menu) { position: relative !important; margin: 0 !important; }

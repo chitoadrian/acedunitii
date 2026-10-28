@@ -208,3 +208,16 @@ test('Lazy PDF library failures remove only their own script and allow a clean r
     assert.equal(scripts.length, 2);
     assert.equal(removed.length, 2);
 });
+
+test('Card rows share natural heights and internal tracks, with a bottom-aligned flex fallback', () => {
+    assert.match(css, /\.gp-grid \{[^}]*gap: 16px !important; align-items: stretch !important; container-type: inline-size/);
+    assert.match(css, /\.gp-card \{[^}]*display: flex !important; flex-direction: column;[^}]*max-width: 480px !important; min-height: 0 !important/);
+    assert.match(css, /\.gp-card > \* \{ flex-shrink: 0; \}/);
+    assert.match(css, /\.gp-project-open \{[^}]*margin: auto 0 0 !important/);
+    assert.match(css, /@supports \(grid-template-rows: subgrid\)/);
+    assert.match(css, /@container \(min-width: 676px\)/);
+    assert.match(css, /grid-template-rows: subgrid; grid-row: span 9/);
+    for (const [name, row] of [['gp-card-top',1],['gp-card-heading',2],['gp-card-description',3],['gp-card-badges',4],['gp-card-progress-copy',5],['gp-progress',6],['gp-card-guidance',7],['gp-card-meta',8],['gp-project-open',9]]) assert.match(css, new RegExp(`\\.gp-card > \\.${name} \\{ grid-row: ${row}; \\}`));
+    assert.match(css, /:not\(:has\(> \.gp-card-description\)\) > \.gp-card-heading \{ grid-row: 2 \/ 4; align-content: start/);
+    assert.doesNotMatch(css, /\.gp-card \{[^}]*(?:height:\s*\d+px|min-height:\s*[1-9]\d*px)/);
+});
