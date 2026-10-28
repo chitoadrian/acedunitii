@@ -5865,7 +5865,10 @@ function setTutorAuthenticatedUser(user) {
     renderTutorConversation();
 
     const label = document.getElementById('tutor-mode-label');
-    if (label) label.textContent = `Modo ${getTutorModeName(tutorState.mode)}`;
+    if (label) {
+        label.textContent = `Modo ${getTutorModeName(tutorState.mode)}`;
+        label.dataset.mode = tutorState.mode;
+    }
 }
 
 function rememberTutorTopic(topic) {
@@ -5895,7 +5898,10 @@ function setTutorMode(mode, button) {
     if (button) button.classList.add('active');
 
     const label = document.getElementById('tutor-mode-label');
-    if (label) label.textContent = `Modo ${getTutorModeName(tutorState.mode)}`;
+    if (label) {
+        label.textContent = `Modo ${getTutorModeName(tutorState.mode)}`;
+        label.dataset.mode = tutorState.mode;
+    }
 
     if (button && tutorState.mode !== 'explain') {
         handleTutorModeAction(tutorState.mode);
@@ -5938,7 +5944,10 @@ function clearTutorChat() {
     `;
 
     const label = document.getElementById('tutor-mode-label');
-    if (label) label.textContent = 'Modo explicar';
+    if (label) {
+        label.textContent = 'Modo explicar';
+        label.dataset.mode = tutorState.mode;
+    }
     applyTutorSuggestionPreference();
 }
 

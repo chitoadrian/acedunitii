@@ -1,0 +1,256 @@
+/* Academic chat presentation only. Existing modes, storage and requests are unchanged. */
+#app-page #ai-assistant {
+    --tui-surface: #192132;
+    --tui-raised: #202b40;
+    --tui-canvas: #131c2c;
+    --tui-text: #edf2fc;
+    --tui-muted: #aab9d0;
+    --tui-border: #35445d;
+    --tui-accent: #b5a7f3;
+    --tui-accent-soft: #2c2e4b;
+    --tui-blue: #8bc9ed;
+    --tui-user: #343c68;
+    --tui-success: #85d5b3;
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 0;
+    margin-inline: 0 !important;
+    padding-inline: 0;
+}
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant {
+    --tui-surface: #fff;
+    --tui-raised: #f3f5fa;
+    --tui-canvas: #f7f8fc;
+    --tui-text: #25324a;
+    --tui-muted: #596981;
+    --tui-border: #d9e1ee;
+    --tui-accent: #6551aa;
+    --tui-accent-soft: #f0ecfa;
+    --tui-blue: #306b98;
+    --tui-user: #ebeafa;
+    --tui-success: #287656;
+}
+#app-page #ai-assistant .tutor-shell { width: 100%; max-width: none; margin: 0; gap: 16px; }
+#app-page #ai-assistant .tutor-hero { justify-content: space-between; gap: 16px; min-height: 60px; padding: 0 2px; }
+#app-page #ai-assistant .tutor-brand { gap: 12px; }
+#app-page #ai-assistant .tutor-header-icon {
+    box-sizing: border-box;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6256c7, #317eac);
+    box-shadow: none;
+}
+#app-page #ai-assistant .tutor-header-icon svg { width: 22px; height: 22px; }
+#app-page #ai-assistant .tutor-brand h1 { margin: 0; font-size: clamp(25px, 2.5vw, 31px); line-height: 1.2; color: var(--tui-text); letter-spacing: -.025em; }
+#app-page #ai-assistant .tutor-brand p { margin: 6px 0 0; max-width: 720px; color: var(--tui-muted); font-size: 12px; line-height: 1.55; }
+#app-page #ai-assistant .tutor-chat-card {
+    display: grid;
+    grid-template-areas: "tabs" "guide" "messages" "suggestions" "composer";
+    grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+    gap: 12px;
+    box-sizing: border-box;
+    height: clamp(520px, calc(100dvh - 190px), 850px);
+    min-width: 0;
+    min-height: 0;
+    padding: 18px;
+    border: 1px solid var(--tui-border);
+    border-radius: 18px;
+    background: var(--tui-surface);
+    box-shadow: 0 7px 25px rgba(10, 19, 43, .07);
+    overflow: visible;
+}
+#app-page #ai-assistant .tutor-chat-card::before { content: none; }
+#app-page #ai-assistant .tutor-chat-card:has(.tutor-auto-suggestions[hidden]) {
+    grid-template-areas: "tabs" "guide" "messages" "composer";
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+}
+#app-page #ai-assistant .tutor-tabs {
+    grid-area: tabs;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin: 0;
+    padding: 0 0 13px;
+    border-bottom: 1px solid var(--tui-border);
+    overflow: visible;
+}
+#app-page #ai-assistant .tutor-tabs button {
+    min-height: 36px;
+    margin: 0;
+    padding: 8px 13px;
+    border: 1px solid var(--tui-border);
+    border-radius: 9px;
+    color: var(--tui-muted);
+    background: var(--tui-raised);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+    box-shadow: none;
+    transform: none;
+}
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="explain"]) [data-tutor-mode="explain"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="practice"]) [data-tutor-mode="practice"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="review"]) [data-tutor-mode="review"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="flashcards"]) [data-tutor-mode="flashcards"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="exam"]) [data-tutor-mode="exam"] {
+    background: var(--tui-accent-soft);
+    border-color: color-mix(in srgb, var(--tui-accent) 45%, var(--tui-border));
+    color: var(--tui-accent);
+    box-shadow: inset 0 -2px 0 var(--tui-accent);
+}
+#app-page #ai-assistant .tutor-tabs button[onclick="clearTutorChat()"] {
+    margin-left: auto;
+    background: transparent;
+    border-color: transparent;
+    color: var(--tui-muted);
+    font-weight: 500;
+}
+#app-page #ai-assistant .tutor-mode-guide { grid-area: guide; color: var(--tui-muted); min-width: 0; }
+#app-page #ai-assistant .tutor-mode-guide p { display: none; margin: 0; padding: 0 2px; font-size: 11px; line-height: 1.5; }
+#app-page #ai-assistant .tutor-mode-guide [data-mode-guide="explain"] { display: block; }
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label:is([data-mode="practice"], [data-mode="review"], [data-mode="flashcards"], [data-mode="exam"])) [data-mode-guide="explain"] { display: none; }
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="practice"]) [data-mode-guide="practice"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="review"]) [data-mode-guide="review"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="flashcards"]) [data-mode-guide="flashcards"],
+#app-page #ai-assistant .tutor-chat-card:has(#tutor-mode-label[data-mode="exam"]) [data-mode-guide="exam"] { display: block; }
+#app-page #ai-assistant .tutor-messages {
+    grid-area: messages;
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    padding: 18px;
+    gap: 16px;
+    border: 1px solid color-mix(in srgb, var(--tui-border) 75%, transparent);
+    border-radius: 13px;
+    background: var(--tui-canvas);
+    overflow: auto;
+    scrollbar-color: #659fac transparent;
+    scrollbar-width: thin;
+    scroll-padding-block: 16px;
+}
+#app-page #ai-assistant .tutor-messages::-webkit-scrollbar { width: 6px; height: 6px; }
+#app-page #ai-assistant .tutor-messages::-webkit-scrollbar-track { background: transparent; }
+#app-page #ai-assistant .tutor-messages::-webkit-scrollbar-thumb { border: 0; border-radius: 8px; background: #659fac; }
+#app-page #ai-assistant .tutor-message {
+    box-sizing: border-box;
+    width: fit-content;
+    max-width: min(88%, 780px);
+    min-width: 0;
+    margin: 0;
+    padding: 15px 17px;
+    border: 1px solid var(--tui-border);
+    border-radius: 13px;
+    color: var(--tui-text);
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+    box-shadow: none;
+}
+#app-page #ai-assistant .tutor-bot { background: var(--tui-surface); border-bottom-left-radius: 5px; }
+#app-page #ai-assistant .tutor-user { max-width: min(78%, 620px); background: var(--tui-user); border-bottom-right-radius: 5px; }
+#app-page #ai-assistant .tutor-message :is(strong, h3, h4) { color: var(--tui-text); }
+#app-page #ai-assistant .tutor-message > strong { display: block; margin: 0 0 9px; color: var(--tui-blue); font-size: 11px; font-weight: 700; letter-spacing: .02em; }
+#app-page #ai-assistant .tutor-message p { margin: 0 0 10px; }
+#app-page #ai-assistant .tutor-message :is(h3, h4) { margin: 16px 0 8px; line-height: 1.45; font-weight: 700; }
+#app-page #ai-assistant .tutor-message h3 { font-size: 15px; }
+#app-page #ai-assistant .tutor-message h4 { font-size: 14px; }
+#app-page #ai-assistant .tutor-message :is(h3, h4):first-child { margin-top: 0; }
+#app-page #ai-assistant .tutor-message :is(ul, ol) { margin: 8px 0 12px; padding-left: 22px; }
+#app-page #ai-assistant .tutor-message li + li { margin-top: 7px; }
+#app-page #ai-assistant .tutor-message :is(p, ul, ol):last-child { margin-bottom: 0; }
+#app-page #ai-assistant .tutor-message :is(code, pre) { color: var(--tui-text); background: var(--tui-raised); }
+#app-page #ai-assistant .tutor-message pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+#app-page #ai-assistant .tutor-message hr { height: 1px; margin: 15px 0; background: var(--tui-border); }
+#app-page #ai-assistant .tutor-thinking { border-style: dashed; color: var(--tui-muted); }
+#app-page #ai-assistant .tutor-practice-grid { gap: 10px; }
+#app-page #ai-assistant .tutor-practice-card { min-width: 0; padding: 11px; border: 1px solid var(--tui-border); border-radius: 10px; background: var(--tui-raised); }
+#app-page #ai-assistant .tutor-practice-card p { font-size: 12px; }
+
+/* The existing welcome message becomes a centered empty state, never a fake conversation. */
+#app-page #ai-assistant .tutor-chat-card:has(.tutor-messages > .tutor-bot:only-child):not(:has(.tutor-message-title, .tutor-thinking)) { height: clamp(500px, calc(100dvh - 220px), 670px); }
+#app-page #ai-assistant .tutor-messages:has(> .tutor-bot:only-child):not(:has(.tutor-message-title, .tutor-thinking)) { justify-content: center; }
+#app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking) {
+    align-self: center;
+    width: min(100%, 460px);
+    max-width: 100%;
+    padding: 20px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    text-align: center;
+}
+#app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking)::before {
+    content: "";
+    display: block;
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 14px;
+    background: var(--tui-accent);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='7' width='14' height='11' rx='4'/%3E%3Cpath d='M12 7V4m-2.5 11h5M3 11v3m18-3v3'/%3E%3Ccircle cx='9' cy='12' r='.8'/%3E%3Ccircle cx='15' cy='12' r='.8'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+}
+#app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking) > strong { font-size: 20px; line-height: 1.4; color: var(--tui-text); margin-bottom: 9px; }
+#app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking) > p { color: var(--tui-muted); font-size: 13px; line-height: 1.7; }
+#app-page #ai-assistant .tutor-auto-suggestions { grid-area: suggestions; gap: 7px; padding: 1px 2px; align-items: center; }
+#app-page #ai-assistant .tutor-auto-suggestions > span { margin-right: 2px; color: var(--tui-muted); font-size: 11px; font-weight: 500; }
+#app-page #ai-assistant .tutor-auto-suggestions button { min-height: 34px; padding: 7px 11px; border: 1px solid var(--tui-border); border-radius: 9px; background: var(--tui-raised); color: var(--tui-text); font-size: 11px; line-height: 1.4; font-weight: 600; }
+#app-page #ai-assistant .tutor-composer { grid-area: composer; padding: 13px 14px 10px; border: 1px solid var(--tui-border); border-radius: 13px; background: var(--tui-canvas); box-shadow: none; }
+#app-page #ai-assistant .tutor-composer textarea { box-sizing: border-box; min-height: 58px; max-height: 130px; padding: 0 1px 10px; background: transparent; color: var(--tui-text); font-size: 13px; line-height: 1.6; }
+#app-page #ai-assistant .tutor-composer textarea::placeholder { color: var(--tui-muted); opacity: 1; }
+#app-page #ai-assistant .tutor-composer:focus-within { border-color: var(--tui-blue); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tui-blue) 12%, transparent); }
+#app-page #ai-assistant .tutor-composer-bar { padding-top: 9px; gap: 10px; border-color: var(--tui-border); }
+#app-page #ai-assistant .tutor-model { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--tui-border); border-radius: 6px; color: var(--tui-muted); background: var(--tui-surface); font-size: 10px; font-weight: 600; }
+#app-page #ai-assistant .tutor-model::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--tui-accent); }
+#app-page #ai-assistant .tutor-send { min-height: 36px; padding: 8px 17px; border: 1px solid transparent; border-radius: 9px; color: #fff; background: linear-gradient(110deg, #5367c6, #6251bc); box-shadow: none; font-size: 12px; font-weight: 650; line-height: 1.4; }
+#app-page #ai-assistant .tutor-send:disabled { opacity: .55; cursor: wait; }
+#app-page #ai-assistant :is(button, .tutor-messages):focus-visible { outline: 2px solid var(--tui-blue); outline-offset: 3px; }
+/* Neutralize the legacy light-theme !important surface rules only inside this chat. */
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-hero { background: transparent !important; box-shadow: none !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-chat-card { background: var(--tui-surface) !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-message { background: var(--tui-surface) !important; box-shadow: none !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-user { background: var(--tui-user) !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking) { background: transparent !important; }
+body:is(.light-theme, .light-mode, [data-theme="light"]) #app-page #ai-assistant .tutor-composer textarea { background: transparent !important; border: 0 !important; }
+@media (hover: hover) {
+    #app-page #ai-assistant .tutor-tabs button:hover,
+    #app-page #ai-assistant .tutor-auto-suggestions button:hover { background: var(--tui-accent-soft); border-color: var(--tui-accent); color: var(--tui-accent); transform: none; }
+    #app-page #ai-assistant .tutor-send:not(:disabled):hover { filter: brightness(1.08); transform: none; }
+}
+@media (max-width: 1100px) {
+    #app-page #ai-assistant .tutor-chat-card { padding: 15px; gap: 10px; }
+    #app-page #ai-assistant .tutor-tabs { gap: 6px; padding-bottom: 11px; }
+    #app-page #ai-assistant .tutor-tabs button { padding-inline: 10px; font-size: 11px; }
+    #app-page #ai-assistant .tutor-messages { padding: 14px; }
+}
+@media (min-width: 768px) and (max-width: 768px) {
+    #app-page.page.active:has(> .main-content > #ai-assistant.section.active) { display: flex; align-items: flex-start; }
+    #app-page.page.active:has(> .main-content > #ai-assistant.section.active) > .main-content { flex: 1; min-width: 0; width: auto !important; margin: 0 !important; }
+}
+@media (max-width: 767px) {
+    #app-page #ai-assistant .tutor-shell { gap: 14px; }
+    #app-page #ai-assistant .tutor-hero { min-height: 65px; }
+    #app-page #ai-assistant .tutor-brand { align-items: flex-start; gap: 10px; }
+    #app-page #ai-assistant .tutor-brand h1 { font-size: 25px; }
+    #app-page #ai-assistant .tutor-brand p { font-size: 11px; line-height: 1.5; }
+    #app-page #ai-assistant .tutor-chat-card,
+    #app-page #ai-assistant .tutor-chat-card:has(.tutor-messages > .tutor-bot:only-child):not(:has(.tutor-message-title, .tutor-thinking)) { height: clamp(565px, calc(100dvh - 205px), 850px); min-height: 0; grid-template-rows: auto auto minmax(180px, 1fr) auto auto; padding: 12px; gap: 10px; border-radius: 15px; }
+    #app-page #ai-assistant .tutor-chat-card:has(.tutor-auto-suggestions[hidden]) { grid-template-rows: auto auto minmax(210px, 1fr) auto; }
+    #app-page #ai-assistant .tutor-messages { height: 100%; min-height: 0; max-height: none; padding: 11px; gap: 13px; }
+    #app-page #ai-assistant .tutor-message { max-width: 95%; padding: 12px; font-size: 13px; }
+    #app-page #ai-assistant .tutor-user { max-width: 88%; }
+    #app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking) { padding: 9px 5px; }
+    #app-page #ai-assistant .tutor-messages > .tutor-bot:only-child:not(:has(.tutor-message-title)):not(.tutor-thinking)::before { width: 30px; height: 30px; margin-bottom: 9px; }
+    #app-page #ai-assistant .tutor-tabs button { min-height: 36px; padding: 8px 9px; font-size: 11px; }
+    #app-page #ai-assistant .tutor-tabs button[onclick="clearTutorChat()"] { margin-left: 0; }
+    #app-page #ai-assistant .tutor-auto-suggestions > span { flex-basis: 100%; }
+    #app-page #ai-assistant .tutor-auto-suggestions button { flex: 1 1 auto; min-height: 36px; padding-inline: 9px; }
+    #app-page #ai-assistant .tutor-composer { padding: 11px; }
+    #app-page #ai-assistant .tutor-composer textarea { min-height: 68px; max-height: 140px; font-size: 13px; }
+    #app-page #ai-assistant .tutor-send { min-height: 38px; padding-inline: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #app-page #ai-assistant *, #app-page #ai-assistant *::before { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

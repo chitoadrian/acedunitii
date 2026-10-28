@@ -104,6 +104,7 @@
     <link rel="stylesheet" href="goals-projects-ui.css?v=20261028-ui-refinement-v1">
     <link rel="stylesheet" href="calendar-ui.css?v=20261028-ui-refinement-v1">
     <link rel="stylesheet" href="attendance-ui.css?v=20261028-ui-refinement-v1">
+    <link rel="stylesheet" href="tutor-ui.css?v=20261028-tutor-ui-refinement-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
     <script id="theme-preload">
@@ -1426,15 +1427,23 @@
 
                     <div class="tutor-chat-card">
                         <div class="tutor-tabs">
-                            <button class="active" type="button" onclick="setTutorMode('explain', this)">Explicar</button>
-                            <button type="button" onclick="setTutorMode('practice', this)">Practicar</button>
-                            <button type="button" onclick="setTutorMode('review', this)">Repasar</button>
-                            <button type="button" onclick="setTutorMode('flashcards', this)">Flashcards</button>
-                            <button type="button" onclick="setTutorMode('exam', this)">Examen</button>
+                            <button class="active" type="button" data-tutor-mode="explain" onclick="setTutorMode('explain', this)">Explicar</button>
+                            <button type="button" data-tutor-mode="practice" onclick="setTutorMode('practice', this)">Practicar</button>
+                            <button type="button" data-tutor-mode="review" onclick="setTutorMode('review', this)">Repasar</button>
+                            <button type="button" data-tutor-mode="flashcards" onclick="setTutorMode('flashcards', this)">Flashcards</button>
+                            <button type="button" data-tutor-mode="exam" onclick="setTutorMode('exam', this)">Examen</button>
                             <button type="button" onclick="clearTutorChat()">Limpiar chat</button>
                         </div>
 
-                        <div class="tutor-messages" id="tutor-messages">
+                        <div class="tutor-mode-guide" id="tutor-mode-description">
+                            <p data-mode-guide="explain">Comprende un tema paso a paso, con ejemplos claros.</p>
+                            <p data-mode-guide="practice">Pon a prueba lo que sabes con ejercicios sobre tu tema.</p>
+                            <p data-mode-guide="review">Repasa las ideas clave y afianza lo aprendido.</p>
+                            <p data-mode-guide="flashcards">Estudia conceptos con tarjetas de pregunta y respuesta.</p>
+                            <p data-mode-guide="exam">Prepárate con preguntas sobre el tema que estás estudiando.</p>
+                        </div>
+
+                        <div class="tutor-messages" id="tutor-messages" tabindex="0" aria-label="Conversación con Tutor IA">
                             <div class="tutor-message tutor-bot">
                                 <strong>Tutor</strong>
                                 <p>Puedes escribirme un tema, pegar un texto corto o pedirme explicaciones, ejercicios, flashcards o preguntas de práctica.</p>
@@ -1449,9 +1458,9 @@
                         </div>
 
                         <div class="tutor-composer">
-                            <textarea id="ai-topic" placeholder="Pregunta, busca o crea material de estudio. Ej: Explícame funciones cuadráticas, resume este texto, crea preguntas para mi examen..." rows="5"></textarea>
+                            <textarea id="ai-topic" aria-label="Escribe tu mensaje para Tutor IA" aria-describedby="tutor-mode-description" placeholder="Pregunta, busca o crea material de estudio. Ej: Explícame funciones cuadráticas, resume este texto, crea preguntas para mi examen..." rows="5"></textarea>
                             <div class="tutor-composer-bar">
-                                <span class="tutor-model" id="tutor-mode-label">Modo explicar</span>
+                                <span class="tutor-model" id="tutor-mode-label" data-mode="explain">Modo explicar</span>
                                 <button class="tutor-send" type="button" onclick="generateTutorAnswer()" title="Enviar">Enviar</button>
                             </div>
                         </div>
@@ -1827,7 +1836,7 @@
     <script src="google-calendar-manual.js?v=20261025-modern-task-cards-v1"></script>
     <script src="academic-years.js?v=20261017-academic-year-rollover-welcome-v1"></script>
     <script src="academic-reports.js?v=20261022-official-branding-v1"></script>
-    <script src="app.js?v=20261027-calendar-agenda-premium-v1"></script>
+    <script src="app.js?v=20261028-tutor-ui-refinement-v1"></script>
     <script src="project-map-pdf.js?v=20261026-goals-workspace-premium-v1"></script>
     <script src="goals-projects.js?v=20261026-goals-workspace-premium-v1"></script>
     <script src="academic-notifications.js?v=20261023-auth-dashboard-performance-v1"></script>
