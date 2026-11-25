@@ -105,6 +105,7 @@
     <link rel="stylesheet" href="calendar-ui.css?v=20261028-ui-refinement-v1">
     <link rel="stylesheet" href="attendance-ui.css?v=20261028-ui-refinement-v1">
     <link rel="stylesheet" href="tutor-ui.css?v=20261028-tutor-math-response-area-v1">
+    <link rel="stylesheet" href="exam-ui.css?v=20261125-private-pilot-v1">
     <link rel="stylesheet" href="backpack-ui.css?v=20261028-backpack-premium-v1">
 </head>
 <body class="app-booting is-landing landing-mode landing-active">
@@ -702,6 +703,18 @@
                         <svg viewBox="0 0 24 24"><use href="#icon-tutor-robot"></use></svg>
                     </span>
                     <span class="nav-label">Tutor</span>
+                </a>
+                <a href="#" onclick="navigateTo('edunity-exam'); return false" class="nav-item" data-section="edunity-exam" hidden>
+                    <span class="nav-icon sidebar-icon sidebar-icon-evaluations" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg>
+                    </span>
+                    <span class="nav-label">Simulador de exámenes</span>
+                </a>
+                <a href="#" onclick="navigateTo('edunity-autopilot'); return false" class="nav-item" data-section="edunity-autopilot" hidden>
+                    <span class="nav-icon sidebar-icon sidebar-icon-goals-projects" aria-hidden="true">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 7v5l4 2M12 3v2"></path></svg>
+                    </span>
+                    <span class="nav-label">Planificador inteligente</span>
                 </a>
                 <a href="#" onclick="navigateTo('progress')" class="nav-item" data-section="progress">
                     <span class="nav-icon sidebar-icon sidebar-icon-progress" aria-hidden="true">
@@ -1412,6 +1425,40 @@
                 </div>
             </section>
 
+            <!-- PRIVATE EXAM PILOT -->
+            <section id="edunity-exam" class="section" hidden>
+                <div class="exam-shell">
+                    <div class="exam-hero">
+                        <span class="exam-hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 8h6M9 12h6M9 16h3"></path></svg></span>
+                        <div><h1>Simulador de exámenes</h1><p>Convierte tus apuntes en práctica personalizada y descubre qué temas reforzar.</p></div>
+                    </div>
+                    <div class="exam-grid">
+                        <div class="exam-card">
+                            <h2>Prepara tu simulacro</h2>
+                            <label class="exam-label" for="exam-files">Fotografías o PDF</label>
+                            <input id="exam-files" type="file" accept="image/jpeg,image/png,image/webp,application/pdf,.pdf" multiple>
+                            <p class="exam-help">Hasta 3 archivos. Revisa siempre el texto reconocido antes de generar preguntas.</p>
+                            <button class="btn-secondary" type="button" id="exam-recognize" onclick="ACEdunityExam.recognize()">Reconocer contenido</button>
+                            <label class="exam-label" for="exam-source-name">Nombre del material</label>
+                            <input id="exam-source-name" type="text" maxlength="180" placeholder="Ej. Apuntes de biología">
+                            <label class="exam-label" for="exam-text">Contenido reconocido</label>
+                            <textarea id="exam-text" rows="10" maxlength="30000" placeholder="Aquí podrás corregir el texto leído de tus apuntes."></textarea>
+                            <div class="exam-options">
+                                <label>Dificultad<select id="exam-difficulty"><option value="basico">Básico</option><option value="intermedio">Intermedio</option><option value="avanzado">Avanzado</option></select></label>
+                                <label>Preguntas<select id="exam-count"><option value="3">3</option><option value="5" selected>5</option><option value="8">8</option></select></label>
+                            </div>
+                            <button class="btn-primary" type="button" id="exam-generate" onclick="ACEdunityExam.generate()">Generar simulacro</button>
+                            <p id="exam-status" role="status" aria-live="polite"></p>
+                        </div>
+                        <div class="exam-card"><h2>Tu simulacro</h2><div id="exam-quiz" class="exam-quiz"><p class="exam-help">Carga material y genera preguntas para comenzar.</p></div></div>
+                    </div>
+                    <div class="exam-card exam-history-card"><h2>Historial y temas por reforzar</h2><div id="exam-history"><p class="exam-help">Tus resultados aparecerán aquí.</p></div></div>
+                </div>
+            </section>
+            <section id="edunity-autopilot" class="section" hidden>
+                <div class="exam-shell"><div class="exam-hero"><div><h1>Planificador inteligente</h1><p>Preparado para la siguiente fase de pruebas privadas.</p></div></div></div>
+            </section>
+
             <!-- TUTOR SECTION -->
             <section id="ai-assistant" class="section">
                 <div class="tutor-shell">
@@ -1839,6 +1886,7 @@
     <script src="academic-reports.js?v=20261022-official-branding-v1"></script>
     <script src="tutor-math.js?v=20261028-tutor-math-response-area-v1"></script>
     <script src="app.js?v=20261028-backpack-premium-v1"></script>
+    <script src="exam.js?v=20261125-private-pilot-v1"></script>
     <script src="project-map-pdf.js?v=20261026-goals-workspace-premium-v1"></script>
     <script src="goals-projects.js?v=20261026-goals-workspace-premium-v1"></script>
     <script src="academic-notifications.js?v=20261023-auth-dashboard-performance-v1"></script>

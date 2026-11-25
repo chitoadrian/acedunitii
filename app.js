@@ -1215,6 +1215,8 @@ function legacyHandleLogoutLocal() {
 function navigateTo(sectionId, evt) {
     const navigationStartedAt = performance.now();
     if (evt && evt.preventDefault) evt.preventDefault();
+    if ((sectionId === 'edunity-exam' || sectionId === 'edunity-autopilot')
+        && !window.ACEdunityExam?.canAccess(sectionId)) sectionId = 'dashboard';
 
     // Remover clase active de secciones
     document.querySelectorAll('.section').forEach(section => {
@@ -1244,6 +1246,7 @@ function navigateTo(sectionId, evt) {
     currentSection = sectionId;
     rememberAppView(sectionId);
     renderWorkspaceSection(sectionId);
+    window.ACEdunityExam?.enter(sectionId);
     if (sectionId === 'ai-assistant') window.ACTutorMath?.typeset(section);
     window.ACAcademicNotifications?.updateVisibility(sectionId);
 
@@ -9966,6 +9969,8 @@ const VALID_APP_VIEWS = new Set([
     'grades',
     'attendance',
     'ai-assistant',
+    'edunity-exam',
+    'edunity-autopilot',
     'progress',
     'backpack',
     'profile',
@@ -9974,6 +9979,8 @@ const VALID_APP_VIEWS = new Set([
 
 function normalizeAppView(view) {
     if (view === 'tutor') return 'ai-assistant';
+    if ((view === 'edunity-exam' || view === 'edunity-autopilot')
+        && !window.ACEdunityExam?.canAccess(view)) return 'dashboard';
     return VALID_APP_VIEWS.has(view) ? view : 'dashboard';
 }
 
@@ -10121,6 +10128,7 @@ function clearAuthenticatedClientState() {
     resourceFileRequests.clear();
     closeSessionChoice();
     setTutorAuthenticatedUser(null);
+    window.ACEdunityExam?.reset();
     switchAppSettingsUser(null);
     resetAcademicYearSession();
     currentUser = null;
@@ -11614,6 +11622,9 @@ async function showDashboard(sectionId = 'dashboard', options = {}) {
         notify('Valida tu sesión antes de entrar al panel.', 'info');
         return;
     }
+    try { await window.ACEdunityExam?.loadAccess(authUser.id); }
+    catch { window.ACEdunityExam?.reset(); }
+    if (generation !== authOperationGeneration) return;
 
     const appPage = document.getElementById('app-page');
     if (!appPage) {
