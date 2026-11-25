@@ -36,3 +36,7 @@ El UUID debe comprobarse en Supabase Auth antes de ejecutar el cambio. No se hab
 6. Comprobar que la vista del Tutor, la Mochila y la navegación actual siguen funcionando en temas claro y oscuro.
 
 No aplicar migraciones ni desplegar funciones en el proyecto activo sin autorización de publicación. Para deshabilitar el piloto después de publicarlo, poner `exam_enabled = false` para el usuario de prueba; el backend dejará de aceptar nuevas llamadas.
+
+## Reversión
+
+El corte inmediato es `supabase/rollback/20261125010000_disable_private_exam.sql`. Desactiva las dos banderas y la función empieza a responder `403` sin borrar el historial. A continuación, restaurar en el sitio la versión anterior de `main` y comprobar el inicio de sesión, el Tutor y la Mochila. Si es necesario, retirar el despliegue de `edunity-exam`; nunca modificar `tutor-ai` para revertir Exam. La eliminación de tablas es una operación posterior que requiere revisar y exportar los datos de prueba antes de borrarlos.

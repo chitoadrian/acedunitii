@@ -126,7 +126,10 @@ Deno.serve(async (request) => {
       if (materialError) throw materialError;
       const { data: attempt, error: attemptError } = await admin.from("exam_attempts")
         .insert({ user_id: userId, material_id: material.id, difficulty, questions }).select("*").single();
-      if (attemptError) throw attemptError;
+      if (attemptError) {
+        await admin.from("exam_materials").delete().eq("id", material.id).eq("user_id", userId);
+        throw attemptError;
+      }
       return reply({ attempt: publicAttempt(attempt) });
     }
     if (action === "grade") {
@@ -167,6 +170,9 @@ Deno.serve(async (request) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Error inesperado";
     console.error("[edunity-exam]", message);
-    return reply({ error: message }, 502);
+    const publicMessage = message === "Límite gratuito de Groq alcanzado; inténtalo más tarde"
+      || message === "No se reconoció texto en la imagen"
+      ? message : "No se pudo completar la operación. Inténtalo de nuevo.";
+    return reply({ error: publicMessage }, 502);
   }
 });

@@ -7,7 +7,7 @@ create table public.edunity_feature_access (
 );
 
 alter table public.edunity_feature_access enable row level security;
-revoke all on public.edunity_feature_access from anon, authenticated;
+revoke all on public.edunity_feature_access from public, anon, authenticated;
 grant select on public.edunity_feature_access to authenticated;
 grant all on public.edunity_feature_access to service_role;
 create policy edunity_feature_access_read_own on public.edunity_feature_access
@@ -23,7 +23,7 @@ create table public.exam_materials (
 );
 create index exam_materials_user_created_idx on public.exam_materials (user_id, created_at desc);
 alter table public.exam_materials enable row level security;
-revoke all on public.exam_materials from anon, authenticated;
+revoke all on public.exam_materials from public, anon, authenticated;
 grant all on public.exam_materials to service_role;
 
 create table public.exam_attempts (
@@ -41,5 +41,5 @@ create table public.exam_attempts (
 create index exam_attempts_user_created_idx on public.exam_attempts (user_id, created_at desc);
 create index exam_attempts_material_idx on public.exam_attempts (material_id);
 alter table public.exam_attempts enable row level security;
-revoke all on public.exam_attempts from anon, authenticated;
+revoke all on public.exam_attempts from public, anon, authenticated;
 grant all on public.exam_attempts to service_role;
