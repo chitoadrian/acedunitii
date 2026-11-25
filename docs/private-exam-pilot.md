@@ -23,7 +23,7 @@ El UUID debe comprobarse en Supabase Auth antes de ejecutar el cambio. No se hab
 - Se admiten hasta tres fotografías JPG, PNG o WebP de 3 MB cada una, o PDF de hasta 5 MB. Para PDF se procesan las primeras tres páginas.
 - Los PDF con texto seleccionable se leen en el navegador con PDF.js. Las imágenes y páginas escaneadas se envían una a una a Groq con `qwen/qwen3.8-27b`.
 - Las imágenes y los PDF no se guardan. El estudiante revisa y puede editar el texto reconocido antes de generar el examen. El texto aprobado, las preguntas, los intentos y la calificación se guardan en Supabase.
-- La generación usa `openai/gpt-oss-120b` con el secreto `GROQ_API_KEY` ya utilizado por Tutor IA. Produce de 3 a 8 preguntas cerradas. La corrección es determinista y las explicaciones provienen de la generación.
+- La generación usa `openai/gpt-oss-120b`. Solo `edunity-exam` lee el secreto de Supabase llamado exactamente `prueba`, cuyo valor debe ser una clave válida de Groq. El Tutor IA sigue leyendo `GROQ_API_KEY`; su código y su secreto no se modifican. Produce de 3 a 8 preguntas cerradas. La corrección es determinista y las explicaciones provienen de la generación.
 - Las respuestas correctas no se entregan al cliente antes de corregir. El historial muestra la calificación y los temas fallados.
 
 ## Comprobaciones antes de publicar
@@ -34,6 +34,18 @@ El UUID debe comprobarse en Supabase Auth antes de ejecutar el cambio. No se hab
 4. Verificar que la cuenta de prueba ve Exam, genera y corrige un simulacro, y recupera su historial desde el celular.
 5. Verificar con otra cuenta **sin consultar sus datos académicos** que no aparece el menú y que una llamada directa a `edunity-exam` recibe `403`.
 6. Comprobar que la vista del Tutor, la Mochila y la navegación actual siguen funcionando en temas claro y oscuro.
+
+## Prueba privada preparada
+
+`tests/fixtures/exam-water-cycle.jpg` es una fotografía sintética de apuntes ficticios sobre el ciclo del agua. No contiene datos personales ni académicos reales. Una vez autorizado el despliegue de la migración y la función, con la cuenta de prueba como único usuario habilitado:
+
+1. Abrir Exam desde el celular y cargar la imagen de prueba. Verificar que el reconocimiento incluye evaporación, condensación y precipitación; corregir cualquier error antes de continuar.
+2. Generar tres preguntas de dificultad básica. Comprobar que cada una tiene cuatro opciones, tema y explicación fundamentada en el texto reconocido.
+3. Responder una correctamente y otra incorrectamente; verificar la calificación, la explicación del error y el tema por reforzar en el historial. Recargar la página y comprobar que el intento persiste.
+4. Con una cuenta sin habilitación, comprobar que Exam no figura en el menú, que la navegación directa vuelve al panel y que una solicitud autenticada a `edunity-exam` recibe `403`. Sin JWT debe recibir `401`.
+5. Confirmar que Tutor IA y Mochila siguen funcionando, y que ambos temas se visualizan correctamente.
+
+El secreto `prueba` se configura en **Edge Functions → Secrets** del proyecto Supabase. Su valor nunca se copia al repositorio ni al navegador. Los secretos de Supabase son del proyecto, pero únicamente el nuevo código de Exam consulta ese nombre. Esta prueba no se puede ejecutar antes del despliegue autorizado de la función y su control de acceso.
 
 No aplicar migraciones ni desplegar funciones en el proyecto activo sin autorización de publicación. Para deshabilitar el piloto después de publicarlo, poner `exam_enabled = false` para el usuario de prueba; el backend dejará de aceptar nuevas llamadas.
 

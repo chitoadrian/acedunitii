@@ -38,7 +38,7 @@ function parseObject(value: unknown): Record<string, unknown> {
 }
 
 async function askGroq(model: string, content: unknown, maxTokens: number) {
-  const key = Deno.env.get("GROQ_API_KEY");
+  const key = Deno.env.get("prueba");
   if (!key) throw new Error("Groq no está configurado");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 45_000);
